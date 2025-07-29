@@ -233,7 +233,7 @@
   <section id="episodes-list" class="episodes-list">
     <h2>Latest Episodes</h2>
     <div id="episodes-container"></div>
-    <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load More</button>
+    <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load Episodes</button>
   </section>
 </main>
 
@@ -292,6 +292,16 @@
 <script>
   const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
 
+  let spotifyEpisodesMap = {};
+
+  async function loadSpotifyEpisodesMap() {
+    const res = await fetch('https://food-gen.onrender.com/api/spotify-episodes');
+    const data = await res.json();
+    data.forEach(ep => {
+      spotifyEpisodesMap[ep.title.toLowerCase().trim()] = ep.spotifyId;
+    });
+  }
+
   const episodesPerPage = 5;
   let allEpisodes = [];
   let currentIndex = 0;
@@ -329,166 +339,34 @@
     if(e.target === popupOverlay) hidePopup();
   });
 
-  // Create episode card element
   function createEpisodeElement(item) {
-    const title = item.querySelector('title')?.textContent || 'No title';
-    const pubDate = item.querySelector('pubDate')?.textContent || '';
-    const descriptionRaw = item.querySelector('description')?.textContent || '';
-    const description = descriptionRaw.replace(/<\/?[^>]+(>|$)/g, ""); // strip HTML tags
-    const audioUrl = item.querySelector('enclosure')?.getAttribute('url') || '#';
-    const duration = item.querySelector('itunes\\:duration')?.textContent || '';
-    let imageUrl = item.querySelector('itunes\\:image')?.getAttribute('href') || null;
-
-    if (!imageUrl) {
-      // fallback: channel image
-      imageUrl = channelImage || '';
+    const title = item.querySelector('title')?.textContent || '';
+    const spotifyId = spotifyEpisodesMap[title.toLowerCase().trim()];
+    if (!spotifyId) {
+      console.warn("No Spotify ID match for:", title);
+      return document.createElement('div');
     }
 
-    // Episode card container
-    const episodeDiv = document.createElement('div');
-    episodeDiv.classList.add('episode');
+    const embedDiv = document.createElement('div');
+    embedDiv.style.marginBottom = '2rem';
 
-    // Episode artwork div
-    const artDiv = document.createElement('div');
-    artDiv.classList.add('episode-artwork');
-    artDiv.style.backgroundImage = `url(${imageUrl})`;
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('data-testid', 'embed-iframe');
+    iframe.style.borderRadius = '12px';
+    iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
+    iframe.width = '100%';
+    iframe.height = '152';
+    iframe.frameBorder = '0';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    iframe.loading = 'lazy';
 
-    // Content container
-    const contentDiv = document.createElement('div');
-    contentDiv.classList.add('episode-content');
-
-    // Title
-    const titleEl = document.createElement('h3');
-    titleEl.classList.add('episode-title');
-    titleEl.textContent = title;
-
-    // Description with truncated text + show more button
-    const descEl = document.createElement('p');
-    descEl.classList.add('episode-description');
-    descEl.textContent = description;
-
-    // "..." button for popup
-    const moreBtn = document.createElement('button');
-    moreBtn.classList.add('show-more-btn');
-    moreBtn.textContent = '...';
-    moreBtn.addEventListener('click', () => {
-      showPopup(title, description);
-    });
-    descEl.appendChild(moreBtn);
-
-    // Media controls container
-    const mediaControls = document.createElement('div');
-    mediaControls.classList.add('media-controls');
-
-    // Audio element (hidden)
-    const audio = document.createElement('audio');
-    audio.src = audioUrl;
-    audio.preload = 'metadata';
-
-    // Control buttons container
-    const controlsRow = document.createElement('div');
-    controlsRow.classList.add('control-buttons');
-
-    // Play/pause button
-    const playBtn = document.createElement('button');
-    playBtn.classList.add('control-button');
-    playBtn.textContent = '▶️';
-    playBtn.title = 'Play/Pause';
-    let isPlaying = false;
-    playBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play();
-        isPlaying = true;
-        playBtn.textContent = '⏸️';
-      } else {
-        audio.pause();
-        isPlaying = false;
-        playBtn.textContent = '▶️';
-      }
-    });
-
-    // Rewind 15s button
-    const rewindBtn = document.createElement('button');
-    rewindBtn.classList.add('control-button');
-    rewindBtn.textContent = '⏪ 15s';
-    rewindBtn.title = 'Rewind 15 seconds';
-    rewindBtn.addEventListener('click', () => {
-      audio.currentTime = Math.max(0, audio.currentTime - 15);
-    });
-
-    // Skip ahead 30s button
-    const skipBtn = document.createElement('button');
-    skipBtn.classList.add('control-button');
-    skipBtn.textContent = '30s ⏩';
-    skipBtn.title = 'Skip ahead 30 seconds';
-    skipBtn.addEventListener('click', () => {
-      audio.currentTime = Math.min(audio.duration, audio.currentTime + 30);
-    });
-
-    controlsRow.append(rewindBtn, playBtn, skipBtn);
-
-    // Timeline container
-    const timelineContainer = document.createElement('div');
-    timelineContainer.classList.add('timeline-container');
-
-    const currentTimeSpan = document.createElement('span');
-    currentTimeSpan.textContent = '0:00';
-
-    const timelineSlider = document.createElement('input');
-    timelineSlider.type = 'range';
-    timelineSlider.classList.add('timeline');
-    timelineSlider.min = 0;
-    timelineSlider.max = 0;
-    timelineSlider.value = 0;
-    timelineSlider.step = 1;
-
-    const durationSpan = document.createElement('span');
-    durationSpan.textContent = duration || '0:00';
-
-    timelineContainer.append(currentTimeSpan, timelineSlider, durationSpan);
-
-    // Update timeline max and duration on metadata load
-    audio.addEventListener('loadedmetadata', () => {
-      timelineSlider.max = Math.floor(audio.duration);
-      durationSpan.textContent = formatTime(audio.duration);
-    });
-
-    // Update current time and slider as audio plays
-    audio.addEventListener('timeupdate', () => {
-      currentTimeSpan.textContent = formatTime(audio.currentTime);
-      timelineSlider.value = Math.floor(audio.currentTime);
-    });
-
-    // Seeking through slider
-    timelineSlider.addEventListener('input', () => {
-      audio.currentTime = timelineSlider.value;
-    });
-
-    // Pause other audios when this one plays
-    audio.addEventListener('play', () => {
-      document.querySelectorAll('audio').forEach(a => {
-        if (a !== audio) a.pause();
-      });
-      playBtn.textContent = '⏸️';
-      isPlaying = true;
-    });
-    audio.addEventListener('pause', () => {
-      playBtn.textContent = '▶️';
-      isPlaying = false;
-    });
-
-    mediaControls.appendChild(controlsRow);
-    mediaControls.appendChild(timelineContainer);
-
-    // Assemble content
-    contentDiv.append(titleEl, descEl, mediaControls);
-
-    episodeDiv.append(artDiv, contentDiv);
-
-    return episodeDiv;
+    embedDiv.appendChild(iframe);
+    return embedDiv;
   }
 
   async function loadEpisodes() {
+    await loadSpotifyEpisodesMap();
     try {
       const response = await fetch(RSS_URL);
       const text = await response.text();
