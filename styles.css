@@ -769,6 +769,11 @@ html {
 	}
 }
 
+@media (min-width: 768px) {
+    .hamburger, #mobileNav{
+        display: none;
+    }
+}
 /* Mobile Navigation */
 @media (max-width: 768px) {
     .hamburger {
