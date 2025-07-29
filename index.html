@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Learning Lab™ - Fun Learning Podcast by a Kid!</title>
+    <title>Kids Learning Lab™ - By a Kid, For Kids</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,6 +25,17 @@
                 <li><a href="contact.html">Contact</a></li>
                 <li><a href="availability.html">Where to Listen</a></li>
             </ul>
+            <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+            <div class="mobile-nav-container" id="mobileNav">
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="episodes.html">Episodes</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="python.html">Python Learning Lab</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="availability.html">Where to Listen</a></li>
+                </ul>
+            </div>
         </nav>
     </header>
 
@@ -32,9 +43,9 @@
         <section class="hero" id="home">
             <div class="container">
                 <div class="hero-content">
-                    <h1>Fun Learning Adventures!</h1>
-                    <p>A podcast for kids, by a kid! Join 12-year-old Eshaan for exciting educational episodes that make learning awesome!</p>
-                    <a href="#episodes" class="cta-button">Listen Now!</a>
+                    <h1>A Kids & Family Podcast</h1>
+                    <p>A podcast for kids, by a kid! Join 12-year-old Eshaan for educational episodes that make learning fun!</p>
+                    <a href="episodes.html" class="cta-button">Listen Now!</a>
                 </div>
             </div>
         </section>
@@ -76,7 +87,7 @@
                         <h2>Hi, I'm <span class="highlight">Eshaan!</span></h2>
                         <p>I'm a <span class="highlight">12-year-old creator</span> who loves making learning fun! I write all the scripts, record every episode, and edit everything myself.</p>
                         <p>From stocks and crypto to the history of the universe, I explore topics that are both educational and entertaining. Every episode is made with kids in mind!</p>
-                        <p>I even wrote a <span class="highlight">Python Learning Lab book</span> to help kids learn programming. Learning should be an adventure, not a chore!</p>
+                        <p>I even wrote <span class="highlight">Python Learning Lab</span> to help kids learn programming. You can <a href="python.html">read it</a> today!</p>
                     </div>
                 </div>
             </div>
@@ -89,36 +100,41 @@
                     <p>Discover why kids and parents love Kids Learning Lab!</p>
                 </div>
                 <div class="features-grid">
-                    <div class="feature-card">
+                    <a href="episodes.html" class="invis"><div class="feature-card">
                         <div class="feature-icon">♪</div>
                         <h3>Kid-Friendly Episodes</h3>
                         <p>Short, engaging episodes perfect for young attention spans. Every topic is explained in a fun, easy-to-understand way!</p>
-                    </div>
-                    <div class="feature-card">
+                    </div></a>
+                    <a href="python.html" class="invis"><div class="feature-card">
                         <div class="feature-icon">◊</div>
                         <h3>Python Learning Lab</h3>
-                        <p>Learn programming with our amazing Python Learning Lab book - written by a kid, for kids who want to code!</p>
-                    </div>
-                    <div class="feature-card">
+                        <p>Learn programming with Python Learning Lab - written by a kid, for kids who want to code!</p>
+                    </div></a>
+                    <a href="episodes.html" class="invis"><div class="feature-card">
                         <div class="feature-icon">★</div>
                         <h3>Educational & Fun</h3>
-                        <p>From science to technology, we cover fascinating topics that spark curiosity and make learning an adventure!</p>
-                    </div>
-                    <div class="feature-card">
+                        <p>From science to technology to history, we cover cool topics that spark curiosity and make learning fun!</p>
+                    </div></a>
+                    <a href="availability.html" class="invis"><div class="feature-card">
                         <div class="feature-icon">♫</div>
                         <h3>Available Everywhere</h3>
                         <p>Listen on Apple Podcasts, Spotify, and all major podcast platforms. Learn anywhere, anytime!</p>
-                    </div>
+                    </div></a>
                     <div class="feature-card">
-                        <div class="feature-icon">✦</div>
-                        <h3>Interactive Community</h3>
-                        <p>Join our Patreon community for exclusive content, real-time updates, and direct interaction with Eshaan!</p>
+                        <div class="feature-icon">+</div>
+                        <h3>Even more fun!</h3>
+                        <p><a href="https://patreon.kidslearninglab.com">Join our Patreon community</a> for bonus content, real-time updates, and direct interaction with Eshaan! Or, <a href="https://go.kidslearninglab.com/subscribe">join the free newsletter!</a></p>
                     </div>
-                    <div class="feature-card">
+                    <a class="invis" href="contact.html"><div class="feature-card">
                         <div class="feature-icon">↗</div>
                         <h3>Always Growing</h3>
                         <p>New episodes regularly, fresh topics constantly, and an ever-expanding universe of knowledge to explore!</p>
-                    </div>
+                    </div></a>
+                </div>
+                <div class="spacer10px"></div>
+                <div class="spacer10px"></div>
+                <div style="display: flex; justify-content: center;">
+                    <a href="episodes.html" class="cta-button">Listen Now!</a>
                 </div>
             </div>
         </section>
@@ -129,7 +145,7 @@
             <div class="footer-content">
                 <div class="footer-brand">
                     <h3>Kids Learning Lab™</h3>
-                    <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining and accessible for kids everywhere!</p>
+                    <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
@@ -157,7 +173,15 @@
         </div>
     </footer>
 
-    <a href="#contact" class="interactive-chat">?</a>
+    <script>
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            const container = document.getElementById('mobileNav');
+            const hamburger = document.querySelector('.hamburger');
 
+            container.classList.toggle('show');
+            hamburger.classList.toggle('open');
+        }
+    </script>
 </body>
 </html>
