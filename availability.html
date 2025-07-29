@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Learning Lab™ - By a Kid, For Kids</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .content-box {
+  background: white;          /* or your preferred bg color */
+  border-radius: 16px;        /* smooth rounded corners */
+  padding: 2rem 3rem;         /* nice spacing inside */
+  max-width: 900px;
+  margin: 3rem auto;          /* center horizontally with vertical spacing */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);  /* subtle shadow */
+  color: #222;                /* text color */
+}.platform-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.grey-bg-paragraph {
+  background-color: #f0f0f0; /* light grey */
+  border-radius: 12px;       /* rounded corners */
+  padding: 1rem 1.5rem;      /* space inside the paragraph */
+  margin: 0;                 /* remove default margin so bg extends fully */
+}
+
+.platform-card {
+  width: 130px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s ease;
+  padding: 6px 6px 6px 6px;
+}
+
+.platform-card img {
+  width: 90px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.platform-card:hover {
+  transform: scale(1.05);
+  border: 1px solid black;
+  border-radius: 12px;
+}
+
+.platform-card span {
+  display: block;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+        .rounded-20 {
+  border-radius: 22px;
+}
+
+.copy-btn {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: #45a049;
+}
+    </style>
+</head>
+<body>
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<header>
+    <nav class="container">
+        <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="episodes.html">Episodes</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="python.html">Python Learning Lab</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="availability.html">Where to Listen</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+        <div class="mobile-nav-container" id="mobileNav">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="episodes.html">Episodes</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="python.html">Python Learning Lab</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="availability.html">Where to Listen</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+    <main class="availability container content-box">
+        <h1>Where to Listen</h1>
+        <p>You can find Kids Learning Lab on these platforms:</p>
+
+        <div class="platform-grid">
+    <a href="https://go.kidslearninglab.com/applepods" target="_blank" class="platform-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Podcasts_%28iOS%29.svg/2048px-Podcasts_%28iOS%29.svg.png" width="90px" alt="Platform Name">
+        <span>Apple Podcasts</span>
+    </a>
+            <a href="episodes.html" target="_blank" class="platform-card">
+                <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="90px" alt="Platform Name">
+                <span>Website Player</span>
+            </a>
+            <a href="https://go.kidslearninglab.com/spotify" target="_blank" class="platform-card">
+                <img src="https://cdn.jim-nielsen.com/ios/512/spotify-music-2015-07-30.png?rf=1024" width="90px" alt="Platform Name" class="rounded-20">
+                <span>Spotify</span>
+            </a>
+            <a href="https://youtube.com/@KidsLearningLab-Podcast" target="_blank" class="platform-card">
+                <img src="https://static.wikia.nocookie.net/ipod/images/e/e7/YouTube_iOS_2019.png" width="90px" alt="Platform Name" class="rounded-20">
+                <span>YouTube</span>
+            </a>
+            <a href="https://go.kidslearninglab.com/overcast" target="_blank" class="platform-card">
+                <img src="https://overcast.fm/img/appicon-3200.png" width="90px" alt="Platform Name" class="rounded-20">
+                <span>Overcast (iOS)</span>
+            </a>
+            <a href="https://music.amazon.com/podcasts/493467fb-447a-49e4-872a-6f3d9a52ee51/kids-learning-lab---by-a-kid-for-kids" target="_blank" class="platform-card">
+                <img src="https://m.media-amazon.com/images/I/51XuuBV5ZgL.png" width="90px" alt="Platform Name" class="rounded-20">
+                <span>Amazon Music</span>
+            </a>
+        </div>
+        <h3 style="text-align: center;">... and more!</h3>
+        <div class="spacer10px"></div>
+        <p>Most podcast providers have Kids Learning Lab.</p>
+        <p>If not, you can click the button below to copy the RSS feed URL to paste in podcast platforms.</p>        <div class="spacer10px"></div>
+
+        <p class="grey-bg-paragraph">https://go.kidslearninglab.com/rss</p>
+        <button class="copy-btn" id="copyBtn" onclick="copyRSS()">Copy RSS Feed</button>
+
+    </main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Kids Learning Lab™</h3>
+                <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="episodes.html">Episodes</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-nav">
+                    <li><a href="https://kidslearninglab.com/pythonlearninglab" target="_blank">Python Learning Lab Book</a></li>
+                    <li><a href="episodes.html">Latest Episodes</a></li>
+                    <li><a href="https://patreon.kidslearninglab.com/">Patreon Community</a></li>
+                    <li><a href="availability.html">Listen Everywhere</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
+            <p>Created with ❤ by Eshaan for curious minds everywhere</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleMenu() {
+        const nav = document.getElementById('navLinks');
+        const container = document.getElementById('mobileNav');
+        const hamburger = document.querySelector('.hamburger');
+
+        container.classList.toggle('show');
+        hamburger.classList.toggle('open');
+    }
+    function copyRSS() {
+        const text = "https://go.kidslearninglab.com/rss";
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById("copyBtn");
+            btn.textContent = "✓ Copied!";
+            setTimeout(() => {
+                btn.textContent = "Copy RSS Feed";
+            }, 2000);
+        }).catch(err => {
+            console.error("Failed to copy text: ", err);
+        });
+    }
+</script>
