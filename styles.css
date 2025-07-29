@@ -775,19 +775,6 @@ html {
     }
 }
 
-.features-grid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    gap: 2rem; /* space between cards */
-}
-
-.feature-card {
-    flex: 1 1 300px; /* grow, shrink, base width */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
 
 /* Mobile Navigation */
 @media (max-width: 768px) {
