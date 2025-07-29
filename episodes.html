@@ -5,6 +5,196 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kids Learning Lab™ - By a Kid, For Kids</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+      color: #222;
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .episodes-list {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-x: hidden;
+    }
+    .episode {
+      max-width: 100%;
+      width: 100%;
+      display: flex;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      cursor: default;
+      box-sizing: border-box;
+    }
+    .episode-artwork {
+      flex: 0 0 150px;
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      border-right: 1px solid #ddd;
+      /* no padding, no margin */
+    }
+    .episode-content {
+      flex: 1;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .episode-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      line-height: 1.2;
+    }
+    .episode-description {
+      position: relative;
+      font-size: 0.95rem;
+      color: #444;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-bottom: 8px;
+    }
+    .show-more-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: transparent;
+      border: none;
+      color: #3b82f6;
+      font-weight: 600;
+      cursor: pointer;
+      padding-left: 4px;
+      font-size: 1rem;
+      user-select: none;
+    }
+    /* Popup */
+    #popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    #popup {
+      background: white;
+      max-width: 400px;
+      max-height: 80vh;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    #popup h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+    #popup p {
+      font-size: 1rem;
+      color: #333;
+      white-space: normal;
+    }
+    #popup-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #888;
+    }
+    /* Media controls container */
+    .media-controls {
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+    .control-buttons {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .control-button {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+    }
+    .control-button:hover {
+      background: #2563eb;
+    }
+    /* Timeline container */
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .timeline {
+      flex: 1;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      top: -4px;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+    .timeline::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+  </style>
 </head>
 <body>
 <div class="floating-shapes">
@@ -40,7 +230,11 @@
 </header>
 
 <main>
-
+  <section id="episodes-list" class="episodes-list">
+    <h2>Latest Episodes</h2>
+    <div id="episodes-container"></div>
+    <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load More</button>
+  </section>
 </main>
 
 <footer class="footer">
@@ -85,6 +279,253 @@
       container.classList.toggle('show');
       hamburger.classList.toggle('open');
   }
+</script>
+<!-- Popup -->
+<div id="popup-overlay" role="dialog" aria-modal="true" tabindex="-1">
+  <div id="popup">
+    <button id="popup-close" aria-label="Close popup">&times;</button>
+    <h3 id="popup-title"></h3>
+    <p id="popup-description"></p>
+  </div>
+</div>
+
+<script>
+  const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
+
+  const episodesPerPage = 5;
+  let allEpisodes = [];
+  let currentIndex = 0;
+  let channelImage = '';
+
+  const episodesContainer = document.getElementById('episodes-container');
+  const loadMoreBtn = document.getElementById('load-more');
+
+  // Popup elements
+  const popupOverlay = document.getElementById('popup-overlay');
+  const popupTitle = document.getElementById('popup-title');
+  const popupDescription = document.getElementById('popup-description');
+  const popupClose = document.getElementById('popup-close');
+
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ':' + (s < 10 ? '0' + s : s);
+  }
+
+  // Show popup
+  function showPopup(title, description) {
+    popupTitle.textContent = title;
+    popupDescription.textContent = description;
+    popupOverlay.style.display = 'flex';
+    popupOverlay.focus();
+  }
+  // Hide popup
+  function hidePopup() {
+    popupOverlay.style.display = 'none';
+  }
+  popupClose.addEventListener('click', hidePopup);
+  popupOverlay.addEventListener('click', (e) => {
+    if(e.target === popupOverlay) hidePopup();
+  });
+
+  // Create episode card element
+  function createEpisodeElement(item) {
+    const title = item.querySelector('title')?.textContent || 'No title';
+    const pubDate = item.querySelector('pubDate')?.textContent || '';
+    const descriptionRaw = item.querySelector('description')?.textContent || '';
+    const description = descriptionRaw.replace(/<\/?[^>]+(>|$)/g, ""); // strip HTML tags
+    const audioUrl = item.querySelector('enclosure')?.getAttribute('url') || '#';
+    const duration = item.querySelector('itunes\\:duration')?.textContent || '';
+    let imageUrl = item.querySelector('itunes\\:image')?.getAttribute('href') || null;
+
+    if (!imageUrl) {
+      // fallback: channel image
+      imageUrl = channelImage || '';
+    }
+
+    // Episode card container
+    const episodeDiv = document.createElement('div');
+    episodeDiv.classList.add('episode');
+
+    // Episode artwork div
+    const artDiv = document.createElement('div');
+    artDiv.classList.add('episode-artwork');
+    artDiv.style.backgroundImage = `url(${imageUrl})`;
+
+    // Content container
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('episode-content');
+
+    // Title
+    const titleEl = document.createElement('h3');
+    titleEl.classList.add('episode-title');
+    titleEl.textContent = title;
+
+    // Description with truncated text + show more button
+    const descEl = document.createElement('p');
+    descEl.classList.add('episode-description');
+    descEl.textContent = description;
+
+    // "..." button for popup
+    const moreBtn = document.createElement('button');
+    moreBtn.classList.add('show-more-btn');
+    moreBtn.textContent = '...';
+    moreBtn.addEventListener('click', () => {
+      showPopup(title, description);
+    });
+    descEl.appendChild(moreBtn);
+
+    // Media controls container
+    const mediaControls = document.createElement('div');
+    mediaControls.classList.add('media-controls');
+
+    // Audio element (hidden)
+    const audio = document.createElement('audio');
+    audio.src = audioUrl;
+    audio.preload = 'metadata';
+
+    // Control buttons container
+    const controlsRow = document.createElement('div');
+    controlsRow.classList.add('control-buttons');
+
+    // Play/pause button
+    const playBtn = document.createElement('button');
+    playBtn.classList.add('control-button');
+    playBtn.textContent = '▶️';
+    playBtn.title = 'Play/Pause';
+    let isPlaying = false;
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        isPlaying = true;
+        playBtn.textContent = '⏸️';
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playBtn.textContent = '▶️';
+      }
+    });
+
+    // Rewind 15s button
+    const rewindBtn = document.createElement('button');
+    rewindBtn.classList.add('control-button');
+    rewindBtn.textContent = '⏪ 15s';
+    rewindBtn.title = 'Rewind 15 seconds';
+    rewindBtn.addEventListener('click', () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 15);
+    });
+
+    // Skip ahead 30s button
+    const skipBtn = document.createElement('button');
+    skipBtn.classList.add('control-button');
+    skipBtn.textContent = '30s ⏩';
+    skipBtn.title = 'Skip ahead 30 seconds';
+    skipBtn.addEventListener('click', () => {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 30);
+    });
+
+    controlsRow.append(rewindBtn, playBtn, skipBtn);
+
+    // Timeline container
+    const timelineContainer = document.createElement('div');
+    timelineContainer.classList.add('timeline-container');
+
+    const currentTimeSpan = document.createElement('span');
+    currentTimeSpan.textContent = '0:00';
+
+    const timelineSlider = document.createElement('input');
+    timelineSlider.type = 'range';
+    timelineSlider.classList.add('timeline');
+    timelineSlider.min = 0;
+    timelineSlider.max = 0;
+    timelineSlider.value = 0;
+    timelineSlider.step = 1;
+
+    const durationSpan = document.createElement('span');
+    durationSpan.textContent = duration || '0:00';
+
+    timelineContainer.append(currentTimeSpan, timelineSlider, durationSpan);
+
+    // Update timeline max and duration on metadata load
+    audio.addEventListener('loadedmetadata', () => {
+      timelineSlider.max = Math.floor(audio.duration);
+      durationSpan.textContent = formatTime(audio.duration);
+    });
+
+    // Update current time and slider as audio plays
+    audio.addEventListener('timeupdate', () => {
+      currentTimeSpan.textContent = formatTime(audio.currentTime);
+      timelineSlider.value = Math.floor(audio.currentTime);
+    });
+
+    // Seeking through slider
+    timelineSlider.addEventListener('input', () => {
+      audio.currentTime = timelineSlider.value;
+    });
+
+    // Pause other audios when this one plays
+    audio.addEventListener('play', () => {
+      document.querySelectorAll('audio').forEach(a => {
+        if (a !== audio) a.pause();
+      });
+      playBtn.textContent = '⏸️';
+      isPlaying = true;
+    });
+    audio.addEventListener('pause', () => {
+      playBtn.textContent = '▶️';
+      isPlaying = false;
+    });
+
+    mediaControls.appendChild(controlsRow);
+    mediaControls.appendChild(timelineContainer);
+
+    // Assemble content
+    contentDiv.append(titleEl, descEl, mediaControls);
+
+    episodeDiv.append(artDiv, contentDiv);
+
+    return episodeDiv;
+  }
+
+  async function loadEpisodes() {
+    try {
+      const response = await fetch(RSS_URL);
+      const text = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, 'application/xml');
+
+      channelImage = xml.querySelector('channel > image > url')?.textContent || '';
+      allEpisodes = Array.from(xml.querySelectorAll('item'));
+      currentIndex = 0;
+      episodesContainer.innerHTML = '';
+      loadMoreEpisodes();
+    } catch (err) {
+      episodesContainer.innerHTML = '<p style="color:red;">Failed to load episodes.</p>';
+      console.error('Failed to load RSS:', err);
+    }
+  }
+
+  function loadMoreEpisodes() {
+    const nextIndex = currentIndex + episodesPerPage;
+    const slice = allEpisodes.slice(currentIndex, nextIndex);
+
+    slice.forEach(item => {
+      const episodeEl = createEpisodeElement(item);
+      episodesContainer.appendChild(episodeEl);
+    });
+
+    currentIndex = nextIndex;
+    if (currentIndex >= allEpisodes.length) {
+      loadMoreBtn.style.display = 'none';
+    } else {
+      loadMoreBtn.style.display = 'block';
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', loadMoreEpisodes);
+
+  loadEpisodes();
 </script>
 </body>
 </html>
