@@ -526,6 +526,15 @@ nav {
 	width: 8px;
 }
 
+.logo {
+    display: flex;
+    align-items: center; /* vertically center */
+    gap: 10px; /* optional spacing between image and text */
+    font-weight: bold;
+    font-size: 18px;
+    color: black !important;
+}
+
 .footer-bottom {
 	border-top: 1px solid rgba(255, 255, 255, 0.2);
 	padding-top: 30px;
