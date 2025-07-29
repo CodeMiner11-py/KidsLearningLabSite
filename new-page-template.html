@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Learning Lab™ - By a Kid, For Kids</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<header>
+    <nav class="container">
+        <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="episodes.html">Episodes</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="python.html">Python Learning Lab</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="availability.html">Where to Listen</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+        <div class="mobile-nav-container" id="mobileNav">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="episodes.html">Episodes</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="python.html">Python Learning Lab</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="availability.html">Where to Listen</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Kids Learning Lab™</h3>
+                <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="episodes.html">Episodes</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-nav">
+                    <li><a href="https://kidslearninglab.com/pythonlearninglab" target="_blank">Python Learning Lab Book</a></li>
+                    <li><a href="episodes.html">Latest Episodes</a></li>
+                    <li><a href="https://patreon.kidslearninglab.com/">Patreon Community</a></li>
+                    <li><a href="availability.html">Listen Everywhere</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
+            <p>Created with ❤ by Eshaan for curious minds everywhere</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleMenu() {
+        const nav = document.getElementById('navLinks');
+        const container = document.getElementById('mobileNav');
+        const hamburger = document.querySelector('.hamburger');
+
+        container.classList.toggle('show');
+        hamburger.classList.toggle('open');
+    }
+</script>

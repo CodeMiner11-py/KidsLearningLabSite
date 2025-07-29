@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Learning Lab™ - By a Kid, For Kids</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+          max-width: 900px;
+          margin: 3rem auto;
+          padding: 0 1rem;
+          color: #222;
+          font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+        }
+        h1, h2 {
+          color: #1e40af;
+          margin-bottom: 1rem;
+        }
+        p {
+          margin-bottom: 1.25rem;
+          font-size: 1.1rem;
+        }
+        a {
+          color: #2563eb;
+          text-decoration: none;
+          font-weight: 600;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        .about-intro {
+          font-size: 1.2rem;
+          font-weight: 500;
+          margin-bottom: 2rem;
+        }
+        .signature {
+          margin-top: 3rem;
+          font-weight: 600;
+          font-style: italic;
+          color: #444;
+        }
+        .about-flex {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.about-flex img {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .about-flex {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+        .content-box {
+  background: white;          /* or your preferred bg color */
+  border-radius: 16px;        /* smooth rounded corners */
+  padding: 2rem 3rem;         /* nice spacing inside */
+  max-width: 900px;
+  margin: 3rem auto;          /* center horizontally with vertical spacing */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);  /* subtle shadow */
+  color: #222;                /* text color */
+}
+    </style>
+</head>
+<body>
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<header>
+    <nav class="container">
+        <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="episodes.html">Episodes</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="python.html">Python Learning Lab</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="availability.html">Where to Listen</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+        <div class="mobile-nav-container" id="mobileNav">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="episodes.html">Episodes</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="python.html">Python Learning Lab</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="availability.html">Where to Listen</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<main class="content-box">
+    <h1>About Kids Learning Lab™</h1>
+
+    <p class="about-intro">
+        Welcome to Kids Learning Lab, a podcast created by a 12-year-old named Eshaan Buddhisagar — made by kids, for kids.
+        This show covers fun, curious topics to help kids learn and explore the world around them through engaging conversations and quizzes inside episodes.
+    </p>
+
+    <div class="about-flex">
+        <img src="https://kidslearninglabcom.wordpress.com/wp-content/uploads/2024/12/eglu.jpeg" alt="Eshaan Buddhisagar">
+        <div>
+            <h2>Who is Eshaan?</h2>
+            <p>
+                Eshaan Buddhisagar began this podcast at just 9 years old and has since created over 40 episodes covering fascinating topics like the water cycle, Disney secrets, and cheese.
+                His passion for technology and space drives him to not only create content but also develop apps and write books aimed at inspiring kids to learn coding and science.
+            </p>
+        </div>
+    </div>
+
+    <h2>What We Do</h2>
+    <p>
+        This show is 100% kid-made—from writing and editing to recording and publishing.
+        Kids Learning Lab encourages young learners to explore science, technology, and fun facts through short, accessible episodes.
+    </p>
+
+    <p>
+        In addition to the podcast, Eshaan has published a Python programming book for kids, <i><a href="python.html">Python Learning Lab</a></i>.
+        You can learn more about his projects by contacting us.
+    </p>
+
+    <p>
+        Feel free to <a href="contact.html">reach out</a> or explore our
+        <a href="python.html">Python Learning Lab</a> page to get started with coding.
+    </p>
+
+    <p class="signature">– Eshaan Buddhisagar, Creator</p>
+    <a class="cta-button" href="mailto:hello@kidslearninglab.com">Email Eshaan</a>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Kids Learning Lab™</h3>
+                <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="episodes.html">Episodes</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-nav">
+                    <li><a href="https://kidslearninglab.com/pythonlearninglab" target="_blank">Python Learning Lab Book</a></li>
+                    <li><a href="episodes.html">Latest Episodes</a></li>
+                    <li><a href="https://patreon.kidslearninglab.com/">Patreon Community</a></li>
+                    <li><a href="availability.html">Listen Everywhere</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
+            <p>Created with ❤ by Eshaan for curious minds everywhere</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleMenu() {
+        const nav = document.getElementById('navLinks');
+        const container = document.getElementById('mobileNav');
+        const hamburger = document.querySelector('.hamburger');
+
+        container.classList.toggle('show');
+        hamburger.classList.toggle('open');
+    }
+</script>
