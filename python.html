@@ -27,6 +27,12 @@
           justify-content: center;
           margin-top: 1rem;
         }
+        .cta-button {
+  display: inline-flex;       /* or flex */
+  justify-content: center;    /* center horizontally */
+  align-items: center;        /* center vertically */
+  text-align: center;         /* fallback for text */ /*bob*/
+}
     </style>
 </head>
 <body>
@@ -72,12 +78,18 @@
         <p>Published & Written by Eshaan Buddhisagar</p>
         <div class="spacer10px"></div>
         <div class="button-grid">
-            <a href="https://go.kidslearninglab.com/pythonlearninglab" class="cta-button">Amazon</a><a href="https://patreon.com/kidslearninglab/shop" class="cta-button">Ebook (Patreon)</a>
+            <a style="vertical-align: center;" href="https://go.kidslearninglab.com/pythonlearninglab" class="cta-button">Paperback</a><a href="#" class="cta-button">Ebook coming soon!</a>
         </div>
     </div>
 </main>
 
 <footer class="footer">
+    <script>
+        import memberstackDOM from '@memberstack/dom';
+const memberstack = memberstackDOM.init({
+publicKey: "pk_bc836b56715e52fa4155",
+});
+    </script>
     <div class="container">
         <div class="footer-content">
             <div class="footer-brand">
