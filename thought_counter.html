@@ -43,26 +43,56 @@
   <small>Includes all thoughts in human history — updated live by global population</small>
 
   <script>
-  const population = 8_200_000_000;
+  const population = 8_200_000_000n; // BigInt literal
 const thoughtsPerSecondPerPerson = 1.67;
-const thoughtsPerSecond = population * thoughtsPerSecondPerPerson;
+const thoughtsPerSecond = BigInt(Math.floor(Number(population) * thoughtsPerSecondPerPerson)); // Approximate for BigInt base growth
 
-// Starting base from history:
-let totalThoughts = 157_738_238_293_465_592_110;
+// Starting base from history, as BigInt:
+let totalThoughtsBigInt = 157_738_238_293_465_592_000n; // Rounded down to nearest 10000 for safety
+let fractionalAccumulator = 0; // Float to hold fractional increments
 
 const counterEl = document.getElementById('counter');
 let lastTime = performance.now();
+
+function formatBigIntWithCommas(bigint) {
+  // Convert BigInt to string, then add commas every 3 digits
+  const str = bigint.toString();
+  return str.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 function update(now) {
   const deltaSeconds = (now - lastTime) / 1000;
   lastTime = now;
 
-  // Increase total thoughts by current rate * elapsed time
-  totalThoughts += thoughtsPerSecond * deltaSeconds;
+  // Calculate growth this frame as float
+  const growthThisFrame = Number(population) * thoughtsPerSecondPerPerson * deltaSeconds;
 
-  // Format and show number
-  counterEl.textContent = Math.floor(totalThoughts).toLocaleString('en-US');
+  // Add integer part to BigInt total
+  const growthIntPart = BigInt(Math.floor(growthThisFrame));
+  totalThoughtsBigInt += growthIntPart;
 
+  // Add fractional remainder to accumulator
+  fractionalAccumulator += growthThisFrame - Math.floor(growthThisFrame);
+
+  // If accumulator >= 1, convert to BigInt and add to total
+  if (fractionalAccumulator >= 1) {
+    const addInt = BigInt(Math.floor(fractionalAccumulator));
+    totalThoughtsBigInt += addInt;
+    fractionalAccumulator -= Math.floor(fractionalAccumulator);
+  }
+
+  // Remove last 4 digits (divide by 10,000)
+  const baseNumber = totalThoughtsBigInt / 10000n;
+
+  // Format baseNumber with commas
+  const formattedBase = formatBigIntWithCommas(baseNumber);
+
+  // Generate random 4-digit tail
+  const randomTail = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+
+  // Display combined number: base + random tail
+  counterEl.textContent = (formattedBase + randomTail).padStart(30, " ");
+  
   requestAnimationFrame(update);
 }
 
