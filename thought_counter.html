@@ -54,24 +54,27 @@
   let lastTime = performance.now();
 
   function update(now) {
-    const deltaSeconds = (now - lastTime) / 1000;
-    lastTime = now;
+  const deltaSeconds = (now - lastTime) / 1000;
+  lastTime = now;
 
-    // Realistic thought growth
-    totalThoughts += thoughtsPerSecond * deltaSeconds;
+  // Realistic thought growth
+  totalThoughts += thoughtsPerSecond * deltaSeconds;
 
-    // Generate random tail (0000–9999)
-    const fakeTail = Math.floor(Math.random() * 10_000).toString().padStart(4, "0");
+  // Convert totalThoughts to string, remove last digit
+  const totalStr = Math.floor(totalThoughts).toString();
+  const trimmedStr = totalStr.slice(0, -1); // remove last digit
 
-    // Strip last 4 digits and format
-    const baseNumber = Math.floor(totalThoughts / 10_000);
-    const formatted = baseNumber.toLocaleString("en-US");
+  // Convert back to int for formatting
+  const trimmedNumber = parseInt(trimmedStr, 10);
 
-    // Final display with fake tail and fixed width
-    counterEl.textContent = `${formatted},${fakeTail}`.padStart(30, " ");
+  // Format with commas
+  const formatted = trimmedNumber.toLocaleString("en-US");
 
-    requestAnimationFrame(update);
-  }
+  // Show formatted number with padding to avoid jiggling
+  counterEl.textContent = formatted.padStart(30, " ");
+
+  requestAnimationFrame(update);
+}
 
   requestAnimationFrame(update);
 </script>
