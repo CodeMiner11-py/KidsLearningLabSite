@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Live Human Thought Counter</title>
   <style>
     body {
@@ -9,7 +9,8 @@
       padding: 0;
       background-color: #0f172a;
       color: #f8fafc;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -17,20 +18,18 @@
       height: 100vh;
       text-align: center;
     }
-
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.25rem;
     }
-
     #counter {
-      font-size: 2.0rem;
+      font-size: 2rem;
       font-weight: 600;
-      font-family: monospace !important;
+      font-family: monospace;
       color: #38bdf8;
       margin: 0.5rem 0;
+      min-width: 300px;
     }
-
     small {
       font-size: 0.9rem;
       color: #94a3b8;
@@ -43,60 +42,28 @@
   <small>Includes all thoughts in human history — updated live by global population</small>
 
   <script>
-  const population = 8_200_000_000n; // BigInt literal
-const thoughtsPerSecondPerPerson = 1.67;
-const thoughtsPerSecond = BigInt(Math.floor(Number(population) * thoughtsPerSecondPerPerson)); // Approximate for BigInt base growth
+    const population = 8_200_000_000;
+    const thoughtsPerSecondPerPerson = 1.67;
+    const thoughtsPerSecond = population * thoughtsPerSecondPerPerson;
 
-// Starting base from history, as BigInt:
-let totalThoughtsBigInt = 157_738_238_293_465_592_000n; // Rounded down to nearest 10000 for safety
-let fractionalAccumulator = 0; // Float to hold fractional increments
+    // Starting big base number
+    let totalThoughts = 157_738_238_293_465_592_110;
 
-const counterEl = document.getElementById('counter');
-let lastTime = performance.now();
+    const counterEl = document.getElementById("counter");
+    let lastTime = performance.now();
 
-function formatBigIntWithCommas(bigint) {
-  // Convert BigInt to string, then add commas every 3 digits
-  const str = bigint.toString();
-  return str.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+    function update(now) {
+      const deltaSeconds = (now - lastTime) / 1000;
+      lastTime = now;
 
-function update(now) {
-  const deltaSeconds = (now - lastTime) / 1000;
-  lastTime = now;
+      totalThoughts += thoughtsPerSecond * deltaSeconds;
 
-  // Calculate growth this frame as float
-  const growthThisFrame = Number(population) * thoughtsPerSecondPerPerson * deltaSeconds;
+      counterEl.textContent = Math.floor(totalThoughts).toLocaleString("en-US");
 
-  // Add integer part to BigInt total
-  const growthIntPart = BigInt(Math.floor(growthThisFrame));
-  totalThoughtsBigInt += growthIntPart;
+      requestAnimationFrame(update);
+    }
 
-  // Add fractional remainder to accumulator
-  fractionalAccumulator += growthThisFrame - Math.floor(growthThisFrame);
-
-  // If accumulator >= 1, convert to BigInt and add to total
-  if (fractionalAccumulator >= 1) {
-    const addInt = BigInt(Math.floor(fractionalAccumulator));
-    totalThoughtsBigInt += addInt;
-    fractionalAccumulator -= Math.floor(fractionalAccumulator);
-  }
-
-  // Remove last 4 digits (divide by 10,000)
-  const baseNumber = totalThoughtsBigInt / 10000n;
-
-  // Format baseNumber with commas
-  const formattedBase = formatBigIntWithCommas(baseNumber);
-
-  // Generate random 4-digit tail
-  const randomTail = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
-
-  // Display combined number: base + random tail
-  counterEl.textContent = (formattedBase + randomTail).padStart(30, " ");
-  
-  requestAnimationFrame(update);
-}
-
-requestAnimationFrame(update);
-</script>
+    requestAnimationFrame(update);
+  </script>
 </body>
 </html>
