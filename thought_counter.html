@@ -57,21 +57,32 @@
   const deltaSeconds = (now - lastTime) / 1000;
   lastTime = now;
 
-  // Realistic thought growth
   totalThoughts += thoughtsPerSecond * deltaSeconds;
 
-  // Convert totalThoughts to string, remove last digit
-  const totalStr = Math.floor(totalThoughts).toString();
-  const trimmedStr = totalStr.slice(0, -1); // remove last digit
+  // Convert to string and remove last digit
+  let totalStr = Math.floor(totalThoughts).toString();
+  totalStr = totalStr.slice(0, -1); // remove last digit
 
-  // Convert back to int for formatting
-  const trimmedNumber = parseInt(trimmedStr, 10);
+  // Remove trailing zeros
+  totalStr = totalStr.replace(/0+$/, '');
+
+  // If empty after removing zeros, set to "0"
+  if (totalStr === '') totalStr = '0';
+
+  // Convert back to number for formatting
+  const trimmedNumber = parseInt(totalStr, 10);
 
   // Format with commas
   const formatted = trimmedNumber.toLocaleString("en-US");
 
-  // Show formatted number with padding to avoid jiggling
-  counterEl.textContent = formatted.padStart(30, " ");
+  // Generate random 3-digit number as string
+  const randomTail = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+  // Combine formatted number with random tail
+  const displayStr = formatted + randomTail;
+
+  // Pad to fixed width to prevent layout shift
+  counterEl.textContent = displayStr.padStart(30, " ");
 
   requestAnimationFrame(update);
 }
