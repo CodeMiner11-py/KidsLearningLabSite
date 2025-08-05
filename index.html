@@ -47,6 +47,66 @@
                     <h1>A Kids & Family Podcast</h1>
                     <p>A podcast for kids, by a kid! Join 12-year-old Eshaan for educational episodes that make learning fun!</p>
                     <a href="episodes.html" class="cta-button">Listen Now!</a>
+                    <div class="latest-episode" id="latest-episode" style="max-width:600px;margin:1rem auto;background:white;padding:1rem;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-family:Arial,sans-serif;">
+                        <p>Loading latest episode...</p>
+                    </div>
+
+                    <script>
+                        const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
+                        const SPOTIFY_API_URL = 'https://food-gen.onrender.com/api/spotify-episodes';
+
+                        async function fetchSpotifyEpisodeMap() {
+                          const res = await fetch(SPOTIFY_API_URL);
+                          const data = await res.json();
+                          const map = {};
+                          data.forEach(ep => {
+                            map[ep.title.toLowerCase().trim()] = ep.spotifyId;
+                          });
+                          return map;
+                        }
+
+                        async function fetchLatestEpisode() {
+                          try {
+                            const [spotifyMap, rssRes] = await Promise.all([
+                              fetchSpotifyEpisodeMap(),
+                              fetch(RSS_URL)
+                            ]);
+
+                            const rssText = await rssRes.text();
+                            const parser = new DOMParser();
+                            const xml = parser.parseFromString(rssText, 'application/xml');
+                            const latestItem = xml.querySelector('item');
+                            const title = latestItem.querySelector('title')?.textContent.trim();
+                            const spotifyId = spotifyMap[title.toLowerCase()];
+
+                            const container = document.getElementById('latest-episode');
+
+                            if (!spotifyId) {
+                              container.innerHTML = `<p style="color:red;">No matching Spotify episode found for: ${title}</p>`;
+                              return;
+                            }
+
+                            const iframe = document.createElement('iframe');
+                            iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
+                            iframe.width = '100%';
+                            iframe.height = '152';
+                            iframe.frameBorder = '0';
+                            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+                            iframe.loading = 'lazy';
+                            iframe.style.borderRadius = '12px';
+
+                            container.innerHTML = '';
+                            container.appendChild(iframe);
+                          } catch (err) {
+                            document.getElementById('latest-episode').innerHTML =
+                              '<p style="color:red;">Error loading episode.</p>';
+                            console.error('Error fetching latest episode:', err);
+                          }
+                        }
+
+                        fetchLatestEpisode();
+                    </script>
+
                 </div>
             </div>
         </section>
