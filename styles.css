@@ -11,10 +11,10 @@ body {
 	overflow-x: hidden;
 }
 
-.beehiiv-embed
+.beehiiv-embed-div
 {
   display: block; /* Ensures the iframe behaves as a block-level element */
-  width: 500px; /* Set a specific width for the iframe */
+  width: 100%; /* Set a specific width for the iframe */
   margin-left: auto;
   margin-right: auto;
 }
