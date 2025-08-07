@@ -441,6 +441,59 @@ const memberstack = memberstackDOM.init({
             factDisplay.textContent = facts[randomIndex];
         }
     </script>
+
+    <!-- Notification container (hidden by default) -->
+    <div id="notification-banner" style="display: none;">
+        <span id="notification-text"></span>
+    </div>
+
+    <style>
+        #notification-banner {
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #38a169; /* green */
+          color: white;
+          padding: 12px 24px;
+          border-radius: 6px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          font-family: sans-serif;
+          font-size: 16px;
+          z-index: 1000;
+          animation: fadeSlideDown 0.5s ease-out;
+        }
+
+        @keyframes fadeSlideDown {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+    </style>
+
+    <script>
+        // Get the 'text' parameter from the URL
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get("text");
+
+        if (message) {
+          const banner = document.getElementById("notification-banner");
+          const textSpan = document.getElementById("notification-text");
+          textSpan.textContent = decodeURIComponent(message);
+          banner.style.display = "block";
+
+          // Optional: hide after 5 seconds
+          setTimeout(() => {
+            banner.style.display = "none";
+          }, 5000);
+        }
+    </script>
+
 </body>
 
 </html>
