@@ -235,10 +235,36 @@
 </header>
 
 <main>
+  <style>
+    .spotify-note {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #555;
+    padding: 10px;
+    background-color: #44ffb0;
+    border-radius: 6px;
+}
+
+.spotify-note a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1DB954; /* Spotify green */
+}
+
+  </style>
+
   <section id="episodes-list" class="episodes-list">
     <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
     <h1>Latest Episodes</h1>
     <a class="cta-button" href="availability.html">Where to Listen</a>
+    <div style="text-align: center; font-family: inherit, sans-serif; font-size: 14px; color: #555; padding: 10px; background-color: #44ffb0; border-radius: 6px;" class="spotify-note">
+      <strong>NOTE:</strong> Please sign in to Spotify at
+      <a href="https://open.spotify.com" target="_blank" style=" text-decoration: none; font-weight: bold;">
+        spotify.com
+      </a>
+      only the first time, then come back to listen to these episodes in full.
+    </div>
     <div id="episodes-container"></div>
     <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load Episodes</button>
   </section>
