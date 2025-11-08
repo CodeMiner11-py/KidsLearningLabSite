@@ -11,6 +11,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+    <script src="node_modules/night.js/lib/night.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Initialize night.js with defaults
+    const night = new Night();
+
+    // Force dark mode permanently
+    night.toggle(); // toggles to dark if not already
+    localStorage.setItem("night-mode", "dark"); // ensure persistence
+
+    // Prevent auto switching
+    // (if the site previously enabled auto mode)
+    if (typeof night.reset === "function") night.reset();
+  });
+</script>
+
     <style>
         * { font-family: Albert Sans; }
     </style>
