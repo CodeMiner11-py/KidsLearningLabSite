@@ -167,19 +167,18 @@ publicKey: "pk_bc836b56715e52fa4155",
     </div>
 </footer>
 
-<script>
-    function toggleMenu() {
-        const nav = document.getElementById('navLinks');
-        const container = document.getElementById('mobileNav');
-        const hamburger = document.querySelector('.hamburger');
-
-        container.classList.toggle('show');
-        hamburger.classList.toggle('open');
-    }
-
     <script>
+function toggleMenu() {
+    const nav = document.getElementById('navLinks');
+    const container = document.getElementById('mobileNav');
+    const hamburger = document.querySelector('.hamburger');
+
+    container.classList.toggle('show');
+    hamburger.classList.toggle('open');
+}
+
 const links = {
-    newsletter: "https://news.kidslearninglab.com";
+    newsletter: "https://news.kidslearninglab.com",
     spotify: "https://go.kidslearninglab.com/spotify"
 };
 
@@ -190,5 +189,6 @@ if (links[path]) {
     window.location.href = finalUrl;
 }
 </script>
+
 
 </body></html>
