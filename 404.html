@@ -179,11 +179,11 @@ publicKey: "pk_bc836b56715e52fa4155",
 
     <script>
 const links = {
-    /newsletter: "https://news.kidslearninglab.com",
-    /spotify: "https://go.kidslearninglab.com/spotify"
+    newsletter: "https://news.kidslearninglab.com";
+    spotify: "https://go.kidslearninglab.com/spotify"
 };
 
-const path = window.location.pathname.toLowerCase();
+const path = window.location.pathname.replace("/", "").toLowerCase();
 
 if (links[path]) {
     const finalUrl = "https://redirect.kidslearninglab.com/?url=" + encodeURIComponent(links[path]);
