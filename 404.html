@@ -176,4 +176,21 @@ publicKey: "pk_bc836b56715e52fa4155",
         container.classList.toggle('show');
         hamburger.classList.toggle('open');
     }
+
+    <script>
+const links = {
+    yt: "https://youtube.com/yourchannel",
+    pod: "https://yourpodcasthomepage.com",
+    book: "https://example.com/book",
+    demo: "https://example.com/demo"
+};
+
+const path = window.location.pathname.replace("/", "").toLowerCase();
+
+if (links[path]) {
+    const finalUrl = "https://redirect.kidslearninglab.com/?url=" + encodeURIComponent(links[path]);
+    window.location.href = finalUrl;
+}
 </script>
+
+</body></html>
