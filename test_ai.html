@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask AI — Kids Learning Lab</title>
+<style>
+  body{max-width:780px;margin:40px auto;padding:20px;font-family:system-ui,Arial;}
+  h1,h2,h3{margin:8px 0;}
+  label{display:block;margin:12px 0 6px;}
+  textarea{width:100%;height:120px;padding:8px;font-size:14px;box-sizing:border-box;}
+  button{margin-top:10px;padding:8px 14px;font-size:14px;}
+  #response{background:#f6f6f6;padding:12px;border-radius:6px;white-space:pre-wrap;}
+</style>
+</head>
+<body>
+
+<h1>Ask the AI</h1>
+<label for="prompt">Question (no conversation history)</label>
+<textarea id="prompt" placeholder="Type your question here..."></textarea>
+<div>
+  <button id="ask">Ask</button>
+  <button id="clear">Clear</button>
+</div>
+<h2>Answer</h2>
+<div id="response">No answer yet.</div>
+
+<script>
+const askBtn = document.getElementById('ask');
+const clearBtn = document.getElementById('clear');
+const promptEl = document.getElementById('prompt');
+const responseEl = document.getElementById('response');
+
+function renderMarkdown(text){
+  // Headings
+  text = text
+    .replace(/^### (.*)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.*)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.*)$/gm,'<h1>$1</h1>');
+
+  // Bold and italics
+  text = text
+    .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+    .replace(/\*(.*?)\*/g,'<i>$1</i>');
+
+  // Lists
+  const lines = text.split('\n');
+  let inList = false;
+  const result = lines.map(line=>{
+    if(line.match(/^\* /)){
+      if(!inList){ inList=true; return '<ul><li>'+line.substr(2)+'</li>'; }
+      else return '<li>'+line.substr(2)+'</li>';
+    } else {
+      if(inList){ inList=false; return '</ul>'+line; }
+      return line;
+    }
+  });
+  if(inList) result.push('</ul>');
+  return result.join('\n');
+}
+
+async function askAI(){
+  const prompt = promptEl.value.trim();
+  if(!prompt){ responseEl.textContent='Enter a question.'; return; }
+
+  askBtn.disabled = true; askBtn.textContent = 'Asking...'; responseEl.textContent='';
+
+  try{
+    const url = 'https://api.kidslearninglab.com/get_response?prompt=' + encodeURIComponent(prompt);
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+
+    let out;
+    const ct = res.headers.get('content-type')||'';
+    if(ct.includes('application/json')){
+      const j = await res.json();
+      out = (typeof j==='string'? j : j.response) || '';
+    } else {
+      out = await res.text();
+    }
+
+    responseEl.innerHTML = renderMarkdown(out) || '(empty response)';
+  }catch(err){
+    responseEl.textContent = 'Error: ' + err.message;
+  }finally{
+    askBtn.disabled = false; askBtn.textContent = 'Ask';
+  }
+}
+
+askBtn.addEventListener('click', askAI);
+clearBtn.addEventListener('click', ()=>{promptEl.value=''; responseEl.textContent='No answer yet.';});
+promptEl.addEventListener('keydown',(e)=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter') askAI();});
+</script>
+
+</body>
+</html>
