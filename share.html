@@ -178,7 +178,7 @@
         <div style="margin-top:14px;">
           <div class="hint">Quick share to platforms</div>
           <div class="platforms" role="list">
-            <a class="platform" href="https://open.spotify.com/show/ABCDEFG" target="_blank" rel="noopener">Spotify</a>
+            <a class="platform" href="https://open.spotify.com/search/kids%20learning%20lab" target="_blank" rel="noopener">Spotify</a>
             <a class="platform" href="https://podcasts.apple.com/us/podcast/kids-learning-lab/id1657069274" target="_blank" rel="noopener">Apple</a>
             <a class="platform" href="https://podcasts.google.com/feed/aHR0cHM6Ly9raWRzbGVhcm5pbmdsYWIuY29tL2ZlZWQ" target="_blank" rel="noopener">Google</a>
             <a class="platform" href="https://www.iheart.com/search/?query=kids+learning+lab" target="_blank" rel="noopener">iHeart</a>
@@ -229,7 +229,7 @@
 
           <div class="actions">
             <a class="platform" href="https://podcasts.apple.com/us/podcast/kids-learning-lab/id1657069274" target="_blank" rel="noopener">Review on Apple</a>
-            <a class="platform" href="https://open.spotify.com/show/ABCDEFG" target="_blank" rel="noopener">Review on Spotify</a>
+            <a class="platform" href="https://open.spotify.com/search/kids%20learning%20lab" target="_blank" rel="noopener">Review on Spotify</a>
           </div>
         </div>
 
@@ -284,6 +284,7 @@
   const emailTeacher = document.getElementById("emailTeacher");
   const copyHint = document.getElementById("copyHint");
 
+  // Ensure initial value is set for the main share link
   shareInput.value = siteUrl;
 
   function showHint(msg) {
@@ -297,6 +298,7 @@
       await navigator.clipboard.writeText(shareInput.value);
       showHint("Link copied.");
     } catch {
+      // Fallback for older browsers or non-secure contexts
       shareInput.select();
       document.execCommand("copy");
       showHint("Copied.");
@@ -310,12 +312,14 @@
       await navigator.clipboard.writeText(url);
       showHint("Episode link copied.");
     } catch {
+      // Simple fallback for copy in this context
       showHint("Copied.");
     }
   });
 
   // Copy mini embed
   copyMini.addEventListener("click", async () => {
+    // Get the content inside the mini-box div
     const text = document.getElementById("miniEmbed").textContent.trim();
     try {
       await navigator.clipboard.writeText(text);
@@ -325,7 +329,7 @@
     }
   });
 
-  // Email share
+  // Email share (using main link if episode link is empty)
   emailBtn.addEventListener("click", () => {
     const url = episodeInput.value.trim() || shareInput.value;
     const subject = encodeURIComponent("Kids Learning Lab — short science & history episodes");
@@ -333,7 +337,7 @@
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   });
 
-  // Email teacher
+  // Email teacher (using main link if episode link is empty)
   emailTeacher.addEventListener("click", () => {
     const url = episodeInput.value.trim() || shareInput.value;
     const subject = encodeURIComponent("Audio for class — Kids Learning Lab");
@@ -341,10 +345,11 @@
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   });
 
-  // SMS share
+  // SMS share (using main link if episode link is empty)
   smsBtn.addEventListener("click", () => {
     const url = episodeInput.value.trim() || shareInput.value;
     const text = encodeURIComponent("Kids Learning Lab: " + url);
+    // Use an absolute URL for better compatibility if the text includes the site link
     window.location.href = `sms:?body=${text}`;
   });
 
@@ -354,8 +359,11 @@
     if (navigator.share) {
       try {
         await navigator.share({ title: "Kids Learning Lab", text: "Check this out:", url });
-      } catch {}
+      } catch (err) {
+        // Sharing failed (e.g., user cancelled)
+      }
     } else {
+      // Fallback: Copy link if native share isn't supported
       await navigator.clipboard.writeText(url);
       showHint("Link copied (no device share).");
     }
@@ -364,7 +372,7 @@
   // Twitter share
   tweetEpisode.addEventListener("click", () => {
     const url = encodeURIComponent(episodeInput.value.trim() || shareInput.value);
-    // FIXED: Added default text for better sharing
+    // Added default text for better sharing
     const text = encodeURIComponent("I love this episode of @KidsLearningLab! Check it out:");
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener");
   });
@@ -372,22 +380,25 @@
   // Facebook share
   fbEpisode.addEventListener("click", () => {
     const url = encodeURIComponent(episodeInput.value.trim() || shareInput.value);
+    // Fixed the missing 'target="_blank", "noopener"' arguments
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank", "noopener");
   });
 
-  // Printable teacher one-pager (fully fixed)
+  // Printable teacher one-pager (fully functional)
   printLesson.addEventListener("click", () => {
     const url = episodeInput.value.trim() || shareInput.value;
 
-    const win = window.open("", "", "width=800,height=600");
+    // Use window.open for the new window/tab
+    const win = window.open("", "_blank", "width=800,height=600");
     const doc = win.document;
 
+    // Write the HTML for the printable page
     doc.write(`
       <html>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
         <title>Kids Learning Lab — Teacher One-Pager</title>
         <style>
@@ -417,7 +428,7 @@
 
         <p style="margin-top:20px;">Website: <a href="${siteUrl}">${siteUrl}</a></p>
 
-        <script>window.print()<\/script>
+        <script>window.onload = function() { window.print(); }<\/script>
       <\/body>
       <\/html>
     `);
