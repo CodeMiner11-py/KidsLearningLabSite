@@ -341,7 +341,7 @@
   emailTeacher.addEventListener("click", () => {
     const url = episodeInput.value.trim() || shareInput.value;
     const subject = encodeURIComponent("Audio for class — Kids Learning Lab");
-    const body = encodeURIComponent("This short episode fits a class warmup:\n" + url);
+    const body = encodeURIComponent("Hi Mr/Ms <teacher name>,\n\nI think you might like this kids' podcast made by a kid covering history, science, and technology! Maybe you could use it in your class:\n" + url);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   });
 
