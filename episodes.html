@@ -4,71 +4,340 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kids Learning Lab™ - By a Kid, For Kids</title>
+  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <style>
+
+
     /* Reset */
-    * { box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-      color: white;
-      font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      margin: 0;
+    * {
+      box-sizing: border-box;
     }
-    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-    h1, h2 { text-align: center; margin-bottom: 1.5rem; }
-    .episodes-list { display: flex; flex-direction: column; gap: 1.5rem; max-width: 900px; margin: 0 auto; }
-    .episode { display: flex; background: white; border-radius: 8px; overflow: hidden; cursor: default; box-shadow: 0 4px 12px rgb(0 0 0 / 0.1); color: #000; }
-    .episode-artwork { flex: 0 0 150px; height: 150px; background-size: cover; background-position: center; border-right: 1px solid #ddd; }
-    .episode-content { flex: 1; padding: 12px 16px; display: flex; flex-direction: column; justify-content: space-between; }
-    .cta-button { display: inline-block; padding: 10px 16px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin-bottom: 1rem; text-align: center; }
-    .spotify-note { text-align: center; font-family: Arial, sans-serif; font-size: 14px; color: #555; padding: 10px; background-color: #44ffb0; border-radius: 6px; }
-    .spotify-note a { text-decoration: none; font-weight: bold; color: #1DB954; }
-    footer { margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.2); font-size: 0.85rem; }
-    .footer-content img { max-width: 100px; display:block; margin-bottom: 0.5rem; }
-    .footer-section ul { list-style: none; padding: 0; margin: 0; }
-    .footer-section ul li a { color: white; text-decoration: none; }
-    #load-more { padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+   body {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .episodes-list {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-x: hidden;
+    }
+    .episode {
+      max-width: 100%;
+      width: 100%;
+      display: flex;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      cursor: default;
+      box-sizing: border-box;
+    }
+    .episode-artwork {
+      flex: 0 0 150px;
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      border-right: 1px solid #ddd;
+      /* no padding, no margin */
+    }
+    .episode-content {
+      flex: 1;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .episode-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      line-height: 1.2;
+    }
+    .episode-description {
+      position: relative;
+      font-size: 0.95rem;
+      color: #444;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-bottom: 8px;
+    }
+    .show-more-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: transparent;
+      border: none;
+      color: #3b82f6;
+      font-weight: 600;
+      cursor: pointer;
+      padding-left: 4px;
+      font-size: 1rem;
+      user-select: none;
+    }
+    /* Popup */
+    #popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    #popup {
+      background: white;
+      max-width: 400px;
+      max-height: 80vh;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    #popup h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+    #popup p {
+      font-size: 1rem;
+      color: #333;
+      white-space: normal;
+    }
+    #popup-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #888;
+    }
+    /* Media controls container */
+    .media-controls {
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+    .control-buttons {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .control-button {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+    }
+    .control-button:hover {
+      background: #2563eb;
+    }
+    /* Timeline container */
+    .timeline-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .timeline {
+      flex: 1;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      top: -4px;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+    .timeline::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
   </style>
 </head>
 <body>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
 <header>
-  <nav style="max-width:900px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:1rem;">
-    <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"> Kids Learning Lab™</div>
+  <nav class="container">
+    <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="episodes.html">Episodes</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="python.html">Python Learning Lab</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="availability.html">Where to Listen</a></li>
+    </ul>
+    <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+    <div class="mobile-nav-container" id="mobileNav">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="episodes.html">Episodes</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="python.html">Python Learning Lab</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="availability.html">Where to Listen</a></li>
+      </ul>
+    </div>
   </nav>
 </header>
 
 <main>
+  <style>
+    .spotify-note {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #555;
+    padding: 10px;
+    background-color: #44ffb0;
+    border-radius: 6px;
+}
+
+.spotify-note a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1DB954; /* Spotify green */
+}
+
+  </style>
+
   <section id="episodes-list" class="episodes-list">
-    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100" style="margin:0 auto;">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
     <h1>Latest Episodes</h1>
     <a class="cta-button" href="availability.html">Where to Listen</a>
-    <div class="spotify-note">
+    <div style="text-align: center; font-family: inherit, sans-serif; font-size: 14px; color: #555; padding: 10px; background-color: #44ffb0; border-radius: 6px;" class="spotify-note">
       <strong>NOTE:</strong> We are also available on other platforms
-      <a href="availability.html" target="_blank">here</a>, like Apple Podcasts and Spotify.
+      <a href="availability.html" target="_blank" style=" text-decoration: none; font-weight: bold;">
+        here,
+      </a>
+      like Apple Podcasts and Spotify.
     </div>
     <div id="episodes-container"></div>
-    <button id="load-more">Load Episodes</button>
+    <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load Episodes</button>
   </section>
 </main>
 
-<footer>
-  <div style="text-align:center;">
-    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
-    <p>&copy; 2025 Kids Learning Lab Media. Created with ❤ by Eshaan.</p>
+<footer class="footer">
+  <script>
+    import memberstackDOM from '@memberstack/dom';
+const memberstack = memberstackDOM.init({
+publicKey: "pk_bc836b56715e52fa4155",
+});
+  </script>
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
+
+        <h3>Kids Learning Lab™</h3>
+        <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul class="footer-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="episodes.html">Episodes</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul class="footer-nav">
+          <li><a href="python.html" target="_blank">Python Learning Lab Book</a></li>
+          <li><a href="episodes.html">Latest Episodes</a></li>
+          <li><a href="https://patreon.kidslearninglab.com/">Patreon Community</a></li>
+          <li><a href="availability.html">Listen Everywhere</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
+      <p>Created with ❤ by Eshaan for curious minds everywhere</p>
+    </div>
   </div>
 </footer>
 
 <script>
+  function toggleMenu() {
+      const nav = document.getElementById('navLinks');
+      const container = document.getElementById('mobileNav');
+      const hamburger = document.querySelector('.hamburger');
+
+      container.classList.toggle('show');
+      hamburger.classList.toggle('open');
+  }
+</script>
+<!-- Popup -->
+<div id="popup-overlay" role="dialog" aria-modal="true" tabindex="-1">
+  <div id="popup">
+    <button id="popup-close" aria-label="Close popup">&times;</button>
+    <h3 id="popup-title"></h3>
+    <p id="popup-description"></p>
+  </div>
+</div>
+
+<script>
   const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
-  let allEpisodes = [], currentIndex = 0;
-  const episodesContainer = document.getElementById('episodes-container');
-  const loadMoreBtn = document.getElementById('load-more');
 
   let spotifyEpisodesMap = {};
+
   async function loadSpotifyEpisodesMap() {
     const res = await fetch('https://food-gen.onrender.com/api/spotify-episodes');
     const data = await res.json();
@@ -78,44 +347,67 @@
   }
 
   const episodesPerPage = 5;
+  let allEpisodes = [];
+  let currentIndex = 0;
+  let channelImage = '';
+
+  const episodesContainer = document.getElementById('episodes-container');
+  const loadMoreBtn = document.getElementById('load-more');
+
+  // Popup elements
+  const popupOverlay = document.getElementById('popup-overlay');
+  const popupTitle = document.getElementById('popup-title');
+  const popupDescription = document.getElementById('popup-description');
+  const popupClose = document.getElementById('popup-close');
+
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ':' + (s < 10 ? '0' + s : s);
+  }
+
+  // Show popup
+  function showPopup(title, description) {
+    popupTitle.textContent = title;
+    popupDescription.textContent = description;
+    popupOverlay.style.display = 'flex';
+    popupOverlay.focus();
+  }
+  // Hide popup
+  function hidePopup() {
+    popupOverlay.style.display = 'none';
+  }
+  popupClose.addEventListener('click', hidePopup);
+  popupOverlay.addEventListener('click', (e) => {
+    if(e.target === popupOverlay) hidePopup();
+  });
 
   function createEpisodeElement(item) {
     const title = item.querySelector('title')?.textContent || '';
     const spotifyId = spotifyEpisodesMap[title.toLowerCase().trim()];
-    if (!spotifyId) return document.createElement('div');
+    if (!spotifyId) {
+      console.warn("No Spotify ID match for:", title);
+      return document.createElement('div');
+    }
 
     const embedDiv = document.createElement('div');
     embedDiv.style.marginBottom = '2rem';
 
-    // id = lowercase, spaces -> dashes, remove special chars
-    embedDiv.id = title.toLowerCase().replace(/\s+/g,'-').replace(/[^\w-]/g,'');
-
     const iframe = document.createElement('iframe');
+    iframe.setAttribute('data-testid', 'embed-iframe');
     iframe.style.borderRadius = '12px';
     iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
     iframe.width = '100%';
     iframe.height = '152';
     iframe.frameBorder = '0';
-    iframe.setAttribute('allowfullscreen','');
+    iframe.setAttribute('allowfullscreen', '');
     iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
     iframe.loading = 'eager';
+
     embedDiv.appendChild(iframe);
     return embedDiv;
   }
-
-  function loadMoreEpisodes() {
-    const nextIndex = currentIndex + episodesPerPage;
-    const slice = allEpisodes.slice(currentIndex, nextIndex);
-    slice.forEach(item => {
-      const episodeEl = createEpisodeElement(item);
-      episodesContainer.appendChild(episodeEl);
-    });
-    currentIndex = nextIndex;
-    if(currentIndex >= allEpisodes.length) loadMoreBtn.style.display = 'none';
-    else loadMoreBtn.style.display = 'block';
-  }
-
-  loadMoreBtn.addEventListener('click', loadMoreEpisodes);
 
   async function loadEpisodes() {
     await loadSpotifyEpisodesMap();
@@ -123,36 +415,41 @@
       const response = await fetch(RSS_URL);
       const text = await response.text();
       const parser = new DOMParser();
-      const xml = parser.parseFromString(text,'application/xml');
+      const xml = parser.parseFromString(text, 'application/xml');
+
+      channelImage = xml.querySelector('channel > image > url')?.textContent || '';
       allEpisodes = Array.from(xml.querySelectorAll('item'));
       currentIndex = 0;
       episodesContainer.innerHTML = '';
       loadMoreEpisodes();
-
-      // If there's a hash, auto-load until found
-      await scrollToHashIfExists();
-    } catch(e) {
+    } catch (err) {
       episodesContainer.innerHTML = '<p style="color:red;">Failed to load episodes.</p>';
-      console.error(e);
+      console.error('Failed to load RSS:', err);
     }
   }
 
-  async function scrollToHashIfExists() {
-    if(!window.location.hash) return;
-    const hashRaw = window.location.hash.substring(1); // remove #
-    const targetId = hashRaw.toLowerCase().replace(/\s+/g,'-').replace(/[^\w-]/g,'');
+  function loadMoreEpisodes() {
+    const nextIndex = currentIndex + episodesPerPage;
+    const slice = allEpisodes.slice(currentIndex, nextIndex);
 
-    while(!document.getElementById(targetId) && currentIndex < allEpisodes.length) {
-      loadMoreEpisodes();
-      await new Promise(r=>setTimeout(r,50));
+    slice.forEach(item => {
+      const episodeEl = createEpisodeElement(item);
+      episodesContainer.appendChild(episodeEl);
+    });
+
+    currentIndex = nextIndex;
+    if (currentIndex >= allEpisodes.length) {
+      loadMoreBtn.style.display = 'none';
+    } else {
+      loadMoreBtn.style.display = 'block';
     }
-
-    const target = document.getElementById(targetId);
-    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
   }
+
+  loadMoreBtn.addEventListener('click', loadMoreEpisodes);
 
   loadEpisodes();
 </script>
+<script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
 
 </body>
 </html>
