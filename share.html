@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Share — Kids Learning Lab</title>
+  <meta name="description" content="Help Kids Learning Lab reach more kids — quick ways to share the podcast with friends, teachers, and classrooms.">
+
+  <meta property="og:title" content="Share Kids Learning Lab">
+  <meta property="og:description" content="Short, fun episodes for curious kids. Share with friends, teachers, or classrooms.">
+  <meta property="og:url" content="https://kidslearninglab.com/share">
+  <meta property="og:image" content="https://kidslearninglab.com/assets/cover-share.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <style>
+    * { font-family: "Albert Sans"; }
+
+    :root {
+      --maxw: 900px;
+      --accent: #0b6cff;
+      --muted: #666;
+      --bg: #f8fafc;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #111;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 36px auto;
+      padding: 28px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 6px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    header { display: flex; align-items: center; gap: 16px; }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 { font-size: 22px; margin: 0; }
+
+    p.lead { margin: 8px 0 18px; color: var(--muted); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr 340px;
+      }
+    }
+
+    .card {
+      background: #fafbff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(10, 20, 60, 0.03);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button, .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--accent); border: 1px solid rgba(11, 108, 255, 0.12); }
+    .btn-small { padding: 8px 10px; font-size: 14px; }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #e6eefc;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .hint { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+    ul.simple { padding-left: 18px; margin: 8px 0; color: var(--muted); }
+
+    .mini-box {
+      background: #fff;
+      border: 1px dashed rgba(10,20,60,0.06);
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
+
+    .platforms { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+    a.platform {
+      display: inline-block;
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(10,20,60,0.04);
+      color: inherit;
+      background: white;
+      font-weight: 600;
+    }
+
+    .teacher { background: #fff8e6; border: 1px solid rgba(255,193,7,0.12); }
+  </style>
+</head>
+
+<body>
+<main class="wrap" id="main">
+
+  <header>
+    <div class="logo" aria-hidden="true">
+      <img src="/assets/logo.png" style="width:50px;">
+    </div>
+    <div>
+      <h1>Share Kids Learning Lab</h1>
+      <p class="lead">Quick ways to share the podcast with parents, teachers, or friends.</p>
+    </div>
+  </header>
+
+  <section class="grid" aria-labelledby="howto">
+
+    <div>
+
+      <div class="card" role="region" aria-label="Share the podcast link">
+        <h2 id="howto" style="font-size:16px; margin:0 0 8px;">Share the podcast (single link)</h2>
+
+        <label for="share-url" class="hint">Share this URL</label>
+        <input id="share-url" type="url" value="https://kidslearninglab.com" aria-label="Shareable link">
+
+        <div class="actions">
+          <button class="btn-primary btn-small" id="copyBtn">Copy link</button>
+          <button class="btn-ghost btn-small" id="emailBtn">Share by email</button>
+          <button class="btn-ghost btn-small" id="smsBtn">Share by text</button>
+          <button class="btn-ghost btn-small" id="nativeShareBtn">Share (device)</button>
+        </div>
+
+        <div id="copyHint" class="hint" aria-live="polite"></div>
+
+        <div style="margin-top:14px;">
+          <div class="hint">Quick share to platforms</div>
+          <div class="platforms" role="list">
+            <a class="platform" href="https://open.spotify.com/show/ABCDEFG" target="_blank" rel="noopener">Spotify</a>
+            <a class="platform" href="https://podcasts.apple.com/us/podcast/kids-learning-lab/id1657069274" target="_blank" rel="noopener">Apple</a>
+            <a class="platform" href="https://podcasts.google.com/feed/aHR0cHM6Ly9raWRzbGVhcm5pbmdsYWIuY29tL2ZlZWQ" target="_blank" rel="noopener">Google</a>
+            <a class="platform" href="https://www.iheart.com/search/?query=kids+learning+lab" target="_blank" rel="noopener">iHeart</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;" role="region">
+        <h3 style="margin:0 0 8px;">Share a specific episode</h3>
+
+        <label class="hint" for="episode-url">Paste an episode link</label>
+        <input id="episode-url" type="url" placeholder="https://kidslearninglab.com/episodes/episode-name">
+
+        <div class="actions">
+          <button class="btn-primary btn-small" id="copyEpisode">Copy episode link</button>
+          <button class="btn-ghost btn-small" id="tweetEpisode">Share to X/Twitter</button>
+          <button class="btn-ghost btn-small" id="fbEpisode">Share to Facebook</button>
+        </div>
+
+        <p class="hint" style="margin-top:10px;">Tip: include one sentence about why you liked it.</p>
+      </div>
+
+      <div class="card teacher" style="margin-top:12px;" role="region">
+        <h3 style="margin:0 0 8px;">For teachers & classrooms</h3>
+        <p class="hint">Printable one-page lesson or quick audio resource.</p>
+
+        <div class="actions">
+          <button class="btn-primary btn-small" id="printLesson">Print teacher one-pager</button>
+          <button class="btn-ghost btn-small" id="emailTeacher">Email to a teacher</button>
+        </div>
+      </div>
+
+    </div>
+
+    <aside>
+
+      <div class="card" role="region">
+        <h3 style="margin:0 0 8px;">Why your share matters</h3>
+        <ul class="simple">
+          <li>One share reaches multiple families and classrooms.</li>
+          <li>Reviews help new listeners trust the show.</li>
+          <li>Teachers use short episodes as quick activities.</li>
+        </ul>
+
+        <div style="margin-top:10px;">
+          <h4 style="margin:0 0 8px;font-size:15px;">Leave a quick review</h4>
+          <p class="hint">A one-sentence review helps a lot.</p>
+
+          <div class="actions">
+            <a class="platform" href="https://podcasts.apple.com/us/podcast/kids-learning-lab/id1657069274" target="_blank" rel="noopener">Review on Apple</a>
+            <a class="platform" href="https://open.spotify.com/show/ABCDEFG" target="_blank" rel="noopener">Review on Spotify</a>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h4 style="margin:0 0 8px; font-size:15px;">Mini embed</h4>
+          <div class="mini-box" id="miniEmbed">
+<div class="kll-share">
+  <a href="https://kidslearninglab.com">Kids Learning Lab – short science & history episodes for kids</a>
+</div>
+          </div>
+
+          <div class="actions" style="margin-top:8px;">
+            <button class="btn-ghost btn-small" id="copyMini">Copy embed</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h4 style="margin:0 0 8px;font-size:15px;">Quick checklist</h4>
+        <ul class="simple">
+          <li>Share one episode + one sentence.</li>
+          <li>Ask a teacher to try an episode this week.</li>
+          <li>Leave a short review.</li>
+        </ul>
+      </div>
+
+      <footer>
+        <div>Need a printable PDF? Use Print teacher one-pager.</div>
+        <div style="margin-top:6px;">Site: <a href="https://kidslearninglab.com">kidslearninglab.com</a></div>
+      </footer>
+
+    </aside>
+
+  </section>
+</main>
+
+<script>
+(function() {
+  const siteUrl = "https://kidslearninglab.com";
+
+  const shareInput = document.getElementById("share-url");
+  const episodeInput = document.getElementById("episode-url");
+  const copyBtn = document.getElementById("copyBtn");
+  const copyEpisode = document.getElementById("copyEpisode");
+  const copyMini = document.getElementById("copyMini");
+  const emailBtn = document.getElementById("emailBtn");
+  const smsBtn = document.getElementById("smsBtn");
+  const nativeShareBtn = document.getElementById("nativeShareBtn");
+  const tweetEpisode = document.getElementById("tweetEpisode");
+  const fbEpisode = document.getElementById("fbEpisode");
+  const printLesson = document.getElementById("printLesson");
+  const emailTeacher = document.getElementById("emailTeacher");
+  const copyHint = document.getElementById("copyHint");
+
+  shareInput.value = siteUrl;
+
+  function showHint(msg) {
+    copyHint.textContent = msg;
+    setTimeout(() => { if (copyHint.textContent === msg) copyHint.textContent = ""; }, 3000);
+  }
+
+  // Copy main link
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(shareInput.value);
+      showHint("Link copied.");
+    } catch {
+      shareInput.select();
+      document.execCommand("copy");
+      showHint("Copied.");
+    }
+  });
+
+  // Copy episode link
+  copyEpisode.addEventListener("click", async () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+    try {
+      await navigator.clipboard.writeText(url);
+      showHint("Episode link copied.");
+    } catch {
+      showHint("Copied.");
+    }
+  });
+
+  // Copy mini embed
+  copyMini.addEventListener("click", async () => {
+    const text = document.getElementById("miniEmbed").textContent.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      showHint("Embed copied.");
+    } catch {
+      showHint("Copied.");
+    }
+  });
+
+  // Email share
+  emailBtn.addEventListener("click", () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+    const subject = encodeURIComponent("Kids Learning Lab — short science & history episodes");
+    const body = encodeURIComponent("Thought you'd like this kid-friendly podcast:\n" + url);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  });
+
+  // Email teacher
+  emailTeacher.addEventListener("click", () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+    const subject = encodeURIComponent("Audio for class — Kids Learning Lab");
+    const body = encodeURIComponent("This short episode fits a class warmup:\n" + url);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  });
+
+  // SMS share
+  smsBtn.addEventListener("click", () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+    const text = encodeURIComponent("Kids Learning Lab: " + url);
+    window.location.href = `sms:?body=${text}`;
+  });
+
+  // Device share (navigator.share)
+  nativeShareBtn.addEventListener("click", async () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Kids Learning Lab", text: "Check this out:", url });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      showHint("Link copied (no device share).");
+    }
+  });
+
+  // Twitter share
+  tweetEpisode.addEventListener("click", () => {
+    const url = encodeURIComponent(episodeInput.value.trim() || shareInput.value);
+    // FIXED: Added default text for better sharing
+    const text = encodeURIComponent("I love this episode of @KidsLearningLab! Check it out:");
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener");
+  });
+
+  // Facebook share
+  fbEpisode.addEventListener("click", () => {
+    const url = encodeURIComponent(episodeInput.value.trim() || shareInput.value);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank", "noopener");
+  });
+
+  // Printable teacher one-pager (fully fixed)
+  printLesson.addEventListener("click", () => {
+    const url = episodeInput.value.trim() || shareInput.value;
+
+    const win = window.open("", "", "width=800,height=600");
+    const doc = win.document;
+
+    doc.write(`
+      <html>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <title>Kids Learning Lab — Teacher One-Pager</title>
+        <style>
+          body { font-family: "Albert Sans", sans-serif; padding:24px; color:#111; }
+          h1 { font-size:20px; margin-bottom:8px; }
+          p { margin:8px 0; }
+          .meta { font-size:13px; color:#444; margin-top:10px; }
+          .box { border-left:4px solid #0b6cff; padding:12px; background:#f6fbff; }
+        </style>
+      </head>
+      <body>
+        <h1>Kids Learning Lab — Teacher One-Pager</h1>
+        <p class="meta">Use this short audio as class warmup or discussion starter.</p>
+
+        <div class="box">
+          <p><strong>Episode:</strong> <a href="${url}">${url}</a></p>
+          <p><strong>Length:</strong> ~5–12 minutes</p>
+          <p><strong>Suggested use:</strong> Play at start of class, ask two follow-up questions.</p>
+        </div>
+
+        <h2 style="margin-top:18px;">Discussion prompts</h2>
+        <ol>
+          <li>What did you learn?</li>
+          <li>How would you explain it to a friend?</li>
+          <li>What experiment could we try?</li>
+        </ol>
+
+        <p style="margin-top:20px;">Website: <a href="${siteUrl}">${siteUrl}</a></p>
+
+        <script>window.print()<\/script>
+      <\/body>
+      <\/html>
+    `);
+
+    doc.close();
+  });
+
+  // Query param ?ep=...
+  const params = new URLSearchParams(location.search);
+  if (params.get("ep")) episodeInput.value = params.get("ep");
+
+  // Enter = copy episode
+  episodeInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      copyEpisode.click();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
