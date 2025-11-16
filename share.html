@@ -450,5 +450,54 @@
 })();
 </script>
 
+<script>
+(async function() {
+  const miniEmbed = document.getElementById("miniEmbed");
+  if (!miniEmbed) return;
+
+  const RSS_URL = "https://anchor.fm/s/d1b8e6fc/podcast/rss";
+  const SPOTIFY_API_URL = "https://food-gen.onrender.com/api/spotify-episodes";
+
+  try {
+    // Fetch Spotify mapping
+    const spotifyRes = await fetch(SPOTIFY_API_URL);
+    const spotifyData = await spotifyRes.json();
+    const spotifyMap = {};
+    spotifyData.forEach(ep => {
+      spotifyMap[ep.title.toLowerCase().trim()] = ep.spotifyId;
+    });
+
+    // Fetch RSS feed
+    const rssRes = await fetch(RSS_URL);
+    const rssText = await rssRes.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(rssText, "application/xml");
+    const latestItem = xml.querySelector("item");
+    const title = latestItem.querySelector("title")?.textContent.trim();
+    const spotifyId = spotifyMap[title.toLowerCase()];
+
+    if (!spotifyId) {
+      miniEmbed.innerHTML = `<p style="color:red;">No Spotify episode found for "${title}"</p>`;
+      return;
+    }
+
+    // Replace miniEmbed content with full iframe
+    miniEmbed.innerHTML = `
+      <iframe
+        src="https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator"
+        width="100%" height="152" frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        style="border-radius:8px;"
+        loading="eager">
+      </iframe>
+    `;
+  } catch(err) {
+    miniEmbed.innerHTML = `<p style="color:red;">Error loading latest episode.</p>`;
+    console.error(err);
+  }
+})();
+</script>
+
+
 </body>
 </html>
