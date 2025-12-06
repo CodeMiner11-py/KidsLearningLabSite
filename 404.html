@@ -171,28 +171,21 @@ publicKey: "pk_bc836b56715e52fa4155",
     </div>
 </footer>
 
-    <script>
-function toggleMenu() {
-    const nav = document.getElementById('navLinks');
-    const container = document.getElementById('mobileNav');
-    const hamburger = document.querySelector('.hamburger');
-
-    container.classList.toggle('show');
-    hamburger.classList.toggle('open');
-}
-
+<script>
 const links = {
     newsletter: "https://news.kidslearninglab.com",
-    spotify: "https://go.kidslearninglab.com/spotify"
+    spotify: "https://go.kidslearninglab.com/spotify",
+    applepods: "https://go.kidslearninglab.com/applepods",
+    vote: "https://tally.so/r/44QKrX"
 };
 
 const path = window.location.pathname.replace("/", "").toLowerCase();
 
 if (links[path]) {
-    const finalUrl = "https://redirect.kidslearninglab.com/?url=" + encodeURIComponent(links[path]);
-    window.location.href = finalUrl;
+    window.location.replace(links[path]);
 }
 </script>
+
 <script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
 
 
