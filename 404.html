@@ -1,15 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids Learning Lab™ - By a Kid, For Kids</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
 
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    height: 100%;
+  }
+
+  /* Loading screen styles */
+  #loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    flex-direction: column;
+    color: white;
+  }
+
+  .spinner {
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    border-top: 8px solid #ffffff;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+
+  .loading-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  /* Hide main content initially */
+  main {
+    display: none;
+  }
+
+  /* Main 404 content styles */
+  .content-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem 3rem;
+    max-width: 900px;
+    margin: 3rem auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    color: #222;
+  }
+
+  .content-box h1, .content-box h2 {
+    color: #1e40af;
+    margin-bottom: 1rem;
+  }
+
+  .content-box p {
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+  }
+
+  .cta-button {
+    background: #2563eb;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+
+  .cta-button:hover {
+    background: #1e40af;
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="loading-text">Loading...</div>
+</div>
+
+<!-- Header & Navigation -->
+<header>
+    <nav class="container">
+        <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="episodes.html">Episodes</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="python.html">Python Learning Lab</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="availability.html">Where to Listen</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
+        <div class="mobile-nav-container" id="mobileNav">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="episodes.html">Episodes</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="python.html">Python Learning Lab</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="availability.html">Where to Listen</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<!-- Main 404 Page -->
+<main class="content-box">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
+    <h1>🔍 We searched far and wide...</h1>
+    <p>But found nothing. Sorry! Error 404.</p>
+    <a class="cta-button" href="index.html">Go home?</a>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
+                <h3>Kids Learning Lab™</h3>
+                <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="episodes.html">Episodes</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-nav">
+                    <li><a href="python.html" target="_blank">Python Learning Lab Book</a></li>
+                    <li><a href="episodes.html">Latest Episodes</a></li>
+                    <li><a href="https://patreon.kidslearninglab.com/">Patreon Community</a></li>
+                    <li><a href="availability.html">Listen Everywhere</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
+            <p>Created with ❤ by Eshaan for curious minds everywhere</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
 <script>
-const links = {
-    newsletter: "https://news.kidslearninglab.com",
-    spotify: "https://go.kidslearninglab.com/spotify",
-    applepods: "https://go.kidslearninglab.com/applepods",
-    vote: "https://tally.so/r/44QKrX"
-};
+  // Redirect logic (non-blocking)
+  const links = {
+      newsletter: "https://news.kidslearninglab.com",
+      spotify: "https://go.kidslearninglab.com/spotify",
+      applepods: "https://go.kidslearninglab.com/applepods",
+      vote: "https://tally.so/r/44QKrX"
+  };
 
-const path = window.location.pathname.replace("/", "").toLowerCase();
+  const path = window.location.pathname.replace("/", "").toLowerCase();
+  if (links[path]) {
+      window.location.replace(links[path]);
+  }
 
-if (links[path]) {
-    window.location.replace(links[path]);
-}
+  // Show main page after 2 seconds
+  setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.querySelector('main').style.display = 'flex';
+  }, 2000);
+
+  // Mobile nav toggle
+  function toggleMenu() {
+    document.getElementById('mobileNav').classList.toggle('show');
+  }
 </script>
+
+</body>
+</html>
