@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mushroom SMP 🍄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 60px 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #5b21b6;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #4b5563;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(251, 191, 36, 0.5);
+        }
+
+        .card:nth-child(2) {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 10px 25px rgba(52, 211, 153, 0.3);
+        }
+
+        .card:nth-child(2):hover {
+            box-shadow: 0 15px 35px rgba(52, 211, 153, 0.5);
+        }
+
+        .card h2 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .card .desc {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            .card h2 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MUSHROOM SMP 🍄</h1>
+        <p>The Merryhill Milpitas Mushroom SMP. Click one of the buttons below to get started.</p>
+        
+        <div class="button-container">
+            <div class="card" onclick="window.location.href='servdetails.html'">
+                <h2>Server IP & Port</h2>
+                <p class="desc">Click here to access the server details to add to Java, like the IP address and port.</p>
+            </div>
+            
+            <div class="card" onclick="window.open('https://tally.so/r/b5jEB1', '_blank')">
+                <h2>Request Access to Start/Stop Server</h2>
+                <p class="desc">Click here to request access to Eshaan to be able to stop and start the server yourself. If you have been granted access, log on to aternos.org and start/stop the server.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
