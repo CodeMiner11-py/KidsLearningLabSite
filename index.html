@@ -97,7 +97,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="text">Connecting to Riverside...</div>
+        <div class="text" id="statusText">Authorize <b>Riverside</b> to connect?</div>
         <div class="logos">
             <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Logo 1">
             <span class="plus">+</span>
@@ -109,6 +109,7 @@
 
     <script>
         document.getElementById('connectBtn').addEventListener('click', function() {
+            document.getElementById('statusText').innerHTML = 'Connecting...';
             this.classList.add('hidden');
             document.getElementById('loader').classList.remove('hidden');
 
