@@ -3,596 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Learning Lab™ - By a Kid, For Kids</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
-    <meta name="description" content="A kids and family podcast made by a 12 year old kid! We explore science, history, technology, and more!">
+    <title>Loading...</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
-        * { font-family: Albert Sans; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Albert Sans', sans-serif;
+            background-color: #0066cc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .text {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .button {
+            background-color: white;
+            color: #0066cc;
+            border: none;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-family: 'Albert Sans', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .logos {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .logos img {
+            height: 60px;
+            width: auto;
+        }
+
+        .plus {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
-    <style>
-    #top-banner {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 9999;
-  background: white;
-  border-bottom: 1px solid #eaeaea;
-  padding: 14px 20px;
-  font-family: "Albert Sans", sans-serif;
-  text-align: center;
-}
-
-#top-banner a {
-  color: black;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-#top-banner a:hover {
-  text-decoration: underline;
-}
-
-.desktop-banner {
-  display: block;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.mobile-banner {
-  display: none;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* Mobile switch */
-@media (max-width: 768px) {
-  .desktop-banner {
-    display: none;
-  }
-
-  .mobile-banner {
-    display: block;
-  }
-}
-
-</style>
-
 </head>
 <body>
-        <div id="top-banner" style="background-color: #add8e6;">
-  <div class="desktop-banner">
-    Click to listen to the
-    <a href="historyseries.html" style="text-decoration: underline;">Kids Learning Lab History Series!</a>
-  </div>
-
-  <div class="mobile-banner" >
-    <a href="historyseries.html">
-      Kids Learning Lab HISTORY SERIES
-    </a>
-  </div>
-
-    </div>
-
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-
-    <header>
-        <nav class="container">
-            <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="episodes.html">Episodes</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="python.html">Python Learning Lab</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="availability.html">Where to Listen</a></li>
-            </ul>
-            <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
-            <div class="mobile-nav-container" id="mobileNav">
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="episodes.html">Episodes</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="python.html">Python Learning Lab</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="availability.html">Where to Listen</a></li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero" id="home">
-            <div class="container">
-                <div class="hero-content">
-                    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
-                    <h1>A Kids & Family Podcast</h1>
-                    <p>A podcast for kids, by a kid! Join 12-year-old Eshaan for <b>FREE</b> educational episodes that make learning fun!</p>
-                    <a href="episodes.html" class="cta-button">Listen Now!</a>
-                    <div class="latest-episode" id="latest-episode" style="max-width:600px;margin:1rem auto;background:inherit;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-family:Arial,sans-serif;">
-    <p>Loading latest episode...</p>
-</div>
-
-
-                    <script>
-                        const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
-                        const SPOTIFY_API_URL = 'https://food-gen.onrender.com/api/spotify-episodes';
-
-                        async function fetchSpotifyEpisodeMap() {
-                          const res = await fetch(SPOTIFY_API_URL);
-                          const data = await res.json();
-                          const map = {};
-                          data.forEach(ep => {
-                            map[ep.title.toLowerCase().trim()] = ep.spotifyId;
-                          });
-                          return map;
-                        }
-
-                        async function fetchLatestEpisode() {
-                          try {
-                            const [spotifyMap, rssRes] = await Promise.all([
-                              fetchSpotifyEpisodeMap(),
-                              fetch(RSS_URL)
-                            ]);
-
-                            const rssText = await rssRes.text();
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(rssText, 'application/xml');
-                            const latestItem = xml.querySelector('item');
-                            const title = latestItem.querySelector('title')?.textContent.trim();
-                            const spotifyId = spotifyMap[title.toLowerCase()];
-
-                            const container = document.getElementById('latest-episode');
-
-                            if (!spotifyId) {
-                              container.innerHTML = `<p style="color:red;">No matching Spotify episode found for: ${title}</p>`;
-                              return;
-                            }
-
-                            const iframe = document.createElement('iframe');
-                            iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
-                            iframe.width = '100%';
-                            iframe.height = '152';
-                            iframe.frameBorder = '0';
-                            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-                            iframe.loading = 'eager';
-                            iframe.style.borderRadius = '12px';
-
-                            container.innerHTML = '';
-                            container.appendChild(iframe);
-                          } catch (err) {
-                            document.getElementById('latest-episode').innerHTML =
-                              '<p style="color:red;">Error loading episode.</p>';
-                            console.error('Error fetching latest episode:', err);
-                          }
-                        }
-
-                        fetchLatestEpisode();
-                    </script>
-                    <style>
-                        .beehiiv-embed{
-                            margin: auto !important;
-                            width: 100% !important;
-                        }
-                    </style>
-
-                </div>
-            </div>
-        </section>
-
-        <section class="stats">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Amazing Stats!</h2>
-                    <p>Look what we've accomplished together!</p>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">2,000+</div>
-                        <div class="stat-label">Listeners</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">70+</div>
-                        <div class="stat-label">Fun Episodes</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">400+</div>
-                        <div class="stat-label">Hours Listened</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">100+</div>
-                        <div class="stat-label">Countries Reached</div>
-                    </div>
-                </div>
-                <div style="margin-bottom: 30px;" id="wrapped-2025-top-spacer"></div>
-                <p style="text-align: center;"><img src="uploads/wrapped/2025.png" width="50%"></p>
-                <a class="cta-button" style="display: block; width: fit-content; margin: 0 auto; margin-top: 50px;" href="#iframe-link">Join the free newsletter</a>
-
-            </div>
-
-        </section>
-
-
-
-        <section class="creator">
-            <div class="container">
-                <div class="creator-content">
-                    <div class="creator-image creator-avatar">
-                        <img src="https://kidslearninglab.com/wp-content/uploads/2024/12/eglu.jpeg">
-                    </div>
-                    <div class="creator-text">
-                        <h2>Hi, I'm <span class="highlight">Eshaan!</span></h2>
-                        <p>I'm a <span class="highlight">12-year-old creator</span> who loves making learning fun! I write all the scripts, record every episode, and edit everything myself.</p>
-                        <p>From stocks and crypto to the history of the universe, I explore topics that are both educational and entertaining. Every episode is made with kids in mind!</p>
-                        <p>You can also check out <span class="highlight">Python Learning Lab</span>, my book to help kids learn programming. You can <a href="python.html">read it</a> today!</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="features" style="margin-bottom: 50px;">
-            <div class="container">
-                <h1 style="font-size: 40px; color: black; text-align: center;">Share this Podcast!</h1>
-                <p style="text-align: center; margin-top: 10px; font-size: 20px;">Share Kids Learning Lab! and help us grow! Help us by sharing our podcast AND help others by giving them free educational content!</p>
-                <div style="margin-top: 20px;"></div>
-                <p style="text-align: center;">
-                    <a href="share.html" class="cta-button">Share!</a>
-                </p>
-            </div>
-        </section>
-
-        <section class="features">
-            <div class="container">
-                <div class="section-header">
-                    <h2>What Makes Us Special</h2>
-                    <p>Discover why kids and parents love Kids Learning Lab!</p>
-                </div>
-                <div class="features-grid">
-                    <a href="episodes.html" class="invis"><div class="feature-card">
-                        <div class="feature-icon">♪</div>
-                        <h3>Kid-Friendly Episodes</h3>
-                        <p>Short, engaging episodes perfect for young attention spans. Every topic is explained in a fun, easy-to-understand way!</p>
-                    </div></a>
-                    <a href="python.html" class="invis"><div class="feature-card">
-                        <div class="feature-icon">◊</div>
-                        <h3>Python Learning Lab</h3>
-                        <p>Learn programming with Python Learning Lab - written by a kid, for kids who want to code!</p>
-                    </div></a>
-                    <a href="episodes.html" class="invis"><div class="feature-card">
-                        <div class="feature-icon">★</div>
-                        <h3>Educational & Fun</h3>
-                        <p>From science to technology to history, we cover cool topics that spark curiosity and make learning fun!</p>
-                    </div></a>
-                    <a href="availability.html" class="invis"><div class="feature-card">
-                        <div class="feature-icon">♫</div>
-                        <h3>Available Everywhere</h3>
-                        <p>Listen on Apple Podcasts, Spotify, and all major podcast platforms. Learn anywhere, anytime!</p>
-                    </div></a>
-                    <a href="https://news.kidslearninglab.com" class="invis"><div class="feature-card">
-                        <div class="feature-icon">+</div>
-                        <h3>Even more fun!</h3>
-                        Join our free newsletter for bonus content, real-time updates, and direct interaction with Eshaan!
-                    </div></a>
-                    <a class="invis" href="contact.html"><div class="feature-card">
-                        <div class="feature-icon">↗</div>
-                        <h3>Always Growing</h3>
-                        <p>New episodes regularly, fresh topics constantly, and an ever-expanding universe of knowledge to explore!</p>
-                    </div></a>
-                </div>
-                <div class="spacer10px"></div>
-                <div class="spacer10px"></div>
-                <div style="display: flex; justify-content: center;">
-                    <a href="episodes.html" class="cta-button">Listen Now!</a>
-                    </div>
-
-            </div>
-        </section>
-        <section class="creator">
-
-        </section>
-
-        <section class="features">
-            <div class="container">
-                <div style="text-align: center;">
-                    <h3 style="font-weight: normal; font-style: italic;">
-                        "I have this for my brother, he's only 4 but I want him to be prepared when he is learning. Thanks so much for this podcast ❤️"<br><br><span style="font-style: normal;">– Listener on Spotify</span>
-                    </h3></div>
-            </div>
-        </section>
-
-        <section class="creator">
-            <div class="container">
-                <h2 style="text-align: center;">Want to Learn Something Cool?</h2>
-                <p style="text-align: center;">Click the button below to discover a random fun fact!</p>
-                <div style="display: flex; justify-content: center; margin-top: 10px;">
-                    <button class="cta-button" onclick="showRandomFact()">Surprise Me with a Fact!</button>
-                </div>
-                <p id="factDisplay" style="text-align: center; font-weight: bold; margin-top: 20px;"></p>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <script>
-            import memberstackDOM from '@memberstack/dom';
-const memberstack = memberstackDOM.init({
-  publicKey: "pk_bc836b56715e52fa4155",
-});
-        </script>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
-
-                    <h3>Kids Learning Lab™</h3>
-                    <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
-                            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/800fb944-0a45-4ab3-af09-fec64c932604" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 244px; margin: auto; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;" id="iframe-link"></iframe><script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
-
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-nav">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="episodes.html">Episodes</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul class="footer-nav">
-                        <li><a href="python.html" target="_blank">Python Learning Lab Book</a></li>
-                        <li><a href="episodes.html">Latest Episodes</a></li>
-                        <li><a href="https://news.kidslearninglab.com">Free Newsletter</a></li>
-                        <li><a href="availability.html">Listen Everywhere</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
-                <p>Created with ❤ by Eshaan for curious minds everywhere</p>
-            </div>
+    <div class="container">
+        <div class="text">Connecting to Riverside...</div>
+        <div class="logos">
+            <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Logo 1">
+            <span class="plus">+</span>
+            <img src="https://scontent-sjc6-1.xx.fbcdn.net/v/t39.30808-1/288521638_653637672957985_5606083582550829029_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=104&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=U65ovr7wLiYQ7kNvwGBS2hX&_nc_oc=AdmykgTNMxpQvzFtBUmel3xA1kl89m0YJb4MAv719ynvtkANqUDG1sJC6wPvKbvQ848&_nc_zt=24&_nc_ht=scontent-sjc6-1.xx&_nc_gid=Nv1MMSnTapgxAQznelgHgA&oh=00_AfpBAf9eN-nOfg9Wvew98j5lANT452bdNvwA_3_wKHCt_g&oe=696B854E" alt="Logo 2">
         </div>
-    </footer>
-
-    <script>
-        function toggleMenu() {
-            const nav = document.getElementById('navLinks');
-            const container = document.getElementById('mobileNav');
-            const hamburger = document.querySelector('.hamburger');
-
-            container.classList.toggle('show');
-            hamburger.classList.toggle('open');
-        }
-
-        const facts = [
-    "Bananas are berries, but strawberries aren't.",
-    "Octopuses have three hearts.",
-    "A group of flamingos is called a flamboyance.",
-    "Slugs have four noses.",
-    "The moon has moonquakes, just like Earth has earthquakes.",
-    "Sharks existed before trees.",
-    "Cows have best friends and get stressed when they’re apart.",
-    "A day on Venus is longer than a year on Venus.",
-    "Elephants can’t jump.",
-    "Butterflies taste with their feet.",
-    "Humans share about 60% of their DNA with bananas.",
-    "A crocodile can’t stick its tongue out.",
-    "The dot over a lowercase 'i' or 'j' is called a tittle.",
-    "Giraffes have no vocal cords.",
-    "Wombat poop is cube-shaped.",
-    "There are more stars in the universe than grains of sand on Earth.",
-    "Koalas have fingerprints almost identical to humans.",
-    "Hot water freezes faster than cold water (called the Mpemba effect).",
-    "You can’t hum while holding your nose.",
-    "A bolt of lightning is five times hotter than the surface of the sun.",
-    "Spiders can’t fly, but some can ‘balloon’ through the air using silk threads.",
-    "An ostrich’s eye is bigger than its brain.",
-    "The longest hiccuping spree lasted 68 years.",
-    "Jellyfish have been around longer than dinosaurs.",
-    "Caterpillars completely liquefy in their cocoon before becoming butterflies.",
-    "A group of porcupines is called a prickle.",
-    "Some turtles can breathe through their butts.",
-    "The shortest war in history lasted 38 minutes.",
-    "There are more fake flamingos in the world than real ones.",
-    "Starfish can regrow their arms—and sometimes even a whole new body.",
-    "Ants never sleep.",
-    "A cloud can weigh over a million pounds.",
-    "The Eiffel Tower can grow taller in the summer because heat makes it expand.",
-    "Frogs can freeze solid and still survive.",
-    "The longest pizza ever made was over a mile long.",
-    "Honey never spoils. Archaeologists have eaten 3,000-year-old honey.",
-    "Some snails can sleep for 3 years.",
-    "A newborn kangaroo is the size of a jellybean.",
-    "An octopus has nine brains—one central brain and one for each arm.",
-    "Bats always turn left when exiting a cave.",
-    "A blue whale's heart is as big as a small car.",
-    "Pineapples take about two years to grow.",
-    "The Amazon rainforest produces 20% of the world's oxygen.",
-    "Rats and mice laugh when tickled.",
-    "You can’t fold a piece of paper more than 7 times (try it!).",
-    "Seahorses are the only animals in which the males get pregnant.",
-    "A group of crows is called a murder.",
-    "Rain contains vitamin B12.",
-    "The first oranges weren’t orange—they were green.",
-    "Giant pandas can poop up to 40 times a day.",
-    "The inventor of the Frisbee was turned into a Frisbee after he died.",
-    "A single strand of spaghetti is called a spaghetto.",
-    "Tigers have striped skin, not just striped fur.",
-    "Tomatoes were once thought to be poisonous.",
-    "A bolt of lightning can reach temperatures of 30,000 Kelvin.",
-    "Bees sometimes sleep in flowers.",
-    "Sloths can hold their breath longer than dolphins.",
-    "Bubble wrap was originally intended to be wallpaper.",
-    "Reindeer eyes turn blue in winter to help them see in the dark.",
-    "Earthworms have five hearts.",
-    "The heart of a shrimp is located in its head.",
-    "A group of owls is called a parliament.",
-    "Some lizards can squirt blood from their eyes to scare off predators.",
-    "Peanuts are not nuts—they’re legumes.",
-    "Rainbows can appear at night. They’re called moonbows.",
-    "Penguins propose to their mates with a pebble.",
-    "Humans are the only animals with chins.",
-    "There’s a species of jellyfish that can live forever.",
-    "Tardigrades (water bears) can survive in space.",
-    "Apples float because 25% of their volume is air.",
-    "Pigeons can do math and recognize themselves in a mirror.",
-    "A narwhal’s tusk is actually a tooth.",
-    "Dogs' noses are as unique as human fingerprints.",
-    "Some fish cough to clear their gills.",
-    "The smell of freshly-cut grass is actually a plant distress signal.",
-    "There’s a planet where it rains molten glass sideways (HD 189733b).",
-    "Your stomach gets a new lining every few days.",
-    "Snakes can sense heat with their faces.",
-    "Mosquitoes are attracted to people who just ate bananas.",
-    "Sharks are older than Saturn’s rings.",
-    "You can hear a blue whale’s heartbeat from 2 miles away.",
-    "Octopuses can change color in less than a second.",
-    "Some frogs can be frozen solid and come back to life.",
-    "Cows have almost 360-degree vision.",
-    "The longest-living animal is the ocean quahog clam (over 500 years old).",
-    "An eagle can spot a rabbit from 3 miles away.",
-    "Bamboo can grow over 35 inches in a day.",
-    "Some ants explode to protect their colony.",
-    "Chickens can remember over 100 faces.",
-    "There’s a jellyfish that can clone itself.",
-    "Male seahorses give birth, not the females.",
-    "The human nose can detect over 1 trillion scents.",
-    "A group of frogs is called an army.",
-    "Caterpillars have 12 eyes.",
-    "Snails have 14,000 teeth.",
-    "Wolves communicate by using facial expressions.",
-    "Rabbits can see behind them without turning their heads.",
-    "Some parrots can live over 80 years.",
-    "A hippo’s sweat is pink.",
-    "Lobsters taste with their legs.",
-    "Bats are the only mammals that can fly.",
-    "A single honeybee makes about 1/12th of a teaspoon of honey in its life.",
-    "Turtles live on every continent except Antarctica.",
-    "Flies have taste buds on their feet.",
-    "Some animals glow in the dark—this is called bioluminescence.",
-    "Sharks don’t have bones—only cartilage.",
-    "A day on Uranus lasts about 17 hours.",
-    "Some cats are allergic to humans.",
-    "A group of zebras is called a dazzle.",
-    "The longest recorded flight of a chicken is 13 seconds.",
-    "Your bones are about five times stronger than steel of the same density.",
-    "Some sea cucumbers can eject their organs to scare predators.",
-    "There’s a mushroom that glows in the dark.",
-    "Ravens can mimic human speech like parrots.",
-    "Male peacocks use their colorful tails to impress females.",
-    "Antarctica is the driest, windiest, and coldest continent.",
-    "Fireflies produce light through a process called bioluminescence.",
-    "Snakes smell with their tongues.",
-    "Crickets hear using ears on their legs.",
-    "The fingerprints of a koala are almost indistinguishable from a human's—even under a microscope.",
-    "Sharks can go into a trance when flipped upside down.",
-    "Goats have rectangular pupils.",
-    "There’s a plant that eats bugs—it’s called a Venus flytrap.",
-    "Some spiders can fly using silk parachutes.",
-    "A group of kittens is called a kindle.",
-    "Each king in a deck of playing cards represents a real king in history.",
-    "The human body glows in the dark—but the light is too weak to see.",
-    "Octopuses can taste through their arms.",
-    "Cows can walk up stairs but not down them easily.",
-    "Some fish can walk on land—like the mudskipper.",
-    "A rainbow can only appear in the sky opposite the sun.",
-    "The first computer mouse was made of wood.",
-    "Saturn could float in water because it’s so light.",
-    "Snowflakes can have up to 200 sides.",
-    "Pine cones can close up when it’s cold and open when it’s warm.",
-    "Some ants farm fungi for food.",
-    "You can’t burp in space (without gravity to separate liquids and gases).",
-    "One teaspoon of honey represents the life’s work of 12 bees.",
-    "There’s a species of ant that can explode itself like a balloon.",
-    "The human stomach gets a new lining every 3–4 days to protect itself from its own acid.",
-    "There are pink dolphins in the Amazon River.",
-    "Beavers have transparent eyelids so they can see underwater.",
-    "A flea can jump 200 times its body length.",
-    "Toucans regulate their body temperature using their beaks.",
-    "Most lipsticks contain fish scales to make them shiny.",
-    "The human brain uses about 20% of the body’s total energy.",
-    "Owls can turn their heads up to 270 degrees.",
-    "The world's oldest toy is a stick (really—it was added to the Toy Hall of Fame).",
-    "Camels have three eyelids to protect their eyes from sand.",
-    "Bananas grow upside down, pointing toward the sun.",
-    "Some frogs don’t have lungs—they breathe through their skin.",
-    "The heaviest onion ever grown weighed over 10 pounds.",
-    "Kangaroos can’t walk backwards.",
-    "The average cumulus cloud weighs over 1 million pounds.",
-    "The fastest recorded sneeze was over 100 miles per hour."
-];
-
-        function showRandomFact() {
-            const randomIndex = Math.floor(Math.random() * facts.length);
-            const factDisplay = document.getElementById("factDisplay");
-            factDisplay.textContent = facts[randomIndex];
-        }
-    </script>
-    <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
-
-    <!-- Notification container (hidden by default) -->
-    <div id="notification-banner" style="display: none;">
-        <span id="notification-text"></span>
+        <button class="button" id="connectBtn">Connect</button>
+        <div class="loader hidden" id="loader"></div>
     </div>
 
-    <style>
-        #notification-banner {
-          position: fixed;
-          top: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: #38a169; /* green */
-          color: white;
-          padding: 12px 24px;
-          border-radius: 6px;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          font-family: sans-serif;
-          font-size: 16px;
-          z-index: 1000;
-          animation: fadeSlideDown 0.5s ease-out;
-        }
-
-        @keyframes fadeSlideDown {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
-        }
-    </style>
-
     <script>
-        // Get the 'text' parameter from the URL
-        const params = new URLSearchParams(window.location.search);
-        const message = params.get("text");
+        document.getElementById('connectBtn').addEventListener('click', function() {
+            this.classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
 
-        if (message) {
-          const banner = document.getElementById("notification-banner");
-          const textSpan = document.getElementById("notification-text");
-          textSpan.textContent = decodeURIComponent(message);
-          banner.style.display = "block";
-
-          // Optional: hide after 5 seconds
-          setTimeout(() => {
-            banner.style.display = "none";
-          }, 5000);
-        }
+            setTimeout(() => {
+                window.location.href = 'https://riverside.com/studio/kids-learning-labs-studio?t=6ce13a10559e2ade8e80';
+            }, 3000);
+        });
     </script>
-<script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
-
 </body>
-
 </html>
