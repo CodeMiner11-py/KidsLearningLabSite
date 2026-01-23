@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Learning Lab - Guest Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Albert Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Auth Page Styles */
+        .auth-container {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .auth-box {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Albert Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Albert Sans', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .error-popup p {
+            margin-bottom: 8px;
+        }
+
+        .error-popup .countdown {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .bento-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .bento-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bento-box .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .bento-box h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .bento-box p {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .bento-box .warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .bento-btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Albert Sans', sans-serif;
+        }
+
+        .bento-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .auth-box {
+                padding: 32px 24px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 36px;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Page -->
+        <div id="authPage" class="auth-container">
+            <div class="auth-box">
+                <div class="logo">
+                    <h1>🎙️ Kids Learning Lab</h1>
+                    <p>Guest Portal</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="login-btn" id="loginBtn">Log In</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h1>Welcome to Kids Learning Lab Guest Portal</h1>
+                <p>Everything you need for the episode on <b>The Roaring 20's</b> 🔖 (bookmark this page if needed)</p>
+            </div>
+            <div class="bento-grid">
+                <div class="bento-box" onclick="openDoc()">
+                    <div class="icon">📄</div>
+                    <h2>Roaring 20's Script</h2>
+                    <p>Access the Google Doc with the episode script (make sure to fill in your answers!)</p>
+                    <button class="bento-btn">Open Google Doc</button>
+                </div>
+
+                <div class="bento-box" onclick="openRiverside()">
+                    <div class="icon">🎬</div>
+                    <h2>Record Episode</h2>
+                    <div class="warning">⚠️ Only press when it's time to record and the host is ready!</div>
+                    <button class="bento-btn">Open Riverside</button>
+                </div>
+
+                <div class="bento-box" onclick="openEpisodes()">
+                    <div class="icon">🎧</div>
+                    <h2>Past Episodes</h2>
+                    <p>Listen to other episodes of Kids Learning Lab for inspiration!</p>
+                    <button class="bento-btn">Browse Episodes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Check for existing auth cookie on load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (getCookie('verified') === 'true') {
+                showDashboard();
+            }
+        });
+
+        // Cookie helpers
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Show loading spinner
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 2500);
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        // Show error popup
+        function showError() {
+            const popup = document.createElement('div');
+            popup.className = 'error-popup';
+            popup.innerHTML = `
+                <p>❌ Wrong password!</p>
+                <p class="countdown">Please wait <span id="countdown">5</span> seconds before trying again.</p>
+            `;
+            document.body.appendChild(popup);
+
+            let seconds = 5;
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+
+            const countdownEl = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                seconds--;
+                countdownEl.textContent = seconds;
+                if (seconds === 0) {
+                    clearInterval(interval);
+                    popup.remove();
+                    loginBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            showLoading();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`https://api.kidslearninglab.com/verify_guest?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+                const data = await response.json();
+
+                hideLoading();
+
+                if (data.status === "1") {
+                    setCookie('verified', 'true', 1);
+                    showDashboard();
+                } else if (data.status === "0") {
+                    showError();
+                } else {
+                    window.location.href = 'https://kidslearninglab.com/other_status_codes';
+                }
+            } catch (error) {
+                hideLoading();
+                showError();
+            }
+        });
+
+        // Button handlers with loading
+        function openDoc() {
+            showLoading();
+            setTimeout(() => {
+                window.open('https://docs.google.com/document/d/1x6YFqiiqYIY5utJGFpooKDGhrsbudCPlroo28ApNdn0/edit?usp=sharing', '_blank');
+                hideLoading();
+            }, 2500);
+        }
+
+        function openRiverside() {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = 'https://kidslearninglab.com/riverside';
+            }, 2500);
+        }
+
+        function openEpisodes() {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = 'https://kidslearninglab.com/episodes';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
