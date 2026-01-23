@@ -411,11 +411,11 @@
             popup.className = 'error-popup';
             popup.innerHTML = `
                 <p>❌ Wrong password!</p>
-                <p class="countdown">Please wait <span id="countdown">5</span> seconds before trying again.</p>
+                <p class="countdown">Please wait <span id="countdown">20</span> seconds before trying again.</p>
             `;
             document.body.appendChild(popup);
 
-            let seconds = 5;
+            let seconds = 20;
             const loginBtn = document.getElementById('loginBtn');
             loginBtn.disabled = true;
 
