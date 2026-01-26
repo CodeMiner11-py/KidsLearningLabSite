@@ -1,3 +1,133 @@
-404 Page Not Found
-This page was not found on the server.
-<a href="index.html">Go Home</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Countdown to May 10, 2026 6:30 PM</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Albert Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+            color: #fff;
+            /* animated gradient background */
+            background: linear-gradient(-45deg, #1e3c72, #2a5298, #4facfe, #00f2fe);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        * { font-family: 'Albert Sans' !important; }
+
+        #title {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            animation: titleBounce 2s ease infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0);}
+            50% { transform: translateY(-10px);}
+        }
+
+        #countdown {
+            display: flex;
+            gap: 2rem;
+            font-size: 2rem;
+        }
+
+        .time-box {
+            background: rgba(255,255,255,0.15);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 90px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* subtle shadow for text */
+        #days, #hours, #minutes, #seconds {
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="title">Countdown to Departure Time</div>
+    <p>A countdown to the very moment you should leave your house to drive to the San Francisco International Airport to meet for the Merryhill East Coast trip 2026.</p>
+    <div id="countdown">
+        <div class="time-box">
+            <div id="days">0</div>
+            <div id="days-label" class="label">Days</div>
+        </div>
+        <div class="time-box">
+            <div id="hours">0</div>
+            <div id="hours-label" class="label">Hours</div>
+        </div>
+        <div class="time-box">
+            <div id="minutes">0</div>
+            <div id="minutes-label" class="label">Minutes</div>
+        </div>
+        <div class="time-box">
+            <div id="seconds">0</div>
+            <div id="seconds-label" class="label">Seconds</div>
+        </div>
+    </div>
+
+    <script>
+        const targetDate = new Date("May 10, 2026 18:30:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if(distance < 0){
+                document.getElementById("days").innerText = 0;
+                document.getElementById("hours").innerText = 0;
+                document.getElementById("minutes").innerText = 0;
+                document.getElementById("seconds").innerText = 0;
+                clearInterval(countdownInterval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000*60*60*24));
+            const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+            const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+            const seconds = Math.floor((distance % (1000*60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
