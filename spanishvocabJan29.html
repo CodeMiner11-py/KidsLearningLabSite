@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+
+    <style>
+body {
+  font-family: "Albert Sans";
+  background: linear-gradient(135deg, #f6f9fc, #e9f0f7);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.modeBtn {
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: none;
+  background-color: #0077cc;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.modeBtn:hover {
+  background-color: #005fa3;
+}
+
+#question {
+  font-size: 1.8em;
+  margin: 30px 0 15px 0;
+  text-align: center;
+  min-height: 60px;
+}
+
+#answerInput {
+  width: 300px;
+  padding: 10px;
+  font-size: 1.2em;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#answerInput:focus {
+  border-color: #0077cc;
+  box-shadow: 0 0 8px rgba(0, 119, 204, 0.5);
+  outline: none;
+}
+
+#continueBtn {
+  padding: 12px 25px;
+  font-size: 1em;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: none;
+  transition: background 0.3s;
+}
+
+.correct {
+  background-color: #28a745;
+  color: white;
+}
+
+.correct:hover {
+  background-color: #218838;
+}
+
+.wrong {
+  background-color: #dc3545;
+  color: white;
+}
+
+.wrong:hover {
+  background-color: #c82333;
+}
+
+input, button {
+  font-family: inherit;
+}
+
+</style>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spanish Quiz</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  #question { font-size: 1.5em; margin-bottom: 15px; }
+  #answerInput { width: 300px; padding: 5px; font-size: 1em; }
+  #continueBtn { padding: 10px 20px; font-size: 1em; margin-top: 10px; display: none; }
+  .modeBtn { padding: 5px 10px; margin-right: 5px; }
+  .correct { background-color: lightgreen; }
+  .wrong { background-color: lightcoral; }
+</style>
+</head>
+<body>
+
+<h1>Spanish Quiz</h1>
+
+<div>
+  <button class="modeBtn" onclick="setMode('es')">Spanish → English</button>
+  <button class="modeBtn" onclick="setMode('en')">English → Spanish</button>
+</div>
+
+<div id="question"></div>
+<input type="text" id="answerInput" placeholder="Type your answer here">
+<button id="continueBtn" onclick="nextQuestion()">Continue</button>
+
+<script>
+const vocab = [
+  { es: "almorzar", en: "to eat lunch" },
+  { es: "prestar atención", en: "to pay attention" },
+  { es: "regresar a casa", en: "to return home" },
+  { es: "el autobús", en: "the bus" },
+  { es: "la ceremonia", en: "the ceremony" },
+  { es: "el/la compañero/a de clase", en: "classmate" },
+  { es: "el maestro/la maestra", en: "teacher" },
+  { es: "el/la profesor/a", en: "teacher / professor" },
+  { es: "el auditorio", en: "the auditorium" },
+  { es: "el aula; el salón de clase", en: "the classroom" },
+  { es: "la biblioteca", en: "the library" },
+  { es: "el comedor/la soda", en: "the cafeteria" },
+  { es: "el campo de fútbol", en: "the soccer field" },
+  { es: "el colegio", en: "the school" },
+  { es: "el edificio", en: "the building" },
+  { es: "el gimnasio", en: "the gym" },
+  { es: "el laboratorio", en: "the laboratory" },
+  { es: "la oficina", en: "the office" },
+  { es: "el pasillo", en: "the hallway" },
+  { es: "la piscina", en: "the pool" },
+  { es: "A qué hora?", en: "At what time?" },
+  { es: "La clase empieza/termina a ...", en: "Class starts/ends at ..." },
+  { es: "el horario", en: "the schedule" },
+  { es: "entre clases", en: "between classes" },
+  { es: "la camisa", en: "the shirt" },
+  { es: "el escudo", en: "the school emblem / crest" },
+  { es: "la falda", en: "the skirt" },
+  { es: "los pantalones", en: "the pants" },
+  { es: "los zapatos", en: "the shoes" },
+  { es: "blanco/a", en: "white" },
+  { es: "negro/a", en: "black" },
+  { es: "verde", en: "green" },
+  { es: "la agenda escolar", en: "the school planner" },
+  { es: "el bolígrafo", en: "the pen" },
+  { es: "la calculadora", en: "the calculator" },
+  { es: "la carpeta", en: "the folder" },
+  { es: "la computadora", en: "the computer" },
+  { es: "el cuaderno", en: "the notebook" },
+  { es: "el diccionario", en: "the dictionary" },
+  { es: "la escuela", en: "the school" },
+  { es: "la hoja de papel", en: "the sheet of paper" },
+  { es: "el lápiz/los lápices", en: "the pencil / pencils" },
+  { es: "el libro de texto", en: "the textbook" },
+  { es: "la mochila", en: "the backpack" },
+  { es: "el papel", en: "the paper" },
+  { es: "el paquete", en: "the package" },
+  { es: "la táblet", en: "the tablet" },
+  { es: "las tijeras", en: "the scissors" },
+  { es: "el almuerzo", en: "lunch" },
+  { es: "la ciencia", en: "science" },
+  { es: "los estudios sociales", en: "social studies" },
+  { es: "la geografía", en: "geography" },
+  { es: "la historia", en: "history" },
+  { es: "la informática", en: "computer science" },
+  { es: "las matemáticas", en: "math" },
+  { es: "la química", en: "chemistry" },
+  { es: "el recreo/el receso", en: "recess / break" }
+];
+
+
+let currentIndex = 0;
+let mode = 'es'; // default mode: Spanish → English
+
+function setMode(newMode) {
+  mode = newMode;
+  resetQuiz();
+}
+
+function resetQuiz() {
+  currentIndex = 0;
+  shuffleArray(vocab);
+  document.getElementById('answerInput').value = '';
+  document.getElementById('continueBtn').style.display = 'none';
+  showQuestion();
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function showQuestion() {
+  if (currentIndex >= vocab.length) {
+    document.getElementById('question').innerText = "Quiz Complete!";
+    document.getElementById('answerInput').style.display = 'none';
+    document.getElementById('continueBtn').style.display = 'none';
+    return;
+  }
+  let q = mode === 'es' ? vocab[currentIndex].es : vocab[currentIndex].en;
+  document.getElementById('question').innerText = q;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').focus();
+}
+
+document.getElementById('answerInput').addEventListener('keyup', function(event) {
+  if (event.key === 'Enter') checkAnswer();
+});
+
+function checkAnswer() {
+  let input = document.getElementById('answerInput').value.trim().toLowerCase();
+  let correctAnswer = mode === 'es' ? vocab[currentIndex].en.toLowerCase() : vocab[currentIndex].es.toLowerCase();
+
+  let btn = document.getElementById('continueBtn');
+  if (input === correctAnswer) {
+    btn.innerText = "Correct! Continue";
+    btn.className = 'correct';
+  } else {
+    btn.innerText = `Wrong! Correct: ${correctAnswer} → Continue`;
+    btn.className = 'wrong';
+  }
+  btn.style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  currentIndex++;
+  document.getElementById('continueBtn').style.display = 'none';
+  showQuestion();
+}
+
+// initialize
+resetQuiz();
+</script>
+
+</body>
+</html>
