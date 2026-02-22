@@ -362,43 +362,7 @@
 
 </script>
 </script>
-<footer class="footer">
-  <div class="footer-content container">
-    <div class="footer-section">
-      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
-
-      <h4>Kids Learning Lab</h4>
-      <p>Inspiring young minds through fun, facts, and fascinating stories.</p>
-    </div>
-    <div class="footer-section">
-      <script>
-        import memberstackDOM from '@memberstack/dom';
-const memberstack = memberstackDOM.init({
-publicKey: "pk_bc836b56715e52fa4155",
-});
-      </script>
-      <h4>Explore</h4>
-      <ul class="footer-nav">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="episodes.html">Episodes</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="python.html">Python Learning Lab</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h4>Contact</h4>
-      <ul class="footer-nav">
-        <li><a href="mailto:hello@kidslearninglab.com">Email Us</a></li>
-        <li><a href="https://forms.gle/D74qu9snYVfYJCzk7" target="_blank">Contact Form</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    &copy; 2025 Kids Learning Lab. All rights reserved.
-    Created with ❤ by Eshaan for curious minds everywhere
-  </div>
-</footer>
+<div id="footer"></div> <script>   fetch("footer.html")     .then(response => response.text())     .then(data => {       document.getElementById("footer").innerHTML = data;     }); </script>
 
 <script>
   function toggleMenu() {

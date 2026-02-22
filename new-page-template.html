@@ -60,44 +60,7 @@
 
 </main>
 
-<footer class="footer">
-    <script>
-        import memberstackDOM from '@memberstack/dom';
-const memberstack = memberstackDOM.init({
-publicKey: "pk_bc836b56715e52fa4155",
-});
-    </script>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>Kids Learning Lab™</h3>
-                <p>A fun educational podcast created by 12-year-old Eshaan. Join us for exciting learning adventures that make education entertaining for kids!</p>
-            </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul class="footer-nav">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="episodes.html">Episodes</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul class="footer-nav">
-                    <li><a href="https://kidslearninglab.com/pythonlearninglab" target="_blank">Python Learning Lab Book</a></li>
-                    <li><a href="episodes.html">Latest Episodes</a></li>
-                    <li><a href="https://news.kidslearninglab.com">Newsletter (free)</a></li>
-                    <li><a href="availability.html">Listen Everywhere</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Kids Learning Lab Media. All rights reserved.</p>
-            <p>Created with ❤ by Eshaan for curious minds everywhere</p>
-        </div>
-    </div>
-</footer>
+<div id="footer"></div> <script>   fetch("footer.html")     .then(response => response.text())     .then(data => {       document.getElementById("footer").innerHTML = data;     }); </script>
 
 <script>
     function toggleMenu() {
