@@ -8,8 +8,8 @@
     <link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
     <meta name="description" content="A kids and family podcast made by a 12 year old kid! We explore science, history, technology, and more!">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
     <style>
         * { font-family: Albert Sans; }
@@ -49,19 +49,238 @@
   font-weight: 600;
 }
 
-/* Mobile switch */
 @media (max-width: 768px) {
-  .desktop-banner {
-    display: none;
-  }
-
-  .mobile-banner {
-    display: block;
-  }
+  .desktop-banner { display: none; }
+  .mobile-banner { display: block; }
 }
 
-</style>
+/* ── Custom RSS Audio Player ── */
+#latest-episode {
+  max-width: 600px;
+  margin: 1.5rem auto 0;
+}
 
+.kll-player {
+  background: linear-gradient(135deg, #1a6fc4 0%, #2196f3 50%, #42a5f5 100%);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 8px 32px rgba(30, 100, 200, 0.35), 0 2px 8px rgba(0,0,0,0.12);
+  font-family: "Albert Sans", sans-serif;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.kll-player::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 150px; height: 150px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 50%;
+}
+.kll-player::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -20px;
+  width: 110px; height: 110px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.kll-player-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.kll-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+
+.kll-title {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.kll-meta {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-bottom: 14px;
+}
+
+/* Progress bar */
+.kll-progress-wrap {
+  position: relative;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.kll-progress-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.kll-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: white;
+  border-radius: 10px;
+  transition: width 0.1s linear;
+}
+
+.kll-progress-input {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 18px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Time */
+.kll-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
+  margin-bottom: 14px;
+}
+
+/* Controls */
+.kll-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kll-btn {
+  background: rgba(255,255,255,0.18);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+  color: white;
+  flex-shrink: 0;
+}
+
+.kll-btn:hover {
+  background: rgba(255,255,255,0.32);
+  transform: scale(1.07);
+}
+
+.kll-btn.play-pause {
+  width: 52px;
+  height: 52px;
+  background: white;
+  color: #1a6fc4;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.kll-btn.play-pause:hover {
+  background: #f0f8ff;
+  transform: scale(1.1);
+}
+
+.kll-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.kll-btn.play-pause svg {
+  width: 22px;
+  height: 22px;
+}
+
+.kll-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.kll-volume-wrap svg {
+  width: 16px;
+  height: 16px;
+  fill: rgba(255,255,255,0.8);
+  flex-shrink: 0;
+}
+
+.kll-volume {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  height: 4px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.3);
+  outline: none;
+  cursor: pointer;
+}
+
+.kll-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.kll-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 0;
+  opacity: 0.8;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.kll-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: kll-spin 0.8s linear infinite;
+}
+
+@keyframes kll-spin { to { transform: rotate(360deg); } }
+
+.kll-error {
+  padding: 18px 0;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .kll-title { font-size: 14px; }
+  .kll-volume-wrap { display: none; }
+}
+    </style>
 </head>
 
 <script>
@@ -73,18 +292,16 @@
 </script>
 
 <body>
-        <div id="top-banner" style="background-color: #add8e6;">
-  <div class="desktop-banner">
-    Click here to learn about
-    <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">our new video episodes!</a>
-  </div>
-
-  <div class="mobile-banner" >
-    <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">
-      New Video Episodes!
-    </a>
-  </div>
-
+    <div id="top-banner" style="background-color: #add8e6;">
+      <div class="desktop-banner">
+        Click here to learn about
+        <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">our new video episodes!</a>
+      </div>
+      <div class="mobile-banner">
+        <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">
+          New Video Episodes!
+        </a>
+      </div>
     </div>
 
     <div class="floating-shapes">
@@ -127,73 +344,176 @@
                     <h1>A Kids & Family Podcast</h1>
                     <p>A podcast for kids, by a kid! Join 12-year-old Eshaan for <b>FREE</b> educational episodes that make learning fun!</p>
                     <a href="episodes.html" class="cta-button">Listen Now!</a>
-                    <div class="latest-episode" id="latest-episode" style="max-width:600px;margin:1rem auto;background:inherit;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-family:Arial,sans-serif;">
-    <p>Loading latest episode...</p>
-</div>
 
+                    <!-- ── Custom RSS Audio Player ── -->
+                    <div id="latest-episode">
+                      <div class="kll-player">
+                        <div class="kll-player-inner">
+                          <div class="kll-loading">
+                            <div class="kll-spinner"></div>
+                            Loading latest episode…
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
                     <script>
-                        const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
-                        const SPOTIFY_API_URL = 'https://api.kidslearninglab.com/api/spotify-episodes';
+                    (function () {
+                      const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
+                      const container = document.getElementById('latest-episode');
 
-                        async function fetchSpotifyEpisodeMap() {
-                          const res = await fetch(SPOTIFY_API_URL);
-                          const data = await res.json();
-                          const map = {};
-                          data.forEach(ep => {
-                            map[ep.title.toLowerCase().trim()] = ep.spotifyId;
-                          });
-                          return map;
-                        }
+                      function formatTime(s) {
+                        if (isNaN(s)) return '0:00';
+                        const m = Math.floor(s / 60);
+                        const sec = Math.floor(s % 60);
+                        return m + ':' + (sec < 10 ? '0' : '') + sec;
+                      }
 
-                        async function fetchLatestEpisode() {
-                          try {
-                            const [spotifyMap, rssRes] = await Promise.all([
-                              fetchSpotifyEpisodeMap(),
-                              fetch(RSS_URL)
-                            ]);
+                      function renderPlayer(title, audioUrl, pubDate) {
+                        const date = pubDate ? new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
-                            const rssText = await rssRes.text();
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(rssText, 'application/xml');
-                            const latestItem = xml.querySelector('item');
-                            const title = latestItem.querySelector('title')?.textContent.trim();
-                            const spotifyId = spotifyMap[title.toLowerCase()];
+                        container.innerHTML = `
+                          <div class="kll-player">
+                            <div class="kll-player-inner">
+                              <div class="kll-label">Latest Episode</div>
+                              <div class="kll-title">${title}</div>
+                              <div class="kll-meta">${date}</div>
 
-                            const container = document.getElementById('latest-episode');
+                              <div class="kll-progress-wrap" id="kll-pw">
+                                <div class="kll-progress-bg">
+                                  <div class="kll-progress-fill" id="kll-fill"></div>
+                                </div>
+                                <input type="range" class="kll-progress-input" id="kll-seek" min="0" max="100" value="0" step="0.1">
+                              </div>
 
-                            if (!spotifyId) {
-                              container.innerHTML = `<p style="color:red;">No matching Spotify episode found for: ${title}</p>`;
-                              return;
-                            }
+                              <div class="kll-times">
+                                <span id="kll-cur">0:00</span>
+                                <span id="kll-dur">--:--</span>
+                              </div>
 
-                            const iframe = document.createElement('iframe');
-                            iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
-                            iframe.width = '100%';
-                            iframe.height = '152';
-                            iframe.frameBorder = '0';
-                            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-                            iframe.loading = 'eager';
-                            iframe.style.borderRadius = '12px';
+                              <div class="kll-controls">
+                                <button class="kll-btn" id="kll-back" title="Rewind 15s">
+                                  <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="7.5" y="15.5" font-size="5" font-family="Albert Sans,sans-serif" font-weight="700" fill="currentColor">15</text></svg>
+                                </button>
 
-                            container.innerHTML = '';
-                            container.appendChild(iframe);
-                          } catch (err) {
-                            document.getElementById('latest-episode').innerHTML =
-                              '<p style="color:red;">Error loading episode.</p>';
-                            console.error('Error fetching latest episode:', err);
+                                <button class="kll-btn play-pause" id="kll-play" title="Play / Pause">
+                                  <svg id="kll-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </button>
+
+                                <button class="kll-btn" id="kll-fwd" title="Forward 15s">
+                                  <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="7.5" y="15.5" font-size="5" font-family="Albert Sans,sans-serif" font-weight="700" fill="currentColor">15</text></svg>
+                                </button>
+
+                                <div class="kll-volume-wrap">
+                                  <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                                  <input type="range" class="kll-volume" id="kll-vol" min="0" max="1" step="0.02" value="1">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        `;
+
+                        const audio = new Audio(audioUrl);
+                        audio.preload = 'metadata';
+
+                        const playBtn   = document.getElementById('kll-play');
+                        const playIcon  = document.getElementById('kll-play-icon');
+                        const fill      = document.getElementById('kll-fill');
+                        const seek      = document.getElementById('kll-seek');
+                        const curEl     = document.getElementById('kll-cur');
+                        const durEl     = document.getElementById('kll-dur');
+                        const backBtn   = document.getElementById('kll-back');
+                        const fwdBtn    = document.getElementById('kll-fwd');
+                        const volInput  = document.getElementById('kll-vol');
+
+                        const PAUSE_PATH = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+                        const PLAY_PATH  = 'M8 5v14l11-7z';
+
+                        audio.addEventListener('loadedmetadata', () => {
+                          durEl.textContent = formatTime(audio.duration);
+                          seek.max = audio.duration;
+                        });
+
+                        audio.addEventListener('timeupdate', () => {
+                          const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+                          fill.style.width = pct + '%';
+                          seek.value = audio.currentTime;
+                          curEl.textContent = formatTime(audio.currentTime);
+                        });
+
+                        audio.addEventListener('ended', () => {
+                          playIcon.querySelector('path').setAttribute('d', PLAY_PATH);
+                        });
+
+                        playBtn.addEventListener('click', () => {
+                          if (audio.paused) {
+                            audio.play();
+                            playIcon.querySelector('path').setAttribute('d', PAUSE_PATH);
+                          } else {
+                            audio.pause();
+                            playIcon.querySelector('path').setAttribute('d', PLAY_PATH);
                           }
-                        }
+                        });
 
-                        fetchLatestEpisode();
+                        seek.addEventListener('input', () => {
+                          audio.currentTime = seek.value;
+                        });
+
+                        backBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+                        fwdBtn.addEventListener('click',  () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15); });
+                        volInput.addEventListener('input', () => { audio.volume = volInput.value; });
+                      }
+
+                      function renderError(msg) {
+                        container.innerHTML = `
+                          <div class="kll-player">
+                            <div class="kll-player-inner">
+                              <div class="kll-error">😔 ${msg}</div>
+                            </div>
+                          </div>`;
+                      }
+
+                      async function fetchLatestEpisode() {
+                        try {
+                          const res  = await fetch('https://anchor.fm/s/d1b8e6fc/podcast/rss');
+                          const text = await res.text();
+
+                          // Grab first <item> block
+                          const itemMatch = text.match(/<item>([\s\S]*?)<\/item>/);
+                          if (!itemMatch) { renderError('No episodes found.'); return; }
+                          const item = itemMatch[1];
+
+                          // Title - handle CDATA or plain
+                          const titleMatch = item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
+                                             item.match(/<title>([\s\S]*?)<\/title>/);
+                          const title = titleMatch ? titleMatch[1].trim() : 'Latest Episode';
+
+                          // Audio URL from enclosure tag
+                          const enclosureMatch = item.match(/<enclosure[^>]+url="([^"]+)"/);
+                          const audioUrl = enclosureMatch ? enclosureMatch[1] : null;
+
+                          // Publish date
+                          const pubMatch = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+                          const pubDate  = pubMatch ? pubMatch[1].trim() : '';
+
+                          if (!audioUrl) { renderError('Audio not available.'); return; }
+                          renderPlayer(title, audioUrl, pubDate);
+                        } catch (e) {
+                          console.error(e);
+                          renderError('Could not load episode. Try again later.');
+                        }
+                      }
+
+                      fetchLatestEpisode();
+                    })();
                     </script>
+
                     <style>
                         .beehiiv-embed{
                             margin: auto !important;
                             width: 100% !important;
                         }
                     </style>
-
                 </div>
             </div>
         </section>
@@ -225,12 +545,8 @@
                 <div style="margin-bottom: 30px;" id="wrapped-2025-top-spacer"></div>
                 <p style="text-align: center;"><img src="uploads/wrapped/2025.png" width="50%"></p>
                 <a class="cta-button" style="display: block; width: fit-content; margin: 0 auto; margin-top: 50px;" href="#iframe-link">Join the free newsletter</a>
-
             </div>
-
         </section>
-
-
 
         <section class="creator">
             <div class="container">
@@ -301,20 +617,19 @@
                 <div class="spacer10px"></div>
                 <div style="display: flex; justify-content: center;">
                     <a href="episodes.html" class="cta-button">Listen Now!</a>
-                    </div>
-
+                </div>
             </div>
         </section>
-        <section class="creator">
 
-        </section>
+        <section class="creator"></section>
 
         <section class="features">
             <div class="container">
                 <div style="text-align: center;">
                     <h3 style="font-weight: normal; font-style: italic;">
                         "I have this for my brother, he's only 4 but I want him to be prepared when he is learning. Thanks so much for this podcast ❤️"<br><br><span style="font-style: normal;">– Listener on Spotify</span>
-                    </h3></div>
+                    </h3>
+                </div>
             </div>
         </section>
 
@@ -338,14 +653,12 @@
             const nav = document.getElementById('navLinks');
             const container = document.getElementById('mobileNav');
             const hamburger = document.querySelector('.hamburger');
-
             container.classList.toggle('show');
             hamburger.classList.toggle('open');
         }
     </script>
     <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
 
-    <!-- Notification container (hidden by default) -->
     <div id="notification-banner" style="display: none;">
         <span id="notification-text"></span>
     </div>
@@ -356,7 +669,7 @@
           top: 55px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: #38a169; /* green */
+          background-color: #38a169;
           color: white;
           padding: 12px 24px;
           border-radius: 6px;
@@ -366,37 +679,23 @@
           z-index: 1000;
           animation: fadeSlideDown 0.5s ease-out;
         }
-
         @keyframes fadeSlideDown {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
+          from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
     </style>
 
     <script>
-        // Get the 'text' parameter from the URL
         const params = new URLSearchParams(window.location.search);
         const message = params.get("text");
-
         if (message) {
           const banner = document.getElementById("notification-banner");
           const textSpan = document.getElementById("notification-text");
           textSpan.textContent = decodeURIComponent(message);
           banner.style.display = "block";
-
-          // Optional: hide after 5 seconds
-          setTimeout(() => {
-            banner.style.display = "none";
-          }, 5000);
+          setTimeout(() => { banner.style.display = "none"; }, 5000);
         }
     </script>
 
 </body>
-
 </html>

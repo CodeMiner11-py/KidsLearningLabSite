@@ -3,218 +3,435 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kids Learning Lab™ - By a Kid, For Kids</title>
+  <title>Episodes — Kids Learning Lab™</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
+  <meta name="description" content="Browse all episodes of Kids Learning Lab — a kids podcast made by a 12 year old!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Funnel+Display:wght@300..800&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg:        #f5f2ed;
+      --bg2:       #edeae3;
+      --card:      #ffffff;
+      --border:    #ddd9d0;
+      --text:      #1a1612;
+      --muted:     #6b6459;
+      --accent:    #1a6fc4;
+      --accent2:   #e8f0fb;
+      --active-bg: #1a6fc4;
+      --active-fg: #ffffff;
+      --radius:    14px;
+      --shadow:    0 2px 12px rgba(0,0,0,0.08);
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Reset */
-    * {
-      box-sizing: border-box;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Albert Sans', sans-serif;
+      min-height: 100vh;
     }
-   body {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    color: white;
-    font-family: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-    main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .episodes-list {
-      max-width: 900px;
+
+    /* ── Page layout ── */
+    .ep-page {
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 0 1rem;
+      padding: 2rem 1.2rem 4rem;
+    }
+
+    /* ── Header row: logo + title ── */
+    .ep-header {
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      overflow-x: hidden;
-    }
-    .episode {
-      max-width: 100%;
-      width: 100%;
-      display: flex;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-      overflow: hidden;
-      cursor: default;
-      box-sizing: border-box;
-    }
-    .episode-artwork {
-      flex: 0 0 150px;
-      height: 150px;
-      background-size: cover;
-      background-position: center;
-      border-right: 1px solid #ddd;
-      /* no padding, no margin */
-    }
-    .episode-content {
-      flex: 1;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .episode-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 6px;
-      line-height: 1.2;
-    }
-    .episode-description {
-      position: relative;
-      font-size: 0.95rem;
-      color: #444;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      margin-bottom: 8px;
-    }
-    .show-more-btn {
-      position: absolute;
-      right: 0;
-      top: 0;
-      background: transparent;
-      border: none;
-      color: #3b82f6;
-      font-weight: 600;
-      cursor: pointer;
-      padding-left: 4px;
-      font-size: 1rem;
-      user-select: none;
-    }
-    /* Popup */
-    #popup-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 10000;
       align-items: center;
-      justify-content: center;
+      gap: 18px;
+      margin-bottom: 2.2rem;
     }
-    #popup {
-      background: white;
-      max-width: 400px;
-      max-height: 80vh;
-      padding: 1.5rem;
+
+    .ep-header img {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(26,111,196,0.18);
+      flex-shrink: 0;
+    }
+
+    .ep-header-text h1 {
+      font-family: 'Funnel Display', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .ep-header-text p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Main split layout ── */
+    .ep-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .ep-layout { grid-template-columns: 1fr; }
+      .ep-player-panel { position: static !important; }
+    }
+
+    /* ── Episode list panel ── */
+    .ep-list-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .ep-list-header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    .ep-list-header h2 {
+      font-family: 'Funnel Display', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .ep-search {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px 12px;
       border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-family: 'Albert Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .ep-search:focus { border-color: var(--accent); }
+
+    .ep-list-scroll {
+      max-height: 520px;
       overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .ep-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
       position: relative;
     }
-    #popup h3 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-size: 1.3rem;
+
+    .ep-item:last-child { border-bottom: none; }
+    .ep-item:hover { background: var(--bg2); }
+
+    .ep-item.active {
+      background: var(--accent2);
+      border-left: 3px solid var(--accent);
+      padding-left: 11px;
     }
-    #popup p {
-      font-size: 1rem;
-      color: #333;
-      white-space: normal;
+
+    .ep-item-art {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg2);
     }
-    #popup-close {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: transparent;
+
+    .ep-item-info { flex: 1; min-width: 0; }
+
+    .ep-item-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ep-item.active .ep-item-title { color: var(--accent); }
+
+    .ep-item-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .ep-item-dur {
+      font-size: 0.75rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* Playing indicator */
+    .ep-item.playing .ep-item-art {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .ep-now-playing-dot {
+      display: none;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .ep-item.playing .ep-now-playing-dot { display: block; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    .ep-load-more {
+      width: 100%;
+      padding: 12px;
       border: none;
-      font-size: 1.5rem;
+      background: var(--bg2);
+      color: var(--accent);
+      font-family: 'Albert Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
-      color: #888;
+      border-top: 1px solid var(--border);
+      transition: background 0.15s;
     }
-    /* Media controls container */
-    .media-controls {
-      display: flex;
-      flex-direction: column;
-      user-select: none;
+    .ep-load-more:hover { background: var(--border); }
+
+    /* ── Player panel ── */
+    .ep-player-panel {
+      position: sticky;
+      top: 20px;
     }
-    .control-buttons {
-      display: flex;
-      justify-content: flex-start;
-      gap: 12px;
+
+    .ep-player-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* Art banner */
+    .ep-player-art {
+      width: 100%;
+      aspect-ratio: 16/7;
+      object-fit: cover;
+      background: var(--bg2);
+      display: block;
+    }
+
+    .ep-player-body {
+      padding: 20px 22px 22px;
+    }
+
+    .ep-player-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
       margin-bottom: 6px;
     }
-    .control-button {
-      background: #3b82f6;
-      border: none;
-      color: white;
-      font-size: 1rem;
-      padding: 6px 12px;
-      border-radius: 6px;
+
+    .ep-player-title {
+      font-family: 'Funnel Display', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .ep-player-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    /* Description */
+    .ep-player-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+      max-height: 72px;
+      overflow: hidden;
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+
+    /* Progress */
+    .ep-progress-wrap {
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .ep-progress-bg {
+      width: 100%;
+      height: 5px;
+      background: var(--bg2);
+      border-radius: 10px;
+      overflow: hidden;
       cursor: pointer;
-      transition: background-color 0.25s ease;
     }
-    .control-button:hover {
-      background: #2563eb;
+
+    .ep-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #42a5f5);
+      border-radius: 10px;
+      transition: width 0.1s linear;
     }
-    /* Timeline container */
-    .timeline-container {
+
+    .ep-seek {
+      position: absolute;
+      top: 50%; left: 0;
+      transform: translateY(-50%);
+      width: 100%; height: 18px;
+      opacity: 0;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .ep-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    /* Controls */
+    .ep-controls {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: #666;
+      gap: 10px;
     }
-    .timeline {
-      flex: 1;
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: #ddd;
+
+    .ep-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
+      transition: background 0.15s, transform 0.12s;
+      color: var(--text);
+      flex-shrink: 0;
     }
-    .timeline::-webkit-slider-thumb {
+    .ep-btn:hover { background: var(--border); transform: scale(1.05); }
+    .ep-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .ep-btn.play-pause {
+      width: 52px; height: 52px;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      box-shadow: 0 4px 14px rgba(26,111,196,0.3);
+    }
+    .ep-btn.play-pause svg { width: 22px; height: 22px; }
+    .ep-btn.play-pause:hover { background: #1560ad; transform: scale(1.06); }
+
+    .ep-vol-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-left: auto;
+    }
+    .ep-vol-wrap svg { width: 15px; height: 15px; fill: var(--muted); flex-shrink: 0; }
+
+    .ep-vol {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #3b82f6;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      top: -4px;
-      border: none;
-      transition: background-color 0.3s ease;
+      width: 72px; height: 4px;
+      border-radius: 10px;
+      background: var(--border);
+      outline: none; cursor: pointer;
     }
-    .timeline::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: #3b82f6;
+    .ep-vol::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
       border-radius: 50%;
+      background: var(--accent);
       cursor: pointer;
-      border: none;
-      transition: background-color 0.3s ease;
+    }
+
+    /* Empty / loading states */
+    .ep-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 30px;
+      text-align: center;
+      color: var(--muted);
+      gap: 12px;
+    }
+    .ep-placeholder svg { width: 48px; height: 48px; fill: var(--border); }
+    .ep-placeholder p { font-size: 0.95rem; }
+
+    .ep-spinner {
+      width: 22px; height: 22px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px) {
+      .ep-vol-wrap { display: none; }
+      .ep-player-title { font-size: 1.1rem; }
     }
   </style>
 </head>
+
+<script>
+  fetch("footer.html")
+    .then(r => r.text())
+    .then(d => { document.getElementById("footer").innerHTML = d; });
+</script>
+
 <body>
+
 <div class="floating-shapes">
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
+  <div class="shape"></div><div class="shape"></div>
+  <div class="shape"></div><div class="shape"></div>
 </div>
 
 <header>
   <nav class="container">
-    <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
+    <div class="logo">
+      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40">
+      <span>Kids Learning Lab™</span>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="episodes.html">Episodes</a></li>
@@ -238,179 +455,292 @@
 </header>
 
 <main>
-  <style>
-    .spotify-note {
-    text-align: center;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    color: #555;
-    padding: 10px;
-    background-color: #44ffb0;
-    border-radius: 6px;
-}
+  <div class="ep-page">
 
-.spotify-note a {
-    text-decoration: none;
-    font-weight: bold;
-    color: #1DB954; /* Spotify green */
-}
-
-  </style>
-
-  <section id="episodes-list" class="episodes-list">
-    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="100">
-    <h1>Latest Episodes</h1>
-    <a class="cta-button" href="availability.html">Where to Listen</a>
-    <div style="text-align: center; font-family: inherit, sans-serif; font-size: 14px; color: #555; padding: 10px; background-color: #44ffb0; border-radius: 6px;" class="spotify-note">
-      <strong>NOTE:</strong> We are also available on other platforms
-      <a href="availability.html" target="_blank" style=" text-decoration: none; font-weight: bold;">
-        here,
-      </a>
-      like Apple Podcasts and Spotify.
+    <!-- Header -->
+    <div class="ep-header">
+      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab logo">
+      <div class="ep-header-text">
+        <h1>All Episodes</h1>
+        <p>By a kid, for kids — pick an episode and start learning!</p>
+      </div>
     </div>
-    <div id="episodes-container"></div>
-    <button id="load-more" class="cta-button" style="margin: 1rem auto; display: block;">Load Episodes</button>
-  </section>
+
+    <!-- Split layout -->
+    <div class="ep-layout">
+
+      <!-- Left: episode list -->
+      <div class="ep-list-panel">
+        <div class="ep-list-header">
+          <h2>Episodes</h2>
+          <input class="ep-search" type="search" id="ep-search" placeholder="Search episodes…">
+        </div>
+        <div class="ep-list-scroll" id="ep-list-scroll">
+          <div class="ep-placeholder">
+            <div class="ep-spinner"></div>
+            <p>Loading episodes…</p>
+          </div>
+        </div>
+        <button class="ep-load-more" id="ep-load-more" style="display:none">Load more episodes ↓</button>
+      </div>
+
+      <!-- Right: player -->
+      <div class="ep-player-panel">
+        <div class="ep-player-card">
+          <div id="ep-player-content">
+            <div class="ep-placeholder">
+              <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+              <p>Select an episode<br>from the list to start listening</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </main>
 
-<div id="footer"></div> <script>   fetch("footer.html")     .then(response => response.text())     .then(data => {       document.getElementById("footer").innerHTML = data;     }); </script>
+<div id="footer"></div>
 
 <script>
   function toggleMenu() {
-      const nav = document.getElementById('navLinks');
-      const container = document.getElementById('mobileNav');
-      const hamburger = document.querySelector('.hamburger');
-
-      container.classList.toggle('show');
-      hamburger.classList.toggle('open');
+    document.getElementById('mobileNav').classList.toggle('show');
+    document.querySelector('.hamburger').classList.toggle('open');
   }
 </script>
-<!-- Popup -->
-<div id="popup-overlay" role="dialog" aria-modal="true" tabindex="-1">
-  <div id="popup">
-    <button id="popup-close" aria-label="Close popup">&times;</button>
-    <h3 id="popup-title"></h3>
-    <p id="popup-description"></p>
-  </div>
-</div>
 
 <script>
-  const RSS_URL = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
+(function () {
+  const RSS_URL        = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
+  const FALLBACK_ART   = 'https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png';
+  const PER_PAGE       = 10;
 
-  let spotifyEpisodesMap = {};
+  let allEpisodes   = [];
+  let filtered      = [];
+  let shownCount    = 0;
+  let currentAudio  = null;
+  let currentIndex  = -1;
 
-  async function loadSpotifyEpisodesMap() {
-    const res = await fetch('https://food-gen.onrender.com/api/spotify-episodes');
-    const data = await res.json();
-    data.forEach(ep => {
-      spotifyEpisodesMap[ep.title.toLowerCase().trim()] = ep.spotifyId;
+  const listScroll  = document.getElementById('ep-list-scroll');
+  const loadMoreBtn = document.getElementById('ep-load-more');
+  const searchInput = document.getElementById('ep-search');
+  const playerEl    = document.getElementById('ep-player-content');
+
+  /* ── Helpers ── */
+  function fmtTime(s) {
+    if (!s || isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function fmtDate(str) {
+    if (!str) return '';
+    const d = new Date(str);
+    return isNaN(d) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function stripHtml(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || d.innerText || '';
+  }
+
+  /* ── Parse RSS text ── */
+  function parseRSS(text) {
+    // Split into <item> blocks
+    const blocks = [];
+    const re = /<item>([\s\S]*?)<\/item>/g;
+    let m;
+    while ((m = re.exec(text)) !== null) blocks.push(m[1]);
+    return blocks.map(block => {
+      const get = (tag) => {
+        const cdataM = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`));
+        if (cdataM) return cdataM[1].trim();
+        const plainM = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+        return plainM ? plainM[1].trim() : '';
+      };
+      const encM   = block.match(/<enclosure[^>]+url="([^"]+)"/);
+      const artM   = block.match(/<itunes:image[^>]+href="([^"]+)"/);
+      const durM   = block.match(/<itunes:duration[^>]*>([^<]+)<\/itunes:duration>/);
+      return {
+        title:    get('title'),
+        pubDate:  get('pubDate'),
+        desc:     stripHtml(get('description') || get('itunes:summary') || ''),
+        audioUrl: encM  ? encM[1]  : null,
+        art:      artM  ? artM[1]  : FALLBACK_ART,
+        duration: durM  ? durM[1].trim() : '',
+      };
+    }).filter(e => e.audioUrl);
+  }
+
+  /* ── Render episode list items ── */
+  function renderList() {
+    listScroll.innerHTML = '';
+    shownCount = 0;
+    appendItems();
+  }
+
+  function appendItems() {
+    const slice = filtered.slice(shownCount, shownCount + PER_PAGE);
+    slice.forEach((ep, i) => {
+      const idx = shownCount + i;
+      const div = document.createElement('div');
+      div.className = 'ep-item' + (idx === currentIndex ? ' active' : '') + (idx === currentIndex && currentAudio && !currentAudio.paused ? ' playing' : '');
+      div.dataset.idx = idx;
+      div.innerHTML = `
+        <img class="ep-item-art" src="${ep.art}" alt="" onerror="this.src='${FALLBACK_ART}'">
+        <div class="ep-item-info">
+          <div class="ep-item-title">${ep.title}</div>
+          <div class="ep-item-date">${fmtDate(ep.pubDate)}</div>
+        </div>
+        <div class="ep-now-playing-dot"></div>
+        <div class="ep-item-dur">${ep.duration || ''}</div>
+      `;
+      div.addEventListener('click', () => playEpisode(idx));
+      listScroll.appendChild(div);
     });
+    shownCount += slice.length;
+    loadMoreBtn.style.display = shownCount < filtered.length ? 'block' : 'none';
   }
 
-  const episodesPerPage = 5;
-  let allEpisodes = [];
-  let currentIndex = 0;
-  let channelImage = '';
+  /* ── Play an episode ── */
+  function playEpisode(idx) {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
 
-  const episodesContainer = document.getElementById('episodes-container');
-  const loadMoreBtn = document.getElementById('load-more');
+    currentIndex = idx;
+    const ep = filtered[idx];
 
-  // Popup elements
-  const popupOverlay = document.getElementById('popup-overlay');
-  const popupTitle = document.getElementById('popup-title');
-  const popupDescription = document.getElementById('popup-description');
-  const popupClose = document.getElementById('popup-close');
+    // Update list highlights
+    document.querySelectorAll('.ep-item').forEach(el => {
+      el.classList.remove('active', 'playing');
+      if (parseInt(el.dataset.idx) === idx) el.classList.add('active', 'playing');
+    });
 
-  function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return m + ':' + (s < 10 ? '0' + s : s);
+    // Build player
+    playerEl.innerHTML = `
+      <img class="ep-player-art" id="ep-art"
+           src="${ep.art}" alt="${ep.title}"
+           onerror="this.src='${FALLBACK_ART}'">
+      <div class="ep-player-body">
+        <div class="ep-player-label">Now Playing</div>
+        <div class="ep-player-title" id="ep-ptitle">${ep.title}</div>
+        <div class="ep-player-meta" id="ep-pmeta">${fmtDate(ep.pubDate)}</div>
+        <div class="ep-player-desc" id="ep-pdesc">${ep.desc}</div>
+
+        <div class="ep-progress-wrap">
+          <div class="ep-progress-bg">
+            <div class="ep-progress-fill" id="ep-fill"></div>
+          </div>
+          <input type="range" class="ep-seek" id="ep-seek" min="0" max="100" value="0" step="0.1">
+        </div>
+        <div class="ep-times">
+          <span id="ep-cur">0:00</span>
+          <span id="ep-dur">--:--</span>
+        </div>
+
+        <div class="ep-controls">
+          <button class="ep-btn" id="ep-prev" title="Previous episode">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          </button>
+          <button class="ep-btn" id="ep-back" title="−15s">
+            <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="7" y="15.5" font-size="5.5" font-family="Albert Sans,sans-serif" font-weight="800" fill="currentColor">15</text></svg>
+          </button>
+          <button class="ep-btn play-pause" id="ep-play" title="Play/Pause">
+            <svg id="ep-play-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <button class="ep-btn" id="ep-fwd" title="+15s">
+            <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="7" y="15.5" font-size="5.5" font-family="Albert Sans,sans-serif" font-weight="800" fill="currentColor">15</text></svg>
+          </button>
+          <button class="ep-btn" id="ep-next" title="Next episode">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2.5-6 6-4.35V16.35L8.5 12zM16 6h2v12h-2z"/></svg>
+          </button>
+          <div class="ep-vol-wrap">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <input type="range" class="ep-vol" id="ep-vol" min="0" max="1" step="0.02" value="1">
+          </div>
+        </div>
+      </div>
+    `;
+
+    const audio    = new Audio(ep.audioUrl);
+    currentAudio   = audio;
+    audio.preload  = 'metadata';
+
+    const fill     = document.getElementById('ep-fill');
+    const seek     = document.getElementById('ep-seek');
+    const curEl    = document.getElementById('ep-cur');
+    const durEl    = document.getElementById('ep-dur');
+    const playBtn  = document.getElementById('ep-play');
+    const playIcon = document.getElementById('ep-play-icon');
+    const vol      = document.getElementById('ep-vol');
+
+    const PLAY  = 'M8 5v14l11-7z';
+    const PAUSE = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+
+    function setIcon(playing) {
+      playIcon.querySelector('path').setAttribute('d', playing ? PAUSE : PLAY);
+    }
+
+    audio.addEventListener('loadedmetadata', () => {
+      durEl.textContent = fmtTime(audio.duration);
+      seek.max = audio.duration;
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      fill.style.width = pct + '%';
+      seek.value = audio.currentTime;
+      curEl.textContent = fmtTime(audio.currentTime);
+    });
+
+    audio.addEventListener('ended', () => {
+      setIcon(false);
+      // Auto-advance to next
+      if (currentIndex + 1 < filtered.length) playEpisode(currentIndex + 1);
+    });
+
+    // Auto-play
+    audio.play().then(() => setIcon(true)).catch(() => setIcon(false));
+
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) { audio.play(); setIcon(true); }
+      else              { audio.pause(); setIcon(false); }
+    });
+
+    seek.addEventListener('input', () => { audio.currentTime = seek.value; });
+    document.getElementById('ep-back').addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+    document.getElementById('ep-fwd').addEventListener('click',  () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15); });
+    document.getElementById('ep-prev').addEventListener('click', () => { if (currentIndex > 0) playEpisode(currentIndex - 1); });
+    document.getElementById('ep-next').addEventListener('click', () => { if (currentIndex + 1 < filtered.length) playEpisode(currentIndex + 1); });
+    vol.addEventListener('input', () => { audio.volume = vol.value; });
   }
 
-  // Show popup
-  function showPopup(title, description) {
-    popupTitle.textContent = title;
-    popupDescription.textContent = description;
-    popupOverlay.style.display = 'flex';
-    popupOverlay.focus();
-  }
-  // Hide popup
-  function hidePopup() {
-    popupOverlay.style.display = 'none';
-  }
-  popupClose.addEventListener('click', hidePopup);
-  popupOverlay.addEventListener('click', (e) => {
-    if(e.target === popupOverlay) hidePopup();
+  /* ── Search ── */
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    filtered = q ? allEpisodes.filter(e => e.title.toLowerCase().includes(q) || e.desc.toLowerCase().includes(q)) : allEpisodes;
+    renderList();
   });
 
-  function createEpisodeElement(item) {
-    const title = item.querySelector('title')?.textContent || '';
-    const spotifyId = spotifyEpisodesMap[title.toLowerCase().trim()];
-    if (!spotifyId) {
-      console.warn("No Spotify ID match for:", title);
-      return document.createElement('div');
-    }
+  loadMoreBtn.addEventListener('click', appendItems);
 
-    const embedDiv = document.createElement('div');
-    embedDiv.style.marginBottom = '2rem';
-
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('data-testid', 'embed-iframe');
-    iframe.style.borderRadius = '12px';
-    iframe.src = `https://open.spotify.com/embed/episode/${spotifyId}?utm_source=generator`;
-    iframe.width = '100%';
-    iframe.height = '152';
-    iframe.frameBorder = '0';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-    iframe.loading = 'eager';
-
-    embedDiv.appendChild(iframe);
-    return embedDiv;
-  }
-
-  async function loadEpisodes() {
-    await loadSpotifyEpisodesMap();
+  /* ── Load RSS ── */
+  async function init() {
     try {
-      const response = await fetch(RSS_URL);
-      const text = await response.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(text, 'application/xml');
-
-      channelImage = xml.querySelector('channel > image > url')?.textContent || '';
-      allEpisodes = Array.from(xml.querySelectorAll('item'));
-      currentIndex = 0;
-      episodesContainer.innerHTML = '';
-      loadMoreEpisodes();
-    } catch (err) {
-      episodesContainer.innerHTML = '<p style="color:red;">Failed to load episodes.</p>';
-      console.error('Failed to load RSS:', err);
+      const res  = await fetch(RSS_URL);
+      const text = await res.text();
+      allEpisodes = parseRSS(text);
+      filtered    = allEpisodes;
+      renderList();
+    } catch (e) {
+      listScroll.innerHTML = '<div class="ep-placeholder"><p>Could not load episodes. Please try again later.</p></div>';
+      console.error(e);
     }
   }
 
-  function loadMoreEpisodes() {
-    const nextIndex = currentIndex + episodesPerPage;
-    const slice = allEpisodes.slice(currentIndex, nextIndex);
-
-    slice.forEach(item => {
-      const episodeEl = createEpisodeElement(item);
-      episodesContainer.appendChild(episodeEl);
-    });
-
-    currentIndex = nextIndex;
-    if (currentIndex >= allEpisodes.length) {
-      loadMoreBtn.style.display = 'none';
-    } else {
-      loadMoreBtn.style.display = 'block';
-    }
-  }
-
-  loadMoreBtn.addEventListener('click', loadMoreEpisodes);
-
-  loadEpisodes();
+  init();
+})();
 </script>
-<script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
 
 </body>
 </html>
