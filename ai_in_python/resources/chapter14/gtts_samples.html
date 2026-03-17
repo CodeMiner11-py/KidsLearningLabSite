@@ -61,9 +61,13 @@
 
     /* ── MAIN ── */
     main {
-      max-width: 720px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 52px 24px 80px;
+      padding: 48px 28px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 36px;
     }
 
     h1 {
@@ -71,7 +75,7 @@
       font-weight: 800;
       color: var(--text);
       letter-spacing: -0.02em;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     h1 span {
@@ -82,7 +86,30 @@
       font-size: 14px;
       color: var(--text-muted);
       font-weight: 500;
-      margin-bottom: 40px;
+    }
+
+    /* ── TWO-COLUMN LAYOUT ── */
+    .layout {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    .col-samples {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .col-tester {
+      width: 340px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .layout { flex-direction: column; }
+      .col-tester { width: 100%; position: static; }
     }
 
     /* ── SAMPLE CARD ── */
@@ -186,11 +213,7 @@
       50% { opacity: 0.5; transform: scale(0.8); }
     }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 32px 0 28px;
-    }
+    .divider { display: none; }
 
     /* ── TESTER CARD ── */
     .tester-card {
@@ -219,7 +242,7 @@
 
     .tester-textarea {
       width: 100%;
-      min-height: 100px;
+      min-height: 160px;
       resize: vertical;
       border: 1.5px solid var(--green-mid);
       border-radius: 10px;
@@ -306,141 +329,184 @@
   </header>
 
   <main>
-    <h1>gTTS <span>Samples</span></h1>
-    <p class="subtitle">Text-to-speech examples powered by Google TTS</p>
-
-    <!-- Sample 1 -->
-    <div class="sample-card">
-      <div class="sample-label">Sample 1</div>
-      <div class="sample-text">My favorite food is pizza because it has tomatoes.</div>
-      <button class="play-btn" onclick="playTTS(this, 'My favorite food is pizza because it has tomatoes.')">
-        <span class="material-symbols-outlined">play_arrow</span> Play
-      </button>
-      <span class="status"><span class="status-dot"></span>Playing…</span>
+    <div class="page-header">
+      <h1>gTTS <span>Samples</span></h1>
+      <p class="subtitle">Text-to-speech examples powered by Google TTS</p>
     </div>
 
-    <!-- Sample 2 -->
-    <div class="sample-card">
-      <div class="sample-label">Sample 2</div>
-      <div class="sample-text">I like reading AI in Python, it's a great book.</div>
-      <button class="play-btn" onclick="playTTS(this, 'I like reading AI in Python, it\'s a great book.')">
-        <span class="material-symbols-outlined">play_arrow</span> Play
-      </button>
-      <span class="status"><span class="status-dot"></span>Playing…</span>
-    </div>
+    <div class="layout">
 
-    <!-- Sample 3 -->
-    <div class="sample-card" id="card-browser">
-      <div class="sample-label">Sample 3</div>
-      <div class="sample-text" id="browser-text">Detecting browser…</div>
-      <button class="play-btn" id="btn-browser" disabled>
-        <span class="material-symbols-outlined">play_arrow</span> Play
-      </button>
-      <span class="status"><span class="status-dot"></span>Playing…</span>
-    </div>
+      <!-- LEFT: Samples -->
+      <div class="col-samples">
 
-    <div class="divider"></div>
+        <!-- Sample 1 -->
+        <div class="sample-card">
+          <div class="sample-label">Sample 1</div>
+          <div class="sample-text">My favorite food is pizza because it has tomatoes.</div>
+          <button class="play-btn" onclick="playTTS(this, 'My favorite food is pizza because it has tomatoes.')">
+            <span class="material-symbols-outlined">play_arrow</span> Play
+          </button>
+          <span class="status"><span class="status-dot"></span>Playing…</span>
+        </div>
 
-    <!-- Tester -->
-    <div class="tester-card">
-      <div class="tester-label">Your Turn</div>
-      <div class="tester-heading">Try it yourself</div>
-      <textarea class="tester-textarea" id="tester-input" placeholder="Type anything to convert to speech…"></textarea>
-      <div class="tester-actions">
-        <button class="play-btn" id="tester-play-btn" onclick="testerPlay()">
-          <span class="material-symbols-outlined">play_arrow</span> Play
-        </button>
-        <button class="btn-download" id="tester-dl-btn" onclick="testerDownload()">
-          <span class="material-symbols-outlined">download</span> Download MP3
-        </button>
-        <span class="tester-status" id="tester-status"><span class="status-dot"></span>Playing…</span>
-      </div>
-    </div>
+        <!-- Sample 2 -->
+        <div class="sample-card">
+          <div class="sample-label">Sample 2</div>
+          <div class="sample-text">I like reading AI in Python, it's a great book.</div>
+          <button class="play-btn" onclick="playTTS(this, 'I like reading AI in Python, it\'s a great book.')">
+            <span class="material-symbols-outlined">play_arrow</span> Play
+          </button>
+          <span class="status"><span class="status-dot"></span>Playing…</span>
+        </div>
+
+        <!-- Sample 3 -->
+        <div class="sample-card" id="card-browser">
+          <div class="sample-label">Sample 3</div>
+          <div class="sample-text" id="browser-text">Detecting browser…</div>
+          <button class="play-btn" id="btn-browser" disabled>
+            <span class="material-symbols-outlined">play_arrow</span> Play
+          </button>
+          <span class="status"><span class="status-dot"></span>Playing…</span>
+        </div>
+
+      </div><!-- /col-samples -->
+
+      <!-- RIGHT: Tester -->
+      <div class="col-tester">
+        <div class="tester-card">
+          <div class="tester-label">Your Turn</div>
+          <div class="tester-heading">Try it yourself</div>
+          <textarea class="tester-textarea" id="tester-input" placeholder="Type anything to convert to speech…"></textarea>
+          <div class="tester-actions">
+            <button class="play-btn" id="tester-play-btn" onclick="testerPlay()">
+              <span class="material-symbols-outlined">play_arrow</span> Play
+            </button>
+            <button class="btn-download" id="tester-dl-btn" onclick="testerDownload()">
+              <span class="material-symbols-outlined">download</span> Download MP3
+            </button>
+            <span class="tester-status" id="tester-status"><span class="status-dot"></span>Playing…</span>
+          </div>
+        </div>
+      </div><!-- /col-tester -->
+
+    </div><!-- /layout -->
 
   </main>
 
   <script>
+    /* ── Global error logging ── */
+    window.addEventListener('error', (e) => {
+      console.error('[gTTS] Uncaught error:', e.message, '\n  Source:', e.filename, `line ${e.lineno}:${e.colno}`, '\n  Error object:', e.error);
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('[gTTS] Unhandled promise rejection:', e.reason);
+    });
+
     /* ── Detect browser name ── */
     function getBrowserName() {
-      const ua = navigator.userAgent;
-      if (/Edg\//.test(ua))    return 'Microsoft Edge';
-      if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
-      if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) return 'Google Chrome';
-      if (/Firefox\//.test(ua)) return 'Mozilla Firefox';
-      if (/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Apple Safari';
-      if (/Trident\//.test(ua)) return 'Internet Explorer';
-      return 'an unknown browser';
+      try {
+        const ua = navigator.userAgent;
+        if (/Edg\//.test(ua))    return 'Microsoft Edge';
+        if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
+        if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) return 'Google Chrome';
+        if (/Firefox\//.test(ua)) return 'Mozilla Firefox';
+        if (/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Apple Safari';
+        if (/Trident\//.test(ua)) return 'Internet Explorer';
+        return 'an unknown browser';
+      } catch (e) {
+        console.error('[gTTS] Failed to detect browser name:', e);
+        return 'an unknown browser';
+      }
     }
 
-    const browserName = getBrowserName();
-    const browserSentence = `You are currently on ${browserName} browser.`;
-    document.getElementById('browser-text').textContent = browserSentence;
+    try {
+      const browserName = getBrowserName();
+      const browserSentence = `You are currently on ${browserName} browser.`;
+      document.getElementById('browser-text').textContent = browserSentence;
 
-    const btnBrowser = document.getElementById('btn-browser');
-    btnBrowser.removeAttribute('disabled');
-    btnBrowser.onclick = () => playTTS(btnBrowser, browserSentence);
+      const btnBrowser = document.getElementById('btn-browser');
+      btnBrowser.removeAttribute('disabled');
+      btnBrowser.onclick = () => playTTS(btnBrowser, browserSentence);
+    } catch (e) {
+      console.error('[gTTS] Failed to initialise browser sample:', e);
+    }
 
     /* ── TTS Player ── */
     let currentAudio = null;
 
     function playTTS(btn, text) {
-      // Stop any currently playing audio
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-        document.querySelectorAll('.play-btn').forEach(b => {
-          b.classList.remove('loading', 'playing');
-          b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+      try {
+        // Stop any currently playing audio
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+          document.querySelectorAll('.play-btn').forEach(b => {
+            b.classList.remove('loading', 'playing');
+            b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+          });
+          document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
+        }
+
+        const statusEl = btn.closest('.sample-card').querySelector('.status');
+        const encoded = encodeURIComponent(text);
+        const url = `https://api.kidslearninglab.com/gtts?text=${encoded}`;
+
+        btn.classList.add('loading');
+        btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
+
+        const audio = new Audio(url);
+        currentAudio = audio;
+
+        audio.addEventListener('canplaythrough', () => {
+          btn.classList.remove('loading');
+          btn.classList.add('playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+          statusEl.classList.add('visible');
+          audio.play().catch(e => console.error('[gTTS] Sample audio playback failed:', e));
         });
-        document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
-      }
 
-      const statusEl = btn.closest('.sample-card').querySelector('.status');
-      const encoded = encodeURIComponent(text);
-      const url = `https://api.kidslearninglab.com/gtts?text=${encoded}`;
-
-      btn.classList.add('loading');
-      btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
-
-      const audio = new Audio(url);
-      currentAudio = audio;
-
-      audio.addEventListener('canplaythrough', () => {
-        btn.classList.remove('loading');
-        btn.classList.add('playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
-        statusEl.classList.add('visible');
-        audio.play();
-      });
-
-      audio.addEventListener('ended', () => {
-        btn.classList.remove('playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        statusEl.classList.remove('visible');
-        currentAudio = null;
-      });
-
-      audio.addEventListener('error', () => {
-        btn.classList.remove('loading', 'playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
-        statusEl.classList.remove('visible');
-        currentAudio = null;
-        setTimeout(() => {
+        audio.addEventListener('ended', () => {
+          btn.classList.remove('playing');
           btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        }, 2500);
-      });
+          statusEl.classList.remove('visible');
+          currentAudio = null;
+        });
 
-      // Allow stop on re-click
-      btn.onclick = () => {
-        audio.pause();
-        audio.currentTime = 0;
-        btn.classList.remove('playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        statusEl.classList.remove('visible');
-        currentAudio = null;
-        btn.onclick = () => playTTS(btn, text);
-      };
+        audio.addEventListener('error', (e) => {
+          const err = audio.error;
+          console.error(`[gTTS] Sample audio load error for text: "${text}"`,
+            '\n  MediaError code:', err ? err.code : 'unknown',
+            '\n  MediaError message:', err ? err.message : 'unknown',
+            '\n  URL:', url,
+            '\n  Event:', e);
+          btn.classList.remove('loading', 'playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          statusEl.classList.remove('visible');
+          currentAudio = null;
+          setTimeout(() => {
+            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+          }, 2500);
+        });
+
+        // Allow stop on re-click
+        btn.onclick = () => {
+          try {
+            audio.pause();
+            audio.currentTime = 0;
+            btn.classList.remove('playing');
+            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+            statusEl.classList.remove('visible');
+            currentAudio = null;
+            btn.onclick = () => playTTS(btn, text);
+          } catch (e) {
+            console.error('[gTTS] Failed to stop sample audio:', e);
+          }
+        };
+      } catch (e) {
+        console.error('[gTTS] Unexpected error in playTTS():', e);
+      }
     }
+
     /* ── Tester ── */
     let testerAudio = null;
 
@@ -449,64 +515,74 @@
     }
 
     function testerPlay() {
-      const text = getTesterText();
-      if (!text) { document.getElementById('tester-input').focus(); return; }
+      try {
+        const text = getTesterText();
+        if (!text) { document.getElementById('tester-input').focus(); return; }
 
-      const btn = document.getElementById('tester-play-btn');
-      const statusEl = document.getElementById('tester-status');
+        const btn = document.getElementById('tester-play-btn');
+        const statusEl = document.getElementById('tester-status');
 
-      // Stop if already playing
-      if (testerAudio) {
-        testerAudio.pause();
-        testerAudio = null;
-        btn.classList.remove('loading', 'playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        statusEl.classList.remove('visible');
-        return;
-      }
-
-      // Stop sample audios
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-        document.querySelectorAll('.play-btn').forEach(b => {
-          b.classList.remove('loading', 'playing');
-          b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        });
-        document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
-      }
-
-      const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
-      btn.classList.add('loading');
-      btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
-
-      const audio = new Audio(url);
-      testerAudio = audio;
-
-      audio.addEventListener('canplaythrough', () => {
-        btn.classList.remove('loading');
-        btn.classList.add('playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
-        statusEl.classList.add('visible');
-        audio.play();
-      });
-
-      audio.addEventListener('ended', () => {
-        btn.classList.remove('playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        statusEl.classList.remove('visible');
-        testerAudio = null;
-      });
-
-      audio.addEventListener('error', () => {
-        btn.classList.remove('loading', 'playing');
-        btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
-        statusEl.classList.remove('visible');
-        testerAudio = null;
-        setTimeout(() => {
+        // Stop if already playing
+        if (testerAudio) {
+          testerAudio.pause();
+          testerAudio = null;
+          btn.classList.remove('loading', 'playing');
           btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-        }, 2500);
-      });
+          statusEl.classList.remove('visible');
+          return;
+        }
+
+        // Stop sample audios
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+          document.querySelectorAll('.play-btn').forEach(b => {
+            b.classList.remove('loading', 'playing');
+            b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+          });
+          document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
+        }
+
+        const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
+        btn.classList.add('loading');
+        btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
+
+        const audio = new Audio(url);
+        testerAudio = audio;
+
+        audio.addEventListener('canplaythrough', () => {
+          btn.classList.remove('loading');
+          btn.classList.add('playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+          statusEl.classList.add('visible');
+          audio.play().catch(e => console.error('[gTTS] Tester audio playback failed:', e));
+        });
+
+        audio.addEventListener('ended', () => {
+          btn.classList.remove('playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+          statusEl.classList.remove('visible');
+          testerAudio = null;
+        });
+
+        audio.addEventListener('error', (e) => {
+          const err = audio.error;
+          console.error(`[gTTS] Tester audio load error for text: "${text}"`,
+            '\n  MediaError code:', err ? err.code : 'unknown',
+            '\n  MediaError message:', err ? err.message : 'unknown',
+            '\n  URL:', url,
+            '\n  Event:', e);
+          btn.classList.remove('loading', 'playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          statusEl.classList.remove('visible');
+          testerAudio = null;
+          setTimeout(() => {
+            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+          }, 2500);
+        });
+      } catch (e) {
+        console.error('[gTTS] Unexpected error in testerPlay():', e);
+      }
     }
 
     async function testerDownload() {
@@ -520,7 +596,9 @@
       try {
         const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error('fetch failed');
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText} — URL: ${url}`);
+        }
         const blob = await res.blob();
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -532,7 +610,8 @@
           btn.innerHTML = '<span class="material-symbols-outlined">download</span> Download MP3';
           btn.style.pointerEvents = '';
         }, 2000);
-      } catch {
+      } catch (e) {
+        console.error('[gTTS] Download failed:', e);
         btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
         setTimeout(() => {
           btn.innerHTML = '<span class="material-symbols-outlined">download</span> Download MP3';
