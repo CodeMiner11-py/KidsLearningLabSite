@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>gTTS Samples</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -317,6 +318,159 @@
     }
 
     .tester-status.visible { opacity: 1; }
+
+    /* ── CODE PREVIEW ── */
+    .code-block {
+      background: #0f1f14;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      font-family: 'IBM Plex Mono', 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .c-kw  { color: #c792ea; }
+    .c-fn  { color: #82aaff; }
+    .c-pn  { color: #e4e4e4; }
+    .c-str { color: #c3e88d; }
+    .c-arg { color: #ffcb6b; }
+    .c-cls { color: #f78c6c; }
+    .c-cm  { color: #546e7a; font-style: italic; }
+    .c-live {
+      color: #c3e88d;
+      background: rgba(195,232,141,0.13);
+      border-radius: 3px;
+      padding: 0 2px;
+      min-width: 4px;
+      display: inline-block;
+      transition: background 0.15s;
+    }
+    .c-live.active { background: rgba(195,232,141,0.32); }
+    .code-line {
+      display: block;
+      border-radius: 4px;
+      padding: 1px 4px;
+      margin: 0 -4px;
+      transition: background 0.3s;
+      white-space: pre;
+    }
+    .code-line.hl { background: rgba(52,199,89,0.13); }
+    .code-line.running { background: rgba(52,199,89,0.22); }
+    .code-line.running::before {
+      content: '\25B6  ';
+      color: #34C759;
+      font-size: 10px;
+      animation: blink .5s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .code-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5a7a65;
+      margin-bottom: 8px;
+    }
+
+
+    /* ── FLOWCHART ── */
+    .flowchart-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 4px 0 8px;
+    }
+    .fc-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 10px;
+      padding: 9px 14px;
+      width: 100%;
+      max-width: 260px;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      position: relative;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s;
+      opacity: 0.45;
+    }
+    .fc-node.diamond {
+      border-radius: 0;
+      transform: rotate(45deg);
+      width: 80px;
+      height: 80px;
+      padding: 0;
+      max-width: 80px;
+    }
+    .fc-node.diamond .fc-label {
+      transform: rotate(-45deg);
+      font-size: 10px;
+      line-height: 1.2;
+    }
+    .fc-node.active {
+      background: var(--green);
+      border-color: var(--green-dark);
+      color: #fff;
+      opacity: 1;
+      box-shadow: 0 4px 16px rgba(52,199,89,0.35);
+    }
+    .fc-node.active.diamond {
+      transform: rotate(45deg) scale(1.08);
+    }
+    .fc-node.done {
+      background: var(--green-light);
+      border-color: var(--green-mid);
+      color: var(--green-deeper);
+      opacity: 1;
+    }
+    .fc-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      height: 32px;
+      position: relative;
+    }
+    .fc-arrow::before {
+      content: '';
+      width: 2px;
+      flex: 1;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .fc-arrow::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--border);
+      transition: border-top-color 0.3s;
+    }
+    .fc-arrow.active::before { background: var(--green); }
+    .fc-arrow.active::after  { border-top-color: var(--green); }
+    .fc-node-icon {
+      font-size: 15px;
+      margin-right: 6px;
+      font-variation-settings: 'FILL' 1;
+    }
+
   </style>
 </head>
 <body>
@@ -376,7 +530,45 @@
         <div class="tester-card">
           <div class="tester-label">Your Turn</div>
           <div class="tester-heading">Try it yourself</div>
-          <textarea class="tester-textarea" id="tester-input" placeholder="Type anything to convert to speech…"></textarea>
+          <textarea class="tester-textarea" id="tester-input" placeholder="Type anything to convert to speech…" oninput="updateCodePreview()"></textarea>
+
+          <div class="code-label">Python equivalent</div>
+          <div class="code-block" id="code-preview">
+<span class="code-line" id="cl-import"><span class="c-kw">import</span> <span class="c-fn">gtts</span></span>
+<span class="code-line" id="cl-blank1"> </span>
+<span class="code-line" id="cl-def"><span class="c-kw">def</span> <span class="c-fn">gtts_get</span><span class="c-pn">():</span></span>
+<span class="code-line" id="cl-text">    <span class="c-arg">text</span> <span class="c-pn">=</span> <span class="c-str">"<span id="live-text"></span>"</span></span>
+<span class="code-line" id="cl-return">    <span class="c-kw">return</span> <span class="c-fn">gtts</span><span class="c-pn">.</span><span class="c-cls">gTTS</span><span class="c-pn">(</span><span class="c-arg">text</span><span class="c-pn">=</span><span class="c-fn">text</span><span class="c-pn">,</span> <span class="c-arg">lang</span><span class="c-pn">=</span><span class="c-str">"en"</span><span class="c-pn">)</span><span class="c-pn">.</span><span class="c-fn">save</span><span class="c-pn">(</span><span class="c-str">"output.mp3"</span><span class="c-pn">)</span></span>
+          </div>
+
+
+          <div class="flowchart-label">Execution flow</div>
+          <div class="flowchart" id="flowchart">
+            <div class="fc-node" id="fn-input">
+              <span class="material-symbols-outlined fc-node-icon">keyboard</span>text input received
+            </div>
+            <div class="fc-arrow" id="fa-1"></div>
+            <div class="fc-node" id="fn-validate">
+              <span class="material-symbols-outlined fc-node-icon">check_circle</span>validate text
+            </div>
+            <div class="fc-arrow" id="fa-2"></div>
+            <div class="fc-node" id="fn-gtts">
+              <span class="material-symbols-outlined fc-node-icon">record_voice_over</span>gtts.gTTS(text, lang)
+            </div>
+            <div class="fc-arrow" id="fa-3"></div>
+            <div class="fc-node" id="fn-save">
+              <span class="material-symbols-outlined fc-node-icon">save</span>save("output_uuid.mp3")
+            </div>
+            <div class="fc-arrow" id="fa-4"></div>
+            <div class="fc-node" id="fn-send">
+              <span class="material-symbols-outlined fc-node-icon">send</span>send_file() → browser
+            </div>
+            <div class="fc-arrow" id="fa-5"></div>
+            <div class="fc-node" id="fn-play">
+              <span class="material-symbols-outlined fc-node-icon">volume_up</span>audio plays ♪
+            </div>
+          </div>
+
           <div class="tester-actions">
             <button class="play-btn" id="tester-play-btn" onclick="testerPlay()">
               <span class="material-symbols-outlined">play_arrow</span> Play
@@ -402,26 +594,84 @@
       console.error('[gTTS] Unhandled promise rejection:', e.reason);
     });
 
-    /* ── Detect browser name ── */
-    function getBrowserName() {
+    /* ── Rich client detection ── */
+    function getClientInfo() {
       try {
         const ua = navigator.userAgent;
-        if (/Edg\//.test(ua))    return 'Microsoft Edge';
-        if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
-        if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) return 'Google Chrome';
-        if (/Firefox\//.test(ua)) return 'Mozilla Firefox';
-        if (/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Apple Safari';
-        if (/Trident\//.test(ua)) return 'Internet Explorer';
-        return 'an unknown browser';
+
+        // Browser
+        let browser = 'an unknown browser';
+        let browserVersion = '';
+        if (/Edg\/(\S+)/.test(ua))            { browser = 'Microsoft Edge';  browserVersion = RegExp.$1.split('.')[0]; }
+        else if (/OPR\/(\S+)/.test(ua))       { browser = 'Opera';           browserVersion = RegExp.$1.split('.')[0]; }
+        else if (/Chrome\/(\S+)/.test(ua))    { browser = 'Google Chrome';   browserVersion = RegExp.$1.split('.')[0]; }
+        else if (/Firefox\/(\S+)/.test(ua))   { browser = 'Mozilla Firefox'; browserVersion = RegExp.$1.split('.')[0]; }
+        else if (/Version\/(\S+).*Safari/.test(ua)) { browser = 'Safari';   browserVersion = RegExp.$1.split('.')[0]; }
+        else if (/Trident\//.test(ua))        { browser = 'Internet Explorer'; }
+        const browserStr = browserVersion ? `${browser} version ${browserVersion}` : browser;
+
+        // OS
+        let os = 'an unknown operating system';
+        if (/Windows NT 10/.test(ua))      os = 'Windows 10 or 11';
+        else if (/Windows NT 6.1/.test(ua)) os = 'Windows 7';
+        else if (/Mac OS X ([\d_]+)/.test(ua)) {
+          const v = RegExp.$1.replace(/_/g, '.');
+          os = `macOS ${v}`;
+        }
+        else if (/Android ([\d.]+)/.test(ua)) os = `Android ${RegExp.$1}`;
+        else if (/iPhone OS ([\d_]+)/.test(ua)) os = `iOS ${RegExp.$1.replace(/_/g,'.')}`;
+        else if (/Linux/.test(ua))         os = 'Linux';
+
+        // Device type
+        const isMobile = navigator.maxTouchPoints > 0 && /Mobi|Android|iPhone|iPad/.test(ua);
+        const isTablet = navigator.maxTouchPoints > 0 && /iPad|Tablet/.test(ua);
+        const deviceType = isTablet ? 'a tablet' : isMobile ? 'a mobile device' : 'a desktop';
+
+        // Screen
+        const sw = screen.width, sh = screen.height;
+        const dpr = window.devicePixelRatio || 1;
+        const isRetina = dpr >= 2;
+        const screenStr = isRetina ? `a retina display at ${sw}×${sh}` : `a ${sw}×${sh} screen`;
+
+        // Hardware
+        const cores = navigator.hardwareConcurrency || null;
+        const ram = navigator.deviceMemory || null;
+
+        // Network
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        let netStr = null;
+        if (conn && conn.effectiveType) {
+          const typeMap = { 'slow-2g': 'a slow 2G connection', '2g': '2G', '3g': '3G', '4g': 'WiFi or 4G' };
+          netStr = typeMap[conn.effectiveType] || conn.effectiveType;
+        }
+
+        // Timezone
+        let tz = null;
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) {}
+
+        // Language
+        const lang = navigator.language || null;
+
+        // Build sentence
+        const parts = [];
+        parts.push(`You are using ${browserStr} on ${os}`);
+        parts.push(`on ${deviceType} with ${screenStr}`);
+        if (cores && ram)       parts.push(`powered by ${cores} CPU cores and ${ram} gigabytes of RAM`);
+        else if (cores)         parts.push(`with ${cores} CPU cores`);
+        else if (ram)           parts.push(`with ${ram} gigabytes of RAM`);
+        if (netStr)             parts.push(`connected via ${netStr}`);
+        if (tz)                 parts.push(`in the ${tz} timezone`);
+        if (lang)               parts.push(`with ${lang} as your browser language`);
+
+        return parts.join(', ') + '.';
       } catch (e) {
-        console.error('[gTTS] Failed to detect browser name:', e);
-        return 'an unknown browser';
+        console.error('[gTTS] Failed to detect client info:', e);
+        return 'Could not detect client information.';
       }
     }
 
     try {
-      const browserName = getBrowserName();
-      const browserSentence = `You are currently on ${browserName} browser.`;
+      const browserSentence = getClientInfo();
       document.getElementById('browser-text').textContent = browserSentence;
 
       const btnBrowser = document.getElementById('btn-browser');
@@ -507,6 +757,102 @@
       }
     }
 
+
+
+    /* ── Flowchart animation ── */
+    const FC_NODES = ['fn-input','fn-validate','fn-gtts','fn-save','fn-send','fn-play'];
+    const FC_ARROWS = ['fa-1','fa-2','fa-3','fa-4','fa-5'];
+
+    function resetFlowchart() {
+      FC_NODES.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active','done');
+      });
+      FC_ARROWS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+    }
+
+    function animateFlowchart(onDone) {
+      resetFlowchart();
+      let step = 0;
+      const total = FC_NODES.length;
+      function next() {
+        if (step > 0) {
+          const prevNode = document.getElementById(FC_NODES[step - 1]);
+          if (prevNode) { prevNode.classList.remove('active'); prevNode.classList.add('done'); }
+        }
+        if (step < total) {
+          const node = document.getElementById(FC_NODES[step]);
+          if (node) node.classList.add('active');
+          if (step > 0) {
+            const arrow = document.getElementById(FC_ARROWS[step - 1]);
+            if (arrow) arrow.classList.add('active');
+          }
+          step++;
+          setTimeout(next, 480);
+        } else {
+          if (onDone) onDone();
+        }
+      }
+      next();
+    }
+
+    /* ── Code preview live update ── */
+    function updateCodePreview() {
+      const raw = document.getElementById('tester-input').value;
+      const escaped = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const live = document.getElementById('live-text');
+      if (live) {
+        live.innerHTML = escaped;
+        live.classList.add('active');
+        clearTimeout(live._t);
+        live._t = setTimeout(() => live.classList.remove('active'), 400);
+      }
+      // Highlight text assignment line when there's content
+      const cl = document.getElementById('cl-text');
+      if (cl) cl.classList.toggle('hl', raw.length > 0);
+    }
+
+    /* ── Flow animation when playing ── */
+    function animateCodeFlow(onDone) {
+      const lines = ['cl-import','cl-def','cl-text','cl-return'];
+      let i = 0;
+      // clear all first
+      lines.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.remove('running','hl'); }
+      });
+      function step() {
+        if (i > 0) {
+          const prev = document.getElementById(lines[i-1]);
+          if (prev) prev.classList.remove('running');
+        }
+        if (i < lines.length) {
+          const el = document.getElementById(lines[i]);
+          if (el) el.classList.add('running');
+          i++;
+          setTimeout(step, 420);
+        } else {
+          // leave return line green-hl to show completion
+          const ret = document.getElementById('cl-return');
+          if (ret) { ret.classList.remove('running'); ret.classList.add('hl'); }
+          if (onDone) onDone();
+        }
+      }
+      step();
+    }
+
+    function resetCodeFlow() {
+      ['cl-import','cl-def','cl-text','cl-return'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('running','hl');
+      });
+      // re-highlight text line if there's content
+      updateCodePreview();
+    }
+
     /* ── Tester ── */
     let testerAudio = null;
 
@@ -555,7 +901,9 @@
           btn.classList.add('playing');
           btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
           statusEl.classList.add('visible');
-          audio.play().catch(e => console.error('[gTTS] Tester audio playback failed:', e));
+          animateCodeFlow(() => {});
+        animateFlowchart(() => {});
+        audio.play().catch(e => console.error('[gTTS] Tester audio playback failed:', e));
         });
 
         audio.addEventListener('ended', () => {
