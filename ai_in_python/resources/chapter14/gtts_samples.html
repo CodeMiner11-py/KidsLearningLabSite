@@ -37,6 +37,7 @@
       height: 60px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       box-shadow: 0 2px 12px rgba(52,199,89,0.25);
     }
 
@@ -51,6 +52,19 @@
       font-size: 26px;
       color: #fff;
       font-variation-settings: 'FILL' 1;
+    }
+
+    .version-pill {
+      margin-left: auto;
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-family: 'IBM Plex Mono', monospace;
     }
 
     .header-brand span.title {
@@ -480,6 +494,7 @@
       <span class="material-symbols-outlined">menu_book</span>
       <span class="title">AI in Python Resources</span>
     </a>
+    <span class="version-pill">v0.9</span>
   </header>
 
   <main>
