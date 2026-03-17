@@ -681,77 +681,78 @@
       console.error('[gTTS] Failed to initialise browser sample:', e);
     }
 
-    /* ── TTS Player ── */
+    /* ── Shared audio helpers ── */
     let currentAudio = null;
+    let currentBlobUrl = null;
 
-    function playTTS(btn, text) {
+    function stopAllAudio() {
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+      if (testerAudio) { testerAudio.pause(); testerAudio = null; }
+      if (testerBlobUrl) { URL.revokeObjectURL(testerBlobUrl); testerBlobUrl = null; }
+      document.querySelectorAll('.play-btn').forEach(b => {
+        b.classList.remove('loading', 'playing');
+        b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+      });
+      document.querySelectorAll('.status, .tester-status').forEach(s => s.classList.remove('visible'));
+    }
+
+    async function fetchBlob(text) {
+      const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
+      console.log('[gTTS] Fetching blob:', url);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} — ${url}`);
+      const blob = await res.blob();
+      console.log('[gTTS] Blob ready — type:', blob.type, 'size:', blob.size, 'bytes');
+      return blob;
+    }
+
+    async function playTTS(btn, text) {
       try {
-        // Stop any currently playing audio
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio = null;
-          document.querySelectorAll('.play-btn').forEach(b => {
-            b.classList.remove('loading', 'playing');
-            b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-          });
-          document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
-        }
-
+        stopAllAudio();
         const statusEl = btn.closest('.sample-card').querySelector('.status');
-        const encoded = encodeURIComponent(text);
-        const url = `https://api.kidslearninglab.com/gtts?text=${encoded}`;
-
         btn.classList.add('loading');
         btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
 
-        const audio = new Audio(url);
+        let blob;
+        try {
+          blob = await fetchBlob(text);
+        } catch (e) {
+          console.error(`[gTTS] Fetch failed for sample: "${text}"`, e);
+          btn.classList.remove('loading');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play'; }, 2500);
+          return;
+        }
+
+        const blobUrl = URL.createObjectURL(blob);
+        currentBlobUrl = blobUrl;
+        const audio = new Audio(blobUrl);
         currentAudio = audio;
 
-        audio.addEventListener('canplaythrough', () => {
-          btn.classList.remove('loading');
-          btn.classList.add('playing');
-          btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
-          statusEl.classList.add('visible');
-          audio.play().catch(e => console.error('[gTTS] Sample audio playback failed:', e));
+        audio.addEventListener('error', (e) => {
+          const err = audio.error;
+          console.error(`[gTTS] Sample playback error: "${text}"`, '\n  MediaError code:', err?.code, '\n  message:', err?.message, e);
+          btn.classList.remove('loading', 'playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          statusEl.classList.remove('visible');
+          currentAudio = null; URL.revokeObjectURL(blobUrl); currentBlobUrl = null;
+          setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play'; }, 2500);
         });
 
         audio.addEventListener('ended', () => {
           btn.classList.remove('playing');
           btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
           statusEl.classList.remove('visible');
-          currentAudio = null;
+          currentAudio = null; URL.revokeObjectURL(blobUrl); currentBlobUrl = null;
         });
 
-        audio.addEventListener('error', (e) => {
-          const err = audio.error;
-          console.error(`[gTTS] Sample audio load error for text: "${text}"`,
-            '\n  MediaError code:', err ? err.code : 'unknown',
-            '\n  MediaError message:', err ? err.message : 'unknown',
-            '\n  URL:', url,
-            '\n  Event:', e);
-          btn.classList.remove('loading', 'playing');
-          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
-          statusEl.classList.remove('visible');
-          currentAudio = null;
-          setTimeout(() => {
-            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-          }, 2500);
-        });
+        btn.classList.remove('loading'); btn.classList.add('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+        statusEl.classList.add('visible');
+        audio.play().catch(e => console.error('[gTTS] audio.play() rejected:', e));
 
-        // Allow stop on re-click
-        btn.onclick = () => {
-          try {
-            audio.pause();
-            audio.currentTime = 0;
-            btn.classList.remove('playing');
-            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-            statusEl.classList.remove('visible');
-            currentAudio = null;
-            btn.onclick = () => playTTS(btn, text);
-          } catch (e) {
-            console.error('[gTTS] Failed to stop sample audio:', e);
-          }
-        };
+        btn.onclick = () => { stopAllAudio(); btn.onclick = () => playTTS(btn, text); };
       } catch (e) {
         console.error('[gTTS] Unexpected error in playTTS():', e);
       }
@@ -855,12 +856,13 @@
 
     /* ── Tester ── */
     let testerAudio = null;
+    let testerBlobUrl = null;
 
     function getTesterText() {
       return document.getElementById('tester-input').value.trim();
     }
 
-    function testerPlay() {
+    async function testerPlay() {
       try {
         const text = getTesterText();
         if (!text) { document.getElementById('tester-input').focus(); return; }
@@ -870,64 +872,56 @@
 
         // Stop if already playing
         if (testerAudio) {
-          testerAudio.pause();
-          testerAudio = null;
-          btn.classList.remove('loading', 'playing');
-          btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-          statusEl.classList.remove('visible');
+          stopAllAudio();
+          resetCodeFlow(); resetFlowchart();
           return;
         }
 
-        // Stop sample audios
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio = null;
-          document.querySelectorAll('.play-btn').forEach(b => {
-            b.classList.remove('loading', 'playing');
-            b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-          });
-          document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
-        }
+        stopAllAudio();
 
-        const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
         btn.classList.add('loading');
         btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
 
-        const audio = new Audio(url);
+        let blob;
+        try {
+          blob = await fetchBlob(text);
+        } catch (e) {
+          console.error(`[gTTS] Fetch failed for tester: "${text}"`, e);
+          btn.classList.remove('loading');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play'; }, 2500);
+          return;
+        }
+
+        const blobUrl = URL.createObjectURL(blob);
+        testerBlobUrl = blobUrl;
+        const audio = new Audio(blobUrl);
         testerAudio = audio;
 
-        audio.addEventListener('canplaythrough', () => {
-          btn.classList.remove('loading');
-          btn.classList.add('playing');
-          btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
-          statusEl.classList.add('visible');
-          animateCodeFlow(() => {});
-        animateFlowchart(() => {});
-        audio.play().catch(e => console.error('[gTTS] Tester audio playback failed:', e));
+        audio.addEventListener('error', (e) => {
+          const err = audio.error;
+          console.error(`[gTTS] Tester playback error: "${text}"`, '\n  MediaError code:', err?.code, '\n  message:', err?.message, e);
+          btn.classList.remove('loading', 'playing');
+          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+          statusEl.classList.remove('visible');
+          testerAudio = null; URL.revokeObjectURL(blobUrl); testerBlobUrl = null;
+          setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play'; }, 2500);
         });
 
         audio.addEventListener('ended', () => {
           btn.classList.remove('playing');
           btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
           statusEl.classList.remove('visible');
-          testerAudio = null;
+          resetCodeFlow(); resetFlowchart();
+          testerAudio = null; URL.revokeObjectURL(blobUrl); testerBlobUrl = null;
         });
 
-        audio.addEventListener('error', (e) => {
-          const err = audio.error;
-          console.error(`[gTTS] Tester audio load error for text: "${text}"`,
-            '\n  MediaError code:', err ? err.code : 'unknown',
-            '\n  MediaError message:', err ? err.message : 'unknown',
-            '\n  URL:', url,
-            '\n  Event:', e);
-          btn.classList.remove('loading', 'playing');
-          btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
-          statusEl.classList.remove('visible');
-          testerAudio = null;
-          setTimeout(() => {
-            btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
-          }, 2500);
-        });
+        btn.classList.remove('loading'); btn.classList.add('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+        statusEl.classList.add('visible');
+        animateCodeFlow(() => {}); animateFlowchart(() => {});
+        audio.play().catch(e => console.error('[gTTS] tester audio.play() rejected:', e));
+
       } catch (e) {
         console.error('[gTTS] Unexpected error in testerPlay():', e);
       }
