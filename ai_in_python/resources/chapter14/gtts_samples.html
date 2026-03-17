@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>gTTS Samples</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #34C759;
+      --green-dark: #28a347;
+      --green-deeper: #1d7a36;
+      --green-light: #e8faf0;
+      --green-mid: #b3ecc6;
+      --surface: #f5fdf7;
+      --card: #ffffff;
+      --text: #0f1f14;
+      --text-muted: #5a7a65;
+      --border: #c8ecd4;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--green);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(52,199,89,0.25);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .header-brand .material-symbols-outlined {
+      font-size: 26px;
+      color: #fff;
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .header-brand span.title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 52px 24px 80px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      color: var(--green);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 40px;
+    }
+
+    /* ── SAMPLE CARD ── */
+    .sample-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 26px;
+      margin-bottom: 18px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .sample-card:hover {
+      box-shadow: 0 4px 24px rgba(52,199,89,0.10);
+      border-color: var(--green-mid);
+    }
+
+    .sample-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+    }
+
+    .sample-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    /* ── PLAY BUTTON ── */
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 9px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.12s;
+      outline: none;
+    }
+
+    .play-btn:hover {
+      background: var(--green-dark);
+      transform: translateY(-1px);
+    }
+
+    .play-btn:active {
+      transform: scale(0.97);
+    }
+
+    .play-btn .material-symbols-outlined {
+      font-size: 18px;
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .play-btn.loading {
+      background: var(--green-dark);
+      pointer-events: none;
+    }
+
+    .play-btn.playing {
+      background: var(--green-deeper);
+    }
+
+    /* ── STATUS DOT ── */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .status.visible { opacity: 1; }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0 28px;
+    }
+
+    /* ── TESTER CARD ── */
+    .tester-card {
+      background: var(--green-light);
+      border: 2px solid var(--green-mid);
+      border-radius: 16px;
+      padding: 26px 26px 24px;
+      margin-top: 10px;
+    }
+
+    .tester-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green-deeper);
+      margin-bottom: 6px;
+    }
+
+    .tester-heading {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .tester-textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      border: 1.5px solid var(--green-mid);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      margin-bottom: 14px;
+    }
+
+    .tester-textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(52,199,89,0.15);
+    }
+
+    .tester-textarea::placeholder {
+      color: #a0c4ad;
+      font-weight: 400;
+    }
+
+    .tester-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: var(--green-dark);
+      border: 2px solid var(--green);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.12s;
+      outline: none;
+      text-decoration: none;
+    }
+
+    .btn-download:hover {
+      background: var(--green-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-download:active { transform: scale(0.97); }
+
+    .btn-download .material-symbols-outlined {
+      font-size: 17px;
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .tester-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tester-status.visible { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="header-brand" href="#">
+      <span class="material-symbols-outlined">menu_book</span>
+      <span class="title">AI in Python Resources</span>
+    </a>
+  </header>
+
+  <main>
+    <h1>gTTS <span>Samples</span></h1>
+    <p class="subtitle">Text-to-speech examples powered by Google TTS</p>
+
+    <!-- Sample 1 -->
+    <div class="sample-card">
+      <div class="sample-label">Sample 1</div>
+      <div class="sample-text">My favorite food is pizza because it has tomatoes.</div>
+      <button class="play-btn" onclick="playTTS(this, 'My favorite food is pizza because it has tomatoes.')">
+        <span class="material-symbols-outlined">play_arrow</span> Play
+      </button>
+      <span class="status"><span class="status-dot"></span>Playing…</span>
+    </div>
+
+    <!-- Sample 2 -->
+    <div class="sample-card">
+      <div class="sample-label">Sample 2</div>
+      <div class="sample-text">I like reading AI in Python, it's a great book.</div>
+      <button class="play-btn" onclick="playTTS(this, 'I like reading AI in Python, it\'s a great book.')">
+        <span class="material-symbols-outlined">play_arrow</span> Play
+      </button>
+      <span class="status"><span class="status-dot"></span>Playing…</span>
+    </div>
+
+    <!-- Sample 3 -->
+    <div class="sample-card" id="card-browser">
+      <div class="sample-label">Sample 3</div>
+      <div class="sample-text" id="browser-text">Detecting browser…</div>
+      <button class="play-btn" id="btn-browser" disabled>
+        <span class="material-symbols-outlined">play_arrow</span> Play
+      </button>
+      <span class="status"><span class="status-dot"></span>Playing…</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Tester -->
+    <div class="tester-card">
+      <div class="tester-label">Your Turn</div>
+      <div class="tester-heading">Try it yourself</div>
+      <textarea class="tester-textarea" id="tester-input" placeholder="Type anything to convert to speech…"></textarea>
+      <div class="tester-actions">
+        <button class="play-btn" id="tester-play-btn" onclick="testerPlay()">
+          <span class="material-symbols-outlined">play_arrow</span> Play
+        </button>
+        <button class="btn-download" id="tester-dl-btn" onclick="testerDownload()">
+          <span class="material-symbols-outlined">download</span> Download MP3
+        </button>
+        <span class="tester-status" id="tester-status"><span class="status-dot"></span>Playing…</span>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ── Detect browser name ── */
+    function getBrowserName() {
+      const ua = navigator.userAgent;
+      if (/Edg\//.test(ua))    return 'Microsoft Edge';
+      if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
+      if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) return 'Google Chrome';
+      if (/Firefox\//.test(ua)) return 'Mozilla Firefox';
+      if (/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Apple Safari';
+      if (/Trident\//.test(ua)) return 'Internet Explorer';
+      return 'an unknown browser';
+    }
+
+    const browserName = getBrowserName();
+    const browserSentence = `You are currently on ${browserName} browser.`;
+    document.getElementById('browser-text').textContent = browserSentence;
+
+    const btnBrowser = document.getElementById('btn-browser');
+    btnBrowser.removeAttribute('disabled');
+    btnBrowser.onclick = () => playTTS(btnBrowser, browserSentence);
+
+    /* ── TTS Player ── */
+    let currentAudio = null;
+
+    function playTTS(btn, text) {
+      // Stop any currently playing audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        document.querySelectorAll('.play-btn').forEach(b => {
+          b.classList.remove('loading', 'playing');
+          b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        });
+        document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
+      }
+
+      const statusEl = btn.closest('.sample-card').querySelector('.status');
+      const encoded = encodeURIComponent(text);
+      const url = `https://api.kidslearninglab.com/gtts?text=${encoded}`;
+
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
+
+      const audio = new Audio(url);
+      currentAudio = audio;
+
+      audio.addEventListener('canplaythrough', () => {
+        btn.classList.remove('loading');
+        btn.classList.add('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+        statusEl.classList.add('visible');
+        audio.play();
+      });
+
+      audio.addEventListener('ended', () => {
+        btn.classList.remove('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        statusEl.classList.remove('visible');
+        currentAudio = null;
+      });
+
+      audio.addEventListener('error', () => {
+        btn.classList.remove('loading', 'playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+        statusEl.classList.remove('visible');
+        currentAudio = null;
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        }, 2500);
+      });
+
+      // Allow stop on re-click
+      btn.onclick = () => {
+        audio.pause();
+        audio.currentTime = 0;
+        btn.classList.remove('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        statusEl.classList.remove('visible');
+        currentAudio = null;
+        btn.onclick = () => playTTS(btn, text);
+      };
+    }
+    /* ── Tester ── */
+    let testerAudio = null;
+
+    function getTesterText() {
+      return document.getElementById('tester-input').value.trim();
+    }
+
+    function testerPlay() {
+      const text = getTesterText();
+      if (!text) { document.getElementById('tester-input').focus(); return; }
+
+      const btn = document.getElementById('tester-play-btn');
+      const statusEl = document.getElementById('tester-status');
+
+      // Stop if already playing
+      if (testerAudio) {
+        testerAudio.pause();
+        testerAudio = null;
+        btn.classList.remove('loading', 'playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        statusEl.classList.remove('visible');
+        return;
+      }
+
+      // Stop sample audios
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        document.querySelectorAll('.play-btn').forEach(b => {
+          b.classList.remove('loading', 'playing');
+          b.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        });
+        document.querySelectorAll('.status').forEach(s => s.classList.remove('visible'));
+      }
+
+      const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Loading…';
+
+      const audio = new Audio(url);
+      testerAudio = audio;
+
+      audio.addEventListener('canplaythrough', () => {
+        btn.classList.remove('loading');
+        btn.classList.add('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">stop</span> Stop';
+        statusEl.classList.add('visible');
+        audio.play();
+      });
+
+      audio.addEventListener('ended', () => {
+        btn.classList.remove('playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        statusEl.classList.remove('visible');
+        testerAudio = null;
+      });
+
+      audio.addEventListener('error', () => {
+        btn.classList.remove('loading', 'playing');
+        btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+        statusEl.classList.remove('visible');
+        testerAudio = null;
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> Play';
+        }, 2500);
+      });
+    }
+
+    async function testerDownload() {
+      const text = getTesterText();
+      if (!text) { document.getElementById('tester-input').focus(); return; }
+
+      const btn = document.getElementById('tester-dl-btn');
+      btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Fetching…';
+      btn.style.pointerEvents = 'none';
+
+      try {
+        const url = `https://api.kidslearninglab.com/gtts?text=${encodeURIComponent(text)}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('fetch failed');
+        const blob = await res.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'tts-audio.mp3';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        btn.innerHTML = '<span class="material-symbols-outlined">check</span> Downloaded!';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined">download</span> Download MP3';
+          btn.style.pointerEvents = '';
+        }, 2000);
+      } catch {
+        btn.innerHTML = '<span class="material-symbols-outlined">error</span> Error';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined">download</span> Download MP3';
+          btn.style.pointerEvents = '';
+        }, 2500);
+      }
+    }
+  </script>
+
+</body>
+</html>
