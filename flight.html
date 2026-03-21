@@ -216,6 +216,136 @@
     .zoom-msg-icon { font-size: 24px; margin-bottom: 6px; }
     .zoom-msg-text { font-size: 13px; font-weight: 500; color: var(--text2); }
     .zoom-msg-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+    /* ── Welcome screen ── */
+    .welcome {
+      position: fixed; inset: 0; z-index: 9000;
+      background: var(--blue-950);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.5s ease;
+    }
+    .welcome.fade-out { opacity: 0; pointer-events: none; }
+
+    .welcome-bg {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .welcome-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(96,165,250,0.08) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(96,165,250,0.08) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .welcome-glow {
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(59,130,246,0.3) 0%, transparent 70%);
+    }
+
+    .welcome-card {
+      position: relative; z-index: 1;
+      text-align: center; max-width: 480px; padding: 0 2rem;
+      animation: welcomeIn 0.7s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    @keyframes welcomeIn {
+      from { opacity:0; transform: translateY(24px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .welcome-icon {
+      width: 72px; height: 72px; background: var(--blue-600);
+      border-radius: 20px; margin: 0 auto 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07);
+    }
+    .welcome-icon svg { width: 36px; height: 36px; fill: #fff; }
+
+    .welcome-title {
+      font-size: 36px; font-weight: 700; color: #fff;
+      letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.75rem;
+    }
+    .welcome-title span { color: var(--blue-400); }
+
+    .welcome-sub {
+      font-size: 15px; color: rgba(255,255,255,0.55);
+      line-height: 1.6; margin-bottom: 2rem; font-weight: 400;
+    }
+
+    .welcome-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-600); color: #fff;
+      border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 600;
+      padding: 14px 28px;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    .welcome-btn:hover { background: var(--blue-500); box-shadow: 0 6px 28px rgba(37,99,235,0.5); transform: translateY(-1px); }
+    .welcome-btn:active { transform: scale(0.97); }
+
+    .welcome-skip {
+      margin-top: 1rem; font-size: 12px; color: rgba(255,255,255,0.3);
+      cursor: pointer; background: none; border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      transition: color 0.15s;
+    }
+    .welcome-skip:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── Tutorial overlay ── */
+    .tut-backdrop {
+      position: fixed; inset: 0; z-index: 8000;
+      pointer-events: none;
+    }
+    .tut-backdrop.active { pointer-events: all; }
+
+    /* SVG cutout overlay */
+    .tut-svg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+    }
+
+    /* Tooltip card */
+    .tut-card {
+      position: fixed; z-index: 8100;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.25rem 1.5rem;
+      width: 280px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      animation: tutPop 0.25s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    @keyframes tutPop {
+      from { opacity:0; transform: scale(0.92); }
+      to { opacity:1; transform: scale(1); }
+    }
+
+    .tut-step { font-size: 10px; font-weight: 600; color: var(--blue-500); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .tut-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.01em; }
+    .tut-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 1rem; }
+
+    .tut-footer { display: flex; align-items: center; justify-content: space-between; }
+    .tut-dots { display: flex; gap: 5px; }
+    .tut-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+    .tut-dot.active { background: var(--blue-600); }
+    .tut-actions { display: flex; gap: 6px; }
+
+    .tut-btn {
+      padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: 'Space Grotesk', sans-serif; border: none;
+      transition: background 0.15s;
+    }
+    .tut-btn-skip { background: var(--bg2); color: var(--text3); }
+    .tut-btn-skip:hover { background: var(--border); }
+    .tut-btn-next { background: var(--blue-600); color: #fff; }
+    .tut-btn-next:hover { background: var(--blue-700); }
+
+    /* highlight ring drawn by JS */
+    .tut-highlight-ring {
+      position: fixed; z-index: 8050; border-radius: 12px;
+      border: 2.5px solid var(--blue-500);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1);
+    }
   </style>
 </head>
 <body>
@@ -239,6 +369,10 @@
       <div class="hstat">
         <div class="hstat-num" id="visibleFlights">—</div>
         <div class="hstat-label">In View</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num" style="font-size:11px; color: var(--text3);" id="sourceLabel">—</div>
+        <div class="hstat-label">Data Source</div>
       </div>
       <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
@@ -302,6 +436,47 @@
   </div>
 </div>
 
+<!-- Welcome screen -->
+<div class="welcome" id="welcome">
+  <div class="welcome-bg">
+    <div class="welcome-grid"></div>
+    <div class="welcome-glow"></div>
+  </div>
+  <div class="welcome-card">
+    <div class="welcome-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+      </svg>
+    </div>
+    <h1 class="welcome-title">Eshaan's<br><span>Flight Tracker</span></h1>
+    <p class="welcome-sub">Track real planes flying around the world, live. Zoom into any region to see flights in the air right now.</p>
+    <button class="welcome-btn" onclick="startTutorial()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Get started
+    </button>
+    <br>
+    <button class="welcome-skip" onclick="dismissWelcome()">Skip intro</button>
+  </div>
+</div>
+
+<!-- Tutorial -->
+<div class="tut-backdrop" id="tutBackdrop">
+  <svg class="tut-svg" id="tutSvg"></svg>
+</div>
+<div class="tut-highlight-ring" id="tutRing" style="display:none;"></div>
+<div class="tut-card" id="tutCard" style="display:none;">
+  <div class="tut-step" id="tutStep">Step 1 of 5</div>
+  <div class="tut-title" id="tutTitle"></div>
+  <div class="tut-desc" id="tutDesc"></div>
+  <div class="tut-footer">
+    <div class="tut-dots" id="tutDots"></div>
+    <div class="tut-actions">
+      <button class="tut-btn tut-btn-skip" onclick="endTutorial()">Skip</button>
+      <button class="tut-btn tut-btn-next" id="tutNext" onclick="nextStep()">Next →</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const WORKER_URL = 'https://flighttracker.kidslearninglab099.workers.dev/';
@@ -336,38 +511,88 @@ function planeIcon(heading, altitude, onGround) {
 function metersToFeet(m) { return m ? Math.round(m * 3.28084).toLocaleString() : '—'; }
 function msToKnots(ms) { return ms ? Math.round(ms * 1.94384) : '—'; }
 
+function setSourceBadge(source) {
+  const labels = {
+    opensky_auth: 'OpenSky (auth)',
+    opensky_anon: 'OpenSky (anon)',
+    adsbLol: 'ADSB.lol'
+  };
+  document.getElementById('sourceLabel').textContent = labels[source] || source;
+}
+
+// Parse OpenSky format → common flight objects
+function parseOpenSky(data) {
+  return (data.states || [])
+    .filter(s => s[5] !== null && s[6] !== null)
+    .map(s => ({
+      icao: s[0],
+      callsign: (s[1] || '').trim() || s[0],
+      country: s[2] || 'Unknown',
+      lon: s[5], lat: s[6],
+      altitude: s[7] || 0,
+      onGround: s[8],
+      speed: s[9] || 0,
+      heading: s[10] || 0,
+    }));
+}
+
+// Parse adsb.lol format → common flight objects
+function parseAdsbLol(data) {
+  return (data.aircraft || [])
+    .filter(a => a.lat !== undefined && a.lon !== undefined)
+    .map(a => ({
+      icao: a.hex || '',
+      callsign: (a.flight || '').trim() || a.hex || '',
+      country: a.r || 'Unknown',
+      lon: a.lon, lat: a.lat,
+      altitude: a.alt_baro === 'ground' ? 0 : (a.alt_baro || 0),
+      onGround: a.alt_baro === 'ground' || a.gs === 0,
+      speed: a.gs || 0,
+      heading: a.track || 0,
+    }));
+}
+
+function applyFlights(parsed, source) {
+  flights = parsed;
+  setSourceBadge(source);
+  document.getElementById('totalFlights').textContent = flights.length.toLocaleString();
+  updateZoomState();
+  renderList();
+  updateVisibleCount();
+  document.getElementById('loadingOverlay').style.display = 'none';
+  setRefreshLabel();
+}
+
 async function fetchFlights() {
+  document.getElementById('refreshLabel').textContent = 'Loading…';
+
+  // 1. Try Worker (OpenSky authenticated → OpenSky anon, handled server-side)
   try {
-    const res = await fetch(WORKER_URL);
-    if (!res.ok) throw new Error('Worker error');
-    const data = await res.json();
+    const res = await fetch(WORKER_URL, { signal: AbortSignal.timeout(10000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (!data.error && data.states) {
+        applyFlights(parseOpenSky(data), data.source || 'opensky_auth');
+        return;
+      }
+    }
+  } catch(e) { console.warn('Worker failed:', e.message); }
 
-    // states array: [icao24, callsign, origin_country, time_position, last_contact,
-    //                longitude, latitude, baro_altitude, on_ground, velocity,
-    //                true_track, vertical_rate, sensors, geo_altitude, squawk, spi, position_source]
-    flights = (data.states || [])
-      .filter(s => s[5] !== null && s[6] !== null)
-      .map(s => ({
-        icao: s[0],
-        callsign: (s[1] || '').trim() || s[0],
-        country: s[2] || 'Unknown',
-        lon: s[5], lat: s[6],
-        altitude: s[7] || 0,
-        onGround: s[8],
-        speed: s[9] || 0,
-        heading: s[10] || 0,
-      }));
+  // 2. Try adsb.lol directly (open CORS, no key needed)
+  try {
+    const res = await fetch('https://api.adsb.lol/v2/all', { signal: AbortSignal.timeout(10000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.aircraft) {
+        applyFlights(parseAdsbLol(data), 'adsbLol');
+        return;
+      }
+    }
+  } catch(e) { console.warn('ADSB.lol failed:', e.message); }
 
-    document.getElementById('totalFlights').textContent = flights.length.toLocaleString();
-    updateZoomState();
-    renderList();
-    updateVisibleCount();
-    document.getElementById('loadingOverlay').style.display = 'none';
-    setRefreshLabel();
-  } catch(e) {
-    console.error(e);
-    document.getElementById('refreshLabel').textContent = 'Error — retrying';
-  }
+  // All sources failed
+  document.getElementById('refreshLabel').textContent = 'All sources failed';
+  setRefreshLabel();
 }
 
 function updateZoomState() {
@@ -489,6 +714,156 @@ document.getElementById('searchBox').addEventListener('input', e => {
   searchQuery = e.target.value;
   renderList();
 });
+
+// ── Welcome & Tutorial ──
+
+const SEEN_KEY = 'eshaan_ft_seen';
+
+const TUT_STEPS = [
+  {
+    target: 'header',
+    title: 'Live stats at a glance',
+    desc: 'The header shows the total number of live flights in the dataset, how many are currently in your map view, and which data source is active.',
+    pos: 'bottom'
+  },
+  {
+    target: 'refreshBtn',
+    title: 'Manual refresh',
+    desc: 'Flights don\'t update automatically — hit this button whenever you want the latest data fetched fresh from the source.',
+    pos: 'bottom-left'
+  },
+  {
+    target: 'sidebar',
+    title: 'Flight list',
+    desc: 'Every live flight appears here. Search by callsign or country to narrow things down. Click any flight to jump to it on the map.',
+    pos: 'right'
+  },
+  {
+    target: 'searchBox',
+    title: 'Search flights',
+    desc: 'Type a callsign like "BA" or a country like "United States" to filter the list instantly.',
+    pos: 'right'
+  },
+  {
+    target: 'map',
+    title: 'The live map',
+    desc: 'Zoom in to level 5 or above to see plane icons appear. Each icon rotates to show heading and scales with altitude. Click any plane for full details.',
+    pos: 'left'
+  }
+];
+
+let tutStep = 0;
+
+function dismissWelcome() {
+  const el = document.getElementById('welcome');
+  el.classList.add('fade-out');
+  setTimeout(() => el.style.display = 'none', 500);
+  localStorage.setItem(SEEN_KEY, '1');
+}
+
+function startTutorial() {
+  dismissWelcome();
+  setTimeout(() => { tutStep = 0; showStep(); }, 550);
+}
+
+function getTargetRect(targetId) {
+  const el = document.getElementById(targetId) || document.querySelector('.' + targetId) || document.querySelector(targetId);
+  if (!el) return null;
+  return el.getBoundingClientRect();
+}
+
+function showStep() {
+  const step = TUT_STEPS[tutStep];
+  const total = TUT_STEPS.length;
+  const rect = getTargetRect(step.target);
+
+  // Draw dark overlay with cutout
+  const svg = document.getElementById('tutSvg');
+  const W = window.innerWidth, H = window.innerHeight;
+  const pad = 8;
+
+  if (rect) {
+    const x = rect.left - pad, y = rect.top - pad;
+    const w = rect.width + pad*2, h = rect.height + pad*2;
+    svg.innerHTML = `<defs><mask id="cutout"><rect width="${W}" height="${H}" fill="white"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="black"/></mask></defs>
+      <rect width="${W}" height="${H}" fill="rgba(15,31,74,0.7)" mask="url(#cutout)"/>`;
+
+    // Ring
+    const ring = document.getElementById('tutRing');
+    ring.style.display = 'block';
+    ring.style.left = x + 'px'; ring.style.top = y + 'px';
+    ring.style.width = w + 'px'; ring.style.height = h + 'px';
+  } else {
+    svg.innerHTML = `<rect width="${W}" height="${H}" fill="rgba(15,31,74,0.7)"/>`;
+    document.getElementById('tutRing').style.display = 'none';
+  }
+
+  // Position tooltip
+  const card = document.getElementById('tutCard');
+  card.style.display = 'block';
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = '';
+
+  const CARD_W = 280, CARD_H = 180, GAP = 16;
+  let left, top;
+  if (rect) {
+    if (step.pos === 'bottom' || step.pos === 'bottom-left') {
+      top = rect.bottom + pad + GAP;
+      left = step.pos === 'bottom-left' ? Math.max(8, rect.right - CARD_W) : rect.left;
+    } else if (step.pos === 'right') {
+      left = rect.right + pad + GAP;
+      top = rect.top + (rect.height / 2) - (CARD_H / 2);
+    } else if (step.pos === 'left') {
+      left = rect.left - pad - GAP - CARD_W;
+      top = rect.top + (rect.height / 2) - (CARD_H / 2);
+    } else {
+      left = rect.left; top = rect.bottom + GAP;
+    }
+    // Clamp to viewport
+    left = Math.max(8, Math.min(W - CARD_W - 8, left));
+    top = Math.max(8, Math.min(H - CARD_H - 8, top));
+  } else {
+    left = W/2 - CARD_W/2; top = H/2 - CARD_H/2;
+  }
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+
+  // Content
+  document.getElementById('tutStep').textContent = `Step ${tutStep + 1} of ${total}`;
+  document.getElementById('tutTitle').textContent = step.title;
+  document.getElementById('tutDesc').textContent = step.desc;
+  document.getElementById('tutNext').textContent = tutStep === total - 1 ? 'Done ✓' : 'Next →';
+
+  // Dots
+  document.getElementById('tutDots').innerHTML = TUT_STEPS.map((_, i) =>
+    `<div class="tut-dot ${i === tutStep ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Activate backdrop
+  document.getElementById('tutBackdrop').classList.add('active');
+}
+
+function nextStep() {
+  tutStep++;
+  if (tutStep >= TUT_STEPS.length) { endTutorial(); return; }
+  showStep();
+}
+
+function endTutorial() {
+  document.getElementById('tutCard').style.display = 'none';
+  document.getElementById('tutRing').style.display = 'none';
+  document.getElementById('tutBackdrop').classList.remove('active');
+  document.getElementById('tutSvg').innerHTML = '';
+}
+
+// Init: show welcome only on first visit
+if (!localStorage.getItem(SEEN_KEY)) {
+  document.getElementById('welcome').style.display = 'flex';
+} else {
+  document.getElementById('welcome').style.display = 'none';
+}
 
 // Start
 fetchFlights();
