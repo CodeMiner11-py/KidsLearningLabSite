@@ -3,65 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flight Tracker — KidsLearningLab</title>
+  <title>Eshaan's Flight Tracker</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%232563eb'/><path fill='white' d='M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z'/></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f5f3ef;
-      --bg2: #edeae4;
-      --surface: #ffffff;
-      --border: #e2ddd6;
-      --blue-50: #eff6ff;
-      --blue-100: #dbeafe;
-      --blue-200: #bfdbfe;
-      --blue-400: #60a5fa;
-      --blue-500: #3b82f6;
-      --blue-600: #2563eb;
-      --blue-700: #1d4ed8;
-      --blue-900: #1e3a8a;
-      --blue-950: #0f1f4a;
-      --text: #0f172a;
-      --text2: #475569;
-      --text3: #94a3b8;
+      --bg: #f5f3ef; --bg2: #edeae4; --surface: #ffffff; --border: #e2ddd6;
+      --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-200: #bfdbfe;
+      --blue-400: #60a5fa; --blue-500: #3b82f6; --blue-600: #2563eb;
+      --blue-700: #1d4ed8; --blue-950: #0f1f4a;
+      --text: #0f172a; --text2: #475569; --text3: #94a3b8;
     }
-
     html, body { height: 100%; font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); }
-
-    /* ── Layout ── */
     .app { display: grid; grid-template-rows: 56px 1fr; height: 100vh; }
 
-    /* ── Header ── */
     header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.5rem;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      z-index: 1000;
+      padding: 0 1.5rem; background: var(--surface);
+      border-bottom: 1px solid var(--border); z-index: 1000;
     }
-
     .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon {
-      width: 28px; height: 28px; background: var(--blue-600);
-      border-radius: 7px; display: flex; align-items: center; justify-content: center;
-    }
+    .logo-icon { width: 28px; height: 28px; background: var(--blue-600); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
     .logo-icon svg { width: 16px; height: 16px; fill: #fff; }
     .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
     .logo-text span { color: var(--blue-600); }
-
     .header-stats { display: flex; gap: 1.5rem; align-items: center; }
     .hstat { text-align: right; }
     .hstat-num { font-size: 16px; font-weight: 700; color: var(--blue-600); line-height: 1; }
     .hstat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
-
     .refresh-btn {
       display: flex; align-items: center; gap: 6px;
-      background: var(--blue-600); border: none;
-      color: #fff; font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px; font-weight: 600;
+      background: var(--blue-600); border: none; color: #fff;
+      font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
       padding: 7px 14px; border-radius: 8px; cursor: pointer;
       transition: background 0.15s, transform 0.1s;
     }
@@ -70,304 +45,116 @@
     .refresh-btn:disabled { background: var(--blue-200); cursor: not-allowed; color: var(--blue-500); }
     .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
 
-    /* ── Body ── */
     .body { display: grid; grid-template-columns: 320px 1fr; height: 100%; overflow: hidden; }
 
-    /* ── Sidebar ── */
-    .sidebar {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      overflow: hidden;
-    }
-
-    .sidebar-header {
-      padding: 1rem 1.25rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
+    .sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-header { padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); }
     .sidebar-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-
     .search-box {
-      width: 100%; padding: 8px 12px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px; color: var(--text); outline: none;
-      transition: border-color 0.15s;
+      width: 100%; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; transition: border-color 0.15s;
     }
     .search-box:focus { border-color: var(--blue-400); }
     .search-box::placeholder { color: var(--text3); }
-
     .flight-list { overflow-y: auto; flex: 1; padding: 8px; }
-
     .flight-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 10px; cursor: pointer;
-      transition: background 0.12s; margin-bottom: 2px;
-      border: 1px solid transparent;
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 10px; cursor: pointer; transition: background 0.12s;
+      margin-bottom: 2px; border: 1px solid transparent;
     }
     .flight-item:hover { background: var(--bg); }
     .flight-item.active { background: var(--blue-50); border-color: var(--blue-200); }
-
-    .fi-icon {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--blue-50); border: 1px solid var(--blue-100);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 14px;
-    }
+    .fi-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-50); border: 1px solid var(--blue-100); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
     .flight-item.active .fi-icon { background: var(--blue-100); }
-
     .fi-info { flex: 1; min-width: 0; }
     .fi-callsign { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.01em; }
     .fi-country { font-size: 11px; color: var(--text3); margin-top: 1px; }
-
-    .fi-alt {
-      font-size: 11px; font-weight: 600; color: var(--blue-600);
-      background: var(--blue-50); padding: 2px 7px; border-radius: 5px;
-      flex-shrink: 0;
-    }
-
-    .empty-state {
-      padding: 2rem; text-align: center; color: var(--text3); font-size: 13px;
-    }
-
-    /* ── Map ── */
-    #map { width: 100%; height: 100%; z-index: 1; }
-
-    /* ── Info panel ── */
-    .info-panel {
-      position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 1000;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.25rem;
-      width: 280px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-      display: none;
-      animation: slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    @keyframes slideUp {
-      from { opacity:0; transform:translateY(10px) scale(0.98); }
-      to { opacity:1; transform:translateY(0) scale(1); }
-    }
-
-    .ip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .ip-callsign { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
-    .ip-close {
-      width: 24px; height: 24px; border-radius: 6px; background: var(--bg);
-      border: 1px solid var(--border); cursor: pointer; font-size: 14px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text3); transition: background 0.12s;
-    }
-    .ip-close:hover { background: var(--bg2); }
-
-    .ip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .ip-stat {
-      background: var(--bg); border-radius: 8px; padding: 10px;
-    }
-    .ip-stat-val { font-size: 15px; font-weight: 700; color: var(--blue-600); line-height: 1; margin-bottom: 3px; }
-    .ip-stat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
-
-    .ip-country { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-    .ip-country span { font-weight: 600; color: var(--text); }
-
-    .ip-route { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-    .ip-route-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-    .ip-airport { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; min-width: 36px; text-align: center; }
-    .ip-route-line { flex: 1; display: flex; align-items: center; gap: 3px; }
-    .ip-route-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-400); flex-shrink: 0; }
-    .ip-route-dashes { flex: 1; height: 1.5px; background: repeating-linear-gradient(90deg, var(--blue-300) 0, var(--blue-300) 4px, transparent 4px, transparent 8px); }
-    .ip-aircraft { font-size: 11px; color: var(--text3); text-align: center; }
-    .ip-route-loading { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); margin-bottom: 12px; }
-    .ip-route-spinner { width: 12px; height: 12px; border: 2px solid var(--blue-100); border-top-color: var(--blue-500); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-
-    /* ── Map container wrapper for positioning ── */
-    .map-wrap { position: relative; height: 100%; overflow: hidden; }
-
-    /* ── Leaflet overrides ── */
-    .leaflet-popup-content-wrapper {
-      font-family: 'Space Grotesk', sans-serif !important;
-      border-radius: 10px !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
-    }
-
-    /* ── Plane marker ── */
-    .plane-marker {
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.3s ease;
-    }
-    .plane-marker svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-
-    /* ── Loading overlay ── */
-    .loading {
-      position: absolute; inset: 0; background: rgba(245,243,239,0.85);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 2000; gap: 12px; backdrop-filter: blur(2px);
-    }
-    .loading-spinner {
-      width: 36px; height: 36px; border: 3px solid var(--blue-100);
-      border-top-color: var(--blue-600); border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 13px; color: var(--text2); font-weight: 500; }
-
-    /* scrollbar */
+    .fi-alt { font-size: 11px; font-weight: 600; color: var(--blue-600); background: var(--blue-50); padding: 2px 7px; border-radius: 5px; flex-shrink: 0; }
+    .empty-state { padding: 2rem; text-align: center; color: var(--text3); font-size: 13px; }
     .flight-list::-webkit-scrollbar { width: 4px; }
     .flight-list::-webkit-scrollbar-track { background: transparent; }
     .flight-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* zoom message */
-    .zoom-msg {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      z-index: 500; pointer-events: none;
+    .map-wrap { position: relative; height: 100%; overflow: hidden; }
+    #map { width: 100%; height: 100%; z-index: 1; }
+
+    .info-panel {
+      position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 1000;
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 1rem 1.5rem; text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+      border-radius: 16px; padding: 1.25rem; width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08); display: none;
+      animation: slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
+    @keyframes slideUp { from { opacity:0; transform:translateY(10px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .ip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ip-callsign { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+    .ip-close { width: 24px; height: 24px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--text3); transition: background 0.12s; }
+    .ip-close:hover { background: var(--bg2); }
+    .ip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ip-stat { background: var(--bg); border-radius: 8px; padding: 10px; }
+    .ip-stat-val { font-size: 15px; font-weight: 700; color: var(--blue-600); line-height: 1; margin-bottom: 3px; }
+    .ip-stat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+    .ip-country { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .ip-country span { font-weight: 600; color: var(--text); }
+
+    .loading { position: absolute; inset: 0; background: rgba(245,243,239,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; gap: 12px; backdrop-filter: blur(2px); }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--blue-100); border-top-color: var(--blue-600); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+    .zoom-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 500; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
     .zoom-msg-icon { font-size: 24px; margin-bottom: 6px; }
     .zoom-msg-text { font-size: 13px; font-weight: 500; color: var(--text2); }
     .zoom-msg-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
 
-    /* ── Welcome screen ── */
-    .welcome {
-      position: fixed; inset: 0; z-index: 9000;
-      background: var(--blue-950);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
-      transition: opacity 0.5s ease;
-    }
+    /* Welcome */
+    .welcome { position: fixed; inset: 0; z-index: 9000; background: var(--blue-950); display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s ease; }
     .welcome.fade-out { opacity: 0; pointer-events: none; }
-
-    .welcome-bg {
-      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-    }
-    .welcome-grid {
-      position: absolute; inset: 0;
-      background-image: linear-gradient(rgba(96,165,250,0.08) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(96,165,250,0.08) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-    .welcome-glow {
-      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
-      width: 700px; height: 500px;
-      background: radial-gradient(ellipse, rgba(59,130,246,0.3) 0%, transparent 70%);
-    }
-
-    .welcome-card {
-      position: relative; z-index: 1;
-      text-align: center; max-width: 480px; padding: 0 2rem;
-      animation: welcomeIn 0.7s cubic-bezier(0.34,1.2,0.64,1);
-    }
-    @keyframes welcomeIn {
-      from { opacity:0; transform: translateY(24px); }
-      to { opacity:1; transform: translateY(0); }
-    }
-
-    .welcome-icon {
-      width: 72px; height: 72px; background: var(--blue-600);
-      border-radius: 20px; margin: 0 auto 1.5rem;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07);
-    }
+    .welcome-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .welcome-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(96,165,250,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,0.08) 1px, transparent 1px); background-size: 48px 48px; }
+    .welcome-glow { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 700px; height: 500px; background: radial-gradient(ellipse, rgba(59,130,246,0.3) 0%, transparent 70%); }
+    .welcome-card { position: relative; z-index: 1; text-align: center; max-width: 480px; padding: 0 2rem; animation: welcomeIn 0.7s cubic-bezier(0.34,1.2,0.64,1); }
+    @keyframes welcomeIn { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+    .welcome-icon { width: 72px; height: 72px; background: var(--blue-600); border-radius: 20px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07); }
     .welcome-icon svg { width: 36px; height: 36px; fill: #fff; }
-
-    .welcome-title {
-      font-size: 36px; font-weight: 700; color: #fff;
-      letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.75rem;
-    }
+    .welcome-title { font-size: 36px; font-weight: 700; color: #fff; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.75rem; }
     .welcome-title span { color: var(--blue-400); }
-
-    .welcome-sub {
-      font-size: 15px; color: rgba(255,255,255,0.55);
-      line-height: 1.6; margin-bottom: 2rem; font-weight: 400;
-    }
-
-    .welcome-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--blue-600); color: #fff;
-      border: none; border-radius: 12px; cursor: pointer;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px; font-weight: 600;
-      padding: 14px 28px;
-      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
-      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    }
-    .welcome-btn:hover { background: var(--blue-500); box-shadow: 0 6px 28px rgba(37,99,235,0.5); transform: translateY(-1px); }
-    .welcome-btn:active { transform: scale(0.97); }
-
-    .welcome-skip {
-      margin-top: 1rem; font-size: 12px; color: rgba(255,255,255,0.3);
-      cursor: pointer; background: none; border: none;
-      font-family: 'Space Grotesk', sans-serif;
-      transition: color 0.15s;
-    }
+    .welcome-sub { font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 2rem; font-weight: 400; }
+    .welcome-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--blue-600); color: #fff; border: none; border-radius: 12px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; padding: 14px 28px; box-shadow: 0 4px 20px rgba(37,99,235,0.4); transition: background 0.15s, transform 0.1s; }
+    .welcome-btn:hover { background: var(--blue-500); transform: translateY(-1px); }
+    .welcome-skip { margin-top: 1rem; font-size: 12px; color: rgba(255,255,255,0.3); cursor: pointer; background: none; border: none; font-family: 'Space Grotesk', sans-serif; transition: color 0.15s; }
     .welcome-skip:hover { color: rgba(255,255,255,0.6); }
 
-    /* ── Tutorial overlay ── */
-    .tut-backdrop {
-      position: fixed; inset: 0; z-index: 8000;
-      pointer-events: none;
-    }
+    /* Tutorial */
+    .tut-backdrop { position: fixed; inset: 0; z-index: 8000; pointer-events: none; }
     .tut-backdrop.active { pointer-events: all; }
-
-    /* SVG cutout overlay */
-    .tut-svg {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-    }
-
-    /* Tooltip card */
-    .tut-card {
-      position: fixed; z-index: 8100;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.25rem 1.5rem;
-      width: 280px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      animation: tutPop 0.25s cubic-bezier(0.34,1.4,0.64,1);
-    }
-    @keyframes tutPop {
-      from { opacity:0; transform: scale(0.92); }
-      to { opacity:1; transform: scale(1); }
-    }
-
+    .tut-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .tut-card { position: fixed; z-index: 8100; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; width: 280px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); animation: tutPop 0.25s cubic-bezier(0.34,1.4,0.64,1); }
+    @keyframes tutPop { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
     .tut-step { font-size: 10px; font-weight: 600; color: var(--blue-500); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
     .tut-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.01em; }
     .tut-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 1rem; }
-
     .tut-footer { display: flex; align-items: center; justify-content: space-between; }
     .tut-dots { display: flex; gap: 5px; }
     .tut-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
     .tut-dot.active { background: var(--blue-600); }
     .tut-actions { display: flex; gap: 6px; }
-
-    .tut-btn {
-      padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
-      cursor: pointer; font-family: 'Space Grotesk', sans-serif; border: none;
-      transition: background 0.15s;
-    }
+    .tut-btn { padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Space Grotesk', sans-serif; border: none; transition: background 0.15s; }
     .tut-btn-skip { background: var(--bg2); color: var(--text3); }
     .tut-btn-skip:hover { background: var(--border); }
     .tut-btn-next { background: var(--blue-600); color: #fff; }
     .tut-btn-next:hover { background: var(--blue-700); }
-
-    /* highlight ring drawn by JS */
-    .tut-highlight-ring {
-      position: fixed; z-index: 8050; border-radius: 12px;
-      border: 2.5px solid var(--blue-500);
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
-      pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1);
-    }
+    .tut-highlight-ring { position: fixed; z-index: 8050; border-radius: 12px; border: 2.5px solid var(--blue-500); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); pointer-events: none; transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1); }
   </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- Header -->
   <header>
     <div class="logo">
       <div class="logo-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
-        </svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
       </div>
       <div class="logo-text">Eshaan's <span>Flight</span> Tracker</div>
     </div>
@@ -381,7 +168,7 @@
         <div class="hstat-label">In View</div>
       </div>
       <div class="hstat">
-        <div class="hstat-num" style="font-size:11px; color: var(--text3);" id="sourceLabel">—</div>
+        <div class="hstat-num" style="font-size:11px;color:var(--text3);" id="sourceLabel">—</div>
         <div class="hstat-label">Data Source</div>
       </div>
       <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">
@@ -391,9 +178,7 @@
     </div>
   </header>
 
-  <!-- Body -->
   <div class="body">
-    <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-title">Live Flights</div>
@@ -404,7 +189,6 @@
       </div>
     </div>
 
-    <!-- Map -->
     <div class="map-wrap">
       <div id="map"></div>
       <div class="zoom-msg" id="zoomMsg" style="display:none;">
@@ -416,47 +200,16 @@
         <div class="loading-spinner"></div>
         <div class="loading-text">Fetching live flights…</div>
       </div>
-      <!-- Info panel -->
       <div class="info-panel" id="infoPanel">
         <div class="ip-header">
           <div class="ip-callsign" id="ipCallsign">—</div>
           <div class="ip-close" onclick="closePanel()">✕</div>
         </div>
-        <div class="ip-route" id="ipRoute" style="display:none;">
-          <div class="ip-route-row">
-            <div class="ip-airport" id="ipOrigin">—</div>
-            <div class="ip-route-line">
-              <div class="ip-route-dot"></div>
-              <div class="ip-route-dashes"></div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--blue-600)"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
-              <div class="ip-route-dashes"></div>
-              <div class="ip-route-dot"></div>
-            </div>
-            <div class="ip-airport" id="ipDest">—</div>
-          </div>
-          <div class="ip-aircraft" id="ipAircraft"></div>
-        </div>
-        <div class="ip-route-loading" id="ipRouteLoading">
-          <div class="ip-route-spinner"></div>
-          <span>Looking up route…</span>
-        </div>
         <div class="ip-grid">
-          <div class="ip-stat">
-            <div class="ip-stat-val" id="ipAlt">—</div>
-            <div class="ip-stat-label">Altitude (ft)</div>
-          </div>
-          <div class="ip-stat">
-            <div class="ip-stat-val" id="ipSpeed">—</div>
-            <div class="ip-stat-label">Speed (kts)</div>
-          </div>
-          <div class="ip-stat">
-            <div class="ip-stat-val" id="ipHeading">—</div>
-            <div class="ip-stat-label">Heading (°)</div>
-          </div>
-          <div class="ip-stat">
-            <div class="ip-stat-val" id="ipGround">—</div>
-            <div class="ip-stat-label">Status</div>
-          </div>
+          <div class="ip-stat"><div class="ip-stat-val" id="ipAlt">—</div><div class="ip-stat-label">Altitude (ft)</div></div>
+          <div class="ip-stat"><div class="ip-stat-val" id="ipSpeed">—</div><div class="ip-stat-label">Speed (kts)</div></div>
+          <div class="ip-stat"><div class="ip-stat-val" id="ipHeading">—</div><div class="ip-stat-label">Heading (°)</div></div>
+          <div class="ip-stat"><div class="ip-stat-val" id="ipGround">—</div><div class="ip-stat-label">Status</div></div>
         </div>
         <div class="ip-country">Country: <span id="ipCountry">—</span></div>
       </div>
@@ -464,33 +217,25 @@
   </div>
 </div>
 
-<!-- Welcome screen -->
+<!-- Welcome -->
 <div class="welcome" id="welcome">
-  <div class="welcome-bg">
-    <div class="welcome-grid"></div>
-    <div class="welcome-glow"></div>
-  </div>
+  <div class="welcome-bg"><div class="welcome-grid"></div><div class="welcome-glow"></div></div>
   <div class="welcome-card">
     <div class="welcome-icon">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
-      </svg>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
     </div>
     <h1 class="welcome-title">Eshaan's<br><span>Flight Tracker</span></h1>
     <p class="welcome-sub">Track real planes flying around the world, live. Zoom into any region to see flights in the air right now.</p>
     <button class="welcome-btn" onclick="startTutorial()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Get started
-    </button>
-    <br>
+    </button><br>
     <button class="welcome-skip" onclick="dismissWelcome()">Skip intro</button>
   </div>
 </div>
 
 <!-- Tutorial -->
-<div class="tut-backdrop" id="tutBackdrop">
-  <svg class="tut-svg" id="tutSvg"></svg>
-</div>
+<div class="tut-backdrop" id="tutBackdrop"><svg class="tut-svg" id="tutSvg"></svg></div>
 <div class="tut-highlight-ring" id="tutRing" style="display:none;"></div>
 <div class="tut-card" id="tutCard" style="display:none;">
   <div class="tut-step" id="tutStep">Step 1 of 5</div>
@@ -508,20 +253,16 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const WORKER_URL = 'https://flighttracker.kidslearninglab099.workers.dev/';
-const REFRESH_MS = 15000;
 const MIN_ZOOM = 5;
+const SEEN_KEY = 'eshaan_ft_seen';
 
-let map, flights = [], markers = {}, activeIcao = null, searchQuery = '';
+let flights = [], markers = {}, activeIcao = null, searchQuery = '';
 
-// Init map
-map = L.map('map', { zoomControl: false }).setView([30, 0], 3);
+const map = L.map('map', { zoomControl: false }).setView([30, 0], 3);
 L.control.zoom({ position: 'topright' }).addTo(map);
-
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors',
-  maxZoom: 18
+  attribution: '© OpenStreetMap contributors', maxZoom: 18
 }).addTo(map);
-
 map.on('moveend zoomend', () => { updateVisibleCount(); updateZoomState(); });
 
 function planeIcon(heading, altitude, onGround) {
@@ -531,7 +272,7 @@ function planeIcon(heading, altitude, onGround) {
     <path fill="${color}" d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
   </svg>`;
   return L.divIcon({
-    html: `<div class="plane-marker" style="transform:rotate(${heading}deg)">${svg}</div>`,
+    html: `<div style="transform:rotate(${heading}deg);display:flex;align-items:center;justify-content:center;">${svg}</div>`,
     className: '', iconSize: [size, size], iconAnchor: [size/2, size/2]
   });
 }
@@ -539,50 +280,28 @@ function planeIcon(heading, altitude, onGround) {
 function metersToFeet(m) { return m ? Math.round(m * 3.28084).toLocaleString() : '—'; }
 function msToKnots(ms) { return ms ? Math.round(ms * 1.94384) : '—'; }
 
-function setSourceBadge(source) {
-  const labels = {
-    opensky_auth: 'OpenSky (auth)',
-    opensky_anon: 'OpenSky (anon)',
-    adsbLol: 'ADSB.lol'
-  };
-  document.getElementById('sourceLabel').textContent = labels[source] || source;
-}
-
-// Parse OpenSky format → common flight objects
 function parseOpenSky(data) {
-  return (data.states || [])
-    .filter(s => s[5] !== null && s[6] !== null)
-    .map(s => ({
-      icao: s[0],
-      callsign: (s[1] || '').trim() || s[0],
-      country: s[2] || 'Unknown',
-      lon: s[5], lat: s[6],
-      altitude: s[7] || 0,
-      onGround: s[8],
-      speed: s[9] || 0,
-      heading: s[10] || 0,
-    }));
+  return (data.states || []).filter(s => s[5] !== null && s[6] !== null).map(s => ({
+    icao: s[0], callsign: (s[1] || '').trim() || s[0],
+    country: s[2] || 'Unknown', lon: s[5], lat: s[6],
+    altitude: s[7] || 0, onGround: s[8], speed: s[9] || 0, heading: s[10] || 0,
+  }));
 }
 
-// Parse adsb.lol format → common flight objects
 function parseAdsbLol(data) {
-  return (data.aircraft || [])
-    .filter(a => a.lat !== undefined && a.lon !== undefined)
-    .map(a => ({
-      icao: a.hex || '',
-      callsign: (a.flight || '').trim() || a.hex || '',
-      country: a.r || 'Unknown',
-      lon: a.lon, lat: a.lat,
-      altitude: a.alt_baro === 'ground' ? 0 : (a.alt_baro || 0),
-      onGround: a.alt_baro === 'ground' || a.gs === 0,
-      speed: a.gs || 0,
-      heading: a.track || 0,
-    }));
+  return (data.aircraft || []).filter(a => a.lat !== undefined && a.lon !== undefined).map(a => ({
+    icao: a.hex || '', callsign: (a.flight || '').trim() || a.hex || '',
+    country: a.r || 'Unknown', lon: a.lon, lat: a.lat,
+    altitude: a.alt_baro === 'ground' ? 0 : (a.alt_baro || 0),
+    onGround: a.alt_baro === 'ground' || a.gs === 0,
+    speed: a.gs || 0, heading: a.track || 0,
+  }));
 }
 
 function applyFlights(parsed, source) {
   flights = parsed;
-  setSourceBadge(source);
+  const labels = { opensky_anon: 'OpenSky', opensky_auth: 'OpenSky (auth)', adsbLol: 'ADSB.lol' };
+  document.getElementById('sourceLabel').textContent = labels[source] || source;
   document.getElementById('totalFlights').textContent = flights.length.toLocaleString();
   updateZoomState();
   renderList();
@@ -592,22 +311,12 @@ function applyFlights(parsed, source) {
 }
 
 async function fetchFlights() {
-  document.getElementById('refreshLabel').textContent = 'Loading…';
-
   try {
-    const res = await fetch(WORKER_URL, { signal: AbortSignal.timeout(25000) });
-    if (!res.ok) throw new Error(`Worker returned ${res.status}`);
+    const res = await fetch(WORKER_URL, { signal: AbortSignal.timeout ? AbortSignal.timeout(25000) : undefined });
+    if (!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-
-    let parsed;
-    if (data.aircraft) {
-      parsed = parseAdsbLol(data);
-    } else {
-      parsed = parseOpenSky(data);
-    }
-
-    applyFlights(parsed, data.source || 'unknown');
+    applyFlights(data.aircraft ? parseAdsbLol(data) : parseOpenSky(data), data.source || 'unknown');
   } catch(e) {
     console.warn('fetchFlights failed:', e.message);
     document.getElementById('refreshLabel').textContent = 'Failed — try again';
@@ -623,131 +332,30 @@ function updateZoomState() {
 }
 
 function updateMarkers() {
-  const zoomed = map.getZoom() >= MIN_ZOOM;
-
-  // If zoomed out, remove all markers and stop
-  if (!zoomed) {
+  if (map.getZoom() < MIN_ZOOM) {
     Object.keys(markers).forEach(icao => { map.removeLayer(markers[icao]); delete markers[icao]; });
     return;
   }
-
   const bounds = map.getBounds();
   const current = new Set(flights.map(f => f.icao));
-
-  // Remove markers no longer in data
   Object.keys(markers).forEach(icao => {
     if (!current.has(icao)) { map.removeLayer(markers[icao]); delete markers[icao]; }
   });
-
-  // Only render flights in current map bounds
   flights.forEach(f => {
     const inView = bounds.contains([f.lat, f.lon]);
-    if (!inView) {
-      if (markers[f.icao]) { map.removeLayer(markers[f.icao]); delete markers[f.icao]; }
-      return;
-    }
+    if (!inView) { if (markers[f.icao]) { map.removeLayer(markers[f.icao]); delete markers[f.icao]; } return; }
     const icon = planeIcon(f.heading, f.altitude, f.onGround);
-    if (markers[f.icao]) {
-      markers[f.icao].setLatLng([f.lat, f.lon]).setIcon(icon);
-    } else {
-      const m = L.marker([f.lat, f.lon], { icon }).addTo(map);
-      m.on('click', () => selectFlight(f.icao));
-      markers[f.icao] = m;
-    }
+    if (markers[f.icao]) { markers[f.icao].setLatLng([f.lat, f.lon]).setIcon(icon); }
+    else { const m = L.marker([f.lat, f.lon], { icon }).addTo(map); m.on('click', () => selectFlight(f.icao)); markers[f.icao] = m; }
   });
 }
 
-let flightPath = null;
-let airportMarkers = [];
-const routeCache = {};
-
-// Great circle: interpolate N points between two lat/lon coords
-function greatCirclePoints(lat1, lon1, lat2, lon2, n = 100) {
-  const toRad = d => d * Math.PI / 180;
-  const toDeg = r => r * 180 / Math.PI;
-  const φ1 = toRad(lat1), λ1 = toRad(lon1);
-  const φ2 = toRad(lat2), λ2 = toRad(lon2);
-  const points = [];
-  for (let i = 0; i <= n; i++) {
-    const f = i / n;
-    const d = 2 * Math.asin(Math.sqrt(
-      Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
-    ));
-    if (d === 0) { points.push([lat1, lon1]); continue; }
-    const A = Math.sin((1-f)*d)/Math.sin(d);
-    const B = Math.sin(f*d)/Math.sin(d);
-    const x = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
-    const y = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
-    const z = A*Math.sin(φ1) + B*Math.sin(φ2);
-    points.push([toDeg(Math.atan2(z, Math.sqrt(x*x+y*y))), toDeg(Math.atan2(y, x))]);
-  }
-  return points;
-}
-
-function drawFlightPath(originLat, originLon, destLat, destLon, planeLat, planeLon) {
-  clearFlightPath();
-  const pts = greatCirclePoints(originLat, originLon, destLat, destLon, 120);
-
-  // Full route — dashed grey
-  flightPath = L.polyline(pts, {
-    color: '#94a3b8', weight: 1.5, opacity: 0.5,
-    dashArray: '6 6'
-  }).addTo(map);
-
-  // Flown portion: origin → plane position (find closest point)
-  let minDist = Infinity, splitIdx = 0;
-  pts.forEach((p, i) => {
-    const d = Math.hypot(p[0] - planeLat, p[1] - planeLon);
-    if (d < minDist) { minDist = d; splitIdx = i; }
-  });
-  L.polyline(pts.slice(0, splitIdx + 1), {
-    color: '#2563eb', weight: 2.5, opacity: 0.85
-  }).addTo(map);
-
-  // Airport dot markers
-  const dotIcon = (label) => L.divIcon({
-    html: `<div style="background:#2563eb;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2)">${label}</div>`,
-    className: '', iconAnchor: [20, 10]
-  });
-  airportMarkers.push(L.marker([originLat, originLon], { icon: dotIcon('ORG'), zIndexOffset: 500 }).addTo(map));
-  airportMarkers.push(L.marker([destLat, destLon], { icon: dotIcon('DST'), zIndexOffset: 500 }).addTo(map));
-
-  // Fit map to show full route
-  map.fitBounds(L.latLngBounds(pts), { padding: [60, 60] });
-}
-
-function clearFlightPath() {
-  if (flightPath) { map.removeLayer(flightPath); flightPath = null; }
-  airportMarkers.forEach(m => map.removeLayer(m));
-  airportMarkers = [];
-  // Remove all polylines (flown + full)
-  map.eachLayer(l => { if (l instanceof L.Polyline) map.removeLayer(l); });
-}
-
-async function fetchRouteFromWorker(icao, callsign) {
-  const key = icao + callsign;
-  if (routeCache[key]) return routeCache[key];
-  const res = await fetch(`${WORKER_URL}?route=${encodeURIComponent(icao)}&callsign=${encodeURIComponent(callsign)}`, {
-    signal: AbortSignal.timeout(8000)
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  if (data.error) return null;
-  routeCache[key] = data;
-  return data;
-}
-
-async function selectFlight(icao) {
+function selectFlight(icao) {
   activeIcao = icao;
   const f = flights.find(x => x.icao === icao);
   if (!f) return;
-
-  // Highlight sidebar
-  document.querySelectorAll('.flight-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.icao === icao);
-  });
-
-  // Basic info panel
+  document.querySelectorAll('.flight-item').forEach(el => el.classList.toggle('active', el.dataset.icao === icao));
+  map.panTo([f.lat, f.lon]);
   document.getElementById('ipCallsign').textContent = f.callsign;
   document.getElementById('ipAlt').textContent = metersToFeet(f.altitude);
   document.getElementById('ipSpeed').textContent = msToKnots(f.speed);
@@ -755,129 +363,55 @@ async function selectFlight(icao) {
   document.getElementById('ipGround').textContent = f.onGround ? 'On Ground' : 'Airborne';
   document.getElementById('ipCountry').textContent = f.country;
   document.getElementById('infoPanel').style.display = 'block';
-  document.getElementById('ipRoute').style.display = 'none';
-  document.getElementById('ipRouteLoading').style.display = 'flex';
-
-  map.panTo([f.lat, f.lon]);
-  clearFlightPath();
-
-  // Fetch route
-  try {
-    const route = await fetchRouteFromWorker(f.icao, f.callsign);
-    document.getElementById('ipRouteLoading').style.display = 'none';
-    if (route && route.origin && route.destination) {
-      document.getElementById('ipOrigin').textContent = route.origin.iata || route.origin.icao || '?';
-      document.getElementById('ipDest').textContent = route.destination.iata || route.destination.icao || '?';
-      document.getElementById('ipAircraft').textContent = [route.aircraft, route.registration].filter(Boolean).join(' · ');
-      document.getElementById('ipRoute').style.display = 'block';
-
-      if (route.origin.lat && route.origin.lon && route.destination.lat && route.destination.lon) {
-        drawFlightPath(
-          route.origin.lat, route.origin.lon,
-          route.destination.lat, route.destination.lon,
-          f.lat, f.lon
-        );
-      }
-    }
-  } catch(e) {
-    document.getElementById('ipRouteLoading').style.display = 'none';
-  }
 }
 
 function closePanel() {
   document.getElementById('infoPanel').style.display = 'none';
   activeIcao = null;
   document.querySelectorAll('.flight-item').forEach(el => el.classList.remove('active'));
-  clearFlightPath();
 }
 
 function renderList() {
   const q = searchQuery.toLowerCase();
-  const filtered = flights.filter(f =>
-    f.callsign.toLowerCase().includes(q) || f.country.toLowerCase().includes(q)
-  ).slice(0, 200);
-
-  if (!filtered.length) {
-    document.getElementById('flightList').innerHTML = '<div class="empty-state">No flights found</div>';
-    return;
-  }
-
+  const filtered = flights.filter(f => f.callsign.toLowerCase().includes(q) || f.country.toLowerCase().includes(q)).slice(0, 200);
+  if (!filtered.length) { document.getElementById('flightList').innerHTML = '<div class="empty-state">No flights found</div>'; return; }
   document.getElementById('flightList').innerHTML = filtered.map(f => `
     <div class="flight-item ${f.icao === activeIcao ? 'active' : ''}" data-icao="${f.icao}" onclick="selectFlight('${f.icao}')">
       <div class="fi-icon">${f.onGround ? '🛬' : '✈️'}</div>
-      <div class="fi-info">
-        <div class="fi-callsign">${f.callsign}</div>
-        <div class="fi-country">${f.country}</div>
-      </div>
+      <div class="fi-info"><div class="fi-callsign">${f.callsign}</div><div class="fi-country">${f.country}</div></div>
       <div class="fi-alt">${f.onGround ? 'GND' : metersToFeet(f.altitude) + ' ft'}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function updateVisibleCount() {
-  if (!map || !flights.length) return;
+  if (!flights.length) return;
   const bounds = map.getBounds();
-  const count = flights.filter(f => bounds.contains([f.lat, f.lon])).length;
-  document.getElementById('visibleFlights').textContent = count.toLocaleString();
+  document.getElementById('visibleFlights').textContent = flights.filter(f => bounds.contains([f.lat, f.lon])).length.toLocaleString();
 }
 
 function setRefreshLabel() {
   const btn = document.getElementById('refreshBtn');
-  btn.classList.remove('spinning');
-  btn.disabled = false;
+  btn.classList.remove('spinning'); btn.disabled = false;
   document.getElementById('refreshLabel').textContent = 'Refresh';
 }
 
 async function manualRefresh() {
   const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  btn.classList.add('spinning');
+  btn.disabled = true; btn.classList.add('spinning');
   document.getElementById('refreshLabel').textContent = 'Loading…';
   await fetchFlights();
 }
 
-document.getElementById('searchBox').addEventListener('input', e => {
-  searchQuery = e.target.value;
-  renderList();
-});
+document.getElementById('searchBox').addEventListener('input', e => { searchQuery = e.target.value; renderList(); });
 
 // ── Welcome & Tutorial ──
-
-const SEEN_KEY = 'eshaan_ft_seen';
-
 const TUT_STEPS = [
-  {
-    target: 'header',
-    title: 'Live stats at a glance',
-    desc: 'The header shows the total number of live flights in the dataset, how many are currently in your map view, and which data source is active.',
-    pos: 'bottom'
-  },
-  {
-    target: 'refreshBtn',
-    title: 'Manual refresh',
-    desc: 'Flights don\'t update automatically — hit this button whenever you want the latest data fetched fresh from the source.',
-    pos: 'bottom-left'
-  },
-  {
-    target: 'sidebar',
-    title: 'Flight list',
-    desc: 'Every live flight appears here. Search by callsign or country to narrow things down. Click any flight to jump to it on the map.',
-    pos: 'right'
-  },
-  {
-    target: 'searchBox',
-    title: 'Search flights',
-    desc: 'Type a callsign like "BA" or a country like "United States" to filter the list instantly.',
-    pos: 'right'
-  },
-  {
-    target: 'map',
-    title: 'The live map',
-    desc: 'Zoom in to level 5 or above to see plane icons appear. Each icon rotates to show heading and scales with altitude. Click any plane for full details.',
-    pos: 'left'
-  }
+  { target: 'header', title: 'Live stats at a glance', desc: 'The header shows total live flights, how many are in your current map view, and which data source is active.', pos: 'bottom' },
+  { target: 'refreshBtn', title: 'Manual refresh', desc: 'Flights don\'t update automatically — hit this whenever you want fresh data.', pos: 'bottom-left' },
+  { target: 'sidebar', title: 'Flight list', desc: 'Every live flight appears here. Click any entry to jump to it on the map.', pos: 'right' },
+  { target: 'searchBox', title: 'Search flights', desc: 'Type a callsign like "BA" or a country like "United States" to filter instantly.', pos: 'right' },
+  { target: 'map', title: 'The live map', desc: 'Zoom in to level 5 or above to see planes. Each icon rotates to show heading and scales with altitude. Click any plane for details.', pos: 'left' }
 ];
-
 let tutStep = 0;
 
 function dismissWelcome() {
@@ -887,95 +421,51 @@ function dismissWelcome() {
   localStorage.setItem(SEEN_KEY, '1');
 }
 
-function startTutorial() {
-  dismissWelcome();
-  setTimeout(() => { tutStep = 0; showStep(); }, 550);
-}
+function startTutorial() { dismissWelcome(); setTimeout(() => { tutStep = 0; showStep(); }, 550); }
 
-function getTargetRect(targetId) {
-  const el = document.getElementById(targetId) || document.querySelector('.' + targetId) || document.querySelector(targetId);
-  if (!el) return null;
-  return el.getBoundingClientRect();
+function getTargetRect(id) {
+  const el = document.getElementById(id) || document.querySelector('.' + id) || document.querySelector(id);
+  return el ? el.getBoundingClientRect() : null;
 }
 
 function showStep() {
   const step = TUT_STEPS[tutStep];
   const total = TUT_STEPS.length;
   const rect = getTargetRect(step.target);
-
-  // Draw dark overlay with cutout
-  const svg = document.getElementById('tutSvg');
   const W = window.innerWidth, H = window.innerHeight;
   const pad = 8;
-
+  const svg = document.getElementById('tutSvg');
   if (rect) {
-    const x = rect.left - pad, y = rect.top - pad;
-    const w = rect.width + pad*2, h = rect.height + pad*2;
-    svg.innerHTML = `<defs><mask id="cutout"><rect width="${W}" height="${H}" fill="white"/>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="black"/></mask></defs>
-      <rect width="${W}" height="${H}" fill="rgba(15,31,74,0.7)" mask="url(#cutout)"/>`;
-
-    // Ring
+    const x = rect.left - pad, y = rect.top - pad, w = rect.width + pad*2, h = rect.height + pad*2;
+    svg.innerHTML = `<defs><mask id="cutout"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(15,31,74,0.7)" mask="url(#cutout)"/>`;
     const ring = document.getElementById('tutRing');
-    ring.style.display = 'block';
-    ring.style.left = x + 'px'; ring.style.top = y + 'px';
-    ring.style.width = w + 'px'; ring.style.height = h + 'px';
+    ring.style.display = 'block'; ring.style.left = x+'px'; ring.style.top = y+'px'; ring.style.width = w+'px'; ring.style.height = h+'px';
   } else {
     svg.innerHTML = `<rect width="${W}" height="${H}" fill="rgba(15,31,74,0.7)"/>`;
     document.getElementById('tutRing').style.display = 'none';
   }
-
-  // Position tooltip
   const card = document.getElementById('tutCard');
-  card.style.display = 'block';
-  card.style.animation = 'none';
-  void card.offsetWidth;
-  card.style.animation = '';
-
+  card.style.display = 'block'; card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
   const CARD_W = 280, CARD_H = 180, GAP = 16;
   let left, top;
   if (rect) {
-    if (step.pos === 'bottom' || step.pos === 'bottom-left') {
-      top = rect.bottom + pad + GAP;
-      left = step.pos === 'bottom-left' ? Math.max(8, rect.right - CARD_W) : rect.left;
-    } else if (step.pos === 'right') {
-      left = rect.right + pad + GAP;
-      top = rect.top + (rect.height / 2) - (CARD_H / 2);
-    } else if (step.pos === 'left') {
-      left = rect.left - pad - GAP - CARD_W;
-      top = rect.top + (rect.height / 2) - (CARD_H / 2);
-    } else {
-      left = rect.left; top = rect.bottom + GAP;
-    }
-    // Clamp to viewport
+    if (step.pos === 'bottom') { top = rect.bottom + pad + GAP; left = rect.left; }
+    else if (step.pos === 'bottom-left') { top = rect.bottom + pad + GAP; left = Math.max(8, rect.right - CARD_W); }
+    else if (step.pos === 'right') { left = rect.right + pad + GAP; top = rect.top + rect.height/2 - CARD_H/2; }
+    else if (step.pos === 'left') { left = rect.left - pad - GAP - CARD_W; top = rect.top + rect.height/2 - CARD_H/2; }
     left = Math.max(8, Math.min(W - CARD_W - 8, left));
     top = Math.max(8, Math.min(H - CARD_H - 8, top));
-  } else {
-    left = W/2 - CARD_W/2; top = H/2 - CARD_H/2;
-  }
-  card.style.left = left + 'px';
-  card.style.top = top + 'px';
-
-  // Content
-  document.getElementById('tutStep').textContent = `Step ${tutStep + 1} of ${total}`;
+  } else { left = W/2 - CARD_W/2; top = H/2 - CARD_H/2; }
+  card.style.left = left+'px'; card.style.top = top+'px';
+  document.getElementById('tutStep').textContent = `Step ${tutStep+1} of ${total}`;
   document.getElementById('tutTitle').textContent = step.title;
   document.getElementById('tutDesc').textContent = step.desc;
-  document.getElementById('tutNext').textContent = tutStep === total - 1 ? 'Done ✓' : 'Next →';
-
-  // Dots
-  document.getElementById('tutDots').innerHTML = TUT_STEPS.map((_, i) =>
-    `<div class="tut-dot ${i === tutStep ? 'active' : ''}"></div>`
-  ).join('');
-
-  // Activate backdrop
+  document.getElementById('tutNext').textContent = tutStep === total-1 ? 'Done ✓' : 'Next →';
+  document.getElementById('tutDots').innerHTML = TUT_STEPS.map((_,i) => `<div class="tut-dot ${i===tutStep?'active':''}"></div>`).join('');
   document.getElementById('tutBackdrop').classList.add('active');
 }
 
-function nextStep() {
-  tutStep++;
-  if (tutStep >= TUT_STEPS.length) { endTutorial(); return; }
-  showStep();
-}
+function nextStep() { tutStep++; if (tutStep >= TUT_STEPS.length) { endTutorial(); return; } showStep(); }
 
 function endTutorial() {
   document.getElementById('tutCard').style.display = 'none';
@@ -984,14 +474,9 @@ function endTutorial() {
   document.getElementById('tutSvg').innerHTML = '';
 }
 
-// Init: show welcome only on first visit
-if (!localStorage.getItem(SEEN_KEY)) {
-  document.getElementById('welcome').style.display = 'flex';
-} else {
-  document.getElementById('welcome').style.display = 'none';
-}
+if (!localStorage.getItem(SEEN_KEY)) { document.getElementById('welcome').style.display = 'flex'; }
+else { document.getElementById('welcome').style.display = 'none'; }
 
-// Start
 fetchFlights();
 </script>
 </body>
