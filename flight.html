@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flight Tracker — KidsLearningLab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f3ef;
+      --bg2: #edeae4;
+      --surface: #ffffff;
+      --border: #e2ddd6;
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --blue-200: #bfdbfe;
+      --blue-400: #60a5fa;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --blue-900: #1e3a8a;
+      --blue-950: #0f1f4a;
+      --text: #0f172a;
+      --text2: #475569;
+      --text3: #94a3b8;
+    }
+
+    html, body { height: 100%; font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* ── Layout ── */
+    .app { display: grid; grid-template-rows: 56px 1fr; height: 100vh; }
+
+    /* ── Header ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 28px; height: 28px; background: var(--blue-600);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 16px; height: 16px; fill: #fff; }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+    .logo-text span { color: var(--blue-600); }
+
+    .header-stats { display: flex; gap: 1.5rem; align-items: center; }
+    .hstat { text-align: right; }
+    .hstat-num { font-size: 16px; font-weight: 700; color: var(--blue-600); line-height: 1; }
+    .hstat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .refresh-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--blue-50); border: 1px solid var(--blue-200);
+      color: var(--blue-700); font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 999px; letter-spacing: 0.04em;
+    }
+    .refresh-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--blue-500);
+    }
+    .refresh-dot.pulsing { animation: pulse 1s ease-in-out; }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.3; transform:scale(0.7); }
+    }
+
+    /* ── Body ── */
+    .body { display: grid; grid-template-columns: 320px 1fr; height: 100%; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+    .search-box {
+      width: 100%; padding: 8px 12px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; color: var(--text); outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-box:focus { border-color: var(--blue-400); }
+    .search-box::placeholder { color: var(--text3); }
+
+    .flight-list { overflow-y: auto; flex: 1; padding: 8px; }
+
+    .flight-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      transition: background 0.12s; margin-bottom: 2px;
+      border: 1px solid transparent;
+    }
+    .flight-item:hover { background: var(--bg); }
+    .flight-item.active { background: var(--blue-50); border-color: var(--blue-200); }
+
+    .fi-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--blue-50); border: 1px solid var(--blue-100);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 14px;
+    }
+    .flight-item.active .fi-icon { background: var(--blue-100); }
+
+    .fi-info { flex: 1; min-width: 0; }
+    .fi-callsign { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.01em; }
+    .fi-country { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+    .fi-alt {
+      font-size: 11px; font-weight: 600; color: var(--blue-600);
+      background: var(--blue-50); padding: 2px 7px; border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .empty-state {
+      padding: 2rem; text-align: center; color: var(--text3); font-size: 13px;
+    }
+
+    /* ── Map ── */
+    #map { width: 100%; height: 100%; z-index: 1; }
+
+    /* ── Info panel ── */
+    .info-panel {
+      position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 1000;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.25rem;
+      width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      display: none;
+      animation: slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(10px) scale(0.98); }
+      to { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .ip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ip-callsign { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+    .ip-close {
+      width: 24px; height: 24px; border-radius: 6px; background: var(--bg);
+      border: 1px solid var(--border); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text3); transition: background 0.12s;
+    }
+    .ip-close:hover { background: var(--bg2); }
+
+    .ip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ip-stat {
+      background: var(--bg); border-radius: 8px; padding: 10px;
+    }
+    .ip-stat-val { font-size: 15px; font-weight: 700; color: var(--blue-600); line-height: 1; margin-bottom: 3px; }
+    .ip-stat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .ip-country { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .ip-country span { font-weight: 600; color: var(--text); }
+
+    /* ── Map container wrapper for positioning ── */
+    .map-wrap { position: relative; height: 100%; overflow: hidden; }
+
+    /* ── Leaflet overrides ── */
+    .leaflet-popup-content-wrapper {
+      font-family: 'Space Grotesk', sans-serif !important;
+      border-radius: 10px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+    }
+
+    /* ── Plane marker ── */
+    .plane-marker {
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s ease;
+    }
+    .plane-marker svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+
+    /* ── Loading overlay ── */
+    .loading {
+      position: absolute; inset: 0; background: rgba(245,243,239,0.85);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 2000; gap: 12px; backdrop-filter: blur(2px);
+    }
+    .loading-spinner {
+      width: 36px; height: 36px; border: 3px solid var(--blue-100);
+      border-top-color: var(--blue-600); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+    /* scrollbar */
+    .flight-list::-webkit-scrollbar { width: 4px; }
+    .flight-list::-webkit-scrollbar-track { background: transparent; }
+    .flight-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+        </svg>
+      </div>
+      <div class="logo-text">Eshaan's <span>Flight</span> Tracker</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-num" id="totalFlights">—</div>
+        <div class="hstat-label">Live Flights</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num" id="visibleFlights">—</div>
+        <div class="hstat-label">In View</div>
+      </div>
+      <div class="refresh-badge">
+        <div class="refresh-dot" id="refreshDot"></div>
+        <span id="refreshLabel">Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div class="body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Live Flights</div>
+        <input class="search-box" id="searchBox" type="text" placeholder="Search callsign or country…">
+      </div>
+      <div class="flight-list" id="flightList">
+        <div class="empty-state">Loading flight data…</div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="loading" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Fetching live flights…</div>
+      </div>
+      <!-- Info panel -->
+      <div class="info-panel" id="infoPanel">
+        <div class="ip-header">
+          <div class="ip-callsign" id="ipCallsign">—</div>
+          <div class="ip-close" onclick="closePanel()">✕</div>
+        </div>
+        <div class="ip-grid">
+          <div class="ip-stat">
+            <div class="ip-stat-val" id="ipAlt">—</div>
+            <div class="ip-stat-label">Altitude (ft)</div>
+          </div>
+          <div class="ip-stat">
+            <div class="ip-stat-val" id="ipSpeed">—</div>
+            <div class="ip-stat-label">Speed (kts)</div>
+          </div>
+          <div class="ip-stat">
+            <div class="ip-stat-val" id="ipHeading">—</div>
+            <div class="ip-stat-label">Heading (°)</div>
+          </div>
+          <div class="ip-stat">
+            <div class="ip-stat-val" id="ipGround">—</div>
+            <div class="ip-stat-label">Status</div>
+          </div>
+        </div>
+        <div class="ip-country">Country: <span id="ipCountry">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORKER_URL = 'https://flighttracker.kidslearninglab099.workers.dev/';
+const REFRESH_MS = 15000;
+
+let map, flights = [], markers = {}, activeIcao = null, searchQuery = '';
+
+// Init map
+map = L.map('map', { zoomControl: false }).setView([30, 0], 3);
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 18
+}).addTo(map);
+
+map.on('moveend zoomend', updateVisibleCount);
+
+function planeIcon(heading, altitude, onGround) {
+  const size = onGround ? 14 : Math.min(24, Math.max(14, 14 + (altitude / 40000) * 10));
+  const color = onGround ? '#94a3b8' : '#2563eb';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
+    <path fill="${color}" d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+  </svg>`;
+  return L.divIcon({
+    html: `<div class="plane-marker" style="transform:rotate(${heading}deg)">${svg}</div>`,
+    className: '', iconSize: [size, size], iconAnchor: [size/2, size/2]
+  });
+}
+
+function metersToFeet(m) { return m ? Math.round(m * 3.28084).toLocaleString() : '—'; }
+function msToKnots(ms) { return ms ? Math.round(ms * 1.94384) : '—'; }
+
+async function fetchFlights() {
+  try {
+    const res = await fetch(WORKER_URL);
+    if (!res.ok) throw new Error('Worker error');
+    const data = await res.json();
+
+    // states array: [icao24, callsign, origin_country, time_position, last_contact,
+    //                longitude, latitude, baro_altitude, on_ground, velocity,
+    //                true_track, vertical_rate, sensors, geo_altitude, squawk, spi, position_source]
+    flights = (data.states || [])
+      .filter(s => s[5] !== null && s[6] !== null)
+      .map(s => ({
+        icao: s[0],
+        callsign: (s[1] || '').trim() || s[0],
+        country: s[2] || 'Unknown',
+        lon: s[5], lat: s[6],
+        altitude: s[7] || 0,
+        onGround: s[8],
+        speed: s[9] || 0,
+        heading: s[10] || 0,
+      }));
+
+    document.getElementById('totalFlights').textContent = flights.length.toLocaleString();
+    updateMarkers();
+    renderList();
+    updateVisibleCount();
+    document.getElementById('loadingOverlay').style.display = 'none';
+    setRefreshLabel();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('refreshLabel').textContent = 'Error — retrying';
+  }
+}
+
+function updateMarkers() {
+  const current = new Set(flights.map(f => f.icao));
+
+  // Remove old
+  Object.keys(markers).forEach(icao => {
+    if (!current.has(icao)) { map.removeLayer(markers[icao]); delete markers[icao]; }
+  });
+
+  // Add/update
+  flights.forEach(f => {
+    const icon = planeIcon(f.heading, f.altitude, f.onGround);
+    if (markers[f.icao]) {
+      markers[f.icao].setLatLng([f.lat, f.lon]).setIcon(icon);
+    } else {
+      const m = L.marker([f.lat, f.lon], { icon }).addTo(map);
+      m.on('click', () => selectFlight(f.icao));
+      markers[f.icao] = m;
+    }
+  });
+}
+
+function selectFlight(icao) {
+  activeIcao = icao;
+  const f = flights.find(x => x.icao === icao);
+  if (!f) return;
+
+  // Highlight sidebar
+  document.querySelectorAll('.flight-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.icao === icao);
+  });
+
+  // Pan map
+  map.panTo([f.lat, f.lon]);
+
+  // Info panel
+  document.getElementById('ipCallsign').textContent = f.callsign;
+  document.getElementById('ipAlt').textContent = metersToFeet(f.altitude);
+  document.getElementById('ipSpeed').textContent = msToKnots(f.speed);
+  document.getElementById('ipHeading').textContent = f.heading ? Math.round(f.heading) + '°' : '—';
+  document.getElementById('ipGround').textContent = f.onGround ? 'On Ground' : 'Airborne';
+  document.getElementById('ipCountry').textContent = f.country;
+  document.getElementById('infoPanel').style.display = 'block';
+}
+
+function closePanel() {
+  document.getElementById('infoPanel').style.display = 'none';
+  activeIcao = null;
+  document.querySelectorAll('.flight-item').forEach(el => el.classList.remove('active'));
+}
+
+function renderList() {
+  const q = searchQuery.toLowerCase();
+  const filtered = flights.filter(f =>
+    f.callsign.toLowerCase().includes(q) || f.country.toLowerCase().includes(q)
+  ).slice(0, 200);
+
+  if (!filtered.length) {
+    document.getElementById('flightList').innerHTML = '<div class="empty-state">No flights found</div>';
+    return;
+  }
+
+  document.getElementById('flightList').innerHTML = filtered.map(f => `
+    <div class="flight-item ${f.icao === activeIcao ? 'active' : ''}" data-icao="${f.icao}" onclick="selectFlight('${f.icao}')">
+      <div class="fi-icon">${f.onGround ? '🛬' : '✈️'}</div>
+      <div class="fi-info">
+        <div class="fi-callsign">${f.callsign}</div>
+        <div class="fi-country">${f.country}</div>
+      </div>
+      <div class="fi-alt">${f.onGround ? 'GND' : metersToFeet(f.altitude) + ' ft'}</div>
+    </div>
+  `).join('');
+}
+
+function updateVisibleCount() {
+  if (!map || !flights.length) return;
+  const bounds = map.getBounds();
+  const count = flights.filter(f => bounds.contains([f.lat, f.lon])).length;
+  document.getElementById('visibleFlights').textContent = count.toLocaleString();
+}
+
+function setRefreshLabel() {
+  const dot = document.getElementById('refreshDot');
+  const label = document.getElementById('refreshLabel');
+  dot.classList.add('pulsing');
+  label.textContent = 'Live';
+  setTimeout(() => dot.classList.remove('pulsing'), 1000);
+
+  let secs = REFRESH_MS / 1000;
+  const interval = setInterval(() => {
+    secs--;
+    if (secs <= 0) { clearInterval(interval); label.textContent = 'Refreshing…'; }
+    else label.textContent = `Refresh in ${secs}s`;
+  }, 1000);
+}
+
+document.getElementById('searchBox').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderList();
+});
+
+// Start
+fetchFlights();
+setInterval(fetchFlights, REFRESH_MS);
+</script>
+</body>
+</html>
