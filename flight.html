@@ -56,20 +56,18 @@
     .hstat-num { font-size: 16px; font-weight: 700; color: var(--blue-600); line-height: 1; }
     .hstat-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
 
-    .refresh-badge {
+    .refresh-btn {
       display: flex; align-items: center; gap: 6px;
-      background: var(--blue-50); border: 1px solid var(--blue-200);
-      color: var(--blue-700); font-size: 11px; font-weight: 600;
-      padding: 4px 10px; border-radius: 999px; letter-spacing: 0.04em;
+      background: var(--blue-600); border: none;
+      color: #fff; font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
     }
-    .refresh-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--blue-500);
-    }
-    .refresh-dot.pulsing { animation: pulse 1s ease-in-out; }
-    @keyframes pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.3; transform:scale(0.7); }
-    }
+    .refresh-btn:hover { background: var(--blue-700); }
+    .refresh-btn:active { transform: scale(0.97); }
+    .refresh-btn:disabled { background: var(--blue-200); cursor: not-allowed; color: var(--blue-500); }
+    .refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
 
     /* ── Body ── */
     .body { display: grid; grid-template-columns: 320px 1fr; height: 100%; overflow: hidden; }
@@ -205,6 +203,18 @@
     .flight-list::-webkit-scrollbar { width: 4px; }
     .flight-list::-webkit-scrollbar-track { background: transparent; }
     .flight-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* zoom message */
+    .zoom-msg {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 500; pointer-events: none;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.5rem; text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+    .zoom-msg-icon { font-size: 24px; margin-bottom: 6px; }
+    .zoom-msg-text { font-size: 13px; font-weight: 500; color: var(--text2); }
+    .zoom-msg-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
   </style>
 </head>
 <body>
@@ -229,10 +239,10 @@
         <div class="hstat-num" id="visibleFlights">—</div>
         <div class="hstat-label">In View</div>
       </div>
-      <div class="refresh-badge">
-        <div class="refresh-dot" id="refreshDot"></div>
-        <span id="refreshLabel">Loading...</span>
-      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        <span id="refreshLabel">Refresh</span>
+      </button>
     </div>
   </header>
 
@@ -252,6 +262,11 @@
     <!-- Map -->
     <div class="map-wrap">
       <div id="map"></div>
+      <div class="zoom-msg" id="zoomMsg" style="display:none;">
+        <div class="zoom-msg-icon">🔍</div>
+        <div class="zoom-msg-text">Zoom in to see flights</div>
+        <div class="zoom-msg-sub">Planes appear at zoom level 5 and above</div>
+      </div>
       <div class="loading" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">Fetching live flights…</div>
@@ -290,6 +305,7 @@
 <script>
 const WORKER_URL = 'https://flighttracker.kidslearninglab099.workers.dev/';
 const REFRESH_MS = 15000;
+const MIN_ZOOM = 5;
 
 let map, flights = [], markers = {}, activeIcao = null, searchQuery = '';
 
@@ -302,7 +318,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 18
 }).addTo(map);
 
-map.on('moveend zoomend', updateVisibleCount);
+map.on('moveend zoomend', () => { updateVisibleCount(); updateZoomState(); });
 
 function planeIcon(heading, altitude, onGround) {
   const size = onGround ? 14 : Math.min(24, Math.max(14, 14 + (altitude / 40000) * 10));
@@ -342,7 +358,7 @@ async function fetchFlights() {
       }));
 
     document.getElementById('totalFlights').textContent = flights.length.toLocaleString();
-    updateMarkers();
+    updateZoomState();
     renderList();
     updateVisibleCount();
     document.getElementById('loadingOverlay').style.display = 'none';
@@ -353,16 +369,36 @@ async function fetchFlights() {
   }
 }
 
+function updateZoomState() {
+  const zoomed = map.getZoom() >= MIN_ZOOM;
+  document.getElementById('zoomMsg').style.display = zoomed ? 'none' : 'block';
+  updateMarkers();
+}
+
 function updateMarkers() {
+  const zoomed = map.getZoom() >= MIN_ZOOM;
+
+  // If zoomed out, remove all markers and stop
+  if (!zoomed) {
+    Object.keys(markers).forEach(icao => { map.removeLayer(markers[icao]); delete markers[icao]; });
+    return;
+  }
+
+  const bounds = map.getBounds();
   const current = new Set(flights.map(f => f.icao));
 
-  // Remove old
+  // Remove markers no longer in data
   Object.keys(markers).forEach(icao => {
     if (!current.has(icao)) { map.removeLayer(markers[icao]); delete markers[icao]; }
   });
 
-  // Add/update
+  // Only render flights in current map bounds
   flights.forEach(f => {
+    const inView = bounds.contains([f.lat, f.lon]);
+    if (!inView) {
+      if (markers[f.icao]) { map.removeLayer(markers[f.icao]); delete markers[f.icao]; }
+      return;
+    }
     const icon = planeIcon(f.heading, f.altitude, f.onGround);
     if (markers[f.icao]) {
       markers[f.icao].setLatLng([f.lat, f.lon]).setIcon(icon);
@@ -434,18 +470,18 @@ function updateVisibleCount() {
 }
 
 function setRefreshLabel() {
-  const dot = document.getElementById('refreshDot');
-  const label = document.getElementById('refreshLabel');
-  dot.classList.add('pulsing');
-  label.textContent = 'Live';
-  setTimeout(() => dot.classList.remove('pulsing'), 1000);
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  document.getElementById('refreshLabel').textContent = 'Refresh';
+}
 
-  let secs = REFRESH_MS / 1000;
-  const interval = setInterval(() => {
-    secs--;
-    if (secs <= 0) { clearInterval(interval); label.textContent = 'Refreshing…'; }
-    else label.textContent = `Refresh in ${secs}s`;
-  }, 1000);
+async function manualRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  document.getElementById('refreshLabel').textContent = 'Loading…';
+  await fetchFlights();
 }
 
 document.getElementById('searchBox').addEventListener('input', e => {
@@ -455,7 +491,6 @@ document.getElementById('searchBox').addEventListener('input', e => {
 
 // Start
 fetchFlights();
-setInterval(fetchFlights, REFRESH_MS);
 </script>
 </body>
 </html>
