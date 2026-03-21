@@ -566,33 +566,26 @@ function applyFlights(parsed, source) {
 async function fetchFlights() {
   document.getElementById('refreshLabel').textContent = 'Loading…';
 
-  // 1. Try Worker (OpenSky authenticated → OpenSky anon, handled server-side)
   try {
-    const res = await fetch(WORKER_URL, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      if (!data.error && data.states) {
-        applyFlights(parseOpenSky(data), data.source || 'opensky_auth');
-        return;
-      }
-    }
-  } catch(e) { console.warn('Worker failed:', e.message); }
+    const res = await fetch(WORKER_URL, { signal: AbortSignal.timeout(25000) });
+    if (!res.ok) throw new Error(`Worker returned ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
 
-  // 2. Try adsb.lol directly (open CORS, no key needed)
-  try {
-    const res = await fetch('https://api.adsb.lol/v2/all', { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.aircraft) {
-        applyFlights(parseAdsbLol(data), 'adsbLol');
-        return;
-      }
+    let parsed;
+    if (data.aircraft) {
+      parsed = parseAdsbLol(data);
+    } else {
+      parsed = parseOpenSky(data);
     }
-  } catch(e) { console.warn('ADSB.lol failed:', e.message); }
 
-  // All sources failed
-  document.getElementById('refreshLabel').textContent = 'All sources failed';
-  setRefreshLabel();
+    applyFlights(parsed, data.source || 'unknown');
+  } catch(e) {
+    console.warn('fetchFlights failed:', e.message);
+    document.getElementById('refreshLabel').textContent = 'Failed — try again';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    setRefreshLabel();
+  }
 }
 
 function updateZoomState() {
