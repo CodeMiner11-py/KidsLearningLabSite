@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eID Generator — KidsLearningLab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --blue-200: #bfdbfe;
+      --blue-400: #60a5fa;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --blue-800: #1e40af;
+      --blue-900: #1e3a8a;
+      --blue-950: #0f1f4a;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --surface: #ffffff;
+      --surface-2: #f8faff;
+      --border: #e2e8f0;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--surface-2);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--blue-100) 1px, transparent 1px),
+        linear-gradient(90deg, var(--blue-100) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(59,130,246,0.15) 0%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04), 0 24px 48px -8px rgba(37,99,235,0.08);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-200);
+      color: var(--blue-700);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--blue-500);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
+    }
+
+    h1 span { color: var(--blue-600); }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--blue-600);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+      margin-bottom: 1.25rem;
+    }
+
+    .generate-btn:hover {
+      background: var(--blue-700);
+      box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+      transform: translateY(-1px);
+    }
+
+    .generate-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+    }
+
+    .generate-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue-600);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .eid-output {
+      display: none;
+      background: var(--blue-950);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(6px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .eid-output-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-400);
+      margin-bottom: 8px;
+    }
+
+    .eid-value {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 13px;
+      font-weight: 400;
+      color: #e2e8f0;
+      word-break: break-all;
+      line-height: 1.7;
+      padding-right: 60px;
+    }
+
+    .eid-value .prefix { color: var(--blue-400); font-weight: 600; }
+    .eid-value .sep { color: #64748b; }
+    .eid-value .uid { color: #93c5fd; }
+    .eid-value .rand { color: #e2e8f0; }
+
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .copy-btn:hover { background: rgba(255,255,255,0.14); color: #e2e8f0; }
+    .copy-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .history-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .clear-btn {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      padding: 2px 0;
+      transition: color 0.15s;
+    }
+
+    .clear-btn:hover { color: #ef4444; }
+
+    .history-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'Space Grotesk', monospace;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      word-break: break-all;
+      line-height: 1.6;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 1.5rem;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .footer span { color: var(--blue-500); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      KidsLearningLab.com
+    </div>
+    <h1>eID <span>Generator</span></h1>
+    <p class="subtitle">Generate unique Educational IDs for learners. Each eID is cryptographically unique and ready to use.</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num" id="countStat">0</div>
+        <div class="stat-label">Generated</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">36</div>
+        <div class="stat-label">UUID chars</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">25</div>
+        <div class="stat-label">Random chars</div>
+      </div>
+    </div>
+
+    <button class="generate-btn" onclick="generate()">Generate eID →</button>
+
+    <div class="eid-output" id="output">
+      <div class="eid-output-label">eID Token</div>
+      <div class="eid-value" id="eid"></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyEid()">Copy</button>
+    </div>
+
+    <div id="historyWrap" style="display:none;">
+      <div class="history-header">
+        <span class="history-title">History</span>
+        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="footer">Powered by <span>KidsLearningLab</span> &mdash; eID v2</div>
+
+  <script>
+    const history = [];
+    let count = 0;
+
+    function uuid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    function randStr(len) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let s = '';
+      for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    }
+
+    function generate() {
+      const u = uuid();
+      const r = randStr(25);
+      const eid = `KIDSLEARNINGLAB.COM_EID>>>${u}>>>${r}`;
+
+      document.getElementById('eid').innerHTML =
+        `<span class="prefix">KIDSLEARNINGLAB.COM_EID</span><span class="sep">&gt;&gt;&gt;</span><span class="uid">${u}</span><span class="sep">&gt;&gt;&gt;</span><span class="rand">${r}</span>`;
+
+      const out = document.getElementById('output');
+      out.style.display = 'block';
+      out.style.animation = 'none';
+      void out.offsetWidth;
+      out.style.animation = '';
+
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('copied');
+      copyBtn.dataset.eid = eid;
+
+      count++;
+      document.getElementById('countStat').textContent = count;
+
+      history.unshift(eid);
+      renderHistory();
+    }
+
+    function copyEid() {
+      const eid = document.getElementById('copyBtn').dataset.eid;
+      navigator.clipboard.writeText(eid);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    }
+
+    function renderHistory() {
+      if (history.length < 2) return;
+      document.getElementById('historyWrap').style.display = 'block';
+      document.getElementById('historyList').innerHTML =
+        history.slice(1, 6).map(e => `<div class="history-item">${e}</div>`).join('');
+    }
+
+    function clearHistory() {
+      history.splice(1);
+      document.getElementById('historyWrap').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
