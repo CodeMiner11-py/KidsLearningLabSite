@@ -169,6 +169,16 @@
     .ip-country { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
     .ip-country span { font-weight: 600; color: var(--text); }
 
+    .ip-route { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .ip-route-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .ip-airport { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; min-width: 36px; text-align: center; }
+    .ip-route-line { flex: 1; display: flex; align-items: center; gap: 3px; }
+    .ip-route-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-400); flex-shrink: 0; }
+    .ip-route-dashes { flex: 1; height: 1.5px; background: repeating-linear-gradient(90deg, var(--blue-300) 0, var(--blue-300) 4px, transparent 4px, transparent 8px); }
+    .ip-aircraft { font-size: 11px; color: var(--text3); text-align: center; }
+    .ip-route-loading { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+    .ip-route-spinner { width: 12px; height: 12px; border: 2px solid var(--blue-100); border-top-color: var(--blue-500); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+
     /* ── Map container wrapper for positioning ── */
     .map-wrap { position: relative; height: 100%; overflow: hidden; }
 
@@ -412,6 +422,24 @@
           <div class="ip-callsign" id="ipCallsign">—</div>
           <div class="ip-close" onclick="closePanel()">✕</div>
         </div>
+        <div class="ip-route" id="ipRoute" style="display:none;">
+          <div class="ip-route-row">
+            <div class="ip-airport" id="ipOrigin">—</div>
+            <div class="ip-route-line">
+              <div class="ip-route-dot"></div>
+              <div class="ip-route-dashes"></div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--blue-600)"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+              <div class="ip-route-dashes"></div>
+              <div class="ip-route-dot"></div>
+            </div>
+            <div class="ip-airport" id="ipDest">—</div>
+          </div>
+          <div class="ip-aircraft" id="ipAircraft"></div>
+        </div>
+        <div class="ip-route-loading" id="ipRouteLoading">
+          <div class="ip-route-spinner"></div>
+          <span>Looking up route…</span>
+        </div>
         <div class="ip-grid">
           <div class="ip-stat">
             <div class="ip-stat-val" id="ipAlt">—</div>
@@ -629,7 +657,87 @@ function updateMarkers() {
   });
 }
 
-function selectFlight(icao) {
+let flightPath = null;
+let airportMarkers = [];
+const routeCache = {};
+
+// Great circle: interpolate N points between two lat/lon coords
+function greatCirclePoints(lat1, lon1, lat2, lon2, n = 100) {
+  const toRad = d => d * Math.PI / 180;
+  const toDeg = r => r * 180 / Math.PI;
+  const φ1 = toRad(lat1), λ1 = toRad(lon1);
+  const φ2 = toRad(lat2), λ2 = toRad(lon2);
+  const points = [];
+  for (let i = 0; i <= n; i++) {
+    const f = i / n;
+    const d = 2 * Math.asin(Math.sqrt(
+      Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
+    ));
+    if (d === 0) { points.push([lat1, lon1]); continue; }
+    const A = Math.sin((1-f)*d)/Math.sin(d);
+    const B = Math.sin(f*d)/Math.sin(d);
+    const x = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
+    const y = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
+    const z = A*Math.sin(φ1) + B*Math.sin(φ2);
+    points.push([toDeg(Math.atan2(z, Math.sqrt(x*x+y*y))), toDeg(Math.atan2(y, x))]);
+  }
+  return points;
+}
+
+function drawFlightPath(originLat, originLon, destLat, destLon, planeLat, planeLon) {
+  clearFlightPath();
+  const pts = greatCirclePoints(originLat, originLon, destLat, destLon, 120);
+
+  // Full route — dashed grey
+  flightPath = L.polyline(pts, {
+    color: '#94a3b8', weight: 1.5, opacity: 0.5,
+    dashArray: '6 6'
+  }).addTo(map);
+
+  // Flown portion: origin → plane position (find closest point)
+  let minDist = Infinity, splitIdx = 0;
+  pts.forEach((p, i) => {
+    const d = Math.hypot(p[0] - planeLat, p[1] - planeLon);
+    if (d < minDist) { minDist = d; splitIdx = i; }
+  });
+  L.polyline(pts.slice(0, splitIdx + 1), {
+    color: '#2563eb', weight: 2.5, opacity: 0.85
+  }).addTo(map);
+
+  // Airport dot markers
+  const dotIcon = (label) => L.divIcon({
+    html: `<div style="background:#2563eb;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2)">${label}</div>`,
+    className: '', iconAnchor: [20, 10]
+  });
+  airportMarkers.push(L.marker([originLat, originLon], { icon: dotIcon('ORG'), zIndexOffset: 500 }).addTo(map));
+  airportMarkers.push(L.marker([destLat, destLon], { icon: dotIcon('DST'), zIndexOffset: 500 }).addTo(map));
+
+  // Fit map to show full route
+  map.fitBounds(L.latLngBounds(pts), { padding: [60, 60] });
+}
+
+function clearFlightPath() {
+  if (flightPath) { map.removeLayer(flightPath); flightPath = null; }
+  airportMarkers.forEach(m => map.removeLayer(m));
+  airportMarkers = [];
+  // Remove all polylines (flown + full)
+  map.eachLayer(l => { if (l instanceof L.Polyline) map.removeLayer(l); });
+}
+
+async function fetchRouteFromWorker(icao, callsign) {
+  const key = icao + callsign;
+  if (routeCache[key]) return routeCache[key];
+  const res = await fetch(`${WORKER_URL}?route=${encodeURIComponent(icao)}&callsign=${encodeURIComponent(callsign)}`, {
+    signal: AbortSignal.timeout(8000)
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (data.error) return null;
+  routeCache[key] = data;
+  return data;
+}
+
+async function selectFlight(icao) {
   activeIcao = icao;
   const f = flights.find(x => x.icao === icao);
   if (!f) return;
@@ -639,10 +747,7 @@ function selectFlight(icao) {
     el.classList.toggle('active', el.dataset.icao === icao);
   });
 
-  // Pan map
-  map.panTo([f.lat, f.lon]);
-
-  // Info panel
+  // Basic info panel
   document.getElementById('ipCallsign').textContent = f.callsign;
   document.getElementById('ipAlt').textContent = metersToFeet(f.altitude);
   document.getElementById('ipSpeed').textContent = msToKnots(f.speed);
@@ -650,12 +755,40 @@ function selectFlight(icao) {
   document.getElementById('ipGround').textContent = f.onGround ? 'On Ground' : 'Airborne';
   document.getElementById('ipCountry').textContent = f.country;
   document.getElementById('infoPanel').style.display = 'block';
+  document.getElementById('ipRoute').style.display = 'none';
+  document.getElementById('ipRouteLoading').style.display = 'flex';
+
+  map.panTo([f.lat, f.lon]);
+  clearFlightPath();
+
+  // Fetch route
+  try {
+    const route = await fetchRouteFromWorker(f.icao, f.callsign);
+    document.getElementById('ipRouteLoading').style.display = 'none';
+    if (route && route.origin && route.destination) {
+      document.getElementById('ipOrigin').textContent = route.origin.iata || route.origin.icao || '?';
+      document.getElementById('ipDest').textContent = route.destination.iata || route.destination.icao || '?';
+      document.getElementById('ipAircraft').textContent = [route.aircraft, route.registration].filter(Boolean).join(' · ');
+      document.getElementById('ipRoute').style.display = 'block';
+
+      if (route.origin.lat && route.origin.lon && route.destination.lat && route.destination.lon) {
+        drawFlightPath(
+          route.origin.lat, route.origin.lon,
+          route.destination.lat, route.destination.lon,
+          f.lat, f.lon
+        );
+      }
+    }
+  } catch(e) {
+    document.getElementById('ipRouteLoading').style.display = 'none';
+  }
 }
 
 function closePanel() {
   document.getElementById('infoPanel').style.display = 'none';
   activeIcao = null;
   document.querySelectorAll('.flight-item').forEach(el => el.classList.remove('active'));
+  clearFlightPath();
 }
 
 function renderList() {
