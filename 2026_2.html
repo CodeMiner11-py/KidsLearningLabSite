@@ -3,882 +3,847 @@
 <head>
 <meta charset="UTF-8">
 <title>Merryhill 24 – 7th Grade East Coast Trip (2026)</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
 <style>
-/* ===== SCREEN STYLES ===== */
-body {
-    font-family: 'Albert Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #c3ecff, #90dffe);
-    color: #333;
-}
+/* ========== SCREEN BASE ========== */
+body{font-family:'Albert Sans',sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#c3ecff,#90dffe);color:#333}
+header{background:linear-gradient(90deg,#4facfe,#00f2fe);color:#fff;text-align:center;padding:2rem 1rem;font-size:2rem;font-weight:700;border-bottom-left-radius:20px;border-bottom-right-radius:20px}
+section{margin:2rem auto;max-width:900px;padding:1.5rem;background:#fff;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.1);border-left:8px solid #4facfe}
+h2{color:#4facfe}
+.day-header{font-size:1.5rem;font-weight:700;color:#ff7f50;margin-top:1rem}
+.event{background:rgba(79,172,254,.1);border-left:5px solid #00aaff;border-radius:10px;padding:.75rem 1rem;margin:.6rem 0}
+a{color:#0066cc;text-decoration:none;font-weight:600}
+a:hover{text-decoration:underline}
+.footer{text-align:center;margin:3rem 0 1rem;font-size:.9rem;color:#777}
 
-header {
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    color: white;
-    text-align: center;
-    padding: 2rem 1rem;
-    font-size: 2rem;
-    font-weight: bold;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-}
+/* ========== PRINT BAR ========== */
+.print-bar{position:sticky;top:0;z-index:999;background:linear-gradient(90deg,#003580,#0057b8);padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.print-bar span{color:#a8d4ff;font-size:.95rem}
+.print-btn{background:#fff;color:#003580;border:none;padding:.6rem 1.6rem;font-size:1rem;font-weight:700;font-family:'Albert Sans',sans-serif;border-radius:50px;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .2s,transform .1s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.print-btn:hover{background:#e0f0ff;transform:translateY(-1px)}
+.print-btn svg{width:18px;height:18px}
 
-section {
-    margin: 2rem auto;
-    max-width: 900px;
-    padding: 1.5rem;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-left: 8px solid #4facfe;
-}
+/* ========== SCREEN PLACE CARDS ========== */
+.cards-section{margin:2rem auto;max-width:900px;padding:1.5rem;background:#fff;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.1);border-left:8px solid #ff7f50}
+.cards-section>h2{color:#ff7f50;font-size:1.4rem;margin-bottom:0.3rem}
+.cards-section>p.sub{font-size:.9rem;color:#666;margin:0 0 1.2rem}
+.day-group{margin-bottom:1.6rem}
+.day-group-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fff;display:inline-block;padding:3px 10px;border-radius:4px;margin-bottom:.7rem}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem}
+.place-card{border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.1);background:#fff;border:1px solid #e0eeff;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s}
+.place-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.15)}
+.card-icon{width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:2.6rem}
+.card-badges{padding:.35rem .75rem .1rem;display:flex;gap:.3rem;flex-wrap:wrap}
+.badge{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;border-radius:4px;padding:2px 7px;white-space:nowrap}
+.card-body{padding:.1rem .75rem .75rem;flex:1;display:flex;flex-direction:column}
+.place-card h3{font-size:.92rem;font-weight:700;color:#003580;margin:.15rem 0 .35rem;line-height:1.25}
+.place-card .desc{font-size:.8rem;color:#444;line-height:1.5;margin-bottom:.5rem}
+.place-card .info-box{margin-top:auto;font-size:.76rem;background:#f0f7ff;border-left:3px solid #4facfe;border-radius:6px;padding:.45rem .6rem;color:#333;line-height:1.5}
+.place-card .info-box strong{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:#003580;margin-bottom:.1rem}
 
-h2 {
-    color: #4facfe;
-}
+/* ========== PRINT-ONLY BLOCKS (hidden on screen) ========== */
+.print-cover,.print-contacts,.print-place-cards,.print-packing,.print-payments,.print-rules,.print-emergency{display:none}
 
-.day-header {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ff7f50;
-    margin-top: 1rem;
-}
+/* ========== PRINT STYLES ========== */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .print-bar,.cards-section,.footer{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:10pt;margin:0;padding:0;font-family:'Albert Sans',sans-serif}
+  header{background:#003580!important;color:#fff!important;font-size:18pt;border-radius:0!important;padding:1.2rem 1rem}
+  section{border-radius:0!important;box-shadow:none!important;max-width:100%!important;margin:0 0 .35rem!important;padding:.55rem 1rem!important;border-left:5px solid #003580!important;page-break-inside:avoid}
+  .event{background:#f0f7ff!important;border-left:3px solid #003580!important;border-radius:0!important;padding:.35rem .6rem!important;margin:.25rem 0!important;page-break-inside:avoid}
+  h2{color:#003580!important;font-size:12pt;margin:.35rem 0}
+  .day-header{color:#c04000!important;font-size:12pt;margin:.25rem 0}
+  a{color:#003580!important;text-decoration:none!important}
 
-.event {
-    background: rgba(79,172,254,0.1);
-    border-left: 5px solid #00aaff;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    margin: 0.6rem 0;
-}
+  /* COVER */
+  .print-cover{display:flex!important;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;page-break-after:always;text-align:center;padding:3rem 2rem}
+  .print-cover .cl{font-size:34pt;font-family:'Playfair Display',serif;font-weight:700;color:#003580;line-height:1.2;margin-bottom:1rem}
+  .print-cover .cs{font-size:15pt;color:#555;margin-bottom:.4rem}
+  .print-cover .cb2{display:inline-block;background:#003580;color:#fff!important;font-size:10pt;padding:.35rem 1.1rem;border-radius:4px;margin:.35rem 0}
+  .print-cover .cdiv{width:70px;height:4px;background:#c04000;margin:1.3rem auto}
+  .print-cover .cd{font-size:9.5pt;color:#555;line-height:1.75}
+  .print-cover .cw{margin-top:1.4rem;font-size:8.5pt;background:#fff3cd;border:1px solid #f0a500;padding:.5rem .9rem;border-radius:4px;max-width:480px}
 
-a {
-    color: #0066cc;
-    text-decoration: none;
-    font-weight: 600;
-}
+  /* CONTACTS */
+  .print-contacts{display:block!important;page-break-before:always;padding:1rem}
+  .print-contacts h2{font-size:14pt;color:#a00000!important;border-bottom:2px solid #a00000;padding-bottom:.3rem;margin-bottom:.7rem}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+  .ccard{border:1px solid #ccc;padding:.55rem .75rem;border-radius:4px;font-size:8.5pt;page-break-inside:avoid}
+  .ccard strong{display:block;font-size:9pt;color:#003580;margin-bottom:.15rem}
+  table.ptbl{width:100%;border-collapse:collapse;font-size:8.5pt}
+  table.ptbl th{background:#003580;color:#fff;padding:.35rem .55rem;text-align:left}
+  table.ptbl td{padding:.3rem .55rem;border-bottom:1px solid #ddd}
+  table.ptbl tr:nth-child(even) td{background:#f0f7ff}
 
-a:hover {
-    text-decoration: underline;
-}
+  /* ========== PRINT PLACE CARDS ========== */
+  .print-place-cards{display:block!important;page-break-before:always;padding:.5rem .8rem}
+  .ppc-title{font-size:16pt;font-family:'Playfair Display',serif;font-weight:700;color:#003580;border-bottom:3px solid #003580;padding-bottom:.4rem;margin:.3rem 0 .3rem}
+  .ppc-sub{font-size:8.5pt;color:#555;margin:0 0 .8rem}
+  .pday-label{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#fff;background:#003580;display:inline-block;padding:2px 8px;border-radius:3px;margin:.6rem 0 .4rem}
+  .pcgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem}
+  .pcard{border:1.5px solid #c8dff7;border-radius:5px;overflow:hidden;page-break-inside:avoid;display:flex;flex-direction:column;background:#fff}
+  .pcard .picon{width:100%;height:50px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+  .pcard .pbadges{padding:.25rem .45rem .05rem;display:flex;gap:.25rem;flex-wrap:wrap}
+  .pbadge{font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;border-radius:3px;padding:1px 5px;white-space:nowrap}
+  .pcard .ptitle{font-size:8pt;font-weight:700;color:#003580;padding:.1rem .45rem .1rem;line-height:1.2}
+  .pcard .pdesc{font-size:6.8pt;color:#333;padding:0 .45rem .2rem;line-height:1.4}
+  .pcard .pinfo{margin:0 .35rem .35rem;background:#f0f7ff;border-left:2.5px solid #003580;border-radius:3px;padding:.25rem .4rem;font-size:6.5pt;color:#222;line-height:1.4}
+  .pcard .pinfo strong{display:block;font-size:6pt;text-transform:uppercase;letter-spacing:.04em;color:#003580;margin-bottom:.07rem}
 
-.footer {
-    text-align: center;
-    margin: 3rem 0 1rem;
-    font-size: 0.9rem;
-    color: #777;
-}
+  /* PACKING */
+  .print-packing{display:block!important;page-break-before:always;padding:1rem}
+  .print-packing h2{font-size:14pt;color:#003580!important;border-bottom:2px solid #003580;padding-bottom:.3rem;margin-bottom:.7rem}
+  .pcols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.35rem}
+  .pi{font-size:8.5pt;padding:.15rem 0;border-bottom:1px dotted #bbb;display:flex;align-items:center;gap:.25rem}
+  .pi::before{content:"☐";font-size:10pt;color:#555}
+  .ps{font-weight:700;font-size:9pt;color:#003580;margin:.5rem 0 .15rem;grid-column:1/-1;text-transform:uppercase;letter-spacing:.05em}
 
-/* ===== PRINT BUTTON ===== */
-.print-bar {
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    background: linear-gradient(90deg, #003580, #0057b8);
-    padding: 0.75rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
+  /* PAYMENTS */
+  .print-payments{display:block!important;page-break-before:always;padding:1rem}
+  .print-payments h2{font-size:14pt;color:#003580!important;border-bottom:2px solid #003580;padding-bottom:.3rem;margin-bottom:.7rem}
 
-.print-bar span {
-    color: #a8d4ff;
-    font-size: 0.95rem;
-    font-family: 'Albert Sans', sans-serif;
-}
+  /* RULES */
+  .print-rules{display:block!important;page-break-before:always;padding:1rem}
+  .print-rules h2{font-size:14pt;color:#003580!important;border-bottom:2px solid #003580;padding-bottom:.3rem;margin-bottom:.7rem}
+  .ri{display:flex;gap:.55rem;margin:.35rem 0;font-size:9pt;page-break-inside:avoid}
+  .rn{font-weight:700;color:#003580;min-width:1.3rem}
 
-.print-btn {
-    background: #ffffff;
-    color: #003580;
-    border: none;
-    padding: 0.6rem 1.6rem;
-    font-size: 1rem;
-    font-weight: 700;
-    font-family: 'Albert Sans', sans-serif;
-    border-radius: 50px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background 0.2s, transform 0.1s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.print-btn:hover {
-    background: #e0f0ff;
-    transform: translateY(-1px);
-}
-
-.print-btn:active {
-    transform: translateY(0);
-}
-
-.print-btn svg {
-    width: 18px;
-    height: 18px;
-}
-
-/* ===== PRINT-ONLY COVER & EXTRAS (hidden on screen) ===== */
-.print-cover,
-.print-contacts,
-.print-packing,
-.print-rules,
-.print-payments,
-.print-emergency {
-    display: none;
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-    /* Hide screen-only chrome */
-    .print-bar { display: none !important; }
-
-    body {
-        background: #fff !important;
-        color: #000 !important;
-        font-family: 'Albert Sans', sans-serif;
-        font-size: 10pt;
-        margin: 0;
-        padding: 0;
-    }
-
-    header {
-        background: #003580 !important;
-        color: #fff !important;
-        font-size: 20pt;
-        border-radius: 0 !important;
-        padding: 1.5rem 1rem;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    section {
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        max-width: 100% !important;
-        margin: 0 0 0.4rem 0 !important;
-        padding: 0.6rem 1rem !important;
-        border-left: 5px solid #003580 !important;
-        page-break-inside: avoid;
-    }
-
-    .event {
-        background: #f0f7ff !important;
-        border-left: 3px solid #003580 !important;
-        border-radius: 0 !important;
-        padding: 0.4rem 0.7rem !important;
-        margin: 0.3rem 0 !important;
-        page-break-inside: avoid;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    h2 { color: #003580 !important; font-size: 13pt; margin: 0.4rem 0; }
-    .day-header { color: #c04000 !important; font-size: 13pt; margin: 0.3rem 0; }
-    a { color: #003580 !important; text-decoration: none !important; }
-
-    .footer { display: none; }
-
-    /* ===== COVER PAGE ===== */
-    .print-cover {
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        page-break-after: always;
-        text-align: center;
-        padding: 3rem 2rem;
-        background: #fff;
-    }
-
-    .print-cover .cover-logo {
-        font-size: 36pt;
-        font-family: 'Playfair Display', serif;
-        font-weight: 700;
-        color: #003580;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-    }
-
-    .print-cover .cover-sub {
-        font-size: 16pt;
-        color: #555;
-        margin-bottom: 0.5rem;
-    }
-
-    .print-cover .cover-badge {
-        display: inline-block;
-        background: #003580;
-        color: #fff !important;
-        font-size: 11pt;
-        padding: 0.4rem 1.2rem;
-        border-radius: 4px;
-        margin: 0.4rem 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .print-cover .cover-divider {
-        width: 80px;
-        height: 4px;
-        background: #c04000;
-        margin: 1.5rem auto;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .print-cover .cover-detail {
-        font-size: 10pt;
-        color: #555;
-        line-height: 1.8;
-    }
-
-    .print-cover .cover-warning {
-        margin-top: 1.5rem;
-        font-size: 9pt;
-        background: #fff3cd;
-        border: 1px solid #f0a500;
-        padding: 0.6rem 1rem;
-        border-radius: 4px;
-        max-width: 500px;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    /* ===== EMERGENCY / CONTACT SHEET ===== */
-    .print-contacts {
-        display: block !important;
-        page-break-before: always;
-        padding: 1rem;
-    }
-
-    .print-contacts h2 {
-        font-size: 15pt;
-        color: #a00000 !important;
-        border-bottom: 2px solid #a00000;
-        padding-bottom: 0.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .contact-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-    }
-
-    .contact-card {
-        border: 1px solid #ccc;
-        padding: 0.6rem 0.8rem;
-        border-radius: 4px;
-        font-size: 9pt;
-        page-break-inside: avoid;
-    }
-
-    .contact-card strong {
-        display: block;
-        font-size: 10pt;
-        color: #003580;
-        margin-bottom: 0.2rem;
-    }
-
-    /* ===== PACKING LIST ===== */
-    .print-packing {
-        display: block !important;
-        page-break-before: always;
-        padding: 1rem;
-    }
-
-    .print-packing h2 {
-        font-size: 15pt;
-        color: #003580 !important;
-        border-bottom: 2px solid #003580;
-        padding-bottom: 0.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .packing-cols {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 0.4rem;
-    }
-
-    .packing-item {
-        font-size: 9pt;
-        padding: 0.2rem 0;
-        border-bottom: 1px dotted #bbb;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .packing-item::before {
-        content: "☐";
-        font-size: 11pt;
-        color: #555;
-    }
-
-    .packing-section-title {
-        font-weight: 700;
-        font-size: 10pt;
-        color: #003580;
-        margin: 0.6rem 0 0.2rem;
-        grid-column: 1 / -1;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    /* ===== RULES ===== */
-    .print-rules {
-        display: block !important;
-        page-break-before: always;
-        padding: 1rem;
-    }
-
-    .print-rules h2 {
-        font-size: 15pt;
-        color: #003580 !important;
-        border-bottom: 2px solid #003580;
-        padding-bottom: 0.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .rule-item {
-        display: flex;
-        gap: 0.6rem;
-        margin: 0.4rem 0;
-        font-size: 9.5pt;
-        page-break-inside: avoid;
-    }
-
-    .rule-num {
-        font-weight: 700;
-        color: #003580;
-        min-width: 1.4rem;
-    }
-
-    /* ===== PAYMENTS / ALLOTMENTS ===== */
-    .print-payments {
-        display: block !important;
-        page-break-before: always;
-        padding: 1rem;
-    }
-
-    .print-payments h2 {
-        font-size: 15pt;
-        color: #003580 !important;
-        border-bottom: 2px solid #003580;
-        padding-bottom: 0.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    table.pay-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 9pt;
-    }
-
-    table.pay-table th {
-        background: #003580;
-        color: #fff;
-        padding: 0.4rem 0.6rem;
-        text-align: left;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    table.pay-table td {
-        padding: 0.35rem 0.6rem;
-        border-bottom: 1px solid #ddd;
-    }
-
-    table.pay-table tr:nth-child(even) td {
-        background: #f0f7ff;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    /* ===== EMERGENCY PROCEDURES ===== */
-    .print-emergency {
-        display: block !important;
-        page-break-before: always;
-        padding: 1rem;
-    }
-
-    .print-emergency h2 {
-        font-size: 15pt;
-        color: #a00000 !important;
-        border-bottom: 2px solid #a00000;
-        padding-bottom: 0.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .emergency-box {
-        border: 2px solid #a00000;
-        border-radius: 4px;
-        padding: 0.7rem 1rem;
-        margin-bottom: 0.7rem;
-        background: #fff5f5;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .emergency-box h3 {
-        margin: 0 0 0.4rem;
-        font-size: 11pt;
-        color: #a00000;
-    }
-
-    .emergency-box p, .emergency-box li {
-        font-size: 9pt;
-        margin: 0.2rem 0;
-    }
-
-    .print-page-break {
-        page-break-after: always;
-    }
+  /* EMERGENCY */
+  .print-emergency{display:block!important;page-break-before:always;padding:1rem}
+  .print-emergency h2{font-size:14pt;color:#a00000!important;border-bottom:2px solid #a00000;padding-bottom:.3rem;margin-bottom:.7rem}
+  .ebox{border:2px solid #a00000;border-radius:4px;padding:.6rem .9rem;margin-bottom:.6rem;background:#fff5f5}
+  .ebox h3{margin:0 0 .35rem;font-size:10pt;color:#a00000}
+  .ebox p{font-size:8.5pt;margin:.15rem 0}
 }
 </style>
 </head>
-
 <body>
 
-<!-- ===== STICKY PRINT BAR ===== -->
+<!-- PRINT BAR -->
 <div class="print-bar">
-    <span>🗺️ Merryhill 7th Grade East Coast Trip 2026 &nbsp;|&nbsp; May 10–16, 2026</span>
-    <button class="print-btn" onclick="window.print()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"/>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
-        </svg>
-        Print Full Trip Guide
-    </button>
+  <span>🗺️ Merryhill 7th Grade East Coast Trip 2026 &nbsp;|&nbsp; May 10–16, 2026</span>
+  <button class="print-btn" onclick="window.print()">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8"/>
+    </svg>
+    Print Full Trip Guide
+  </button>
 </div>
 
-<!-- ===== PRINT-ONLY COVER PAGE ===== -->
+<!-- PRINT: COVER -->
 <div class="print-cover">
-    <div class="cover-logo">Merryhill School<br>7th Grade East Coast Trip</div>
-    <div class="cover-sub">Educational Travel with WorldStrides</div>
-    <div class="cover-divider"></div>
-    <div class="cover-badge">May 10 – 16, 2026</div>
-    <div class="cover-badge">Washington D.C. &amp; New York City</div>
-    <div class="cover-divider"></div>
-    <div class="cover-detail">
-        <strong>Trip ID:</strong> 209811 HC &nbsp;|&nbsp; <strong>Group Number:</strong> 45482-41-L<br>
-        <strong>Total Travelers:</strong> 64 &nbsp;|&nbsp; 57 Students &nbsp;|&nbsp; 2 Adults &nbsp;|&nbsp; 5 Teachers/Chaperones<br><br>
-        <strong>Outbound Flight:</strong> Alaska Airlines AS455 &nbsp;|&nbsp; SFO → IAD &nbsp;|&nbsp; Departs 9:30 PM May 10<br>
-        <strong>Return Flight:</strong> United Airlines UA1148 &nbsp;|&nbsp; EWR → SFO &nbsp;|&nbsp; Departs 6:00 PM May 16<br><br>
-        <strong>D.C. Hotel:</strong> Hyatt Regency Bethesda &nbsp;|&nbsp; 1 Bethesda Metro Center, Bethesda, MD 20814 &nbsp;|&nbsp; (301) 657-1234<br>
-        <strong>NYC Hotel:</strong> Sheraton New York Times Square &nbsp;|&nbsp; 811 Seventh Ave at 53rd St, NY 10019 &nbsp;|&nbsp; (212) 581-1000
-    </div>
-    <div class="cover-warning">
-        ⚠️ <strong>SAMPLE ITINERARY</strong> — This is based on a previous DC/NYC trip. Updated itinerary will be available around March or April 2026.
-    </div>
+  <div class="cl">Merryhill School<br>7th Grade East Coast Trip</div>
+  <div class="cs">Educational Travel with WorldStrides</div>
+  <div class="cdiv"></div>
+  <div class="cb2">May 10 – 16, 2026</div>
+  <div class="cb2">Washington D.C. &amp; New York City</div>
+  <div class="cdiv"></div>
+  <div class="cd">
+    <strong>Trip ID:</strong> 209811 HC &nbsp;|&nbsp; <strong>Group Number:</strong> 45482-41-L<br>
+    <strong>Total Travelers:</strong> 64 &nbsp;|&nbsp; 57 Students &nbsp;|&nbsp; 2 Adults &nbsp;|&nbsp; 5 Teachers/Chaperones<br><br>
+    <strong>Outbound:</strong> Alaska Airlines AS455 &nbsp;|&nbsp; SFO → IAD &nbsp;|&nbsp; Departs 9:30 PM May 10<br>
+    <strong>Return:</strong> United Airlines UA1148 &nbsp;|&nbsp; EWR → SFO &nbsp;|&nbsp; Departs 6:00 PM May 16<br><br>
+    <strong>D.C. Hotel:</strong> Hyatt Regency Bethesda &nbsp;|&nbsp; 1 Bethesda Metro Center, MD &nbsp;|&nbsp; (301) 657-1234<br>
+    <strong>NYC Hotel:</strong> Sheraton Times Square &nbsp;|&nbsp; 811 Seventh Ave at 53rd St, NY &nbsp;|&nbsp; (212) 581-1000
+  </div>
+  <div class="cw">⚠️ <strong>SAMPLE ITINERARY</strong> — Based on a previous DC/NYC trip. Updated itinerary available March–April 2026.</div>
 </div>
 
-<!-- ===== PRINT-ONLY EMERGENCY & KEY CONTACTS ===== -->
+<!-- PRINT: CONTACTS -->
 <div class="print-contacts">
-    <h2>🚨 Emergency &amp; Key Contacts</h2>
-    <div class="contact-grid">
-        <div class="contact-card">
-            <strong>Emergency – USA</strong>
-            Call 911 immediately for any life-threatening emergency.
-        </div>
-        <div class="contact-card">
-            <strong>WorldStrides 24/7 Emergency Line</strong>
-            1-800-468-5899<br>
-            Available around the clock during travel.
-        </div>
-        <div class="contact-card">
-            <strong>D.C. Hotel – Hyatt Regency Bethesda</strong>
-            1 Bethesda Metro Center, Bethesda, MD 20814<br>
-            ☎ (301) 657-1234
-        </div>
-        <div class="contact-card">
-            <strong>NYC Hotel – Sheraton Times Square</strong>
-            811 Seventh Ave at 53rd St, New York, NY 10019<br>
-            ☎ (212) 581-1000
-        </div>
-        <div class="contact-card">
-            <strong>Alaska Airlines (Outbound)</strong>
-            Flight AS455 &nbsp;|&nbsp; ☎ 1-800-252-7522<br>
-            SFO → IAD, departs 9:30 PM May 10
-        </div>
-        <div class="contact-card">
-            <strong>United Airlines (Return)</strong>
-            Flight UA1148 &nbsp;|&nbsp; ☎ 1-800-864-8331<br>
-            EWR → SFO, departs 6:00 PM May 16
-        </div>
-        <div class="contact-card">
-            <strong>San Francisco International Airport (SFO)</strong>
-            ☎ (650) 821-8211<br>
-            Alaska Airlines terminal – check airline app for gate
-        </div>
-        <div class="contact-card">
-            <strong>Washington Dulles Airport (IAD)</strong>
-            ☎ (703) 572-2700<br>
-            Meet WorldStrides Field Specialist at baggage claim
-        </div>
-        <div class="contact-card">
-            <strong>Newark Liberty Airport (EWR)</strong>
-            ☎ (973) 961-6000<br>
-            Drop at 4:00 PM on May 16 for 6:00 PM departure
-        </div>
-        <div class="contact-card">
-            <strong>Twin Towers Florist (Wreath)</strong>
-            WWII Wreath Laying coordinator<br>
-            ☎ (703) 527-7110
-        </div>
-        <div class="contact-card">
-            <strong>Ford's Theatre</strong>
-            511 10th St NW, Washington, DC 20004<br>
-            Confirmation #1430257 – pick up at will call
-        </div>
-        <div class="contact-card">
-            <strong>9/11 Museum (NYC)</strong>
-            Southeast corner entry, World Trade Center site<br>
-            Confirmation #5178584
-        </div>
-    </div>
-    <br>
-    <strong>Venue Confirmations at a Glance:</strong><br>
-    <table class="pay-table" style="margin-top:0.5rem;">
-        <tr><th>Venue</th><th>Confirmation #</th><th>Notes</th></tr>
-        <tr><td>Ford's Theatre</td><td>#1430257</td><td>Will call pickup</td></tr>
-        <tr><td>National Archives Museum</td><td>Order #0625600871</td><td>1:10 adult-to-student ratio required</td></tr>
-        <tr><td>United States Capitol Tour</td><td>#202404221612305</td><td>Arrive 30 min early</td></tr>
-        <tr><td>ARTECHOUSE DC</td><td>#B-3ENRVXR</td><td>May 12 at 3:30 PM</td></tr>
-        <tr><td>Mt. Vernon Timed Mansion Tour</td><td>#5164772</td><td>9:30 AM slot; no backpacks/packages</td></tr>
-        <tr><td>Holocaust Memorial Museum</td><td>Individual tickets</td><td>14th St entrance; 50 students at 12:45, 25 at 1:45</td></tr>
-        <tr><td>National Cathedral Guided Tour</td><td>#800785</td><td>Arrive 15 min early; leave 1 hr after appt</td></tr>
-        <tr><td>Top of the Rock</td><td>Will call #1372403200385</td><td>May 14, 7:30 PM</td></tr>
-        <tr><td>Statue of Liberty Ferry</td><td>Battery Park</td><td>Airport-type security; minimize bags</td></tr>
-        <tr><td>9/11 Museum</td><td>#5178584</td><td>Southeast corner entry, 1:30 PM</td></tr>
-        <tr><td>Broadway – "Aladdin"</td><td>#389320088 / #391841610</td><td>New Amsterdam Theatre, 7:00 PM, ~2:30 running time</td></tr>
-    </table>
+  <h2>🚨 Emergency &amp; Key Contacts</h2>
+  <div class="cgrid">
+    <div class="ccard"><strong>Emergency – USA</strong>Call 911 immediately for any life-threatening emergency.</div>
+    <div class="ccard"><strong>WorldStrides 24/7 Emergency</strong>1-800-468-5899 — Available around the clock.</div>
+    <div class="ccard"><strong>D.C. Hotel – Hyatt Regency Bethesda</strong>1 Bethesda Metro Center, MD 20814 | ☎ (301) 657-1234</div>
+    <div class="ccard"><strong>NYC Hotel – Sheraton Times Square</strong>811 Seventh Ave at 53rd St, NY 10019 | ☎ (212) 581-1000</div>
+    <div class="ccard"><strong>Alaska Airlines (Outbound)</strong>Flight AS455 | ☎ 1-800-252-7522 | SFO → IAD, 9:30 PM May 10</div>
+    <div class="ccard"><strong>United Airlines (Return)</strong>Flight UA1148 | ☎ 1-800-864-8331 | EWR → SFO, 6:00 PM May 16</div>
+    <div class="ccard"><strong>SFO Airport</strong>☎ (650) 821-8211</div>
+    <div class="ccard"><strong>Dulles Airport (IAD)</strong>☎ (703) 572-2700 — Meet WorldStrides at baggage claim</div>
+    <div class="ccard"><strong>Newark Airport (EWR)</strong>☎ (973) 961-6000</div>
+    <div class="ccard"><strong>Twin Towers Florist</strong>☎ (703) 527-7110 — WWII Wreath coordinator</div>
+    <div class="ccard"><strong>Ford's Theatre</strong>511 10th St NW | Confirmation #1430257</div>
+    <div class="ccard"><strong>9/11 Museum</strong>SE corner entry, WTC | Confirmation #5178584</div>
+  </div>
+  <br><strong>Venue Confirmations:</strong>
+  <table class="ptbl" style="margin-top:.4rem">
+    <tr><th>Venue</th><th>Confirmation</th><th>Notes</th></tr>
+    <tr><td>Ford's Theatre</td><td>#1430257</td><td>Will call pickup</td></tr>
+    <tr><td>National Archives</td><td>Order #0625600871</td><td>1:10 adult-to-student ratio</td></tr>
+    <tr><td>US Capitol Tour</td><td>#202404221612305</td><td>Arrive 30 min early</td></tr>
+    <tr><td>ARTECHOUSE DC</td><td>#B-3ENRVXR</td><td>May 12, 3:30 PM</td></tr>
+    <tr><td>Mt. Vernon Mansion Tour</td><td>#5164772</td><td>9:30 AM slot; no backpacks in mansion</td></tr>
+    <tr><td>Holocaust Memorial Museum</td><td>Individual tickets</td><td>14th St entrance; 50 at 12:45, 25 at 1:45</td></tr>
+    <tr><td>National Cathedral</td><td>#800785</td><td>Arrive 15 min early</td></tr>
+    <tr><td>Top of the Rock</td><td>Will call #1372403200385</td><td>May 14, 7:30 PM</td></tr>
+    <tr><td>Statue of Liberty Ferry</td><td>Battery Park</td><td>Airport-style security; minimize bags</td></tr>
+    <tr><td>9/11 Museum</td><td>#5178584</td><td>SE corner entry, 1:30 PM May 15</td></tr>
+    <tr><td>Broadway – Aladdin</td><td>#389320088 / #391841610</td><td>New Amsterdam Theatre, 7:00 PM, ~2:30 run</td></tr>
+  </table>
 </div>
 
-<!-- ===== SCREEN & PRINT: STANDARD CONTENT ===== -->
-
-<header>
-Merryhill 7th Grade East Coast Trip – 2026
-</header>
+<!-- SCREEN: ITINERARY -->
+<header>Merryhill 7th Grade East Coast Trip – 2026</header>
 
 <section>
-<p><strong>Trip ID:</strong> 209811 HC | <strong>Group Number:</strong> 45482-41-L</p>
-<p><strong>Total Travelers:</strong> 64 (57 Students, 2 Adults, 5 Teachers/Chaperones)</p>
-<p><strong>PLEASE NOTE THIS IS A SAMPLE ITINERARY FROM THE PREVIOUS DC/NYC TRIP. UPDATED ITINERARY WILL BE AVAILABLE AROUND MARCH OR APRIL.</strong></p>
+  <p><strong>Trip ID:</strong> 209811 HC | <strong>Group Number:</strong> 45482-41-L</p>
+  <p><strong>Total Travelers:</strong> 64 (57 Students, 2 Adults, 5 Teachers/Chaperones)</p>
+  <p><strong>PLEASE NOTE THIS IS A SAMPLE ITINERARY FROM THE PREVIOUS DC/NYC TRIP. UPDATED ITINERARY WILL BE AVAILABLE AROUND MARCH OR APRIL.</strong></p>
 </section>
-
 <section>
-<h2>Flight Information</h2>
-
-<div class="event">
-<strong>Outbound:</strong>
-<a href="https://www.alaskaair.com/">Alaska Airlines AS455</a><br>
-<a href="https://www.flysfo.com/">San Francisco International Airport (SFO)</a> →
-<a href="https://www.flydulles.com/">Washington Dulles International Airport (IAD)</a><br>
-Depart 9:30 PM • Arrive 5:40 AM (overnight flight)
-</div>
-
-<div class="event">
-<strong>Return:</strong>
-<a href="https://www.united.com/">United Airlines UA1148</a><br>
-<a href="https://www.newarkairport.com/">Newark Liberty International Airport (EWR)</a> →
-<a href="https://www.flysfo.com/">San Francisco International Airport (SFO)</a><br>
-Depart 6:00 PM • Arrive 9:24 PM
-</div>
+  <h2>Flight Information</h2>
+  <div class="event"><strong>Outbound:</strong> <a href="https://www.alaskaair.com/">Alaska Airlines AS455</a><br>SFO → IAD | Depart 9:30 PM • Arrive 5:40 AM (overnight)</div>
+  <div class="event"><strong>Return:</strong> <a href="https://www.united.com/">United Airlines UA1148</a><br>EWR → SFO | Depart 6:00 PM • Arrive 9:24 PM</div>
 </section>
-
 <section>
-<h2>Hotel Information</h2>
-
-<div class="event">
-<a href="https://www.hyatt.com/en-US/hotel/maryland/hyatt-regency-bethesda/wasrb">Hyatt Regency Bethesda</a><br>
-1 Bethesda Metro Center, Bethesda, MD 20814<br>
-Phone: (301) 657-1234<br>
-Stay: May 11–13
-</div>
-
-<div class="event">
-<a href="https://www.marriott.com/en-us/hotels/nycss-sheraton-new-york-times-square-hotel/overview/">Sheraton New York Times Square Hotel</a><br>
-811 Seventh Avenue at 53rd Street, New York, NY 10019<br>
-Phone: (212) 581-1000<br>
-Stay: May 14–15
-</div>
+  <h2>Hotel Information</h2>
+  <div class="event"><a href="https://www.hyatt.com/en-US/hotel/maryland/hyatt-regency-bethesda/wasrb">Hyatt Regency Bethesda</a><br>1 Bethesda Metro Center, Bethesda, MD 20814 | ☎ (301) 657-1234 | Stay: May 11–13</div>
+  <div class="event"><a href="https://www.marriott.com/en-us/hotels/nycss-sheraton-new-york-times-square-hotel/overview/">Sheraton New York Times Square Hotel</a><br>811 Seventh Avenue at 53rd Street, New York, NY 10019 | ☎ (212) 581-1000 | Stay: May 14–15</div>
 </section>
-
 <section>
-<h2 class="day-header">Sunday, May 10, 2026</h2>
-<div class="event">7:30 PM — Group meets at SFO for group check-in at Alaska Airlines ticket counter.</div>
-<div class="event">9:30 PM — Depart SFO on Alaska Airlines Flight AS455. Fly overnight.</div>
+  <h2 class="day-header">Sunday, May 10, 2026</h2>
+  <div class="event">7:30 PM — Group meets at SFO for group check-in at Alaska Airlines ticket counter.</div>
+  <div class="event">9:30 PM — Depart SFO on Alaska Airlines Flight AS455. Fly overnight.</div>
 </section>
-
 <section>
-<h2 class="day-header">Monday, May 11, 2026 (Washington, D.C.)</h2>
-<div class="event">5:40 AM — Arrive at IAD. Meet WorldStrides Field Specialist at baggage claim.</div>
-<div class="event">6:00 AM — Motorcoaches report to airport. Bags on bus.</div>
-<div class="event"><strong>7:30 AM — Breakfast:</strong><br>
-<a href="https://maps.google.com/?q=Amphora's+Diner+Deluxe+Herndon+VA">Amphora's Diner Deluxe</a><br>
-1151 Elden Street, Herndon, VA 20170 | Phone: (703) 925-0900<br>
-Vendor requests call-ahead for special dietary needs. JASSBY cards used.</div>
-<div class="event"><strong>9:00 AM — Meet Course Leaders:</strong><br>
-<a href="https://www.wmata.com/service/stations/huntington.cfm">Huntington Avenue Metrorail Station</a>, Alexandria, VA<br>
-Exit 176A off I-95 (Telegraph Road).</div>
-<div class="event"><a href="https://www.nationalharbor.com/">The Awakening – National Harbor</a></div>
-<div class="event"><strong>10:30 AM —</strong> <a href="https://www.fords.org/">Ford's Theatre</a><br>
-511 10th St NW, Washington, DC 20004<br>
-Tickets picked up at will call • Confirmation #1430257</div>
-<div class="event">$15 Lunch Allotment</div>
-<div class="event"><strong>12:45 PM —</strong> <a href="https://www.archives.gov/museum">National Archives Museum</a><br>
-Must meet 1:10 adult-to-student ratio • Confirmation Order #0625600871</div>
-<div class="event"><a href="https://www.arlingtoncemetery.mil/">Arlington National Cemetery</a><br>
-Guests 18+ may need photo ID. All bags remain on coach.</div>
-<div class="event"><a href="https://www.nps.gov/usmcplanyourvisit.htm">Iwo Jima Marine Memorial</a></div>
-<div class="event"><strong>5:00 PM — Dinner:</strong><br>
-<a href="https://maps.google.com/?q=Metro+29+Diner+Arlington+VA">Metro 29 Diner</a><br>
-4711 Lee Hwy, Arlington, VA • Pre-order required</div>
-<div class="event"><a href="https://www.nps.gov/subjects/911memorials/pentagon.htm">September 11th Pentagon Memorial</a></div>
-<div class="event">7:40 PM — Coaches drop group at Hyatt Bethesda for check-in.</div>
+  <h2 class="day-header">Monday, May 11, 2026 (Washington, D.C.)</h2>
+  <div class="event">5:40 AM — Arrive at IAD. Meet WorldStrides Field Specialist at baggage claim.</div>
+  <div class="event">6:00 AM — Motorcoaches report to airport. Bags on bus.</div>
+  <div class="event"><strong>7:30 AM — Breakfast:</strong> <a href="https://maps.google.com/?q=Amphora's+Diner+Deluxe+Herndon+VA">Amphora's Diner Deluxe</a> | 1151 Elden St, Herndon, VA | ☎ (703) 925-0900 | JASSBY cards. Call ahead for dietary needs.</div>
+  <div class="event"><strong>9:00 AM — Meet Course Leaders:</strong> Huntington Ave Metrorail Station, Alexandria, VA | Exit 176A off I-95</div>
+  <div class="event">The Awakening – National Harbor</div>
+  <div class="event"><strong>10:30 AM —</strong> <a href="https://www.fords.org/">Ford's Theatre</a> | 511 10th St NW | Will call • Confirmation #1430257</div>
+  <div class="event">$15 Lunch Allotment</div>
+  <div class="event"><strong>12:45 PM —</strong> <a href="https://www.archives.gov/museum">National Archives Museum</a> | 1:10 ratio required • Confirmation #0625600871</div>
+  <div class="event"><a href="https://www.arlingtoncemetery.mil/">Arlington National Cemetery</a> | 18+ may need photo ID. All bags remain on coach.</div>
+  <div class="event">Iwo Jima Marine Memorial</div>
+  <div class="event"><strong>5:00 PM — Dinner:</strong> Metro 29 Diner | 4711 Lee Hwy, Arlington, VA | Pre-order required</div>
+  <div class="event">September 11th Pentagon Memorial</div>
+  <div class="event">7:40 PM — Coaches drop group at Hyatt Bethesda for check-in.</div>
 </section>
-
 <section>
-<h2 class="day-header">Tuesday, May 12, 2026</h2>
-<div class="event">7:00 AM — Hotel breakfast.</div>
-<div class="event"><a href="https://www.nps.gov/wwii/">World War II Memorial Wreath Laying</a><br>
-Floral delivery by Twin Towers Florist • (703) 527-7110</div>
-<div class="event"><strong>11:30 AM — Lunch:</strong><br>
-<a href="https://www.itcdc.com/">Ronald Reagan International Trade Center Food Court</a><br>
-Enter via 14th Street • Do not self-scan tickets</div>
-<div class="event"><strong>12:40 PM —</strong> <a href="https://www.visitthecapitol.gov/">United States Capitol Tour</a><br>
-Arrive 30 minutes early • Confirmation #202404221612305</div>
-<div class="event"><a href="https://americanhistory.si.edu/">National Museum of American History</a></div>
-<div class="event"><strong>3:30 PM —</strong> <a href="https://www.artechouse.com/location/dc/">ARTECHOUSE DC</a><br>
-Confirmation #B-3ENRVXR</div>
-<div class="event"><strong>5:30 PM — Dinner:</strong><br>
-<a href="https://www.districttaco.com/">District Taco – Capitol Hill</a></div>
-<div class="event"><a href="https://www.nps.gov/linc/">Lincoln Memorial</a>, <a href="https://www.nps.gov/kowa/">Korean War Memorial</a>, <a href="https://www.nps.gov/vive/">Vietnam Veterans Memorial</a>, <a href="https://www.nps.gov/wwii/">World War II Memorial</a></div>
+  <h2 class="day-header">Tuesday, May 12, 2026</h2>
+  <div class="event">7:00 AM — Hotel breakfast.</div>
+  <div class="event"><a href="https://www.nps.gov/wwii/">World War II Memorial Wreath Laying</a> | Twin Towers Florist • ☎ (703) 527-7110</div>
+  <div class="event"><strong>11:30 AM — Lunch:</strong> <a href="https://www.itcdc.com/">Ronald Reagan International Trade Center Food Court</a> | Enter via 14th Street • Do not self-scan tickets</div>
+  <div class="event"><strong>12:40 PM —</strong> <a href="https://www.visitthecapitol.gov/">United States Capitol Tour</a> | Arrive 30 mins early • Confirmation #202404221612305</div>
+  <div class="event"><a href="https://americanhistory.si.edu/">National Museum of American History</a></div>
+  <div class="event"><strong>3:30 PM —</strong> <a href="https://www.artechouse.com/location/dc/">ARTECHOUSE DC</a> | Confirmation #B-3ENRVXR</div>
+  <div class="event"><strong>5:30 PM — Dinner:</strong> District Taco – Capitol Hill</div>
+  <div class="event">Evening: Lincoln Memorial, Korean War Memorial, Vietnam Veterans Memorial, WWII Memorial</div>
 </section>
-
 <section>
-<h2 class="day-header">Wednesday, May 13, 2026 (Washington, D.C.)</h2>
-<div class="event">7:00 AM — Hotel breakfast</div>
-<div class="event">8:00 AM — Coaches depart</div>
-<div class="event"><strong>9:00 AM —</strong> <a href="https://www.mountvernon.org/">Mt. Vernon – Home of George Washington</a><br>
-Timed Mansion Tour at 9:30 AM • Confirmation #5164772 • Grounds &amp; Education Center included • Backpacks/packages not allowed</div>
-<div class="event"><strong>12:00 PM — Lunch:</strong><br>
-<a href="https://maps.google.com/?q=Primo+Family+Restaurant+Alexandria+VA">Primo Family Restaurant</a><br>
-1636 Belleview Blvd, Alexandria, VA 22307 • Buses pull to side before unloading</div>
-<div class="event">12:45 PM — <a href="https://www.ushmm.org/">Holocaust Memorial Museum</a><br>
-Individual tickets • 50 students (14th Street entrance, arrive 15 mins early)</div>
-<div class="event">1:45 PM — Holocaust Memorial Museum continued • 25 students</div>
-<div class="event">3:45 PM — <a href="https://cathedral.org/">National Cathedral Guided Tour</a><br>
-Arrive 15 mins early • Leave 1 hour after appointment • Confirmation #800785</div>
-<div class="event">6:00 PM — Dinner: <a href="https://maps.google.com/?q=GRK+Fresh+Greek+DC">GRK Fresh Greek</a><br>
-1000 F Street NW, Washington, DC 20004</div>
-<div class="event">Evening visit: FDR Memorial, Jefferson Memorial, Dr. Martin Luther King Jr. National Memorial</div>
-<div class="event">8:45 PM — Course Leaders dismissed</div>
-<div class="event">9:20 PM — Coaches drop at hotel</div>
+  <h2 class="day-header">Wednesday, May 13, 2026 (Washington, D.C.)</h2>
+  <div class="event">7:00 AM — Hotel breakfast | 8:00 AM — Coaches depart</div>
+  <div class="event"><strong>9:00 AM —</strong> <a href="https://www.mountvernon.org/">Mt. Vernon</a> | Timed Mansion Tour 9:30 AM • Confirmation #5164772 • No backpacks</div>
+  <div class="event"><strong>12:00 PM — Lunch:</strong> Primo Family Restaurant | 1636 Belleview Blvd, Alexandria, VA</div>
+  <div class="event">12:45 PM — <a href="https://www.ushmm.org/">Holocaust Memorial Museum</a> | 50 students (14th St entrance, 15 mins early)</div>
+  <div class="event">1:45 PM — Holocaust Memorial Museum continued | 25 students</div>
+  <div class="event">3:45 PM — <a href="https://cathedral.org/">National Cathedral Guided Tour</a> | Arrive 15 mins early • Confirmation #800785</div>
+  <div class="event">6:00 PM — Dinner: GRK Fresh Greek | 1000 F Street NW, DC</div>
+  <div class="event">Evening: FDR Memorial, Jefferson Memorial, MLK National Memorial</div>
+  <div class="event">8:45 PM — Course Leaders dismissed | 9:20 PM — Coaches drop at hotel</div>
 </section>
-
 <section>
-<h2 class="day-header">Thursday, May 14, 2026 (Travel to New York)</h2>
-<div class="event">6:15 AM — Hotel breakfast &amp; check-out • Bags on bus</div>
-<div class="event">7:00 AM — Coaches depart for New York City</div>
-<div class="event">$15 Lunch allotment (stop before arrival in NYC)</div>
-<div class="event">1:30 PM — NY Course Leaders report at Grand Central Terminal (42nd between Lexington &amp; Vanderbilt)</div>
-<div class="event">1:45 PM — Coaches drop group at Grand Central Terminal • Proceed to hotel • Luggage assistance by NY Field Specialist</div>
-<div class="event">2:30 PM — Walk to <a href="https://www.un.org/">United Nations</a> (photo stop)</div>
-<div class="event">Visit: <a href="https://www.nypl.org/locations/schwarzman">New York Public Library – Stephen A Schwarzman Building</a></div>
-<div class="event">6:00 PM — Dinner: <a href="https://schnippers.com/">Schnipper's</a> (Pre-order pending)</div>
-<div class="event">7:30 PM — Top of the Rock Observation Deck • Tickets pick up at will call #1372403200385</div>
-<div class="event">Evening sightseeing: Rockefeller Center, St. Patrick's Cathedral, NBC Store, Times Square</div>
-<div class="event">10:30 PM — Walk group to hotel for check-in</div>
+  <h2 class="day-header">Thursday, May 14, 2026 (Travel to New York)</h2>
+  <div class="event">6:15 AM — Hotel breakfast &amp; check-out • Bags on bus | 7:00 AM — Coaches depart for NYC</div>
+  <div class="event">$15 Lunch allotment (stop before arrival in NYC)</div>
+  <div class="event">1:30 PM — NY Course Leaders at Grand Central Terminal (42nd between Lexington &amp; Vanderbilt)</div>
+  <div class="event">1:45 PM — Coaches drop at Grand Central • Proceed to hotel</div>
+  <div class="event">2:30 PM — Walk to United Nations (photo stop)</div>
+  <div class="event">Visit: New York Public Library – Stephen A Schwarzman Building</div>
+  <div class="event">6:00 PM — Dinner: Schnipper's (Pre-order pending)</div>
+  <div class="event">7:30 PM — Top of the Rock Observation Deck | Will call #1372403200385</div>
+  <div class="event">Evening: Rockefeller Center, St. Patrick's Cathedral, NBC Store, Times Square</div>
+  <div class="event">10:30 PM — Walk group to hotel for check-in</div>
 </section>
-
 <section>
-<h2 class="day-header">Friday, May 15, 2026 (New York)</h2>
-<div class="event">7:15 AM — Meet Course Leaders at hotel • Walk to breakfast</div>
-<div class="event">7:30 AM — Breakfast: <a href="https://maps.google.com/?q=Cook+Eatery+NY">Cook Eatery</a>, 115 W 45th St, NY 10036</div>
-<div class="event">Group travels via subway with NY Course Leaders to Lower Manhattan</div>
-<div class="event">9:00 AM — <a href="https://www.statueoflibertytickets.com/">Statue of Liberty Ferry from Battery Park</a> • Airport-type security • Minimize backpacks/packages</div>
-<div class="event">9/11 Memorial at World Trade Center site</div>
-<div class="event">1:30 PM — <a href="https://www.911memorial.org/">9/11 Museum</a> • Southeast corner entry • Confirmation #5178584</div>
-<div class="event">Sightseeing: Financial District – U.S. Customs House, Trinity Church, Federal Hall, Wall Street</div>
-<div class="event">4:00 PM — Subway to Times Square • NY Field Specialist assists group to dinner &amp; theater</div>
-<div class="event">5:00 PM — Dinner: <a href="https://maps.google.com/?q=Margaritaville+NYC">Margaritaville</a>, 560 Seventh Ave, NY 10018</div>
-<div class="event">7:00 PM — Theater: "Aladdin" at New Amsterdam Theatre • Confirmation #389320088 / 391841610 • Running time 2:30</div>
-<div class="event">10:00 PM — Group photo in Times Square (46th St between 7th &amp; 8th Ave)</div>
-<div class="event">10:30 PM — Walk to hotel</div>
+  <h2 class="day-header">Friday, May 15, 2026 (New York)</h2>
+  <div class="event">7:15 AM — Meet Course Leaders at hotel • Walk to breakfast</div>
+  <div class="event">7:30 AM — Breakfast: Cook Eatery, 115 W 45th St, NY</div>
+  <div class="event">Group travels via subway with NY Course Leaders to Lower Manhattan</div>
+  <div class="event">9:00 AM — Statue of Liberty Ferry from Battery Park | Airport-type security • Minimize bags</div>
+  <div class="event">9/11 Memorial at World Trade Center site</div>
+  <div class="event">1:30 PM — <a href="https://www.911memorial.org/">9/11 Museum</a> | SE corner entry • Confirmation #5178584</div>
+  <div class="event">Sightseeing: Financial District – U.S. Customs House, Trinity Church, Federal Hall, Wall Street</div>
+  <div class="event">4:00 PM — Subway to Times Square</div>
+  <div class="event">5:00 PM — Dinner: Margaritaville, 560 Seventh Ave, NY</div>
+  <div class="event">7:00 PM — Theater: "Aladdin" at New Amsterdam Theatre | Conf. #389320088 / #391841610 | ~2:30 run</div>
+  <div class="event">10:00 PM — Group photo in Times Square (46th St between 7th &amp; 8th Ave)</div>
+  <div class="event">10:30 PM — Walk to hotel</div>
 </section>
-
 <section>
-<h2 class="day-header">Saturday, May 16, 2026 (New York / Travel Home)</h2>
-<div class="event">7:15 AM — Meet Course Leaders at hotel</div>
-<div class="event">7:30 AM — Breakfast: <a href="https://www.hardrockcafe.com/location/new-york/">Hard Rock Cafe</a>, 1501 Broadway &amp; 43rd St, NY 10036</div>
-<div class="event">8:30 AM — Subway with NY Course Leaders to Central Park • Walking tour</div>
-<div class="event">Midtown sightseeing: Rockefeller Center, St. Patrick's Cathedral</div>
-<div class="event">$15 Lunch allotment</div>
-<div class="event">12:30 PM — Walk to hotel to load luggage &amp; board bus</div>
-<div class="event">1:00 PM — Load luggage on NY bus • On-site coordinator assists</div>
-<div class="event">2:00 PM — NY bus pick-up at Rockefeller Center (49th between 5th &amp; 6th Ave) → Proceed to airport</div>
-<div class="event">4:00 PM — Drop at Newark Liberty International Airport • Course Leaders dismissed once group connects with Field Specialist</div>
-<div class="event">$20 Dinner allotment</div>
-<div class="event">6:00 PM — Depart EWR on United Airlines UA1148</div>
-<div class="event">9:24 PM — Arrive SFO • Proceed to baggage claim</div>
+  <h2 class="day-header">Saturday, May 16, 2026 (New York / Travel Home)</h2>
+  <div class="event">7:15 AM — Meet Course Leaders at hotel</div>
+  <div class="event">7:30 AM — Breakfast: Hard Rock Cafe, 1501 Broadway &amp; 43rd St</div>
+  <div class="event">8:30 AM — Subway to Central Park • Walking tour</div>
+  <div class="event">Midtown sightseeing: Rockefeller Center, St. Patrick's Cathedral</div>
+  <div class="event">$15 Lunch allotment</div>
+  <div class="event">12:30 PM — Walk to hotel to load luggage | 2:00 PM — Bus pick-up at Rockefeller Center</div>
+  <div class="event">4:00 PM — Drop at Newark Liberty International Airport</div>
+  <div class="event">$20 Dinner allotment | 6:00 PM — Depart EWR on United Airlines UA1148</div>
+  <div class="event">9:24 PM — Arrive SFO • Proceed to baggage claim</div>
 </section>
 
-<!-- ===== PRINT-ONLY PACKING LIST ===== -->
+<!-- SCREEN + PRINT: PLACE CARDS (built by JS) -->
+<div id="screen-cards-section"></div>
+<div class="print-place-cards" id="print-cards-section"></div>
+
+<!-- PRINT: PACKING -->
 <div class="print-packing">
-    <h2>🎒 Suggested Packing List</h2>
-    <div class="packing-cols">
-        <div class="packing-section-title">Clothing (6 days)</div>
-        <div class="packing-item">6–7 shirts / tops</div>
-        <div class="packing-item">3–4 pairs of pants / shorts</div>
-        <div class="packing-item">1 nicer outfit (theater night)</div>
-        <div class="packing-item">Comfortable walking shoes</div>
-        <div class="packing-item">Dress shoes or clean sneakers</div>
-        <div class="packing-item">Jacket / light layer</div>
-        <div class="packing-item">Rain jacket or small umbrella</div>
-        <div class="packing-item">Pajamas / sleepwear</div>
-        <div class="packing-item">Underwear &amp; socks (7 pairs)</div>
-        <div class="packing-item">Hat / cap for sun</div>
-        <div class="packing-section-title">Toiletries &amp; Health</div>
-        <div class="packing-item">Toothbrush &amp; toothpaste</div>
-        <div class="packing-item">Deodorant</div>
-        <div class="packing-item">Shampoo &amp; conditioner</div>
-        <div class="packing-item">Body wash / soap</div>
-        <div class="packing-item">Sunscreen (SPF 30+)</div>
-        <div class="packing-item">Lip balm</div>
-        <div class="packing-item">Hair brush / comb</div>
-        <div class="packing-item">Personal medications (labeled)</div>
-        <div class="packing-item">Band-aids &amp; blister pads</div>
-        <div class="packing-item">Hand sanitizer</div>
-        <div class="packing-item">Tissues / small pack</div>
-        <div class="packing-item">Glasses / contacts + solution</div>
-        <div class="packing-section-title">Documents &amp; Money</div>
-        <div class="packing-item">School ID</div>
-        <div class="packing-item">JASSBY card (loaded &amp; ready)</div>
-        <div class="packing-item">Cash for extras / souvenirs</div>
-        <div class="packing-item">Emergency contact card</div>
-        <div class="packing-item">Copy of this itinerary</div>
-        <div class="packing-item">Health insurance card (copy)</div>
-        <div class="packing-section-title">Tech &amp; Gear</div>
-        <div class="packing-item">Phone &amp; charger</div>
-        <div class="packing-item">Portable power bank</div>
-        <div class="packing-item">Headphones / earbuds</div>
-        <div class="packing-item">Camera (optional)</div>
-        <div class="packing-item">Small day backpack</div>
-        <div class="packing-item">Reusable water bottle</div>
-        <div class="packing-item">Snacks for flights</div>
-        <div class="packing-item">Travel pillow / eye mask</div>
-        <div class="packing-item">Book / journal for the flight</div>
-    </div>
-    <br>
-    <strong>⚠️ Do NOT Bring:</strong> Large backpacks or packages to Mt. Vernon or Statue of Liberty (not allowed). Minimize carry-on bags for airport-style security at Liberty Ferry.
+  <h2>🎒 Suggested Packing List</h2>
+  <div class="pcols">
+    <div class="ps">Clothing (6 days)</div>
+    <div class="pi">6–7 shirts / tops</div><div class="pi">3–4 pairs pants / shorts</div><div class="pi">1 nicer outfit (theater night)</div>
+    <div class="pi">Comfortable walking shoes</div><div class="pi">Dress / clean sneakers</div><div class="pi">Jacket / light layer</div>
+    <div class="pi">Rain jacket or umbrella</div><div class="pi">Pajamas / sleepwear</div><div class="pi">Underwear &amp; socks (7 pairs)</div>
+    <div class="pi">Hat / cap for sun</div>
+    <div class="ps">Toiletries &amp; Health</div>
+    <div class="pi">Toothbrush &amp; toothpaste</div><div class="pi">Deodorant</div><div class="pi">Shampoo &amp; conditioner</div>
+    <div class="pi">Body wash / soap</div><div class="pi">Sunscreen (SPF 30+)</div><div class="pi">Lip balm</div>
+    <div class="pi">Hair brush / comb</div><div class="pi">Personal medications (labeled)</div><div class="pi">Band-aids &amp; blister pads</div>
+    <div class="pi">Hand sanitizer</div><div class="pi">Tissues / small pack</div><div class="pi">Glasses / contacts + solution</div>
+    <div class="ps">Documents &amp; Money</div>
+    <div class="pi">School ID</div><div class="pi">JASSBY card (loaded)</div><div class="pi">Cash for extras / souvenirs</div>
+    <div class="pi">Emergency contact card</div><div class="pi">Copy of this itinerary</div><div class="pi">Health insurance card (copy)</div>
+    <div class="ps">Tech &amp; Gear</div>
+    <div class="pi">Phone &amp; charger</div><div class="pi">Portable power bank</div><div class="pi">Headphones / earbuds</div>
+    <div class="pi">Camera (optional)</div><div class="pi">Small day backpack</div><div class="pi">Reusable water bottle</div>
+    <div class="pi">Snacks for flights</div><div class="pi">Travel pillow / eye mask</div><div class="pi">Book / journal</div>
+  </div>
+  <br><strong>⚠️ Do NOT Bring:</strong> Large backpacks to Mt. Vernon or Statue of Liberty. Minimize bags for airport-style security at Liberty Ferry.
 </div>
 
-<!-- ===== PRINT-ONLY MEAL ALLOTMENTS ===== -->
+<!-- PRINT: PAYMENTS -->
 <div class="print-payments">
-    <h2>💳 Meal Allotments &amp; Payment Notes</h2>
-    <p style="font-size:9.5pt;">The following meals are provided with allotments on JASSBY cards or cash. All other meals are included in the trip package and pre-ordered by WorldStrides.</p>
-    <table class="pay-table">
-        <tr><th>Day</th><th>Meal</th><th>Allotment</th><th>Details</th></tr>
-        <tr><td>Mon May 11</td><td>Breakfast</td><td>JASSBY card</td><td>Amphora's Diner Deluxe, Herndon VA — call-ahead for dietary needs</td></tr>
-        <tr><td>Mon May 11</td><td>Lunch</td><td>$15</td><td>Free choice near Ford's Theatre / Archives area</td></tr>
-        <tr><td>Mon May 11</td><td>Dinner</td><td>Included</td><td>Metro 29 Diner, Arlington VA — pre-order required</td></tr>
-        <tr><td>Tue May 12</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda</td></tr>
-        <tr><td>Tue May 12</td><td>Lunch</td><td>Included</td><td>Reagan International Trade Center Food Court — do NOT self-scan tickets</td></tr>
-        <tr><td>Tue May 12</td><td>Dinner</td><td>Included</td><td>District Taco – Capitol Hill</td></tr>
-        <tr><td>Wed May 13</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda</td></tr>
-        <tr><td>Wed May 13</td><td>Lunch</td><td>Included</td><td>Primo Family Restaurant, Alexandria VA</td></tr>
-        <tr><td>Wed May 13</td><td>Dinner</td><td>Included</td><td>GRK Fresh Greek, 1000 F Street NW, DC</td></tr>
-        <tr><td>Thu May 14</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda (before checkout)</td></tr>
-        <tr><td>Thu May 14</td><td>Lunch</td><td>$15</td><td>Stop en route to NYC — location TBD</td></tr>
-        <tr><td>Thu May 14</td><td>Dinner</td><td>Included</td><td>Schnipper's, NYC — pre-order pending</td></tr>
-        <tr><td>Fri May 15</td><td>Breakfast</td><td>Included</td><td>Cook Eatery, 115 W 45th St, NY 10036</td></tr>
-        <tr><td>Fri May 15</td><td>Lunch</td><td>—</td><td>Time built in near Financial District / Lower Manhattan</td></tr>
-        <tr><td>Fri May 15</td><td>Dinner</td><td>Included</td><td>Margaritaville, 560 Seventh Ave, NY 10018</td></tr>
-        <tr><td>Sat May 16</td><td>Breakfast</td><td>Included</td><td>Hard Rock Cafe, 1501 Broadway &amp; 43rd St</td></tr>
-        <tr><td>Sat May 16</td><td>Lunch</td><td>$15</td><td>Free choice in Midtown / Central Park area</td></tr>
-        <tr><td>Sat May 16</td><td>Dinner</td><td>$20</td><td>Newark Airport — use at any terminal restaurant</td></tr>
-    </table>
-    <p style="font-size:8.5pt; margin-top:0.6rem;">Note: JASSBY cards are the primary payment method for included meals. Bring personal cash for souvenir shopping and any additional snacks or extras not covered above.</p>
+  <h2>💳 Meal Allotments &amp; Payment Notes</h2>
+  <table class="ptbl">
+    <tr><th>Day</th><th>Meal</th><th>Allotment</th><th>Details</th></tr>
+    <tr><td>Mon May 11</td><td>Breakfast</td><td>JASSBY card</td><td>Amphora's Diner Deluxe, Herndon VA</td></tr>
+    <tr><td>Mon May 11</td><td>Lunch</td><td>$15</td><td>Free choice near Ford's Theatre / Archives area</td></tr>
+    <tr><td>Mon May 11</td><td>Dinner</td><td>Included</td><td>Metro 29 Diner, Arlington VA — pre-order required</td></tr>
+    <tr><td>Tue May 12</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda</td></tr>
+    <tr><td>Tue May 12</td><td>Lunch</td><td>Included</td><td>Reagan Trade Center Food Court — do NOT self-scan tickets</td></tr>
+    <tr><td>Tue May 12</td><td>Dinner</td><td>Included</td><td>District Taco – Capitol Hill</td></tr>
+    <tr><td>Wed May 13</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda</td></tr>
+    <tr><td>Wed May 13</td><td>Lunch</td><td>Included</td><td>Primo Family Restaurant, Alexandria VA</td></tr>
+    <tr><td>Wed May 13</td><td>Dinner</td><td>Included</td><td>GRK Fresh Greek, 1000 F Street NW, DC</td></tr>
+    <tr><td>Thu May 14</td><td>Breakfast</td><td>Included</td><td>Hotel breakfast, Hyatt Bethesda (before checkout)</td></tr>
+    <tr><td>Thu May 14</td><td>Lunch</td><td>$15</td><td>Stop en route to NYC — location TBD</td></tr>
+    <tr><td>Thu May 14</td><td>Dinner</td><td>Included</td><td>Schnipper's, NYC — pre-order pending</td></tr>
+    <tr><td>Fri May 15</td><td>Breakfast</td><td>Included</td><td>Cook Eatery, 115 W 45th St, NY</td></tr>
+    <tr><td>Fri May 15</td><td>Lunch</td><td>—</td><td>Time built in near Financial District</td></tr>
+    <tr><td>Fri May 15</td><td>Dinner</td><td>Included</td><td>Margaritaville, 560 Seventh Ave, NY</td></tr>
+    <tr><td>Sat May 16</td><td>Breakfast</td><td>Included</td><td>Hard Rock Cafe, 1501 Broadway &amp; 43rd St</td></tr>
+    <tr><td>Sat May 16</td><td>Lunch</td><td>$15</td><td>Free choice in Midtown / Central Park area</td></tr>
+    <tr><td>Sat May 16</td><td>Dinner</td><td>$20</td><td>Newark Airport — any terminal restaurant</td></tr>
+  </table>
 </div>
 
-<!-- ===== PRINT-ONLY RULES & GUIDELINES ===== -->
+<!-- PRINT: RULES -->
 <div class="print-rules">
-    <h2>📋 Student Code of Conduct &amp; Trip Rules</h2>
-    <p style="font-size:9.5pt;">All students and chaperones are expected to follow WorldStrides and Merryhill School guidelines throughout the trip. Violations may result in parents being called and students being sent home at family expense.</p>
-
-    <div class="rule-item"><span class="rule-num">1.</span><span><strong>Supervision at all times.</strong> Students must stay with their assigned group and Course Leader at all times. No wandering away from the group without explicit permission from a chaperone or Course Leader.</span></div>
-    <div class="rule-item"><span class="rule-num">2.</span><span><strong>Curfew.</strong> All students must be in their hotel rooms by the designated curfew each night. Doors must remain closed. No hallway socializing after lights-out.</span></div>
-    <div class="rule-item"><span class="rule-num">3.</span><span><strong>Room rules.</strong> No students of different genders in each other's rooms at any time. No food or beverages that could damage hotel property.</span></div>
-    <div class="rule-item"><span class="rule-num">4.</span><span><strong>Electronics.</strong> Phones are permitted for photos and communication with parents. They must be silenced during tours, memorials, theater performances, and any instructional time. Sharing of location with parents is encouraged.</span></div>
-    <div class="rule-item"><span class="rule-num">5.</span><span><strong>Dress code.</strong> Appropriate clothing at all times. Closed-toe shoes recommended for all walking days. A nicer outfit is required for the Broadway theater evening (May 15).</span></div>
-    <div class="rule-item"><span class="rule-num">6.</span><span><strong>Conduct at memorials &amp; museums.</strong> Respectful, quiet behavior is mandatory at Arlington National Cemetery, Holocaust Memorial Museum, 9/11 Memorial &amp; Museum, and all war memorials. No photos in restricted areas. Follow all posted rules.</span></div>
-    <div class="rule-item"><span class="rule-num">7.</span><span><strong>Purchases &amp; money.</strong> Students are responsible for their own spending money beyond allotted amounts. Teachers/chaperones will not hold student money. Keep wallets secure in busy areas like Times Square.</span></div>
-    <div class="rule-item"><span class="rule-num">8.</span><span><strong>Bags &amp; security.</strong> Minimize bags for Statue of Liberty (airport-style security) and Mt. Vernon (no backpacks/packages allowed in mansion). All bags stay on coach during Arlington Cemetery visit.</span></div>
-    <div class="rule-item"><span class="rule-num">9.</span><span><strong>Medications.</strong> All prescription medications must be disclosed to chaperones before departure. Students may not share medications. Over-the-counter medications must be pre-approved by parents and declared to trip leaders.</span></div>
-    <div class="rule-item"><span class="rule-num">10.</span><span><strong>Lost or separated.</strong> If separated from the group, stay calm and in place. Contact a nearby adult in uniform (security, museum staff) and call your Course Leader or WorldStrides emergency line immediately: <strong>1-800-468-5899</strong>.</span></div>
-    <div class="rule-item"><span class="rule-num">11.</span><span><strong>Social media.</strong> Students may post trip photos, but must not post real-time location updates, hotel names, or room numbers on public social media during the trip for safety reasons.</span></div>
-    <div class="rule-item"><span class="rule-num">12.</span><span><strong>Illness.</strong> Report any illness, injury, or feeling unwell immediately to a chaperone. Do not try to hide being sick. The group carries a basic first aid kit; serious medical issues will be escalated to emergency services.</span></div>
+  <h2>📋 Student Code of Conduct &amp; Trip Rules</h2>
+  <p style="font-size:9pt">Violations may result in students being sent home at family expense.</p>
+  <div class="ri"><span class="rn">1.</span><span><strong>Supervision at all times.</strong> Stay with your assigned group and Course Leader. No wandering without explicit permission.</span></div>
+  <div class="ri"><span class="rn">2.</span><span><strong>Curfew.</strong> In hotel rooms by designated curfew. Doors remain closed. No hallway socializing after lights-out.</span></div>
+  <div class="ri"><span class="rn">3.</span><span><strong>Room rules.</strong> No students of different genders in each other's rooms at any time.</span></div>
+  <div class="ri"><span class="rn">4.</span><span><strong>Electronics.</strong> Phones silenced during tours, memorials, theater, and instruction. Location-sharing with parents encouraged.</span></div>
+  <div class="ri"><span class="rn">5.</span><span><strong>Dress code.</strong> Closed-toe shoes for all walking days. Nicer outfit required for Broadway theater (May 15).</span></div>
+  <div class="ri"><span class="rn">6.</span><span><strong>Conduct at memorials.</strong> Quiet, respectful behavior at Arlington, Holocaust Museum, 9/11 Memorial, and all war memorials. No photos in restricted areas.</span></div>
+  <div class="ri"><span class="rn">7.</span><span><strong>Spending money.</strong> Students responsible for personal spending beyond allotted amounts. Keep wallets secure in Times Square and busy areas.</span></div>
+  <div class="ri"><span class="rn">8.</span><span><strong>Bags &amp; security.</strong> Minimize bags for Statue of Liberty and Mt. Vernon. All bags stay on coach at Arlington.</span></div>
+  <div class="ri"><span class="rn">9.</span><span><strong>Medications.</strong> All prescriptions must be disclosed. Students may not share medications. OTC meds must be pre-approved by parents.</span></div>
+  <div class="ri"><span class="rn">10.</span><span><strong>If separated.</strong> Stay calm, stay in place. Contact WorldStrides 24/7: <strong>1-800-468-5899</strong>. Find uniformed staff.</span></div>
+  <div class="ri"><span class="rn">11.</span><span><strong>Social media.</strong> No real-time location updates, hotel names, or room numbers on public social media.</span></div>
+  <div class="ri"><span class="rn">12.</span><span><strong>Illness.</strong> Report any illness or injury immediately to a chaperone. Do not hide being sick.</span></div>
 </div>
 
-<!-- ===== PRINT-ONLY EMERGENCY PROCEDURES ===== -->
+<!-- PRINT: EMERGENCY -->
 <div class="print-emergency">
-    <h2>🚨 Emergency Procedures</h2>
-
-    <div class="emergency-box">
-        <h3>Medical Emergency</h3>
-        <p>1. Call 911 immediately for any life-threatening situation.</p>
-        <p>2. Notify the nearest Course Leader or chaperone at once.</p>
-        <p>3. Do not move an injured person unless they are in immediate danger.</p>
-        <p>4. WorldStrides 24/7 Emergency: <strong>1-800-468-5899</strong></p>
-        <p>5. Stay with the student — do not leave them alone.</p>
-    </div>
-
-    <div class="emergency-box">
-        <h3>Lost / Missing Student</h3>
-        <p>1. Immediately alert all nearby chaperones and Course Leaders.</p>
-        <p>2. Last known location, time, and what the student was wearing — gather this info fast.</p>
-        <p>3. Do not allow the rest of the group to disperse searching alone.</p>
-        <p>4. Contact venue security; in NYC, contact NYPD non-emergency: (646) 610-5000.</p>
-        <p>5. Contact WorldStrides: <strong>1-800-468-5899</strong></p>
-        <p>6. Notify parents only after WorldStrides and school administration have been contacted.</p>
-    </div>
-
-    <div class="emergency-box">
-        <h3>If a Student Feels Unsafe or Encounters a Threat</h3>
-        <p>1. Move away from the threat calmly. Alert a Course Leader immediately.</p>
-        <p>2. In a public emergency (evacuation, lockdown): follow all instructions from law enforcement and venue staff.</p>
-        <p>3. Text is often faster than calls in crowded emergency situations — text Course Leader and parents.</p>
-        <p>4. Pre-designated group meetup point: <em>The nearest hotel lobby, or Grand Central Terminal main concourse (NYC) / Hyatt Bethesda main entrance (D.C.)</em></p>
-    </div>
-
-    <div class="emergency-box">
-        <h3>Severe Weather</h3>
-        <p>Course Leaders monitor weather forecasts daily. In the event of severe weather (thunderstorm, tornado watch), all outdoor activities will be suspended and the group will move to the nearest indoor facility. Follow Course Leader instructions without delay.</p>
-    </div>
-
-    <p style="font-size:9pt; margin-top:1rem;"><strong>Key Addresses:</strong><br>
-    D.C. Hotel: Hyatt Regency Bethesda, 1 Bethesda Metro Center, Bethesda, MD 20814 | (301) 657-1234<br>
-    NYC Hotel: Sheraton Times Square, 811 Seventh Ave at 53rd St, New York, NY 10019 | (212) 581-1000<br>
-    WorldStrides 24/7: 1-800-468-5899 | SFO: (650) 821-8211 | EWR: (973) 961-6000
-    </p>
+  <h2>🚨 Emergency Procedures</h2>
+  <div class="ebox"><h3>Medical Emergency</h3>
+    <p>1. Call 911 immediately for any life-threatening situation.</p>
+    <p>2. Notify the nearest Course Leader or chaperone at once.</p>
+    <p>3. Do not move an injured person unless in immediate danger.</p>
+    <p>4. WorldStrides 24/7: <strong>1-800-468-5899</strong></p>
+  </div>
+  <div class="ebox"><h3>Lost / Missing Student</h3>
+    <p>1. Immediately alert all nearby chaperones and Course Leaders.</p>
+    <p>2. Note last known location, time, and what the student was wearing.</p>
+    <p>3. Contact venue security. NYC non-emergency: (646) 610-5000.</p>
+    <p>4. WorldStrides: <strong>1-800-468-5899</strong>. Notify parents only after WorldStrides is contacted.</p>
+  </div>
+  <div class="ebox"><h3>Threat / Safety Concern</h3>
+    <p>Move away calmly. Alert Course Leader immediately. Follow all law enforcement instructions. Pre-designated meetup: nearest hotel lobby or Grand Central main concourse (NYC) / Hyatt Bethesda entrance (D.C.).</p>
+  </div>
+  <div class="ebox"><h3>Severe Weather</h3>
+    <p>Course Leaders monitor forecasts daily. In severe weather, all outdoor activities are suspended. Move to the nearest indoor facility. Follow Course Leader instructions.</p>
+  </div>
 </div>
 
-<div class="footer">
-WorldStrides Educational Travel • Always follow Course Leader instructions
-</div>
+<div class="footer">WorldStrides Educational Travel • Always follow Course Leader instructions</div>
 
+<script>
+const PLACES = [
+  // ── MAY 10: DEPARTURE ──
+  {
+    day:"Sunday, May 10 — Departure",dayBg:"#555",
+    icon:"✈️",iconBg:"#1a73e820",
+    badges:[{l:"Airport",c:"#1a73e8"},{l:"Departure",c:"#555"}],
+    title:"San Francisco International Airport (SFO)",
+    desc:"One of the busiest West Coast airports, serving over 50 million passengers yearly. Your East Coast adventure begins here with an overnight Alaska Airlines flight to Washington D.C.",
+    info:"<b>Meet time:</b> 7:30 PM at Alaska Airlines ticket counter. <b>Flight:</b> AS455, departs 9:30 PM. Arrive 2+ hours early. Bring school ID. JASSBY cards should be loaded before arrival."
+  },
+  // ── MAY 11: D.C. ──
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🛬",iconBg:"#0057b820",
+    badges:[{l:"Airport",c:"#0057b8"},{l:"D.C.",c:"#c04000"}],
+    title:"Washington Dulles International Airport (IAD)",
+    desc:"Designed by architect Eero Saarinen with its iconic swooping roof. Named after Secretary of State John Foster Dulles, it opened in 1962 and remains a major international gateway to the capital.",
+    info:"<b>Arrive:</b> 5:40 AM. <b>Action:</b> Meet WorldStrides Field Specialist at baggage claim. Motorcoaches load at 6:00 AM. Stay at baggage claim — do NOT wander."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🍳",iconBg:"#e67e2220",
+    badges:[{l:"Breakfast",c:"#e67e22"},{l:"JASSBY Card",c:"#27ae60"}],
+    title:"Amphora's Diner Deluxe",
+    desc:"A beloved Northern Virginia institution open since 1982. Known for generous portions of classic American and Greek diner fare — omelettes, pancakes, gyros — and a welcoming atmosphere for large groups.",
+    info:"<b>Address:</b> 1151 Elden St, Herndon, VA 20170 | <b>Phone:</b> (703) 925-0900 | <b>Payment:</b> JASSBY cards. Special dietary needs must be communicated in advance — vendor requires a call-ahead."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🗿",iconBg:"#27ae6020",
+    badges:[{l:"Landmark",c:"#27ae60"},{l:"Outdoor",c:"#16a085"}],
+    title:"The Awakening – National Harbor",
+    desc:"A dramatic 70-foot aluminum sculpture depicting a giant emerging from the earth, created by J. Seward Johnson Jr. Originally installed at Hains Point in 1980, it became iconic before moving to National Harbor in 2008. One of the most photographed public artworks in the D.C. metro area.",
+    info:"<b>Location:</b> National Harbor, Oxon Hill, MD. Free outdoor visit. Perfect for group photos — the hands and feet are designed to climb on. No admission required."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🎭",iconBg:"#8e44ad20",
+    badges:[{l:"Historic Site",c:"#8e44ad"},{l:"Confirmed",c:"#27ae60"}],
+    title:"Ford's Theatre",
+    desc:"Site of the assassination of President Abraham Lincoln on April 14, 1865. Restored to its 1865 appearance, it still operates as a working theater. The basement museum holds Lincoln artifacts including the derringer pistol used by John Wilkes Booth and the clothes Lincoln wore that night.",
+    info:"<b>Address:</b> 511 10th St NW, Washington, DC 20004 | <b>Time:</b> 10:30 AM | <b>Confirmation:</b> #1430257 — pick up tickets at will call. Stay with group. Photography rules posted inside."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"📜",iconBg:"#c0392b20",
+    badges:[{l:"Museum",c:"#c0392b"},{l:"Confirmed",c:"#27ae60"}],
+    title:"National Archives Museum",
+    desc:"The permanent home of America's three most important founding documents: the Declaration of Independence, the U.S. Constitution, and the Bill of Rights — all on display in the Rotunda under protective lighting. The Archives house over 13 billion pages of American history.",
+    info:"<b>Time:</b> 12:45 PM | <b>Confirmation:</b> Order #0625600871 | Must maintain 1:10 adult-to-student ratio. Bags screened at entry. Photography of the founding documents is restricted — follow posted signage."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"⚔️",iconBg:"#2c3e5020",
+    badges:[{l:"National Cemetery",c:"#2c3e50"},{l:"Solemn",c:"#7f8c8d"}],
+    title:"Arlington National Cemetery",
+    desc:"The nation's most sacred burial ground, spanning 639 acres in Virginia. The Tomb of the Unknown Soldier is guarded 24/7 by the U.S. Army's 3rd Infantry Regiment. Over 400,000 veterans are buried here, including President John F. Kennedy and his brother Robert.",
+    info:"<b>Note:</b> Guests 18+ may need photo ID to enter. <b>All student bags must remain on the coach — no exceptions.</b> Quiet, respectful behavior required at all times. No food outside designated areas."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🪖",iconBg:"#1a527620",
+    badges:[{l:"Memorial",c:"#1a5276"},{l:"Outdoor",c:"#16a085"}],
+    title:"Iwo Jima Marine Memorial (USMC War Memorial)",
+    desc:"One of the largest bronze statues ever cast, depicting the iconic flag-raising on Mount Suribachi during the Battle of Iwo Jima. Based on Joe Rosenthal's Pulitzer Prize-winning photograph. Stands 78 feet tall and honors all Marines who have died in service to the United States since 1775.",
+    info:"<b>Location:</b> Near Rosslyn, VA, adjacent to Arlington National Cemetery. Brief outdoor stop for photos and reflection. No admission. Stay with the group."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🍽️",iconBg:"#e67e2220",
+    badges:[{l:"Dinner",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Metro 29 Diner",
+    desc:"A classic Northern Virginia diner serving the Arlington community since 1947. Generous portions of American comfort food — breakfast all day, hearty sandwiches, pasta, and daily specials. A reliable, welcoming spot for a tired group after a long first day.",
+    info:"<b>Address:</b> 4711 Lee Highway, Arlington, VA | <b>Note:</b> Pre-order required — do not order off-menu. Dinner included in the trip. Inform chaperones of allergy concerns before the meal."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🕯️",iconBg:"#7f8c8d20",
+    badges:[{l:"Memorial",c:"#7f8c8d"},{l:"Evening Visit",c:"#555"}],
+    title:"September 11th Pentagon Memorial",
+    desc:"Dedicated on September 11, 2008 — the 7th anniversary — this outdoor memorial honors 184 victims who perished at the Pentagon and aboard American Airlines Flight 77. Each of the 184 cantilevered illuminated benches is positioned based on the victim's age and flight path. Haunting and beautiful at night.",
+    info:"<b>Location:</b> Pentagon grounds, Arlington, VA. Evening visit. Open 24/7, free admission. Quiet, respectful behavior required. Photography permitted. Stay with the group at all times."
+  },
+  {
+    day:"Monday, May 11 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🏨",iconBg:"#0057b820",
+    badges:[{l:"Hotel",c:"#0057b8"},{l:"Stay: May 11–13",c:"#27ae60"}],
+    title:"Hyatt Regency Bethesda",
+    desc:"A full-service upscale hotel connected directly to the Bethesda Metro station, providing easy access to all of Washington D.C. Modern, comfortable rooms and on-site dining after long days of sightseeing. Your base for three nights.",
+    info:"<b>Address:</b> 1 Bethesda Metro Center, Bethesda, MD 20814 | <b>Phone:</b> (301) 657-1234 | Check-in ~7:40 PM May 11. Curfew strictly enforced. Do not share room numbers with anyone outside the group."
+  },
+  // ── MAY 12 ──
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🌿",iconBg:"#1a527620",
+    badges:[{l:"Memorial",c:"#1a5276"},{l:"Wreath Ceremony",c:"#8e44ad"}],
+    title:"World War II Memorial — Wreath Laying",
+    desc:"Dedicated in 2004, the WWII Memorial honors the 16 million Americans who served and the 400,000+ who gave their lives. The wreath-laying is a solemn ceremony of remembrance. Set between the Lincoln Memorial and Washington Monument on the National Mall with its stunning granite pillars and cascading fountains.",
+    info:"<b>Location:</b> National Mall, between Lincoln Memorial and Washington Monument. <b>Wreath delivered by:</b> Twin Towers Florist ☎ (703) 527-7110. Formal, respectful behavior required. Students may be invited to participate in the ceremony."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🥗",iconBg:"#e67e2220",
+    badges:[{l:"Lunch",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Ronald Reagan Building — International Trade Center Food Court",
+    desc:"Inside the Ronald Reagan Building — the largest federal building in Washington D.C. at over 3.1 million square feet. The food court hosts dozens of vendors representing a wide variety of cuisines, perfect for a group with diverse tastes. A popular lunch spot for government workers and tourists.",
+    info:"<b>Entry:</b> 14th Street entrance only. Meal is included — <b>do NOT self-scan tickets</b> at entry kiosks. Wait for staff instructions before ordering. Stay within the group's designated seating area."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🏛️",iconBg:"#c0392b20",
+    badges:[{l:"Government",c:"#c0392b"},{l:"Confirmed",c:"#27ae60"}],
+    title:"United States Capitol Tour",
+    desc:"The seat of the U.S. Congress and one of the world's most recognizable buildings. The Capitol houses both the Senate and the House of Representatives. The Rotunda's 180-foot dome features 'The Apotheosis of Washington' painted by Constantino Brumidi, along with a frieze of American history that circles the drum.",
+    info:"<b>Time:</b> 12:40 PM | <b>Confirmation:</b> #202404221612305 | Arrive 30 minutes early. Airport-style security — no liquids over 3 oz. No food or drink inside. Photography allowed in most public areas. Listen carefully to tour staff."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🇺🇸",iconBg:"#c0392b20",
+    badges:[{l:"Museum",c:"#c0392b"},{l:"Smithsonian",c:"#8e44ad"}],
+    title:"National Museum of American History",
+    desc:"A Smithsonian treasure exploring the full sweep of American culture through remarkable objects. Permanent highlights include the original Star-Spangled Banner (1814), Julia Child's kitchen, the First Ladies' inaugural gowns, and the Woolworth lunch counter from the civil rights sit-ins. More than 1.8 million objects in the collection.",
+    info:"<b>Location:</b> Constitution Ave NW between 12th and 14th St | Free admission (Smithsonian). Stay with the group. Multiple floors — designated meeting point announced by Course Leaders. No food or drinks inside galleries."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🎨",iconBg:"#9b59b620",
+    badges:[{l:"Art + Tech",c:"#9b59b6"},{l:"Confirmed",c:"#27ae60"}],
+    title:"ARTECHOUSE DC",
+    desc:"A pioneering art and technology exhibition space creating immersive, multi-sensory environments where digital art, data, and science converge. Visitors are surrounded by floor-to-ceiling interactive projections that transform the entire space into living, responsive artwork. No two visits are the same.",
+    info:"<b>Time:</b> 3:30 PM | <b>Confirmation:</b> #B-3ENRVXR | 1238 Maryland Ave SW, DC. The dark immersive environments can be disorienting — stay with group. Photography encouraged. Wear comfortable shoes."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🌮",iconBg:"#e67e2220",
+    badges:[{l:"Dinner",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"District Taco — Capitol Hill",
+    desc:"A beloved D.C.-born fast-casual chain founded by a contractor who learned authentic recipes in the Yucatan Peninsula. Known for fresh, made-from-scratch Mexican food — outstanding al pastor, carne asada, and excellent vegetarian options. A local favorite with a cult following.",
+    info:"<b>Time:</b> 5:30 PM | Capitol Hill location | Dinner included. Inform chaperones of allergies. Order quickly — the group has a schedule to keep before the evening memorial walk."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"🌙",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Lincoln Memorial",
+    desc:"One of America's most iconic monuments, honoring the 16th President who preserved the Union through the Civil War. The 19-foot marble seated Lincoln presides over the National Mall since 1922. Dr. Martin Luther King Jr. delivered his 'I Have a Dream' speech on its steps in 1963. Breathtaking at night.",
+    info:"<b>Location:</b> West end of the National Mall | Open 24/7, no admission. Evening visit. The Gettysburg Address and Second Inaugural Address are carved into the interior walls. Respectful behavior required."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"🕊️",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Korean War Veterans Memorial",
+    desc:"Dedicated in 1995, this memorial features 19 stainless steel statues of soldiers on patrol representing all military branches. A granite wall bears the names of 36,574 Americans killed. The nearby Pool of Remembrance reflects the statues. The wall also contains a photomural of 2,500 images representing the support teams behind combat troops.",
+    info:"<b>Location:</b> National Mall, near Lincoln Memorial | Evening visit. No admission required. The soldier reflections in the polished granite wall are intentional — each soldier doubled in reflection symbolizes the full scale of American sacrifice."
+  },
+  {
+    day:"Tuesday, May 12 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"📿",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Vietnam Veterans Memorial",
+    desc:"Designed by architecture student Maya Lin (age 21, still in college) and dedicated in 1982. The V-shaped wall of black granite lists 58,318 Americans killed or missing in Vietnam. One of the most visited and deeply personal monuments in Washington — visitors leave flowers, flags, photos, and letters and make pencil rubbings of names.",
+    info:"<b>Location:</b> National Mall, near Lincoln Memorial | Evening visit, no admission. Names are in chronological order of death. Pencil rubbings of names are a meaningful tribute — bring paper and a soft pencil. Quiet behavior required."
+  },
+  // ── MAY 13 ──
+  {
+    day:"Wednesday, May 13 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🏡",iconBg:"#27ae6020",
+    badges:[{l:"Historic Estate",c:"#27ae60"},{l:"Timed Tour",c:"#e67e22"}],
+    title:"Mount Vernon — Home of George Washington",
+    desc:"George Washington's beloved estate overlooking the Potomac River in Virginia. Washington lived here from 1754 until his death in 1799. The 500-acre working farm includes the restored mansion, original outbuildings, slave memorial, colonial garden, working distillery and gristmill, and a museum housing thousands of Washington artifacts.",
+    info:"<b>Timed Mansion Tour:</b> 9:30 AM | <b>Confirmation:</b> #5164772 | <b>NO backpacks or packages inside the mansion</b> — leave everything on the bus. Grounds and Education Center included. Arrive before 9:30 AM. Allow ~3 hours total."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🍝",iconBg:"#e67e2220",
+    badges:[{l:"Lunch",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Primo Family Restaurant",
+    desc:"A family-owned Italian-American restaurant in Alexandria, Virginia, known for hearty pasta dishes, fresh salads, and warm hospitality. A trusted stop for school and tour groups visiting the D.C. area for its consistency, generous portions, and welcoming staff.",
+    info:"<b>Address:</b> 1636 Belleview Blvd, Alexandria, VA 22307 | Buses pull to the side before unloading — wait for the signal. Lunch included. Inform chaperones of dietary restrictions before ordering."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C.",dayBg:"#c04000",
+    icon:"✡️",iconBg:"#2c3e5020",
+    badges:[{l:"Museum",c:"#2c3e50"},{l:"Solemn — Please Respect",c:"#7f8c8d"}],
+    title:"U.S. Holocaust Memorial Museum",
+    desc:"One of the world's most visited and impactful museums, dedicated to documenting and interpreting the Holocaust. The permanent exhibition traces the rise of the Nazi regime, life and death in the camps, liberation, and aftermath. Contains powerful testimonies, artifacts, photographs, film footage, and personal stories. A place of profound importance.",
+    info:"<b>14th Street entrance</b> — arrive 15 minutes early. <b>Split visit:</b> 50 students at 12:45 PM, 25 students at 1:45 PM. Individual tickets. Quiet, respectful behavior is essential. Photography restricted in certain areas. Support one another — this exhibition is emotionally intense."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C.",dayBg:"#c04000",
+    icon:"⛪",iconBg:"#1a527620",
+    badges:[{l:"Architecture",c:"#1a5276"},{l:"Confirmed",c:"#27ae60"}],
+    title:"Washington National Cathedral",
+    desc:"The sixth-largest cathedral in the world, built in the Gothic style over 83 years (1907–1990). Constructed entirely of Indiana limestone with no steel reinforcement. Contains 231 stained glass windows, including one with a moon rock. One gargoyle is famously carved in the likeness of Darth Vader. Site of presidential funerals and national prayer services.",
+    info:"<b>Time:</b> 3:45 PM | <b>Confirmation:</b> #800785 | Arrive 15 mins early. Leave approximately 1 hour after appointment. Respectful attire and behavior inside. Guided tour included — follow the docents carefully."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C.",dayBg:"#c04000",
+    icon:"🥙",iconBg:"#e67e2220",
+    badges:[{l:"Dinner",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"GRK Fresh Greek",
+    desc:"A fast-casual Mediterranean restaurant celebrated for fresh, wholesome ingredients sourced with care. Known for outstanding gyros, chicken pitas, Greek salads, and satisfying bowls. The 1000 F Street location is popular with the D.C. business community for its quality and speed.",
+    info:"<b>Address:</b> 1000 F Street NW, Washington, DC 20004 | <b>Time:</b> 6:00 PM | Dinner included. Fast-casual format — wait for chaperone instruction on ordering procedure. Good vegetarian and gluten-free options available."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"🌳",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Franklin Delano Roosevelt Memorial",
+    desc:"A sprawling 7.5-acre outdoor memorial across four rooms representing FDR's four presidential terms. Features powerful waterfalls, bronze sculptures, and quotations tracing America from the Great Depression through World War II. Includes statues of Eleanor Roosevelt (the first First Lady to have a dedicated statue in a presidential memorial) and Americans in a breadline.",
+    info:"<b>Location:</b> West Potomac Park, National Mall | Evening visit, no admission, open 24/7. Walk through chronologically from first to fourth term for the full narrative arc. Stay with group."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"🌹",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Thomas Jefferson Memorial",
+    desc:"Completed in 1943 and modeled after the Roman Pantheon, this classical memorial honors America's 3rd President and primary author of the Declaration of Independence. The 19-foot bronze statue stands inside a domed colonnade on the edge of the Tidal Basin. Particularly beautiful at night with the reflection in the water.",
+    info:"<b>Location:</b> South bank of the Tidal Basin | Evening visit, no admission, open 24/7. Jefferson's most famous words are carved into the walls. The reflective pool view is spectacular — great photo opportunity."
+  },
+  {
+    day:"Wednesday, May 13 — Washington, D.C. (Evening Memorials)",dayBg:"#8e4400",
+    icon:"✊",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Evening",c:"#555"}],
+    title:"Dr. Martin Luther King Jr. National Memorial",
+    desc:"Opened in 2011, this is the first memorial on the National Mall honoring an African American. The 30-foot Stone of Hope is carved from a single block of Chinese granite depicting Dr. King looking toward the Jefferson Memorial. A 450-foot granite wall features 14 quotes from his speeches and writings, including quotes on justice, democracy, and hope.",
+    info:"<b>Location:</b> West Potomac Park, near the Tidal Basin | Evening visit, no admission, open 24/7. Spend time reading the inscription wall. This is a place of inspiration and reflection — quiet, respectful behavior expected."
+  },
+  // ── MAY 14: NYC ──
+  {
+    day:"Thursday, May 14 — New York City",dayBg:"#8e44ad",
+    icon:"🏙️",iconBg:"#8e44ad20",
+    badges:[{l:"Transit Hub",c:"#8e44ad"},{l:"NYC Arrival",c:"#c0392b"}],
+    title:"Grand Central Terminal",
+    desc:"A National Historic Landmark and one of the world's most beautiful train stations, opened in 1913. The Main Concourse's celestial ceiling mural depicts 2,500 stars of the winter zodiac. Beneath the terminal lie 44 platforms across two underground levels — more than any other station in the world. An architectural and engineering masterpiece.",
+    info:"<b>Address:</b> 42nd St between Lexington and Vanderbilt Ave | <b>1:30 PM:</b> NY Course Leaders meet here. <b>1:45 PM:</b> Group drops here. Luggage assisted by NY Field Specialist. Stay together — Grand Central is enormous and crowded."
+  },
+  {
+    day:"Thursday, May 14 — New York City",dayBg:"#8e44ad",
+    icon:"🌐",iconBg:"#27ae6020",
+    badges:[{l:"Landmark",c:"#27ae60"},{l:"Photo Stop",c:"#555"}],
+    title:"United Nations Headquarters",
+    desc:"The global home of international diplomacy, established after World War II to promote peace and cooperation among nations. The 39-story glass Secretariat building is one of the most recognizable in the world. The campus sits on international territory on the East River. All 193 member nation flags fly outside in alphabetical order.",
+    info:"<b>Address:</b> First Ave between 42nd and 48th St | <b>Time:</b> 2:30 PM — exterior photo stop only. Stay on the sidewalk with the group. Excellent views of all 193 national flags. No entry tickets needed for this visit."
+  },
+  {
+    day:"Thursday, May 14 — New York City",dayBg:"#8e44ad",
+    icon:"📚",iconBg:"#c0392b20",
+    badges:[{l:"Landmark",c:"#c0392b"},{l:"Architecture",c:"#1a5276"}],
+    title:"New York Public Library — Schwarzman Building",
+    desc:"A Beaux-Arts masterpiece completed in 1911 and guarded by the famous marble lion statues 'Patience' and 'Fortitude' on Fifth Avenue. One of the world's greatest research libraries with over 55 million items. The Rose Main Reading Room — 297 feet long with hand-painted celestial ceilings — is considered one of the most beautiful rooms in New York City.",
+    info:"<b>Address:</b> Fifth Ave at 42nd St, Midtown | Free to enter public spaces. The Rose Reading Room on the 3rd floor is not to be missed. The lions out front are iconic for photos. Stay with the group."
+  },
+  {
+    day:"Thursday, May 14 — New York City",dayBg:"#8e44ad",
+    icon:"🍔",iconBg:"#e67e2220",
+    badges:[{l:"Dinner",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Schnipper's",
+    desc:"A beloved New York City fast-casual restaurant known for quality burgers, sandwiches, milkshakes, and American comfort food made with fresh, locally-sourced ingredients. A step well above typical fast food, Schnipper's has been a New York City staple since 2008, popular with the lunchtime crowd and after-work diners.",
+    info:"<b>Time:</b> 6:00 PM | NYC location | Pre-order pending — wait for Course Leader instructions. Dinner included. Vegetarian options available. The milkshakes are excellent if you have room in your budget!"
+  },
+  {
+    day:"Thursday, May 14 — New York City (Evening)",dayBg:"#6c3483",
+    icon:"🌆",iconBg:"#c0392b20",
+    badges:[{l:"Observation Deck",c:"#c0392b"},{l:"Confirmed",c:"#27ae60"}],
+    title:"Top of the Rock — Rockefeller Center",
+    desc:"The three-tiered observation deck atop 30 Rockefeller Plaza offering the best 360-degree views of Manhattan. The only observation deck where you can see the Empire State Building as part of the panorama. The open-air top deck has unobstructed views extending 50 miles on a clear day. Spectacular at sunset and after dark.",
+    info:"<b>Time:</b> 7:30 PM | <b>Confirmation:</b> #1372403200385 — pick up at will call. Airport-style security. Bring a jacket — significantly colder at the top. No large bags. Phones only (no selfie sticks). Stay together. Don't rush through — take in the views!"
+  },
+  {
+    day:"Thursday, May 14 — New York City (Evening)",dayBg:"#6c3483",
+    icon:"🎵",iconBg:"#c0392b20",
+    badges:[{l:"Rockefeller Center",c:"#c0392b"},{l:"Times Square",c:"#e67e22"}],
+    title:"Rockefeller Center &amp; Times Square Evening Sightseeing",
+    desc:"Rockefeller Center is a 22-acre Art Deco complex of 19 buildings including the famous ice rink (closed in summer), NBC Studios, and the Today Show. Times Square is the 'Crossroads of the World' — over 50 million visitors per year come to see the towering LED billboards, Broadway theaters, and neon-lit streets that pulse with energy 24/7.",
+    info:"<b>Sightseeing stops:</b> Rockefeller Center plaza, St. Patrick's Cathedral, NBC Store, Times Square. Stay with the group at all times. Be extremely careful with wallets and phones in crowded areas. No unauthorized purchases. Hotel check-in at 10:30 PM."
+  },
+  {
+    day:"Thursday, May 14 — New York City",dayBg:"#8e44ad",
+    icon:"🛏️",iconBg:"#0057b820",
+    badges:[{l:"Hotel",c:"#0057b8"},{l:"Stay: May 14–15",c:"#27ae60"}],
+    title:"Sheraton New York Times Square Hotel",
+    desc:"A landmark Midtown Manhattan hotel perfectly positioned in the heart of Times Square. Modern rooms, many with city views, and steps from Broadway theaters, world-class restaurants, Central Park, and every major NYC attraction. One of the most iconic hotel addresses in New York.",
+    info:"<b>Address:</b> 811 Seventh Ave at 53rd St, New York, NY 10019 | <b>Phone:</b> (212) 581-1000 | Check-in 10:30 PM. Curfew strictly enforced. Do not share room number with anyone. No visitors from outside the group."
+  },
+  // ── MAY 15 ──
+  {
+    day:"Friday, May 15 — New York City",dayBg:"#8e44ad",
+    icon:"☕",iconBg:"#e67e2220",
+    badges:[{l:"Breakfast",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Cook Eatery",
+    desc:"A Midtown Manhattan breakfast and lunch spot offering fast, quality American fare in a convenient location near Times Square and the theater district. Popular with tourists and the local working crowd, Cook Eatery is a reliable, efficient morning stop to fuel up before a big day in Lower Manhattan.",
+    info:"<b>Address:</b> 115 W 45th Street, New York, NY 10036 | <b>Time:</b> 7:30 AM | Breakfast included. Walk from hotel with Course Leaders. Quick-service — order and find a seat promptly to keep the group on schedule for the ferry."
+  },
+  {
+    day:"Friday, May 15 — New York City",dayBg:"#8e44ad",
+    icon:"🗽",iconBg:"#1a527620",
+    badges:[{l:"Iconic Landmark",c:"#1a5276"},{l:"Ferry Required",c:"#27ae60"}],
+    title:"Statue of Liberty — Ferry from Battery Park",
+    desc:"One of the world's most recognized symbols of freedom and democracy, a gift from France dedicated in 1886. The copper statue stands 305 feet from ground to torch and has greeted millions of immigrants arriving to America for over a century. The sculpture's full name is 'Liberty Enlightening the World.'",
+    info:"<b>Time:</b> 9:00 AM — ferry departs Battery Park, Lower Manhattan. <b>Airport-style security:</b> remove belts, empty pockets. <b>MINIMIZE bags</b> — less is much more here. Allow extra time for security lines. Keep your ferry ticket accessible at all times."
+  },
+  {
+    day:"Friday, May 15 — New York City",dayBg:"#8e44ad",
+    icon:"🕊️",iconBg:"#2c3e5020",
+    badges:[{l:"Memorial",c:"#2c3e50"},{l:"Solemn — Please Respect",c:"#7f8c8d"}],
+    title:"9/11 Memorial at the World Trade Center",
+    desc:"Two massive reflecting pools occupy the footprints of the original Twin Towers, surrounded by the largest man-made waterfalls in North America. The names of all 2,983 victims are inscribed in bronze around the pools. One of the most visited memorials in the world and a testament to resilience — the 104-floor One World Trade Center now rises beside it.",
+    info:"<b>Location:</b> World Trade Center site, Lower Manhattan | Outdoor memorial is free and open daily. Quiet, respectful behavior required — this is an active memorial visited by families of victims. Photography permitted with sensitivity."
+  },
+  {
+    day:"Friday, May 15 — New York City",dayBg:"#8e44ad",
+    icon:"🏛️",iconBg:"#2c3e5020",
+    badges:[{l:"Museum",c:"#2c3e50"},{l:"Confirmed",c:"#27ae60"}],
+    title:"9/11 Memorial Museum",
+    desc:"Located within the original footprint of the Twin Towers, this museum tells the full story of September 11 through thousands of artifacts, photographs, oral histories, and documentary footage. It contains the original 'slurry wall' that prevented the Hudson River from flooding lower Manhattan. One of the most powerful and emotional museums in the world.",
+    info:"<b>Time:</b> 1:30 PM | <b>Confirmation:</b> #5178584 | Enter at the <b>southeast corner</b> of the memorial plaza. Large museum — stay together. Some content is graphic and intense. Support one another. Photography restricted in certain memorial areas."
+  },
+  {
+    day:"Friday, May 15 — New York City",dayBg:"#8e44ad",
+    icon:"💸",iconBg:"#27ae6020",
+    badges:[{l:"Financial District",c:"#27ae60"},{l:"Historic",c:"#c0392b"}],
+    title:"Wall Street &amp; Financial District Sightseeing",
+    desc:"New York's oldest neighborhood and the beating heart of global finance. Key stops: the New York Stock Exchange (largest by market cap), the Charging Bull sculpture on Bowling Green, Federal Hall (where Washington was inaugurated as first president), Trinity Church (where Hamilton is buried), and the U.S. Customs House.",
+    info:"<b>Afternoon walk</b> after 9/11 Museum. Key stops: Federal Hall (26 Wall St), NYSE (11 Wall St), Trinity Church (Broadway at Wall St), U.S. Customs House (1 Bowling Green). Area gets very crowded — stay with group and watch your belongings carefully."
+  },
+  {
+    day:"Friday, May 15 — New York City (Evening)",dayBg:"#6c3483",
+    icon:"🍹",iconBg:"#e67e2220",
+    badges:[{l:"Dinner",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Margaritaville Restaurant NYC",
+    desc:"Jimmy Buffett's beloved tropical-themed restaurant brings island vibes to the heart of Times Square. Festive Caribbean-American food and atmosphere — great burgers, sandwiches, nachos, and tropical drinks (non-alcoholic for students!). An energetic, fun environment to gear up for a Broadway show.",
+    info:"<b>Address:</b> 560 Seventh Avenue, New York, NY 10018 | <b>Time:</b> 5:00 PM | Dinner included. Large, lively restaurant. Order promptly — the group must be at the theater by 7:00 PM curtain. Don't skip dinner; it's a long show!"
+  },
+  {
+    day:"Friday, May 15 — New York City (Evening)",dayBg:"#6c3483",
+    icon:"🧞",iconBg:"#9b59b620",
+    badges:[{l:"Broadway",c:"#9b59b6"},{l:"Confirmed",c:"#27ae60"}],
+    title:"\"Aladdin\" at the New Amsterdam Theatre",
+    desc:"Disney's Tony Award-winning Broadway musical brings the world of Agrabah to spectacular life with over 300 dazzling costumes, flying carpets, and incredible stagecraft. Features beloved songs including 'A Whole New World,' 'Friend Like Me,' and 'Prince Ali,' plus thrilling new numbers created exclusively for the stage. A must-see Broadway experience.",
+    info:"<b>Venue:</b> New Amsterdam Theatre, 214 W 42nd St | <b>Time:</b> 7:00 PM | <b>Confirmation:</b> #389320088 / #391841610 | Running time: ~2 hrs 30 mins. No late seating. <b>Silence your phone completely.</b> Dress smartly (smart casual at minimum). Stay in your assigned seats throughout."
+  },
+  {
+    day:"Friday, May 15 — New York City (Late Evening)",dayBg:"#6c3483",
+    icon:"📸",iconBg:"#c0392b20",
+    badges:[{l:"Times Square",c:"#c0392b"},{l:"Group Photo",c:"#27ae60"}],
+    title:"Times Square — Midnight Group Photo",
+    desc:"The 'Crossroads of the World' draws over 50 million visitors annually. Times Square pulses with energy 24/7 — towering LED billboards, Broadway marquees, and the famous New Year's Eve ball. The intersection of Broadway and Seventh Avenue from 42nd to 47th Streets is one of the most electric places on Earth, especially at night.",
+    info:"<b>Group photo location:</b> 46th Street between 7th and 8th Ave | <b>Time:</b> 10:00 PM | Stay together — Times Square is very crowded even late at night. <b>Be extremely careful with phones and wallets.</b> Walk back to hotel at 10:30 PM."
+  },
+  // ── MAY 16: HOME ──
+  {
+    day:"Saturday, May 16 — New York City / Travel Home",dayBg:"#555",
+    icon:"🎸",iconBg:"#e67e2220",
+    badges:[{l:"Breakfast",c:"#e67e22"},{l:"Included",c:"#27ae60"}],
+    title:"Hard Rock Cafe New York",
+    desc:"The New York flagship of the world-famous chain, located in Times Square and filled with authentic rock and roll memorabilia — guitars, stage costumes, and instruments from music legends spanning six decades. Known for classic American burgers, milkshakes, and an electric atmosphere that celebrates music history.",
+    info:"<b>Address:</b> 1501 Broadway at 43rd St, NY 10036 | <b>Time:</b> 7:30 AM | Breakfast included. Eat promptly — the day is busy. The adjacent gift shop is worth a quick browse for souvenirs if time allows."
+  },
+  {
+    day:"Saturday, May 16 — New York City / Travel Home",dayBg:"#555",
+    icon:"🌲",iconBg:"#27ae6020",
+    badges:[{l:"Park",c:"#27ae60"},{l:"Walking Tour",c:"#16a085"}],
+    title:"Central Park",
+    desc:"An 843-acre urban masterpiece designed by Frederick Law Olmsted and Calvert Vaux in 1858. Central Park receives over 42 million visitors each year — more than any park in the United States. Highlights include Bethesda Fountain, Strawberry Fields (John Lennon memorial), the Great Lawn, Belvedere Castle, and the iconic Bow Bridge over the Lake.",
+    info:"<b>Time:</b> 8:30 AM — subway from hotel with NY Course Leaders. Walking tour of the southern section. Comfortable walking shoes essential. Excellent photo opportunities at Bethesda Fountain and Bow Bridge. Stay with group."
+  },
+  {
+    day:"Saturday, May 16 — New York City / Travel Home",dayBg:"#555",
+    icon:"🌹",iconBg:"#c0392b20",
+    badges:[{l:"Landmark",c:"#c0392b"},{l:"Midtown",c:"#8e44ad"}],
+    title:"St. Patrick's Cathedral",
+    desc:"The largest Gothic-style Catholic cathedral in North America, built between 1858 and 1878. Its twin 330-foot spires are iconic features of the Midtown Manhattan skyline, directly across Fifth Avenue from Rockefeller Center. The interior features marble altars crafted in Italy, Germany, and the U.S., plus stunning stained glass windows from studios around the world.",
+    info:"<b>Address:</b> Fifth Ave between 50th and 51st St | Midtown sightseeing stop. Free to enter — entry may be limited during services. Quiet, respectful behavior inside. Photography permitted in the main nave."
+  },
+  {
+    day:"Saturday, May 16 — Travel Home",dayBg:"#555",
+    icon:"🛬",iconBg:"#0057b820",
+    badges:[{l:"Airport",c:"#0057b8"},{l:"Return Flight",c:"#c0392b"}],
+    title:"Newark Liberty International Airport (EWR)",
+    desc:"One of three major airports serving the New York metro area, located in Newark, New Jersey. Opened in 1928 as one of America's first commercial airports, Newark Liberty is now a major international hub operated by the Port Authority of New York and New Jersey. Home base for United Airlines.",
+    info:"<b>Drop off:</b> 4:00 PM | <b>Flight:</b> United UA1148, departs 6:00 PM | <b>$20 dinner allotment</b> — use at any airport restaurant. Course Leaders dismissed after check-in. Keep ID accessible. Be at your gate at least 60 mins before departure. Arrive SFO at 9:24 PM."
+  }
+];
+
+function badgeHtml(b, cls) {
+  return b.map(x => `<span class="${cls}" style="background:${x.c}">${x.l}</span>`).join('');
+}
+function groupByDay(arr) {
+  const out = [];
+  let cur = null;
+  arr.forEach(p => {
+    if (!cur || cur.day !== p.day) { cur = {day:p.day, bg:p.dayBg, items:[]}; out.push(cur); }
+    cur.items.push(p);
+  });
+  return out;
+}
+
+// ── SCREEN CARDS ──
+(function() {
+  const wrap = document.getElementById('screen-cards-section');
+  if (!wrap) return;
+  wrap.className = 'cards-section';
+  wrap.innerHTML = '<h2>📍 Destination Guide — Every Place On The Trip</h2><p class="sub">A card for every location across all 7 days — descriptions, context, and important logistics for each stop.</p>';
+  groupByDay(PLACES).forEach(g => {
+    const gDiv = document.createElement('div');
+    gDiv.className = 'day-group';
+    gDiv.innerHTML = `<div class="day-group-label" style="background:${g.bg}">${g.day}</div><div class="cards-grid"></div>`;
+    const grid = gDiv.querySelector('.cards-grid');
+    g.items.forEach(p => {
+      const c = document.createElement('div');
+      c.className = 'place-card';
+      c.innerHTML = `
+        <div class="card-icon" style="background:${p.iconBg}">${p.icon}</div>
+        <div class="card-badges">${badgeHtml(p.badges,'badge')}</div>
+        <div class="card-body">
+          <h3>${p.title}</h3>
+          <div class="desc">${p.desc}</div>
+          <div class="info-box"><strong>📌 Important Info</strong>${p.info}</div>
+        </div>`;
+      grid.appendChild(c);
+    });
+    wrap.appendChild(gDiv);
+  });
+})();
+
+// ── PRINT CARDS ──
+(function() {
+  const wrap = document.getElementById('print-cards-section');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="ppc-title">📍 Destination Guide — Every Place On The Trip</div><div class="ppc-sub">One card per location. Descriptions, context, and important logistics for every stop across all 7 days.</div>';
+  groupByDay(PLACES).forEach(g => {
+    const lbl = document.createElement('div');
+    lbl.className = 'pday-label';
+    lbl.style.background = g.bg;
+    lbl.textContent = g.day;
+    wrap.appendChild(lbl);
+    const grid = document.createElement('div');
+    grid.className = 'pcgrid';
+    g.items.forEach(p => {
+      const c = document.createElement('div');
+      c.className = 'pcard';
+      c.innerHTML = `
+        <div class="picon" style="background:${p.iconBg}">${p.icon}</div>
+        <div class="pbadges">${badgeHtml(p.badges,'pbadge')}</div>
+        <div class="ptitle">${p.title}</div>
+        <div class="pdesc">${p.desc}</div>
+        <div class="pinfo"><strong>📌 Important Info</strong> ${p.info}</div>`;
+      grid.appendChild(c);
+    });
+    wrap.appendChild(grid);
+  });
+})();
+</script>
 </body>
 </html>
