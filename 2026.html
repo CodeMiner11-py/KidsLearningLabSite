@@ -4,26 +4,25 @@
     <script src="/url_fixing_worker.js"></script>
     <meta charset="UTF-8">
     <title>Countdown to May 10, 2026 6:30 PM</title>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 2rem 1rem;
             font-family: 'Albert Sans', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             flex-direction: column;
             text-align: center;
             color: #fff;
-            /* animated gradient background */
             background: linear-gradient(-45deg, #1e3c72, #2a5298, #4facfe, #00f2fe);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            box-sizing: border-box;
         }
 
         @keyframes gradientBG {
@@ -34,9 +33,9 @@
 
         * { font-family: 'Albert Sans' !important; }
 
-        #title {
-            font-size: 3rem;
-            margin-bottom: 2rem;
+        .section-title {
+            font-size: 2.4rem;
+            margin-bottom: 1rem;
             animation: titleBounce 2s ease infinite;
         }
 
@@ -45,19 +44,29 @@
             50% { transform: translateY(-10px);}
         }
 
-        #countdown {
+        .section-desc {
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            opacity: 0.9;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .timer-row {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             font-size: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .time-box {
             background: rgba(255,255,255,0.15);
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             border-radius: 20px;
             display: flex;
             flex-direction: column;
-            min-width: 90px;
+            min-width: 80px;
             animation: pulse 1.5s infinite;
         }
 
@@ -68,67 +77,154 @@
         }
 
         .label {
-            font-size: 1rem;
+            font-size: 0.9rem;
             opacity: 0.9;
         }
 
-        /* subtle shadow for text */
-        #days, #hours, #minutes, #seconds {
+        .time-val {
             text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
         }
+
+        .divider {
+            width: 80%;
+            max-width: 600px;
+            height: 2px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 2px;
+            margin: 2.5rem auto;
+        }
+
+        .phase-block {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        /* Hide phases until relevant */
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div id="title">Countdown to Departure Time</div>
-    <p>A countdown to the very moment you should leave your house to drive to the San Francisco International Airport to meet for the Merryhill East Coast trip 2026.</p>
-    <div id="countdown">
-        <div class="time-box">
-            <div id="days">0</div>
-            <div id="days-label" class="label">Days</div>
+
+    <!-- PHASE 1: Countdown to departure -->
+    <div class="phase-block" id="phase1">
+        <div class="section-title">Countdown to Departure Time</div>
+        <p class="section-desc">A countdown to the very moment you should leave your house to drive to the San Francisco International Airport to meet for the Merryhill East Coast trip 2026.</p>
+        <div class="timer-row">
+            <div class="time-box"><div class="time-val" id="p1-days">0</div><div class="label">Days</div></div>
+            <div class="time-box"><div class="time-val" id="p1-hours">0</div><div class="label">Hours</div></div>
+            <div class="time-box"><div class="time-val" id="p1-minutes">0</div><div class="label">Minutes</div></div>
+            <div class="time-box"><div class="time-val" id="p1-seconds">0</div><div class="label">Seconds</div></div>
         </div>
-        <div class="time-box">
-            <div id="hours">0</div>
-            <div id="hours-label" class="label">Hours</div>
+    </div>
+
+    <!-- PHASE 2: Count-up since departure + countdown to trip end -->
+    <div class="phase-block hidden" id="phase2">
+        <div class="section-title">✈️ Trip in Progress!</div>
+        <p class="section-desc">You've been on the Merryhill East Coast Trip 2026 for:</p>
+        <div class="timer-row">
+            <div class="time-box"><div class="time-val" id="p2-up-days">0</div><div class="label">Days</div></div>
+            <div class="time-box"><div class="time-val" id="p2-up-hours">0</div><div class="label">Hours</div></div>
+            <div class="time-box"><div class="time-val" id="p2-up-minutes">0</div><div class="label">Minutes</div></div>
+            <div class="time-box"><div class="time-val" id="p2-up-seconds">0</div><div class="label">Seconds</div></div>
         </div>
-        <div class="time-box">
-            <div id="minutes">0</div>
-            <div id="minutes-label" class="label">Minutes</div>
+
+        <div class="divider"></div>
+
+        <p class="section-desc">Time remaining on the trip:</p>
+        <div class="timer-row">
+            <div class="time-box"><div class="time-val" id="p2-dn-days">0</div><div class="label">Days</div></div>
+            <div class="time-box"><div class="time-val" id="p2-dn-hours">0</div><div class="label">Hours</div></div>
+            <div class="time-box"><div class="time-val" id="p2-dn-minutes">0</div><div class="label">Minutes</div></div>
+            <div class="time-box"><div class="time-val" id="p2-dn-seconds">0</div><div class="label">Seconds</div></div>
         </div>
-        <div class="time-box">
-            <div id="seconds">0</div>
-            <div id="seconds-label" class="label">Seconds</div>
+    </div>
+
+    <!-- PHASE 3: Count-up since trip ended -->
+    <div class="phase-block hidden" id="phase3">
+        <div class="section-title">🏠 Back Home!</div>
+        <p class="section-desc">The Merryhill East Coast Trip 2026 ended. Time since the trip wrapped up:</p>
+        <div class="timer-row">
+            <div class="time-box"><div class="time-val" id="p3-days">0</div><div class="label">Days</div></div>
+            <div class="time-box"><div class="time-val" id="p3-hours">0</div><div class="label">Hours</div></div>
+            <div class="time-box"><div class="time-val" id="p3-minutes">0</div><div class="label">Minutes</div></div>
+            <div class="time-box"><div class="time-val" id="p3-seconds">0</div><div class="label">Seconds</div></div>
         </div>
     </div>
 
     <script>
-        const targetDate = new Date("May 10, 2026 18:30:00").getTime();
+        const departure = new Date("May 10, 2026 18:30:00").getTime();
+        const tripDurationMs = ((6 * 24) + 3) * 60 * 60 * 1000;
+        const tripEnd = departure + tripDurationMs;
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+        const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+        let secretOffset = 0;
 
-            if(distance < 0){
-                document.getElementById("days").innerText = 0;
-                document.getElementById("hours").innerText = 0;
-                document.getElementById("minutes").innerText = 0;
-                document.getElementById("seconds").innerText = 0;
-                clearInterval(countdownInterval);
-                return;
-            }
+        function getNow() { return Date.now() + secretOffset; }
 
-            const days = Math.floor(distance / (1000*60*60*24));
-            const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-            const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-            const seconds = Math.floor((distance % (1000*60)) / 1000);
+        // Secret: clicking the SECONDS number of the second (lower) counter adds +2 days per click.
+        // No cursor change, no visual feedback whatsoever.
+        // Phase 1 -> the only counter's seconds = p1-seconds
+        // Phase 2 -> the second counter (trip remaining) seconds = p2-dn-seconds
+        // Phase 3 -> the only counter's seconds = p3-seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            ['p1-seconds', 'p2-dn-seconds', 'p3-seconds'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        secretOffset += TWO_DAYS_MS;
+                        tick();
+                    });
+                }
+            });
+        });
 
-            document.getElementById("days").innerText = days;
-            document.getElementById("hours").innerText = hours;
-            document.getElementById("minutes").innerText = minutes;
-            document.getElementById("seconds").innerText = seconds;
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function msToComponents(ms) {
+            const abs = Math.abs(ms);
+            return {
+                days:    Math.floor(abs / (1000*60*60*24)),
+                hours:   Math.floor((abs % (1000*60*60*24)) / (1000*60*60)),
+                minutes: Math.floor((abs % (1000*60*60)) / (1000*60)),
+                seconds: Math.floor((abs % (1000*60)) / 1000)
+            };
         }
 
-        const countdownInterval = setInterval(updateCountdown, 1000);
-        updateCountdown();
+        function setTimer(prefix, t) {
+            document.getElementById(prefix + '-days').innerText    = t.days;
+            document.getElementById(prefix + '-hours').innerText   = pad(t.hours);
+            document.getElementById(prefix + '-minutes').innerText = pad(t.minutes);
+            document.getElementById(prefix + '-seconds').innerText = pad(t.seconds);
+        }
+
+        let currentPhase = 0;
+        function showPhase(n) {
+            if (currentPhase === n) return;
+            currentPhase = n;
+            document.getElementById('phase1').classList.toggle('hidden', n !== 1);
+            document.getElementById('phase2').classList.toggle('hidden', n !== 2);
+            document.getElementById('phase3').classList.toggle('hidden', n !== 3);
+        }
+
+        function tick() {
+            const now = getNow();
+
+            if (now < departure) {
+                showPhase(1);
+                setTimer('p1', msToComponents(departure - now));
+            } else if (now < tripEnd) {
+                showPhase(2);
+                setTimer('p2-up', msToComponents(now - departure));
+                setTimer('p2-dn', msToComponents(tripEnd - now));
+            } else {
+                showPhase(3);
+                setTimer('p3', msToComponents(now - tripEnd));
+            }
+        }
+
+        setInterval(tick, 1000);
+        tick();
     </script>
 </body>
 </html>
