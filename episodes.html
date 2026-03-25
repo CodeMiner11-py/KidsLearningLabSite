@@ -726,18 +726,32 @@
   loadMoreBtn.addEventListener('click', appendItems);
 
   /* ── Load RSS ── */
-  async function init() {
-    try {
-      const res  = await fetch(RSS_URL);
-      const text = await res.text();
-      allEpisodes = parseRSS(text);
-      filtered    = allEpisodes;
-      renderList();
-    } catch (e) {
-      listScroll.innerHTML = '<div class="ep-placeholder"><p>Could not load episodes. Please try again later.</p></div>';
-      console.error(e);
+async function init() {
+  try {
+    const res  = await fetch(RSS_URL);
+    const text = await res.text();
+    allEpisodes = parseRSS(text);
+    filtered    = allEpisodes;
+
+    // Get ?episode= from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const episodeDate = urlParams.get('episode');
+
+    renderList();
+
+    // If ?episode is present, try to find it
+    if (episodeDate) {
+      const targetIndex = filtered.findIndex(ep => {
+        // Compare only the date part (ignore time)
+        return new Date(ep.pubDate).toISOString().split('T')[0] === episodeDate;
+      });
+      if (targetIndex >= 0) playEpisode(targetIndex);
     }
+  } catch (e) {
+    listScroll.innerHTML = '<div class="ep-placeholder"><p>Could not load episodes. Please try again later.</p></div>';
+    console.error(e);
   }
+}
 
   init();
 })();
