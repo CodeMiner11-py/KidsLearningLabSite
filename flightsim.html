@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2D AeroPhysics Sim - A380</title>
+    <style>
+        body { margin: 0; background: #1a1a1a; color: #00ff00; font-family: 'Courier New', monospace; overflow: hidden; }
+        canvas { display: block; }
+        #hud {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0, 40, 0, 0.7); padding: 15px;
+            border: 1px solid #00ff00; border-radius: 5px;
+            pointer-events: none; line-height: 1.4;
+        }
+        #controls {
+            position: absolute; bottom: 20px; left: 20px;
+            font-size: 0.8em; color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div id="hud">
+    SPEED: <span id="spd">0</span> knots<br>
+    ALT : <span id="alt">0</span> ft<br>
+    V/S : <span id="vs">0</span> fpm<br>
+    THR : <span id="thr">0</span>% <span id="rev" style="color:red; display:none;">(REV)</span><br>
+    PITCH: <span id="pit">0</span>°
+</div>
+
+<div id="controls">
+    W/S: Pitch Up/Down | UP/DOWN: Throttle | R: Toggle Reverse Thrust | SPACE: Brakes
+</div>
+
+<canvas id="sim"></canvas>
+
+<script>
+const canvas = document.getElementById('sim');
+const ctx = canvas.getContext('2d');
+
+// --- Physics Constants ---
+const GRAVITY = 0.15;
+const DRAG_COEFF = 0.0002;
+const LIFT_COEFF = 0.0006;
+const MAX_THRUST = 0.8;
+const GROUND_Y = window.innerHeight - 100;
+
+// --- Aircraft State ---
+let plane = {
+    x: 200,
+    y: GROUND_Y,
+    vx: 0,
+    vy: 0,
+    pitch: 0, // Degrees
+    throttle: 0,
+    isReverse: false,
+    width: 120,
+    height: 40
+};
+
+// --- Input Handling ---
+let keys = {};
+window.addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if(e.key.toLowerCase() === 'r') plane.isReverse = !plane.isReverse;
+});
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+function update() {
+    // 1. Handle Inputs
+    if (keys['arrowup']) plane.throttle = Math.min(plane.throttle + 1, 100);
+    if (keys['arrowdown']) plane.throttle = Math.max(plane.throttle - 1, 0);
+    if (keys['w']) plane.pitch = Math.min(plane.pitch + 0.5, 20); // Nose Up
+    if (keys['s']) plane.pitch = Math.max(plane.pitch - 0.5, -10); // Nose Down
+
+    // 2. Calculate Forces
+    let speed = Math.sqrt(plane.vx**2 + plane.vy**2);
+
+    // Thrust
+    let currentThrust = (plane.throttle / 100) * MAX_THRUST;
+    if (plane.isReverse) currentThrust *= -0.4;
+
+    // Lift (Simplified: depends on speed^2 and pitch)
+    // We add a small base lift from AoA even at 0 pitch if moving fast
+    let lift = (speed**2) * LIFT_COEFF * (Math.sin(plane.pitch * Math.PI / 180) + 0.05);
+
+    // Drag
+    let drag = (speed**2) * DRAG_COEFF;
+
+    // 3. Apply Accelerations
+    plane.vx += currentThrust;
+    plane.vx -= (plane.vx > 0) ? drag : -drag;
+
+    // Vertical movement (Gravity vs Lift)
+    let netLift = lift - GRAVITY;
+    plane.vy -= netLift;
+
+    // 4. Position Update
+    plane.y += plane.vy;
+
+    // Ground Collision
+    if (plane.y >= GROUND_Y) {
+        plane.y = GROUND_Y;
+        plane.vy = 0;
+        // Ground friction
+        plane.vx *= 0.98;
+        if (keys[' ']) plane.vx *= 0.95; // Brakes
+        // Auto-level pitch on ground
+        if (plane.vx < 5) plane.pitch *= 0.9;
+    }
+
+    // Wrap X for infinite runway effect (or just keep moving)
+    // We'll move the "camera" instead of the plane.
+    draw();
+    requestAnimationFrame(update);
+}
+
+function draw() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Draw Runway
+    ctx.strokeStyle = '#444';
+    ctx.beginPath();
+    ctx.moveTo(0, GROUND_Y + 20);
+    ctx.lineTo(canvas.width, GROUND_Y + 20);
+    ctx.stroke();
+
+    // Draw Aircraft (A380 Side View Silhouette)
+    ctx.save();
+    ctx.translate(300, plane.y); // Lock horizontal camera on plane
+    ctx.rotate(-plane.pitch * Math.PI / 180);
+
+    ctx.fillStyle = '#ddd';
+    // Fuselage
+    ctx.fillRect(-60, -15, 120, 25);
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(-60, -10);
+    ctx.lineTo(-80, -40);
+    ctx.lineTo(-40, -10);
+    ctx.fill();
+    // Wing (side profile)
+    ctx.fillStyle = '#bbb';
+    ctx.fillRect(-10, 5, 40, 5);
+
+    ctx.restore();
+
+    // Update HUD
+    document.getElementById('spd').innerText = Math.round(plane.vx * 15);
+    document.getElementById('alt').innerText = Math.round((GROUND_Y - plane.y) * 2);
+    document.getElementById('vs').innerText = Math.round(-plane.vy * 600);
+    document.getElementById('thr').innerText = plane.throttle;
+    document.getElementById('pit').innerText = plane.pitch.toFixed(1);
+    document.getElementById('rev').style.display = plane.isReverse ? 'inline' : 'none';
+}
+
+update();
+</script>
+</body>
+</html>
