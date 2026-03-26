@@ -223,15 +223,13 @@
     <div class="content-box">
         <div class="hero">
             <img src="https://stickypng.com/wp-content/uploads/2023/07/62a4bbf6fdee15d2905007bb.png" width="35%"><br><br>
-            <div class="hero-badge">🐍 this summer &nbsp;·&nbsp; sign up now</div>
-            <h1>Register for <span>Python Learning Lab</span></h1>
+            <h1>Register for <span>Python Learning Lab Summer Course with Eshaan</span></h1>
             <p class="hero-sub">
                 Secure your spot in this 10-week live coding course for kids and teens (ages 6–14). Every Sunday this summer — go from zero to building your own Python project.
             </p>
             <div class="hero-price">$300</div>
-            <div class="hero-price-note">Full course · 10 sessions · 45 min each</div>
             <button class="cta-button-big" onclick="openModal()">Save My Spot →</button>
-            <p class="dates-note"><b>Dates:</b> Sundays, June 14 – August 16, 2026</p>
+            <button class="cta-button-big" onclick="goToPythonCourse()">See More Info</button>
         </div>
     </div>
 </main>
@@ -284,6 +282,10 @@
             closeBtn.style.display = 'block';
         }, 2000);
     }
+
+    function goToPythonCourse() {
+    window.location.href = "https://kidslearninglab.com/python_course";
+}
 
     function closeModal() {
         document.getElementById('overlay').classList.remove('active');
