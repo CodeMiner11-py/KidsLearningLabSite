@@ -13,6 +13,7 @@
 
     <style>
         * { font-family: "Albert Sans" !important; box-sizing: border-box; }
+        body { margin: 0; padding: 0; }
 
         .content-box {
             background: white;
@@ -128,15 +129,14 @@
             box-shadow: 0 8px 40px rgba(0,0,0,0.18);
             position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             transform: translateY(20px);
             transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
         }
 
-        .overlay.active .modal {
-            transform: translateY(0);
-        }
+        .overlay.active .modal { transform: translateY(0); }
 
         .spinner-wrap {
             display: flex;
@@ -162,7 +162,7 @@
             font-weight: 600;
         }
 
-        .modal-content { display: none; width: 100%; }
+        .modal-content { display: none; width: 100%; text-align: center; }
 
         .modal-close {
             position: absolute;
@@ -177,19 +177,34 @@
         }
         .modal-close:hover { color: #555; }
 
-        @media (max-width: 600px) {
-            .content-box { padding: 1.5rem 1.2rem; }
+        .payment-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #fff;
+            transition: transform 0.15s;
         }
+
+        .payment-btn:hover { transform: translateY(-2px); }
+
+        .stripe { background-color: #635bff; }
+        .paypal { background-color: #003087; }
+
+        .payment-btn img { height: 20px; }
+
+        @media (max-width: 600px) { .content-box { padding: 1.5rem 1.2rem; } }
     </style>
 </head>
 <body>
-
-<div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-</div>
 
 <header>
     <nav class="container">
@@ -242,61 +257,73 @@
             <div class="spinner-label">Loading…</div>
         </div>
         <div class="modal-content" id="modalContent">
-            <!-- blank -->
+            <h2>Select Payment Method</h2>
+            <button class="payment-btn stripe" onclick="openStripeModal()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Stripe_Logo%2C_revised_2016.svg" alt="Stripe logo">
+                Credit/Debit Card (powered by Stripe)
+            </button>
+            <button class="payment-btn paypal" onclick="openPayPalModal()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal logo">
+                PayPal
+            </button>
         </div>
     </div>
 </div>
 
 <div id="footer"></div>
 <script>
-    fetch("footer.html")
-        .then(response => response.text())
-        .then(data => { document.getElementById("footer").innerHTML = data; });
+fetch("footer.html")
+    .then(response => response.text())
+    .then(data => { document.getElementById("footer").innerHTML = data; });
 </script>
 
 <script>
-    function toggleMenu() {
-        const nav = document.getElementById('navLinks');
-        const container = document.getElementById('mobileNav');
-        const hamburger = document.querySelector('.hamburger');
-        container.classList.toggle('show');
-        hamburger.classList.toggle('open');
-    }
-
-    function openModal() {
-        const overlay = document.getElementById('overlay');
-        const spinnerWrap = document.getElementById('spinnerWrap');
-        const modalContent = document.getElementById('modalContent');
-        const closeBtn = document.getElementById('closeBtn');
-
-        spinnerWrap.style.display = 'flex';
-        modalContent.style.display = 'none';
-        closeBtn.style.display = 'none';
-
-        overlay.classList.add('active');
-
-        setTimeout(() => {
-            spinnerWrap.style.display = 'none';
-            modalContent.style.display = 'block';
-            closeBtn.style.display = 'block';
-        }, 2000);
-    }
-
-    function goToPythonCourse() {
-    window.location.href = "https://kidslearninglab.com/python_course";
+function toggleMenu() {
+    const nav = document.getElementById('navLinks');
+    const container = document.getElementById('mobileNav');
+    const hamburger = document.querySelector('.hamburger');
+    container.classList.toggle('show');
+    hamburger.classList.toggle('open');
 }
 
-    function closeModal() {
-        document.getElementById('overlay').classList.remove('active');
-    }
+function openModal() {
+    const overlay = document.getElementById('overlay');
+    const spinnerWrap = document.getElementById('spinnerWrap');
+    const modalContent = document.getElementById('modalContent');
+    const closeBtn = document.getElementById('closeBtn');
 
-    function handleOverlayClick(e) {
-        if (e.target === document.getElementById('overlay')) closeModal();
-    }
+    spinnerWrap.style.display = 'flex';
+    modalContent.style.display = 'none';
+    closeBtn.style.display = 'none';
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeModal();
-    });
+    overlay.classList.add('active');
+
+    setTimeout(() => {
+        spinnerWrap.style.display = 'none';
+        modalContent.style.display = 'block';
+        closeBtn.style.display = 'block';
+    }, 2000);
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('active'); }
+
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function goToPythonCourse() { window.location.href = "https://kidslearninglab.com/python_course"; }
+
+function openStripeModal() {
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = '<h2>Stripe Payment</h2><p>(blank)</p>';
+}
+
+function openPayPalModal() {
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = '<h2>PayPal Payment</h2><p>(blank)</p>';
+}
 </script>
 
 </body>
