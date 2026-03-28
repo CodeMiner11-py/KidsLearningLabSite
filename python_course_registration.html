@@ -309,6 +309,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 .pay-btn-stripe:hover { background: #4f46e5; box-shadow: 0 6px 22px rgba(99,91,255,0.38); }
 .pay-btn-paypal { background: #003087; box-shadow: 0 4px 16px rgba(0,48,135,0.22); }
 .pay-btn-paypal:hover { background: #002268; box-shadow: 0 6px 22px rgba(0,48,135,0.32); }
+.pay-btn-venmo { background: #3D95CE; box-shadow: 0 4px 16px rgba(61,149,206,0.28); }
+.pay-btn-venmo:hover { background: #2d7eb0; box-shadow: 0 6px 22px rgba(61,149,206,0.38); }
+.pay-btn-zelle { background: #6D1ED4; box-shadow: 0 4px 16px rgba(109,30,212,0.28); }
+.pay-btn-zelle:hover { background: #5a18b0; box-shadow: 0 6px 22px rgba(109,30,212,0.38); }
 
 .pay-btn svg { flex-shrink: 0; }
 
@@ -407,7 +411,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="slide active" data-index="0">
         <div class="slide-eyebrow">Step 1 of 6</div>
         <h2 class="slide-title">About the student</h2>
-        <p class="slide-sub">Let's start with some basics about your child.</p>
+        <p class="slide-sub">Your child's information.</p>
 
         <div class="field">
           <label for="kidName">Kid's Full Name</label>
@@ -534,8 +538,39 @@ input[type=range]::-webkit-slider-thumb:hover {
           </a>
           <div class="pay-divider">or</div>
           <a class="pay-btn pay-btn-paypal" id="paypalBtn" href="/course/paypal.html?payment=300">
+            <!-- PayPal wordmark SVG -->
             <svg height="20" viewBox="0 0 101 32" xmlns="http://www.w3.org/2000/svg" fill="white"><path d="M 12.237 2.8 L 4.437 2.8 C 3.937 2.8 3.437 3.2 3.337 3.7 L 0.237 23.7 C 0.137 24.1 0.437 24.4 0.837 24.4 L 4.537 24.4 C 5.037 24.4 5.537 24 5.637 23.5 L 6.437 18.1 C 6.537 17.6 6.937 17.2 7.537 17.2 L 10.037 17.2 C 15.137 17.2 18.137 14.7 18.937 9.8 C 19.237 7.7 18.937 6 17.937 4.8 C 16.837 3.5 14.837 2.8 12.237 2.8 Z M 13.137 10.1 C 12.737 12.9 10.537 12.9 8.537 12.9 L 7.337 12.9 L 8.137 7.7 C 8.137 7.4 8.437 7.2 8.737 7.2 L 9.237 7.2 C 10.637 7.2 11.937 7.2 12.637 8 C 13.137 8.4 13.337 9.1 13.137 10.1 Z M 35.437 10 L 31.737 10 C 31.437 10 31.137 10.2 31.137 10.5 L 30.937 11.5 L 30.637 11.1 C 29.737 9.8 27.837 9.4 25.937 9.4 C 21.637 9.4 17.937 12.7 17.237 17.3 C 16.837 19.6 17.337 21.8 18.637 23.3 C 19.837 24.7 21.537 25.3 23.537 25.3 C 27.037 25.3 28.937 23.1 28.937 23.1 L 28.737 24.1 C 28.637 24.5 28.937 24.8 29.337 24.8 L 32.737 24.8 C 33.237 24.8 33.737 24.4 33.837 23.9 L 35.937 10.7 C 36.037 10.4 35.737 10 35.437 10 Z M 30.037 17.4 C 29.637 19.6 27.937 21.2 25.637 21.2 C 24.537 21.2 23.637 20.8 23.037 20.1 C 22.437 19.4 22.237 18.4 22.437 17.3 C 22.737 15.1 24.537 13.5 26.737 13.5 C 27.837 13.5 28.737 13.9 29.337 14.6 C 29.937 15.4 30.137 16.3 30.037 17.4 Z M 55.337 10 L 51.637 10 C 51.237 10 50.937 10.2 50.737 10.5 L 45.537 18.2 L 43.337 10.8 C 43.237 10.3 42.737 10 42.337 10 L 38.637 10 C 38.237 10 37.937 10.4 38.037 10.8 L 42.137 23.2 L 38.337 28.6 C 38.037 29 38.337 29.6 38.837 29.6 L 42.537 29.6 C 42.937 29.6 43.237 29.4 43.437 29.1 L 55.837 10.9 C 56.137 10.6 55.837 10 55.337 10 Z"/><path d="M 67.737 2.8 L 59.937 2.8 C 59.437 2.8 58.937 3.2 58.837 3.7 L 55.737 23.6 C 55.637 24 55.937 24.3 56.337 24.3 L 60.337 24.3 C 60.737 24.3 61.037 24 61.037 23.7 L 61.937 18 C 62.037 17.5 62.437 17.1 63.037 17.1 L 65.537 17.1 C 70.637 17.1 73.637 14.6 74.437 9.7 C 74.737 7.6 74.437 5.9 73.437 4.7 C 72.237 3.5 70.337 2.8 67.737 2.8 Z M 68.637 10.1 C 68.237 12.9 66.037 12.9 64.037 12.9 L 62.837 12.9 L 63.637 7.7 C 63.637 7.4 63.937 7.2 64.237 7.2 L 64.737 7.2 C 66.137 7.2 67.437 7.2 68.137 8 C 68.637 8.4 68.737 9.1 68.637 10.1 Z M 90.937 10 L 87.237 10 C 86.937 10 86.637 10.2 86.637 10.5 L 86.437 11.5 L 86.137 11.1 C 85.237 9.8 83.337 9.4 81.437 9.4 C 77.137 9.4 73.437 12.7 72.737 17.3 C 72.337 19.6 72.837 21.8 74.137 23.3 C 75.337 24.7 77.037 25.3 79.037 25.3 C 82.537 25.3 84.437 23.1 84.437 23.1 L 84.237 24.1 C 84.137 24.5 84.437 24.8 84.837 24.8 L 88.237 24.8 C 88.737 24.8 89.237 24.4 89.337 23.9 L 91.437 10.7 C 91.537 10.4 91.237 10 90.937 10 Z M 85.437 17.4 C 85.037 19.6 83.337 21.2 81.037 21.2 C 79.937 21.2 79.037 20.8 78.437 20.1 C 77.837 19.4 77.637 18.4 77.837 17.3 C 78.137 15.1 79.937 13.5 82.137 13.5 C 83.237 13.5 84.137 13.9 84.737 14.6 C 85.437 15.4 85.537 16.3 85.437 17.4 Z M 95.337 3.3 L 92.137 23.6 C 92.037 24 92.337 24.3 92.737 24.3 L 95.937 24.3 C 96.437 24.3 96.937 23.9 97.037 23.4 L 100.237 3.5 C 100.337 3.1 100.037 2.8 99.637 2.8 L 96.037 2.8 C 95.637 2.8 95.437 3 95.337 3.3 Z"/></svg>
             Pay with PayPal
+          </a>
+          <div class="pay-divider">or</div>
+          <a class="pay-btn pay-btn-venmo" id="venmoBtn" href="/course/venmo.html?payment=300">
+            <!-- Venmo wordmark SVG -->
+            <svg height="20" viewBox="0 0 111 32" xmlns="http://www.w3.org/2000/svg" fill="white" aria-label="Venmo">
+              <path d="M10.5 1.2c.8 1.3 1.2 2.7 1.2 4.5 0 5.6-4.8 12.9-8.7 18H.3L0 1.6l7.2-.7.2 11.3c1.7-2.8 3.8-7.1 3.8-10.1 0-1.6-.3-2.7-.7-3.6L10.5 1.2z"/>
+              <path d="M22.7 12.4c0 3.3-2.9 10.6-7.3 10.6-2.1 0-3.1-1.5-3.1-3.6 0-3.3 2.9-10.7 7.4-10.7 2.2 0 3 1.6 3 3.7zm7.3-1.5c0-4.2-2.4-6.9-7.3-6.9-7.7 0-13.4 7.6-13.4 15.3 0 4.7 2.5 7.7 7.3 7.7 7.4 0 13.4-7.8 13.4-16.1z"/>
+              <path d="M55.1 4.2c0 5.6-3.4 13.1-5.6 18.1h-7.1l-2.3-16.5-5.4 16.5h-7.1L24.5 4.2l7-.4 1.7 13.5 5.5-13.5h6.6l2.4 13.5 5.2-13.5 2.2.4z"/>
+              <path d="M67.8 4.2L55.6 22.3h-7l-2.5-18.1 7-.4 1 14.4 7.9-14.4 5.8.4z"/>
+              <path d="M84.5 12.4c0 3.3-2.9 10.6-7.3 10.6-2.1 0-3.1-1.5-3.1-3.6 0-3.3 2.9-10.7 7.4-10.7 2.2 0 3 1.6 3 3.7zm7.3-1.5c0-4.2-2.4-6.9-7.3-6.9-7.7 0-13.4 7.6-13.4 15.3 0 4.7 2.5 7.7 7.3 7.7 7.4 0 13.4-7.8 13.4-16.1z"/>
+              <path d="M110.9 22.3h-6.8V12c0-2.3-.8-3.2-2.5-3.2-2 0-3.3 1.3-3.3 4v9.5h-6.8V12c0-2.3-.8-3.2-2.5-3.2-2 0-3.3 1.3-3.3 4v9.5H79V4.6h6.4v2.5c1.2-1.8 3.2-2.8 5.8-2.8 2.6 0 4.6 1.1 5.6 3.2 1.3-2 3.5-3.2 6.2-3.2 4.1 0 7 2.4 7 7.6v10.4z"/>
+            </svg>
+            Pay with Venmo
+          </a>
+          <div class="pay-divider">or</div>
+          <a class="pay-btn pay-btn-zelle" id="zelleBtn" href="/course/zelle.html?payment=300">
+            <!-- Zelle wordmark SVG -->
+            <svg height="22" viewBox="0 0 80 32" xmlns="http://www.w3.org/2000/svg" fill="white" aria-label="Zelle">
+              <!-- Z -->
+              <path d="M4 6h14l-10 14h10v6H4v-6l10-14H4z"/>
+              <!-- e -->
+              <path d="M24 18c.3 2 1.5 3 3.2 3 1.2 0 2.2-.5 2.8-1.4l4.8 1.2C33.3 23.7 30.9 25 27.2 25c-5 0-8.2-3.2-8.2-7.5 0-4.2 3.1-7.5 7.8-7.5 4.8 0 7.6 3.3 7.6 7.5 0 .5-.1 1-.1 1H24zm6.8-3c-.2-1.7-1.4-2.7-3-2.7-1.6 0-2.8 1-3.2 2.7h6.2z"/>
+              <!-- l -->
+              <path d="M39 6h5v19h-5z"/>
+              <!-- l -->
+              <path d="M47 6h5v19h-5z"/>
+              <!-- e -->
+              <path d="M59 18c.3 2 1.5 3 3.2 3 1.2 0 2.2-.5 2.8-1.4l4.8 1.2C68.3 23.7 65.9 25 62.2 25c-5 0-8.2-3.2-8.2-7.5 0-4.2 3.1-7.5 7.8-7.5 4.8 0 7.6 3.3 7.6 7.5 0 .5-.1 1-.1 1H59zm6.8-3c-.2-1.7-1.4-2.7-3-2.7-1.6 0-2.8 1-3.2 2.7h6.2z"/>
+            </svg>
+            Pay with Zelle
           </a>
         </div>
 
@@ -591,8 +626,10 @@ function updatePaymentLinks() {
   const amountStr = '$' + amount;
   document.getElementById('paymentAmount').textContent = amountStr;
   document.getElementById('paymentAmountNote').textContent = amountStr;
-  document.getElementById('stripeBtn').href = `/course/stripe.html?payment=${amount}`;
-  document.getElementById('paypalBtn').href = `/course/paypal.html?payment=${amount}`;
+  document.getElementById('stripeBtn').href  = `/course/stripe.html?payment=${amount}`;
+  document.getElementById('paypalBtn').href  = `/course/paypal.html?payment=${amount}`;
+  document.getElementById('venmoBtn').href   = `/course/venmo.html?payment=${amount}`;
+  document.getElementById('zelleBtn').href   = `/course/zelle.html?payment=${amount}`;
 }
 
 function showSlide(idx, dir) {
