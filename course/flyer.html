@@ -279,4 +279,23 @@
 </div>
 
 </body>
+
+<footer>
+
+    <button id="downloadFlyer" style="margin:20px; padding:10px 20px; font-size:16px; font-family: var(--sans);">Download Flyer as PNG</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  document.getElementById('downloadFlyer').addEventListener('click', function() {
+    const flyer = document.querySelector('.flyer');
+    html2canvas(flyer).then(canvas => {
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'PythonLearningLabFlyer.png';
+      link.click();
+    });
+  });
+</script>
+</footer>
+
 </html>
