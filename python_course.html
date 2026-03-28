@@ -63,17 +63,77 @@
             line-height: 1.6;
         }
 
-        .hero-price {
+        /* ── Pricing Cards ── */
+        .pricing-row {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            margin: 0 auto 1.8rem;
+            flex-wrap: wrap;
+            max-width: 580px;
+        }
+
+        .pricing-card {
+            flex: 1;
+            min-width: 220px;
+            border-radius: 14px;
+            padding: 1.4rem 1.5rem;
+            text-align: center;
+            border: 2px solid #e8eef8;
+            background: #f8faff;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: #3a7bd5;
+            background: #f0f5ff;
+        }
+
+        .pricing-card .badge-top {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3a7bd5;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .pricing-card .plan-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #3a7bd5;
+            margin-bottom: 0.4rem;
+        }
+
+        .pricing-card .plan-price {
             font-size: 2.4rem;
             font-weight: 900;
             color: #111;
-            margin-bottom: 0.25rem;
+            line-height: 1;
+            margin-bottom: 0.2rem;
         }
 
-        .hero-price-note {
-            font-size: 0.9rem;
+        .pricing-card .plan-note {
+            font-size: 0.8rem;
             color: #888;
-            margin-bottom: 1.8rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .pricing-card .plan-desc {
+            font-size: 0.88rem;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 1.1rem;
         }
 
         /* ── CTA Button ── */
@@ -104,6 +164,32 @@
         .cta-button-big.yellow:hover {
             background: #e6c200;
         }
+
+        .cta-button-sm {
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 800;
+            padding: 0.65rem 1.4rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .cta-button-sm.blue {
+            background: #3a7bd5;
+            color: #fff !important;
+            box-shadow: 0 3px 12px rgba(58,123,213,0.3);
+        }
+
+        .cta-button-sm.blue:hover { background: #2a5cb5; transform: translateY(-1px); }
+
+        .cta-button-sm.yellow {
+            background: #FFD700;
+            color: #111 !important;
+            box-shadow: 0 3px 12px rgba(255,215,0,0.35);
+        }
+
+        .cta-button-sm.yellow:hover { background: #e6c200; transform: translateY(-1px); }
 
         /* ── Section titles ── */
         .section-title {
@@ -240,6 +326,34 @@
             margin: 0 0 1.6rem;
         }
 
+        .bottom-cta-pricing {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .bottom-cta-price-item {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 0.9rem 1.6rem;
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .bottom-cta-price-item .price {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #FFD700;
+        }
+
+        .bottom-cta-price-item .type {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
         .dates-note {
             font-size: 0.88rem;
             color: #888;
@@ -249,6 +363,7 @@
 
         @media (max-width: 600px) {
             .content-box { padding: 1.5rem 1.2rem; }
+            .pricing-row { flex-direction: column; }
         }
     </style>
 </head>
@@ -268,22 +383,22 @@
             <span>Kids Learning Lab™</span>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="episodes.html">Episodes</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="python.html">Python Learning Lab</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="availability.html">Where to Listen</a></li>
+            <li><a href='/'>Home</a></li>
+            <li><a href='/episodes'>Episodes</a></li>
+            <li><a href='/about'>About</a></li>
+            <li><a href='/python'>Python Learning Lab</a></li>
+            <li><a href='/contact'>Contact</a></li>
+            <li><a href='/availability'>Where to Listen</a></li>
         </ul>
         <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
         <div class="mobile-nav-container" id="mobileNav">
             <ul class="nav-links" id="navLinks">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="episodes.html">Episodes</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="python.html">Python Learning Lab</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="availability.html">Where to Listen</a></li>
+                <li><a href='/'>Home</a></li>
+                <li><a href='/episodes'>Episodes</a></li>
+                <li><a href='/about'>About</a></li>
+                <li><a href='/python'>Python Learning Lab</a></li>
+                <li><a href='/contact'>Contact</a></li>
+                <li><a href='/availability'>Where to Listen</a></li>
             </ul>
         </div>
     </nav>
@@ -294,15 +409,32 @@
     <!-- ── HERO ── -->
     <div class="content-box">
         <div class="hero">
-                        <img src="https://stickypng.com/wp-content/uploads/2023/07/62a4bbf6fdee15d2905007bb.png" width="35%"><br>
+            <img src="https://stickypng.com/wp-content/uploads/2023/07/62a4bbf6fdee15d2905007bb.png" width="35%"><br>
             <div class="hero-badge">🐍 this summer &nbsp;·&nbsp; sign up now</div>
             <h1>Learn Python with <span>Eshaan</span> — This Summer</h1>
             <p class="hero-sub">
                 A 10-week live coding course for kids and teens (ages 6-14). Go from no coding experience to building your own Python project every Sunday in summer.
             </p>
-            <div class="hero-price">$300</div>
-            <div class="hero-price-note">Full course · 10 sessions · 45 min each</div>
-            <a class="cta-button-big" href="python_course_registration.html">Save My Spot →</a>
+
+            <!-- Pricing cards -->
+            <div class="pricing-row">
+                <div class="pricing-card">
+                    <div class="plan-name">Group Class</div>
+                    <div class="plan-price">$300</div>
+                    <div class="plan-note">Full course · 10 sessions · 45 min each</div>
+                    <div class="plan-desc">Learn alongside other kids in a fun, collaborative live session.</div>
+                    <a class="cta-button-sm blue" href="/python_course_registration">Save My Spot →</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="badge-top">⭐ Most Personal</div>
+                    <div class="plan-name">1-on-1 Class</div>
+                    <div class="plan-price">$450</div>
+                    <div class="plan-note">Full course · 10 sessions · 45 min each</div>
+                    <div class="plan-desc">Dedicated attention tailored entirely to your child's pace and questions.</div>
+                    <a class="cta-button-sm yellow" href="/python_course_registration">Save My Spot →</a>
+                </div>
+            </div>
+
             <a class="cta-button-big yellow" href="#learn">What will I learn?</a>
             <p class="dates-note"><b>Dates:</b> Sundays, June 14 – August 16, 2026</p>
         </div>
@@ -343,7 +475,7 @@
 
         <hr class="divider">
         <div style="text-align:center;">
-            <a class="cta-button-big yellow" href="python_course_registration.html">Register Now!</a>
+            <a class='cta-button-big yellow' href='/python_course_registration'>Register Now!</a>
         </div>
     </div>
 
@@ -411,8 +543,18 @@
         <div class="bottom-cta">
             <h2>Register Now</h2>
             <p>Register now to secure your place for this summer!</p>
-            <a class="cta-button-big yellow" href="python_course_registration.html">Sign Up →</a>
-            <p style="font-size:0.85rem; opacity:0.75; margin-top:1rem;">$300 · 10 Sundays · June 14 – August 16, 2026</p>
+            <div class="bottom-cta-pricing">
+                <div class="bottom-cta-price-item">
+                    <div class="price">$300</div>
+                    <div class="type">Group Class</div>
+                </div>
+                <div class="bottom-cta-price-item">
+                    <div class="price">$450</div>
+                    <div class="type">1-on-1 Class</div>
+                </div>
+            </div>
+            <a class='cta-button-big yellow' href='/python_course_registration'>Sign Up →</a>
+            <p style="font-size:0.85rem; opacity:0.75; margin-top:1rem;">10 Sundays · June 14 – August 16, 2026</p>
         </div>
     </div>
 
