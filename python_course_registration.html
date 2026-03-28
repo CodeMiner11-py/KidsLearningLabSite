@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js?render=6LeZGZssAAAAACQ_gRJe-b302vXmkA6jdi3kZHoW"></script>
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -219,7 +220,6 @@ html, body {
 .class-card:hover { border-color: #b0c4f5; background: #f9fbff; }
 .class-card.selected { border-color: var(--accent); background: var(--accent-light); }
 
-.class-card-icon { font-size: 1.9rem; margin-bottom: 0.5rem; }
 .class-card-title { font-size: 0.88rem; font-weight: 800; color: var(--ink); margin-bottom: 0.15rem; }
 .class-card-price { font-size: 1.15rem; font-weight: 800; color: var(--accent); margin-bottom: 0.3rem; letter-spacing: -0.02em; }
 .class-card-desc { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.4; }
@@ -363,6 +363,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 }
 
 .btn-next:hover { background: #1444b8; transform: translateY(-1px); box-shadow: 0 4px 14px var(--accent-glow); }
+.btn-next:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .btn-back {
   display: inline-flex;
@@ -517,7 +518,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
         <div class="nav-row">
           <button class="btn-back" onclick="prevSlide(4)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back</button>
-          <button class="btn-next" onclick="nextSlide(4)">Continue <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn-next" id="submitBtn" onclick="nextSlide(4)">Continue <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
       </div>
 
@@ -550,6 +551,9 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 
 <script>
+const WORKER_URL = "https://course-registration.nameless-cherry-998c.workers.dev";
+const RECAPTCHA_SITE_KEY = "6LeZGZssAAAAACQ_gRJe-b302vXmkA6jdi3kZHoW";
+
 let currentSlide = 0;
 let selectedClass = null;
 const totalSlides = 6;
@@ -585,14 +589,10 @@ function selectClass(type) {
 function updatePaymentLinks() {
   const amount = selectedClass === '1on1' ? 450 : 300;
   const amountStr = '$' + amount;
-  const el1 = document.getElementById('paymentAmount');
-  const el2 = document.getElementById('paymentAmountNote');
-  const stripe = document.getElementById('stripeBtn');
-  const paypal = document.getElementById('paypalBtn');
-  if (el1) el1.textContent = amountStr;
-  if (el2) el2.textContent = amountStr;
-  if (stripe) stripe.href = `/course/stripe.html?payment=${amount}`;
-  if (paypal) paypal.href = `/course/paypal.html?payment=${amount}`;
+  document.getElementById('paymentAmount').textContent = amountStr;
+  document.getElementById('paymentAmountNote').textContent = amountStr;
+  document.getElementById('stripeBtn').href = `/course/stripe.html?payment=${amount}`;
+  document.getElementById('paypalBtn').href = `/course/paypal.html?payment=${amount}`;
 }
 
 function showSlide(idx, dir) {
@@ -652,8 +652,53 @@ function validateSlide(idx) {
   return true;
 }
 
-function nextSlide(idx) {
+async function submitRegistration() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const recaptchaToken = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'register' });
+
+  const payload = {
+    recaptchaToken,
+    kidName: document.getElementById('kidName').value.trim(),
+    kidEmail: document.getElementById('kidEmail').value.trim(),
+    kidAge: parseInt(document.getElementById('kidAge').value),
+    parentName: document.getElementById('parentName').value.trim(),
+    parentEmail: document.getElementById('parentEmail').value.trim(),
+    parentPhone: document.getElementById('parentPhone').value.trim(),
+    classType: selectedClass,
+    pythonLevel: parseInt(document.getElementById('knowledgeSlider').value),
+  };
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await res.json();
+    if (!result.success) {
+      alert('Submission failed. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = 'Continue <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      return false;
+    }
+    return true;
+  } catch (e) {
+    alert('Network error. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = 'Continue <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return false;
+  }
+}
+
+async function nextSlide(idx) {
   if (!validateSlide(idx)) return;
+  if (idx === 4) {
+    const ok = await submitRegistration();
+    if (!ok) return;
+  }
   if (idx < totalSlides - 1) {
     showSlide(idx + 1, 'forward');
     if (idx + 1 === 5) updatePaymentLinks();
