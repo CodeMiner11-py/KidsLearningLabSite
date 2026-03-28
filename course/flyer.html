@@ -4,23 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Python Learning Lab – Kids Learning Lab™</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,600;0,900;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;600;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f5f7fa;
     --surface: #ffffff;
-    --surface2: #eef1f7;
+    --surface2: #f1f5f9;
     --accent: #1a6cff;
     --accent2: #00c48c;
     --accent3: #ff6b35;
     --snake: #3ecf8e;
     --text: #0d1117;
     --text2: #4b5563;
-    --text3: #6b7280;
     --border: #e2e8f0;
     --mono: 'Space Mono', monospace;
     --sans: 'DM Sans', sans-serif;
-    --radius: 12px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,617 +28,255 @@
     font-family: var(--sans);
     color: var(--text);
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
   .flyer {
     width: 816px;
-    min-height: 1056px;
-    margin: 32px auto;
+    height: 1056px;
+    margin: 20px auto;
     background: var(--surface);
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 8px 48px rgba(0,0,0,0.10);
-  }
-
-  /* ── Top bar ── */
-  .top-bar {
-    background: var(--text);
-    color: #fff;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 36px;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-  }
-  .top-bar .logo { font-weight: 700; font-size: 14px; letter-spacing: 0.02em; }
-  .top-bar .logo span { color: var(--snake); }
-  .top-bar .tagline { color: #9ca3af; font-size: 11px; }
-
-  /* ── Hero ── */
-  .hero {
-    background: linear-gradient(135deg, #0d1117 0%, #1a2540 60%, #0f2744 100%);
-    padding: 48px 36px 44px;
-    position: relative;
+    flex-direction: column;
     overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 320px; height: 320px;
-    background: radial-gradient(circle, rgba(26,108,255,0.18) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero::after {
-    content: '{ }';
-    position: absolute;
-    bottom: -20px; right: 30px;
-    font-family: var(--mono);
-    font-size: 140px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.03);
-    pointer-events: none;
-    letter-spacing: -10px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.1);
   }
 
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(62,207,142,0.15);
-    border: 1px solid rgba(62,207,142,0.35);
-    color: var(--snake);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 5px 12px;
-    border-radius: 99px;
-    margin-bottom: 20px;
-    letter-spacing: 0.08em;
-  }
-  .hero-eyebrow .dot {
-    width: 6px; height: 6px;
-    background: var(--snake);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #1a2540 100%);
+    padding: 35px 45px 30px;
+    position: relative;
+    color: white;
   }
 
   .hero h1 {
-    font-family: var(--sans);
     font-size: 36px;
     font-weight: 900;
-    line-height: 1.15;
-    color: #fff;
-    max-width: 520px;
-    margin-bottom: 14px;
-    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 10px;
   }
-  .hero h1 .highlight {
-    background: linear-gradient(90deg, var(--snake), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  .hero h1 span { color: var(--snake); }
 
   .hero-sub {
+    font-size: 14px;
     color: #94a3b8;
-    font-size: 15px;
-    line-height: 1.6;
     max-width: 480px;
-    margin-bottom: 28px;
-    font-weight: 300;
+    margin-bottom: 20px;
+    line-height: 1.5;
   }
 
   .hero-stats {
     display: flex;
-    gap: 28px;
-    margin-bottom: 32px;
+    gap: 25px;
   }
-  .stat {
+  .stat-val { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+  .stat-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+
+  .price-badges {
+    position: absolute;
+    top: 35px; right: 45px;
     display: flex;
     flex-direction: column;
+    gap: 10px;
   }
-  .stat-val {
-    font-family: var(--mono);
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-  }
-  .stat-val span { color: var(--snake); font-size: 14px; }
-  .stat-label {
-    font-size: 11px;
-    color: #64748b;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  .hero-cta-row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 12px 22px;
-    border-radius: var(--radius);
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    display: inline-block;
-    transition: background 0.2s;
-  }
-  .btn-secondary {
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.75);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 12px 22px;
-    border-radius: var(--radius);
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    display: inline-block;
-  }
-
-  /* ── Price badge ── */
-  .price-badge {
-    position: absolute;
-    top: 36px; right: 36px;
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 18px 22px;
+  .price-card {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    border: 1px solid var(--border);
-    min-width: 130px;
-  }
-  .price-badge .price {
-    font-family: var(--mono);
-    font-size: 32px;
-    font-weight: 700;
     color: var(--text);
-    line-height: 1;
+    min-width: 110px;
   }
-  .price-badge .price-sub {
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 4px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .price-badge .sessions-tag {
-    margin-top: 10px;
-    background: var(--accent2);
-    color: #fff;
-    border-radius: 99px;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 10px;
-    font-family: var(--mono);
-    letter-spacing: 0.05em;
+  .pc-price { font-family: var(--mono); font-size: 22px; font-weight: 700; }
+  .pc-tag { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 99px; color: white; margin-top: 4px; display: inline-block; }
+
+  .content {
+    padding: 20px 45px;
+    flex: 1;
   }
 
-  /* ── Body content ── */
-  .body { padding: 0 36px 36px; }
-
-  /* Date bar */
   .date-bar {
-    background: linear-gradient(90deg, #f0f4ff, #e8f5f0);
-    border: 1px solid #c7d9ff;
+    background: #f0f7ff;
+    border: 1px solid #bae6fd;
+    padding: 10px 18px;
     border-radius: 10px;
-    padding: 14px 20px;
-    margin: 24px 0;
+    margin-bottom: 20px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .date-bar .date-main {
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-  }
-  .date-bar .date-detail {
     font-size: 12px;
-    color: var(--text2);
   }
 
-  /* Why section */
   .section-label {
     font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-size: 20px;
-    font-weight: 900;
-    margin-bottom: 16px;
-    letter-spacing: -0.3px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    font-weight: 700;
   }
 
   .why-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 28px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
   }
   .why-card {
     background: var(--surface2);
-    border-radius: 10px;
-    padding: 14px 16px;
-    border-left: 3px solid var(--accent);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
   }
-  .why-card:nth-child(2) { border-left-color: var(--snake); }
-  .why-card:nth-child(3) { border-left-color: var(--accent3); }
-  .why-card:nth-child(4) { border-left-color: #9333ea; }
-  .why-card .why-title {
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-  .why-card .why-desc {
-    font-size: 12px;
-    color: var(--text2);
-    line-height: 1.5;
-    font-weight: 300;
-  }
+  .why-title { font-weight: 700; font-size: 12px; margin-bottom: 2px; }
+  .why-desc { font-size: 10.5px; color: var(--text2); line-height: 1.4; }
 
-  /* Sessions */
-  .sessions-grid {
+  .roadmap {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    margin-bottom: 28px;
-  }
-  .session-card {
-    background: var(--surface2);
-    border-radius: 8px;
-    padding: 10px 10px 8px;
-    border-top: 2px solid var(--border);
-    position: relative;
-  }
-  .session-card:nth-child(9), .session-card:nth-child(10) {
-    border-top-color: var(--accent3);
-    background: #fff5f1;
-  }
-  .session-num {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--text3);
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
-  }
-  .session-title {
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 3px;
-    line-height: 1.3;
-  }
-  .session-date {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--accent);
-  }
-  .session-desc {
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 4px;
-    line-height: 1.4;
-  }
-
-  /* Bottom CTA */
-  .bottom-cta {
-    background: linear-gradient(135deg, #0d1117, #1a2540);
-    border-radius: 14px;
-    padding: 28px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-  .bottom-cta h3 {
-    font-size: 18px;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 4px;
-  }
-  .bottom-cta p {
-    font-size: 12px;
-    color: #64748b;
-    font-family: var(--mono);
-  }
-
-  /* Links section */
-  .links-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
     margin-bottom: 20px;
   }
-  .link-card {
-    background: var(--surface2);
-    border-radius: 10px;
-    padding: 14px 16px;
+  .session {
+    background: #f8fafc;
     border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: 8px;
   }
-  .link-card .link-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 6px;
-    font-family: var(--mono);
+  .session-head { font-family: var(--mono); font-size: 9px; color: var(--accent); font-weight: 700; }
+  .session-name { font-size: 10.5px; font-weight: 700; margin: 2px 0; display: block; }
+  .session-info { font-size: 9px; color: var(--text2); line-height: 1.3; }
+
+  .qr-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
-  .link-card .link-url {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    word-break: break-all;
-    line-height: 1.4;
+  .qr-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
   }
-  .link-card .qr-placeholder {
-    width: 56px; height: 56px;
-    border: 2px dashed var(--border);
-    border-radius: 6px;
+  .qr-box {
+    width: 130px;
+    height: 130px;
+    border: 2px dashed #cbd5e1;
+    margin: 0 auto 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 8px;
-    color: var(--text3);
-    font-size: 9px;
     font-family: var(--mono);
-    text-align: center;
-    line-height: 1.3;
+    font-size: 10px;
+    color: #94a3b8;
+    background: #fcfcfc;
   }
+  .qr-label { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+  .qr-link { font-family: var(--mono); font-size: 9px; color: var(--accent); word-break: break-all; }
 
-  /* Footer */
   .footer {
+    padding: 15px 45px;
+    background: #f8fafc;
     border-top: 1px solid var(--border);
-    padding: 16px 36px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #fafbfc;
-  }
-  .footer .brand {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .footer .brand span { color: var(--snake); }
-  .footer .foot-sub {
     font-size: 10px;
-    color: var(--text3);
-    margin-top: 2px;
-  }
-  .footer .foot-copy {
-    font-size: 10px;
-    color: var(--text3);
-    text-align: right;
-    line-height: 1.5;
-  }
-
-  @media print {
-    body { background: #fff; }
-    .flyer { margin: 0; border: none; box-shadow: none; width: 100%; }
+    color: #64748b;
   }
 </style>
 </head>
 <body>
+
 <div class="flyer">
-
-  <!-- Top bar -->
-  <div class="top-bar">
-    <div class="logo">Kids Learning Lab<span>™</span></div>
-    <div class="tagline">A fun educational podcast by 12-year-old Eshaan</div>
-  </div>
-
-  <!-- Hero -->
   <div class="hero">
-    <div class="hero-eyebrow">
-      <span class="dot"></span>
-      🐍 &nbsp;SUMMER 2026 · LIVE ONLINE COURSE
-    </div>
-    <h1>Learn <span class="highlight">Python</span> with Eshaan — This Summer</h1>
-    <p class="hero-sub">A 10-week live coding course for kids and teens (ages 6–14). Go from zero coding experience to building your own Python project — every Sunday in summer.</p>
+    <div style="font-family:var(--mono); font-size:10px; color:var(--snake); margin-bottom:5px;">Summer 2026</div>
+    <h1>Learn <span>Python</span> with Eshaan</h1>
+    <p class="hero-sub">A 10-week live coding course for kids and teens (ages 6–14). Go from zero coding experience to building your own Python project — every Sunday.</p>
 
     <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-val">10<span> wks</span></span>
-        <span class="stat-label">Live Sessions</span>
-      </div>
-      <div class="stat">
-        <span class="stat-val">45<span> min</span></span>
-        <span class="stat-label">Per Session</span>
-      </div>
-      <div class="stat">
-        <span class="stat-val">0<span> experience</span></span>
-        <span class="stat-label">Needed</span>
-      </div>
-      <div class="stat">
-        <span class="stat-val">1<span> project</span></span>
-        <span class="stat-label">Built by You</span>
-      </div>
+      <div class="stat"><span class="stat-val">10 wks </span><span class="stat-label">Live Sessions</span></div>
+      <div class="stat"><span class="stat-val">45 min </span><span class="stat-label">Per Session</span></div>
+      <div class="stat"><span class="stat-val">No experience </span><span class="stat-label">Needed</span></div>
     </div>
 
-    <div class="hero-cta-row">
-      <a class="btn-primary" href="#">Register: kidslearninglab.com/register</a>
-        <br>
-      <a class="btn-secondary" href="#">Learn More: kidslearninglab.com/python_course</a>
-    </div>
-
-    <!-- Price badges -->
-    <div style="position:absolute; top:36px; right:36px; display:flex; flex-direction:column; gap:10px;">
-      <div style="background:#fff; border-radius:14px; padding:14px 18px; text-align:center; box-shadow:0 4px 24px rgba(0,0,0,0.3); border:1px solid #e2e8f0; min-width:120px;">
-        <div style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; color:#6b7280; text-transform:uppercase; margin-bottom:4px;">1-on-1</div>
-        <div style="font-family:'DM Mono',monospace; font-size:28px; font-weight:700; color:#0d1117; line-height:1;">$450</div>
-        <div style="margin-top:8px; background:#1a6cff; color:#fff; border-radius:99px; font-size:10px; font-weight:700; padding:3px 10px; font-family:'DM Mono',monospace; letter-spacing:0.04em;">Private</div>
+    <div class="price-badges">
+      <div class="price-card">
+        <div class="pc-price">$450</div>
+        <span class="pc-tag" style="background:var(--accent)">1-on-1 Private</span>
       </div>
-      <div style="background:#fff; border-radius:14px; padding:14px 18px; text-align:center; box-shadow:0 4px 24px rgba(0,0,0,0.3); border:1px solid #e2e8f0; min-width:120px;">
-        <div style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; color:#6b7280; text-transform:uppercase; margin-bottom:4px;">Group</div>
-        <div style="font-family:'DM Mono',monospace; font-size:28px; font-weight:700; color:#0d1117; line-height:1;">$300</div>
-        <div style="margin-top:8px; background:#00c48c; color:#fff; border-radius:99px; font-size:10px; font-weight:700; padding:3px 10px; font-family:'DM Mono',monospace; letter-spacing:0.04em;">10 Sessions</div>
+      <div class="price-card">
+        <div class="pc-price">$300</div>
+        <span class="pc-tag" style="background:var(--accent2)">Group Course</span>
       </div>
     </div>
   </div>
 
-  <!-- Body -->
-  <div class="body">
-
-    <!-- Date bar -->
+  <div class="content">
     <div class="date-bar">
-      <span class="date-main">📅 &nbsp;Sundays, June 14 – August 16, 2026</span>
-      <span class="date-detail">Every Sunday · 10 sessions · 45 min each · Live &amp; interactive</span>
+      <span><strong>Sundays:</strong> June 14 – August 16, 2026</span>
+      <span style="color:var(--accent); font-weight:600;">10 Sessions • Live & Interactive</span>
     </div>
 
-    <!-- Why -->
     <div class="section-label">Why Python Learning Lab?</div>
     <div class="why-grid">
       <div class="why-card">
-        <div class="why-title">🧠 Learn a real skill</div>
-        <div class="why-desc">Python is used by professionals, scientists &amp; creators everywhere — it's a language that actually matters.</div>
+        <div class="why-title">Learn a real skill</div>
+        <div class="why-desc">Python is used by professionals & creators everywhere — it's a language that actually matters.</div>
       </div>
-      <div class="why-card">
-        <div class="why-title">👦 Taught by a kid, for kids</div>
-        <div class="why-desc">Designed with young learners in mind — the pace, language, and examples actually make sense.</div>
+      <div class="why-card" style="border-left-color:var(--snake)">
+        <div class="why-title">Taught by a kid, for kids</div>
+        <div class="why-desc">Designed with young learners in mind — the pace and examples actually make sense.</div>
       </div>
-      <div class="why-card">
-        <div class="why-title">🛠️ Build a real project</div>
-        <div class="why-desc">The final two sessions are dedicated to creating your own mini project — something to show off.</div>
+      <div class="why-card" style="border-left-color:var(--accent3)">
+        <div class="why-title">Build a real project</div>
+        <div class="why-desc">The final sessions are dedicated to creating your own mini project to show off.</div>
       </div>
-      <div class="why-card">
-        <div class="why-title">🗓️ One Sunday per week</div>
-        <div class="why-desc">Just one session a week keeps weekdays free. Ask questions and learn alongside peers.</div>
+      <div class="why-card" style="border-left-color:#9333ea">
+        <div class="why-title">Flexible Schedule</div>
+        <div class="why-desc">Just one session a week keeps your weekdays free for other summer fun. Every Sunday morning.</div>
       </div>
     </div>
 
-    <!-- Sessions -->
     <div class="section-label">What You'll Learn — 10 Sessions</div>
-    <div class="sessions-grid">
-      <div class="session-card">
-        <div class="session-num">Session 1</div>
-        <div class="session-title">Getting Started</div>
-        <div class="session-date">Jun 14</div>
-        <div class="session-desc">Install Python, print, math &amp; variables.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 2</div>
-        <div class="session-title">Variables &amp; Data Types</div>
-        <div class="session-date">Jun 21</div>
-        <div class="session-desc">Strings, numbers, booleans.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 3</div>
-        <div class="session-title">Operators &amp; Conditionals</div>
-        <div class="session-date">Jun 28</div>
-        <div class="session-desc">Math, logic &amp; if conditions.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 4</div>
-        <div class="session-title">Loops</div>
-        <div class="session-date">Jul 5</div>
-        <div class="session-desc">for &amp; while loops, range().</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 5</div>
-        <div class="session-title">Lists &amp; Tuples</div>
-        <div class="session-date">Jul 12</div>
-        <div class="session-desc">Collections, iteration &amp; transforms.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 6</div>
-        <div class="session-title">Dictionaries</div>
-        <div class="session-date">Jul 19</div>
-        <div class="session-desc">Key-value storage &amp; cipher app.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 7</div>
-        <div class="session-title">Functions</div>
-        <div class="session-date">Jul 26</div>
-        <div class="session-desc">Parameters &amp; return values.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 8</div>
-        <div class="session-title">Classes &amp; Objects</div>
-        <div class="session-date">Aug 2</div>
-        <div class="session-desc">Intro to OOP concepts.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 9</div>
-        <div class="session-title">Mini Project — Pt. 1</div>
-        <div class="session-date">Aug 9</div>
-        <div class="session-desc">Plan &amp; start your own project.</div>
-      </div>
-      <div class="session-card">
-        <div class="session-num">Session 10</div>
-        <div class="session-title">Mini Project — Pt. 2</div>
-        <div class="session-date">Aug 16</div>
-        <div class="session-desc">Finish, present &amp; celebrate! 🎉</div>
-      </div>
+    <div class="roadmap">
+      <div class="session"><span class="session-head">S01</span><span class="session-name">Basics</span><span class="session-info">Python install, print & math.</span></div>
+      <div class="session"><span class="session-head">S02</span><span class="session-name">Data</span><span class="session-info">Strings, numbers & variables.</span></div>
+      <div class="session"><span class="session-head">S03</span><span class="session-name">Logic</span><span class="session-info">If conditions & operators.</span></div>
+      <div class="session"><span class="session-head">S04</span><span class="session-name">Loops</span><span class="session-info">For/While loops & range().</span></div>
+      <div class="session"><span class="session-head">S05</span><span class="session-name">Lists</span><span class="session-info">Storing data in collections.</span></div>
+      <div class="session"><span class="session-head">S06</span><span class="session-name">Keys</span><span class="session-info">Dictionaries & storage.</span></div>
+      <div class="session"><span class="session-head">S07</span><span class="session-name">Funcs</span><span class="session-info">Parameters & returns.</span></div>
+      <div class="session"><span class="session-head">S08</span><span class="session-name">OOP</span><span class="session-info">Classes & Object concepts.</span></div>
+      <div class="session" style="background:#fff7ed; border-color:#fdba74"><span class="session-head">S09</span><span class="session-name">Project 1</span><span class="session-info">Plan & start your project.</span></div>
+      <div class="session" style="background:#fff7ed; border-color:#fdba74"><span class="session-head">S10</span><span class="session-name">Project 2</span><span class="session-info">Finish & show!</span></div>
     </div>
 
-    <!-- Bottom CTA -->
-    <div class="bottom-cta">
-      <div>
-        <h3>Reserve your spot today!</h3>
-        <p>$300 Group &nbsp;·&nbsp; $450 1-on-1 &nbsp;·&nbsp; 10 Sundays · June 14 – August 16, 2026</p>
+    <div class="section-label">Scan to Register or Learn More</div>
+    <div class="qr-section">
+      <div class="qr-card">
+        <div class="qr-box">PLACE QR HERE</div>
+        <div class="qr-label">Learn More</div>
+        <div class="qr-link">kidslearninglab.com/python_course</div>
       </div>
-      <a class="btn-primary" href="#" style="white-space:nowrap; font-size:13px; padding:14px 28px;">Sign Up →</a>
-    </div>
-
-    <!-- Links with QR placeholders -->
-    <div class="links-section">
-      <div class="link-card">
-        <div class="link-label">🌐 Learn More</div>
-        <div class="link-url">kidslearninglab.com/<wbr>python_course</div>
-        <div class="qr-placeholder">QR<br>Code</div>
+      <div class="qr-card">
+        <div class="qr-box">PLACE QR HERE</div>
+        <div class="qr-label">Register Now</div>
+        <div class="qr-link">kidslearninglab.com/register</div>
       </div>
-      <div class="link-card">
-        <div class="link-label">📝 Register Now</div>
-        <div class="link-url">kidslearninglab.com/<wbr>python_course_registration</div>
-        <div class="qr-placeholder">QR<br>Code</div>
+      <div class="qr-card">
+        <div class="qr-box">PLACE QR HERE</div>
+        <div class="qr-label">Any Questions?</div>
+        <div class="qr-link">hello@kidslearninglab.com</div>
       </div>
-      <div class="link-card">
-        <div class="link-label">✉️ Any Questions?</div>
-        <div class="link-url">hello@kidslearninglab.com</div>
-        <div class="qr-placeholder">QR<br>Code</div>
-      </div>
-    </div>
-
-  </div><!-- /body -->
-
-  <!-- Footer -->
-  <div class="footer">
-    <div>
-      <div class="brand">Kids Learning Lab<span>™</span></div>
-      <div class="foot-sub">Created with ❤ by Eshaan for curious minds everywhere</div>
-    </div>
-    <div class="foot-copy">
-      © 2025 Kids Learning Lab. A fictitious business name of The Investment Lab LLC.<br>
-      All rights reserved.
     </div>
   </div>
 
+    <h2 style="margin-bottom: 50px; margin-left: 50px;">Register Now before spots fill up!</h2>
+
+  <div class="footer">
+    <div><strong>Kids Learning Lab<span>™</span></strong> — Created by Eshaan Buddhisagar</div>
+    <div>© 2026 All rights reserved.</div>
+  </div>
 </div>
+
 </body>
 </html>
