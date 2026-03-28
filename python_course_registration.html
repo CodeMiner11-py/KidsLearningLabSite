@@ -578,7 +578,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 
 <script>
-const WORKER_URL = "https://course-registration.nameless-cherry-998c.workers.dev";
+
+const FIREBASE_WORKER = "https://course-registration.nameless-cherry-998c.workers.dev";
+const EMAIL_WORKER = "https://kidslearninglab-pythoncourseregistration-email-server.kidslearninglab099.workers.dev/";
+
 const RECAPTCHA_SITE_KEY = "6LeZGZssAAAAACQ_gRJe-b302vXmkA6jdi3kZHoW";
 
 let currentSlide = 0;
@@ -703,19 +706,43 @@ async function submitRegistration() {
   };
 
   try {
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const result = await res.json();
-    if (!result.success) {
-      alert('Please try again without adblockers. There are no ads on the site.');
-      btn.disabled = false;
-      btn.innerHTML = 'Continue <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      return false;
-    }
-    return true;
+    const payload = {
+  studentName,
+  parentName,
+  email,
+  phone,
+  experience,
+  goals,
+};
+
+try {
+  // 1. Save to Firebase
+  const res1 = await fetch(FIREBASE_WORKER, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const result1 = await res1.json();
+
+  // 2. Send email
+  const res2 = await fetch(EMAIL_WORKER, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const result2 = await res2.json();
+
+  if (!result1.success || !result2.success) {
+    throw new Error("One of the services failed");
+  }
+
+
+} catch (err) {
+  alert("Something went wrong.");
+  console.error(err);
+}
   } catch (e) {
     alert('Network error. Please try again.');
     btn.disabled = false;
