@@ -618,7 +618,9 @@ function updatePaymentLinks() {
   const amountStr = '$' + amount;
   document.getElementById('paymentAmount').textContent = amountStr;
   document.getElementById('paymentAmountNote').textContent = amountStr;
-  document.getElementById('stripeBtn').href  = `/course/stripe.html?payment=${amount}`;
+  document.getElementById('stripeBtn').href  = selectedClass === '1on1'
+    ? 'https://buy.stripe.com/4gMcN5fdbb3R8YMciXcbC02'
+    : 'https://buy.stripe.com/7sY3cv7KJeg31wk6YDcbC01';
   document.getElementById('paypalBtn').href  = `/course/paypal.html?payment=${amount}`;
   document.getElementById('venmoBtn').href   = `/course/venmo.html?payment=${amount}`;
   document.getElementById('zelleBtn').href   = `/course/zelle.html?payment=${amount}`;
