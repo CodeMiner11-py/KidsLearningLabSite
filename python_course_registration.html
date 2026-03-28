@@ -706,43 +706,27 @@ async function submitRegistration() {
   };
 
   try {
-    const payload = {
-  studentName,
-  parentName,
-  email,
-  phone,
-  experience,
-  goals,
-};
+    const [res1, res2] = await Promise.all([
+      fetch(FIREBASE_WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+      fetch(EMAIL_WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+    ]);
 
-try {
-  // 1. Save to Firebase
-  const res1 = await fetch(FIREBASE_WORKER, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+    const [result1, result2] = await Promise.all([res1.json(), res2.json()]);
 
-  const result1 = await res1.json();
+    if (!result1.success || !result2.success) {
+      throw new Error("One of the services failed");
+    }
 
-  // 2. Send email
-  const res2 = await fetch(EMAIL_WORKER, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+    return true;
 
-  const result2 = await res2.json();
-
-  if (!result1.success || !result2.success) {
-    throw new Error("One of the services failed");
-  }
-
-
-} catch (err) {
-  alert("Something went wrong. Try removing adblockers. There are no ads.");
-  console.error(err);
-}
   } catch (e) {
     alert('Network error. Please try again. Try removing adblockers. There are no ads.');
     btn.disabled = false;
