@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Spice Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .game-title {
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .game-desc {
+      font-size: 12px;
+      font-weight: 300;
+      color: #666;
+      letter-spacing: 0.08em;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #fff;
+      background: transparent;
+      border: 1px solid #333;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { border-color: #fff; }
+    .btn:active { color: #aaa; border-color: #aaa; }
+
+    .btn-restart {
+      color: #888;
+    }
+    .btn-restart:hover { color: #fff; border-color: #fff; }
+
+    .frame-border {
+      border: 1.5px solid #c0392b;
+      width: 100%;
+      position: relative;
+      background: #000;
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+      background: #000;
+    }
+
+    /* Fullscreen overrides */
+    .frame-border:fullscreen,
+    .frame-border:-webkit-full-screen {
+      border: none;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .frame-border:fullscreen iframe,
+    .frame-border:-webkit-full-screen iframe {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: unset;
+    }
+
+    .btn-fs-exit { display: none; }
+
+    body.is-fullscreen .btn-fs-enter { display: none; }
+    body.is-fullscreen .btn-fs-exit  { display: inline-block; }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+
+    <div class="meta">
+      <div class="title-block">
+        <div class="game-title">The Spice Game</div>
+        <div class="game-desc">Identify spices by sight. How many do you know?</div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-restart" onclick="restartGame()">↺ Restart</button>
+        <button class="btn btn-fs-enter" onclick="enterFullscreen()">⤢ Fullscreen</button>
+        <button class="btn btn-fs-exit"  onclick="exitFullscreen()">✕ Exit fullscreen</button>
+      </div>
+    </div>
+
+    <div class="frame-border" id="frameBorder">
+      <iframe
+        id="gameFrame"
+        src="https://kidslearninglab.com/spiceweb/index.html"
+        allow="autoplay; fullscreen"
+        allowfullscreen
+        scrolling="no">
+      </iframe>
+    </div>
+
+  </div>
+
+  <script>
+    const frame = document.getElementById('gameFrame');
+    const border = document.getElementById('frameBorder');
+
+    function restartGame() {
+      frame.src = frame.src;
+    }
+
+    function enterFullscreen() {
+      const el = border;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+
+    document.addEventListener('fullscreenchange', syncFsState);
+    document.addEventListener('webkitfullscreenchange', syncFsState);
+
+    function syncFsState() {
+      const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      document.body.classList.toggle('is-fullscreen', inFs);
+    }
+  </script>
+
+</body>
+</html>
