@@ -110,7 +110,7 @@
         fb_width : "1280",
         fb_height : "720"
     }
-
+    
     function show_infobox() {
         infobox.style.display = "block";
         const w = infobox.offsetWidth;
@@ -121,271 +121,243 @@
         infobox.style.top = top + "px";
     }
     </script>
-
-    <title>The Spice Game</title>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
-
-    <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'DM Mono', monospace;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-        }
-
-        /* ── Loading overlay ── */
-        #loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 56px;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-
-        #loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .game-title {
-            font-family: 'DM Mono', monospace;
-            font-size: clamp(28px, 5vw, 56px);
-            font-weight: 500;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #fff;
-            text-align: center;
-        }
-
-        /* ── START button ── */
-        #start-btn {
-            font-family: 'DM Mono', monospace;
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: #fff;
-            background: #c0392b;
-            border: none;
-            padding: 14px 52px;
-            cursor: pointer;
-            outline: none;
-            transition: background 0.15s ease, transform 0.1s ease;
-            display: none; /* shown once ready */
-        }
-
-        #start-btn:hover {
-            background: #e74c3c;
-        }
-
-        #start-btn:active {
-            transform: scale(0.97);
-            background: #a93226;
-        }
-
-        /* loading indicator shown before START is ready */
-        .loading-dots {
-            font-family: 'DM Mono', monospace;
-            font-size: 13px;
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            color: #444;
-            text-transform: uppercase;
-        }
-
-        .loading-dots span {
-            animation: blink 1.2s step-start infinite;
-        }
-        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        /* ── Canvas ── */
-        canvas.emscripten {
-            border: 0px none;
-            background-color: transparent;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            padding: 0;
-            margin: 0 auto;
-            position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
-        }
-
-        /* ── Hide all pygbag chrome ── */
-        #transfer, #pyconsole, #crt, #system, #box,
-        #info, #dlg, #html { display: none !important; }
-
-        #infobox {
-            position: fixed;
-            background: #000;
-            color: #555;
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            padding: 8px 18px;
-            border: 1px solid #222;
-            z-index: 999999;
-        }
-    </style>
-
-</head>
-
-<body>
-
-    <!-- Custom loading screen -->
-    <div id="loading-overlay">
-        <div class="game-title">The Spice Game</div>
-
-        <div id="action-area">
-            <div class="loading-dots">
-                Loading<span>.</span><span>.</span><span>.</span>
+    
+        <title>The Spice Game</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+        <style>
+            *, *::before, *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+    
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background-color: #07080f;
+                color: #c8d8f0;
+                overflow: hidden;
+            }
+    
+            /* ── Loading overlay ── */
+            #loading-overlay {
+                position: fixed;
+                inset: 0;
+                background: #07080f;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 28px;
+                z-index: 9999;
+                transition: opacity 0.6s ease;
+            }
+    
+            #loading-overlay.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+    
+            .game-title {
+                font-size: 13px;
+                font-weight: 500;
+                letter-spacing: 0.25em;
+                text-transform: uppercase;
+                color: #3c7cd6;
+                margin-bottom: 4px;
+            }
+    
+            .game-subtitle {
+                font-size: 28px;
+                font-weight: 600;
+                color: #e8f0ff;
+                letter-spacing: 0.04em;
+            }
+    
+            /* ── Spinner ── */
+            .spinner-wrap {
+                position: relative;
+                width: 56px;
+                height: 56px;
+            }
+    
+            .spinner-ring {
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: #3c7cd6;
+                border-right-color: #3c7cd620;
+                border-bottom-color: #3c7cd620;
+                border-left-color: #3c7cd620;
+                animation: spin 1s linear infinite;
+            }
+    
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+    
+            /* ── Status text ── */
+            .loading-label {
+                font-size: 13px;
+                font-weight: 400;
+                color: #6a8ab8;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+    
+            /* ── Canvas (hidden until ready) ── */
+            canvas.emscripten {
+                border: 0px none;
+                background-color: transparent;
+                width: 100%;
+                height: 100%;
+                z-index: 5;
+                padding: 0;
+                margin: 0 auto;
+                position: absolute;
+                top: 0; bottom: 0; left: 0; right: 0;
+            }
+    
+            /* ── Hide all pygbag chrome we don't want ── */
+            #transfer, #pyconsole, #crt, #system, #box,
+            #info, #dlg, #html { display: none !important; }
+    
+            #infobox {
+                position: fixed;
+                background: #0d1626;
+                color: #6aaeff;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+                letter-spacing: 0.08em;
+                padding: 10px 22px;
+                border: 1px solid #1e3a6e;
+                border-radius: 8px;
+                z-index: 999999;
+            }
+        </style>
+    
+    </head>
+    
+    <body>
+    
+        <!-- Custom loading screen -->
+        <div id="loading-overlay">
+            <div class="game-subtitle">The Spice Game</div>
+    
+            <div class="spinner-wrap">
+                <div class="spinner-ring"></div>
             </div>
-            <button id="start-btn" onclick="handleStart()">Start</button>
+    
+            <div class="loading-label">Loading</div>
         </div>
-    </div>
-
-    <!-- Required pygbag elements (hidden) -->
-    <div id="transfer" align=center>
-        <div class="emscripten" id="status">Downloading...</div>
-        <div class="emscripten">
-            <progress value="0" max="100" id="progress"></progress>
+    
+        <!-- Required pygbag elements (hidden) -->
+        <div id="transfer" align=center>
+            <div class="emscripten" id="status">Downloading...</div>
+            <div class="emscripten">
+                <progress value="0" max="100" id="progress"></progress>
+            </div>
         </div>
-    </div>
-
-    <canvas class="emscripten" id="canvas"
-        width="1px" height="1px"
-        oncontextmenu="event.preventDefault()" tabindex=1>
-    </canvas>
-
-    <canvas class="emscripten" id="canvas3d"
-        width="1280px" height="720px"
-        oncontextmenu="event.preventDefault()" tabindex=1 hidden>
-    </canvas>
-
-    <div id="infobox">Loading, please wait...</div>
-    <div id="info" hidden></div>
-    <div id="html"></div>
-
-    <div id="crt">
-        <div id="system" hidden></div>
-        <div id="box" hidden></div>
-    </div>
-
-    <div id="dlg" hidden>
-        <input type="file" id="dlg_multifile" multiple accept="image/*">
-        <label for="dlg_multifile">Select files</label>
-    </div>
-
-    <div id="pyconsole">
-        <div id="terminal" tabIndex=1 align="left"></div>
-    </div>
-
-    <script type="application/javascript">
-
-    globalThis.__canvas_resized = (self, ecw, ech) => {
-        console.warn("TODO: panda3d canvas monitor", self, ecw, ech)
-    }
-
-    const overlayEl = document.getElementById("loading-overlay");
-    const startBtn  = document.getElementById("start-btn");
-    const dotsEl    = document.querySelector(".loading-dots");
-
-    // When infobox says "Ready", swap dots → START button
-    const infoboxObserver = new MutationObserver(() => {
-        const txt = document.getElementById("infobox").innerText || "";
-        if (txt.toLowerCase().includes("ready") || txt.toLowerCase().includes("click")) {
-            dotsEl.style.display = "none";
-            startBtn.style.display = "inline-block";
+    
+        <canvas class="emscripten" id="canvas"
+            width="1px" height="1px"
+            oncontextmenu="event.preventDefault()" tabindex=1>
+        </canvas>
+    
+        <canvas class="emscripten" id="canvas3d"
+            width="1280px" height="720px"
+            oncontextmenu="event.preventDefault()" tabindex=1 hidden>
+        </canvas>
+    
+        <div id="infobox">Loading, please wait...</div>
+        <div id="html"></div>
+    
+        <div id="crt">
+            <div id="system" hidden></div>
+            <div id="box" hidden></div>
+        </div>
+    
+        <div id="dlg" hidden>
+            <input type="file" id="dlg_multifile" multiple accept="image/*">
+            <label for="dlg_multifile">Select files</label>
+        </div>
+    
+        <div id="pyconsole">
+            <div id="terminal" tabIndex=1 align="left"></div>
+        </div>
+    
+        <script type="application/javascript">
+    
+        globalThis.__canvas_resized = (self, ecw, ech) => {
+            console.warn("TODO: panda3d canvas monitor", self, ecw, ech)
         }
-    });
-    infoboxObserver.observe(document.getElementById("infobox"), { childList: true, characterData: true, subtree: true });
-
-    function handleStart() {
-        // Simulate a click on the canvas to trigger media user engagement
-        document.getElementById("canvas").click();
-        document.getElementById("canvas").focus();
-    }
-
-    // Hide overlay once canvas becomes visible (game started)
-    const canvasObserver = new MutationObserver(() => {
-        const canvas = document.getElementById("canvas");
-        if (canvas && canvas.style.visibility === "visible" &&
-            parseInt(canvas.width) > 1) {
-            overlayEl.classList.add("hidden");
-            setTimeout(() => overlayEl.remove(), 600);
-            canvasObserver.disconnect();
+    
+        const overlayEl  = document.getElementById("loading-overlay");
+    
+        // Hide overlay once canvas becomes visible (game started)
+        const canvasObserver = new MutationObserver(() => {
+            const canvas = document.getElementById("canvas");
+            if (canvas && canvas.style.visibility === "visible" &&
+                parseInt(canvas.width) > 1) {
+                overlayEl.classList.add("hidden");
+                setTimeout(() => overlayEl.remove(), 700);
+                canvasObserver.disconnect();
+            }
+        });
+        canvasObserver.observe(document.getElementById("canvas"),
+            { attributes: true, attributeFilter: ["width", "style"] });
+    
+        async function custom_onload(debug_hidden) {
+            console.log(__FILE__, "custom_onload")
+            pyconsole.hidden = debug_hidden
+            system.hidden    = debug_hidden
+            transfer.hidden  = true        // always hide, we have our own UI
+            info.hidden      = debug_hidden
+            box.hidden       = debug_hidden
+            show_infobox()
         }
-    });
-    canvasObserver.observe(document.getElementById("canvas"),
-        { attributes: true, attributeFilter: ["width", "style"] });
-
-    async function custom_onload(debug_hidden) {
-        console.log(__FILE__, "custom_onload")
-        pyconsole.hidden = debug_hidden
-        system.hidden    = debug_hidden
-        transfer.hidden  = true
-        info.hidden      = debug_hidden
-        box.hidden       = debug_hidden
-        show_infobox()
-    }
-
-    function custom_prerun(){
-        console.log(__FILE__, "custom_prerun")
-    }
-
-    function custom_postrun(){
-        console.log(__FILE__, "custom_postrun")
-    }
-
-    function debug() {
-        python.config.debug = true
-        custom_onload(false)
-        Module.PyRun_SimpleString("shell.uptime()")
-        window_resize()
-    }
-
-    function info_inline(data){
-        document.getElementById("info").innerHTML = data
-    }
-
-    function info_online(url) {
-        fetch(url)
-            .then((response) => response.text())
-            .then((html) => { info_inline(html); })
-            .catch((error) => { console.warn(error); });
-    }
-
-    function frame_online(url) {
-        window.frames["iframe"].location = url;
-    }
-
-    </script>
-
-</body>
-</html>
+    
+        function custom_prerun(){
+            console.log(__FILE__, "custom_prerun")
+        }
+    
+        function custom_postrun(){
+            console.log(__FILE__, "custom_postrun")
+        }
+    
+        function debug() {
+            python.config.debug = true
+            custom_onload(false)
+            Module.PyRun_SimpleString("shell.uptime()")
+            window_resize()
+        }
+    
+        function info_inline(data){
+            document.getElementById("info").innerHTML = data
+        }
+    
+        function info_online(url) {
+            fetch(url)
+                .then((response) => response.text())
+                .then((html) => { info_inline(html); })
+                .catch((error) => { console.warn(error); });
+        }
+    
+        function frame_online(url) {
+            window.frames["iframe"].location = url;
+        }
+    
+        </script>
+    
+    </body>
+    </html>
