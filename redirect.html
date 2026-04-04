@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get("url");
+    if (url) {
+      window.location.href = url;
+    }
+  </script>
+</head>
+<body>
+</body>
+</html>
