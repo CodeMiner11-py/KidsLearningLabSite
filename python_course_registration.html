@@ -6,7 +6,7 @@
 <title>Python Learning Lab — Registration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js?render=6LeZGZssAAAAACQ_gRJe-b302vXmkA6jdi3kZHoW"></script>
 
 <style>
@@ -21,16 +21,28 @@
   --accent: #1a56db;
   --accent-light: #e8effc;
   --accent-glow: rgba(26,86,219,0.18);
+  --green: #22c55e;
+  --green-light: #dcfce7;
+  --green-dark: #166534;
   --pill: 999px;
   --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 
 html, body {
   min-height: 100%;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background: var(--white);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6,
+.slide-title,
+.class-card-price,
+.slider-value,
+.countdown-text,
+.coupon-code {
+  font-family: 'Space Grotesk', sans-serif !important;
 }
 
 .page {
@@ -154,6 +166,79 @@ html, body {
   line-height: 1.65;
 }
 
+/* ── Early Bird Banner ── */
+.early-bird-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--green-light);
+  border: 1.5px solid var(--green);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.6rem;
+  flex-wrap: wrap;
+}
+
+.eb-tag {
+  background: var(--green);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.early-bird-banner p {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Coupon box ── */
+.coupon-box {
+  background: var(--green-light);
+  border: 2px dashed var(--green);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.coupon-box .coupon-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--green-dark);
+  margin-bottom: 0.35rem;
+}
+
+.coupon-code {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--green-dark);
+  background: rgba(34,197,94,0.15);
+  border-radius: 8px;
+  padding: 0.3rem 0.9rem;
+  display: inline-block;
+  margin-bottom: 0.3rem;
+}
+
+.coupon-box .coupon-note {
+  font-size: 0.74rem;
+  color: #4ade80;
+  font-weight: 600;
+  color: var(--green-dark);
+  opacity: 0.75;
+}
+
 .field { margin-bottom: 1.35rem; }
 
 .field label {
@@ -204,7 +289,7 @@ html, body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 1.6rem;
+  margin-bottom: 0.8rem;
 }
 
 .class-card {
@@ -221,7 +306,41 @@ html, body {
 .class-card.selected { border-color: var(--accent); background: var(--accent-light); }
 
 .class-card-title { font-size: 0.88rem; font-weight: 800; color: var(--ink); margin-bottom: 0.15rem; }
-.class-card-price { font-size: 1.15rem; font-weight: 800; color: var(--accent); margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+
+.class-card-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.class-card-price {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.class-card-price-orig {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-decoration: line-through;
+}
+
+.class-card-eb {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--green-dark);
+  background: var(--green-light);
+  border-radius: var(--pill);
+  padding: 0.12rem 0.5rem;
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.03em;
+}
+
 .class-card-desc { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.4; }
 
 .slider-wrap { margin-bottom: 1.6rem; }
@@ -284,7 +403,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 .slider-ticks span { font-size: 0.67rem; color: var(--ink-faint); font-weight: 600; }
 
-/* Countdown / redirect slide */
+/* ── Summary & redirect ── */
 .redirect-card {
   background: var(--off);
   border: 1.5px solid #e2e2e2;
@@ -336,7 +455,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.2rem;
 }
 
 .summary-row {
@@ -351,6 +470,47 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 .summary-row .label { color: var(--ink-soft); font-weight: 600; }
 .summary-row .value { font-weight: 800; color: var(--ink); }
+
+/* ── Coupon reminder on final slide ── */
+.coupon-reminder {
+  background: var(--green-light);
+  border: 1.5px solid var(--green);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.coupon-reminder .cr-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--green-dark);
+  flex-shrink: 0;
+}
+
+.coupon-reminder .cr-code {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--green-dark);
+  background: rgba(34,197,94,0.18);
+  border-radius: 6px;
+  padding: 0.1rem 0.55rem;
+}
+
+.coupon-reminder .cr-note {
+  font-size: 0.76rem;
+  color: var(--green-dark);
+  opacity: 0.8;
+  font-weight: 500;
+  line-height: 1.4;
+}
 
 .btn-redirect-now {
   display: inline-flex;
@@ -445,6 +605,11 @@ input[type=range]::-webkit-slider-thumb:hover {
         <h2 class="slide-title">About the student</h2>
         <p class="slide-sub">Your child's information.</p>
 
+        <div class="early-bird-banner">
+          <span class="eb-tag">🏷️ 10% Early Bird</span>
+          <p>Use code <strong>EARLYBIRD</strong> at Stripe checkout — offer ends May 14, 2026.</p>
+        </div>
+
         <div class="field">
           <label for="kidName">Kid's Full Name</label>
           <input type="text" id="kidName" placeholder="e.g. Eshaan Buddhisagar" autocomplete="off">
@@ -508,7 +673,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         </div>
       </div>
 
-      <!-- SLIDE 3 -->
+      <!-- SLIDE 3 — Class format -->
       <div class="slide" data-index="3">
         <div class="slide-eyebrow">Step 4 of 6</div>
         <h2 class="slide-title">Class format</h2>
@@ -517,16 +682,31 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div class="class-cards">
           <div class="class-card" id="card-1on1" onclick="selectClass('1on1')">
             <div class="class-card-title">1-on-1</div>
-            <div class="class-card-price">$450</div>
+            <div class="class-card-price-row">
+              <div class="class-card-price">$405</div>
+              <div class="class-card-price-orig">$450</div>
+            </div>
+            <div class="class-card-eb">🏷️ 10% off with EARLYBIRD</div>
             <div class="class-card-desc">Private, fully personalized to your child's pace</div>
           </div>
           <div class="class-card" id="card-group" onclick="selectClass('group')">
             <div class="class-card-title">Group</div>
-            <div class="class-card-price">$300</div>
+            <div class="class-card-price-row">
+              <div class="class-card-price">$270</div>
+              <div class="class-card-price-orig">$300</div>
+            </div>
+            <div class="class-card-eb">🏷️ 10% off with EARLYBIRD</div>
             <div class="class-card-desc">Learn alongside peers, collaborative &amp; social</div>
           </div>
         </div>
-        <div class="error-msg" id="classTypeErr" style="margin-top:-8px;margin-bottom:12px;">Please select a class format.</div>
+        <div class="error-msg" id="classTypeErr" style="margin-top:-2px;margin-bottom:12px;">Please select a class format.</div>
+
+        <!-- Coupon code box -->
+        <div class="coupon-box">
+          <div class="coupon-label">🏷️ Early Bird Discount — use at Stripe checkout</div>
+          <div class="coupon-code">EARLYBIRD</div>
+          <div class="coupon-note">Save 10% · Valid until May 14, 2026</div>
+        </div>
 
         <div class="nav-row">
           <button class="btn-back" onclick="prevSlide(3)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back</button>
@@ -570,9 +750,16 @@ input[type=range]::-webkit-slider-thumb:hover {
             <span class="value" id="summaryFormat">—</span>
           </div>
           <div class="summary-row">
-            <span class="label">Total</span>
+            <span class="label">Full price</span>
             <span class="value" id="summaryAmount">—</span>
           </div>
+        </div>
+
+        <!-- Coupon reminder -->
+        <div class="coupon-reminder">
+          <span class="cr-label">🏷️ Coupon code</span>
+          <span class="cr-code">EARLYBIRD</span>
+          <span class="cr-note">Enter this at Stripe checkout to get 10% off — valid until May 14, 2026!</span>
         </div>
 
         <div class="redirect-card">
