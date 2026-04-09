@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kids Learning Lab — ID Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;}
+
+    body {
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      color: #1a1a1a;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-mark {
+      width: 64px;
+      height: 64px;
+      background: #1D9E75;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+
+    .logo-mark svg {
+      width: 34px;
+      height: 34px;
+      fill: #fff;
+    }
+
+    header h1 {
+      font-size: 26px;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: -0.3px;
+    }
+
+    header p {
+      font-size: 15px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 2rem;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      background: #1D9E75;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .generate-btn:hover { background: #0F6E56; }
+    .generate-btn:active { transform: scale(0.98); }
+
+    .result-area {
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .id-box {
+      background: #f4f6f9;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 12.5px;
+      color: #1a1a1a;
+      word-break: break-all;
+      line-height: 1.8;
+    }
+
+    .id-part-prefix { color: #0F6E56; font-weight: 600; }
+    .id-part-uuid { color: #185FA5; }
+    .id-part-v1 { color: #854F0B; font-weight: 600; }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 1rem;
+    }
+
+    .copy-btn, .again-btn {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .copy-btn {
+      background: #fff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+
+    .copy-btn:hover { background: #f9fafb; }
+    .copy-btn:active { transform: scale(0.98); }
+
+    .copy-btn.copied {
+      background: #EAF3DE;
+      border-color: #97C459;
+      color: #27500A;
+    }
+
+    .again-btn {
+      background: #f4f6f9;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+    }
+
+    .again-btn:hover { background: #e9edf2; }
+    .again-btn:active { transform: scale(0.98); }
+
+    .history-section {
+      margin-top: 2rem;
+      display: none;
+    }
+
+    .history-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .clear-btn {
+      font-size: 11px;
+      color: #9ca3af;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      padding: 0;
+    }
+
+    .clear-btn:hover { color: #6b7280; }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-item {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 11px;
+      color: #6b7280;
+      background: #f9fafb;
+      border: 1px solid #f3f4f6;
+      border-radius: 8px;
+      padding: 8px 12px;
+      word-break: break-all;
+      line-height: 1.7;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .history-item:hover { background: #f3f4f6; }
+
+    .counter {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .counter span {
+      font-weight: 600;
+      color: #1D9E75;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-mark">
+      <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="11" height="11" rx="3"/>
+        <rect x="19" y="4" width="11" height="11" rx="3"/>
+        <rect x="4" y="19" width="11" height="11" rx="3"/>
+        <rect x="19" y="19" width="11" height="11" rx="3"/>
+      </svg>
+    </div>
+    <h1>Kids Learning Lab</h1>
+    <p>Unique ID generator</p>
+  </header>
+
+  <div class="card">
+    <button class="generate-btn" onclick="generateID()">Generate ID</button>
+
+    <div class="result-area" id="resultArea">
+      <p class="result-label">Generated ID</p>
+      <div class="id-box" id="idBox"></div>
+      <div class="actions">
+        <button class="copy-btn" id="copyBtn" onclick="copyID()">Copy to clipboard</button>
+        <button class="again-btn" onclick="generateID()">Generate another</button>
+      </div>
+    </div>
+
+    <div class="history-section" id="historySection">
+      <div class="history-label">
+        <span>Recent IDs</span>
+        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <p class="counter" id="counter" style="display:none;">
+      <span id="countNum">0</span> IDs generated this session
+    </p>
+  </div>
+
+  <script>
+    let history = [];
+    let count = 0;
+    let currentID = '';
+
+    function uuidv4() {
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+    }
+
+    function generateID() {
+      const uuid1 = uuidv4();
+      const uuid2 = uuidv4();
+      currentID = 'KidsLearningLabID-' + uuid1 + '-V1-' + uuid2;
+
+      document.getElementById('idBox').innerHTML =
+        '<span class="id-part-prefix">KidsLearningLabID-</span>' +
+        '<span class="id-part-uuid">' + uuid1 + '</span>' +
+        '<span class="id-part-v1">-V1-</span>' +
+        '<span class="id-part-uuid">' + uuid2 + '</span>';
+
+      document.getElementById('resultArea').style.display = 'block';
+
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.textContent = 'Copy to clipboard';
+      copyBtn.className = 'copy-btn';
+
+      count++;
+      history.unshift(currentID);
+      if (history.length > 5) history.pop();
+
+      renderHistory();
+
+      document.getElementById('counter').style.display = 'block';
+      document.getElementById('countNum').textContent = count;
+    }
+
+    function copyID() {
+      navigator.clipboard.writeText(currentID).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.className = 'copy-btn copied';
+        setTimeout(() => {
+          btn.textContent = 'Copy to clipboard';
+          btn.className = 'copy-btn';
+        }, 2000);
+      });
+    }
+
+    function renderHistory() {
+      const section = document.getElementById('historySection');
+      const list = document.getElementById('historyList');
+
+      if (history.length <= 1) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      list.innerHTML = history.slice(1).map(id =>
+        '<div class="history-item" onclick="selectID(\'' + id + '\')" title="Click to select">' + id + '</div>'
+      ).join('');
+    }
+
+    function selectID(id) {
+      currentID = id;
+      const parts = id.split('-V1-');
+      const prefix = 'KidsLearningLabID-';
+      const uuid1 = parts[0].replace(prefix, '');
+      const uuid2 = parts[1];
+
+      document.getElementById('idBox').innerHTML =
+        '<span class="id-part-prefix">KidsLearningLabID-</span>' +
+        '<span class="id-part-uuid">' + uuid1 + '</span>' +
+        '<span class="id-part-v1">-V1-</span>' +
+        '<span class="id-part-uuid">' + uuid2 + '</span>';
+
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.textContent = 'Copy to clipboard';
+      copyBtn.className = 'copy-btn';
+    }
+
+    function clearHistory() {
+      history = currentID ? [currentID] : [];
+      renderHistory();
+    }
+  </script>
+
+</body>
+</html>
