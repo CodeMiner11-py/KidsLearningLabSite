@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thanks for Registering! – Python Learning Lab</title>
+  <style>
+    @font-face {
+      font-family: 'LabFont';
+      src: url('Font.ttf') format('truetype');
+      font-weight: normal;
+    }
+    @font-face {
+      font-family: 'LabFont';
+      src: url('FontBold.ttf') format('truetype');
+      font-weight: bold;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #4A6CF7;
+      --blue-dark: #3558e8;
+      --green: #5BBF5B;
+      --green-dark: #3d9e3d;
+      --yellow: #F5C842;
+      --white: #ffffff;
+      --off-white: #f7f9ff;
+      --text: #1a1a2e;
+      --text-light: #555577;
+      --shadow: 0 4px 24px rgba(74,108,247,0.13);
+    }
+
+    body {
+      font-family: 'LabFont', sans-serif;
+      font-weight: normal;
+      background: var(--off-white);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--blue);
+      width: 100%;
+      padding: 48px 24px 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .check-wrap {
+      width: 88px;
+      height: 88px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 0 0 0 rgba(91,191,91,0.5);
+      animation: pulse 2.4s ease-out infinite, popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+    .check-wrap svg {
+      width: 46px;
+      height: 46px;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(91,191,91,0.5); }
+      60%  { box-shadow: 0 0 0 18px rgba(91,191,91,0); }
+      100% { box-shadow: 0 0 0 0 rgba(91,191,91,0); }
+    }
+
+    .hero h1 {
+      font-weight: bold;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: var(--white);
+      line-height: 1.15;
+      animation: fadeUp 0.6s 0.15s both;
+    }
+
+    .hero p.sub {
+      color: rgba(255,255,255,0.88);
+      font-size: 1.1rem;
+      margin-top: 10px;
+      max-width: 480px;
+      animation: fadeUp 0.6s 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* wave divider */
+    .wave {
+      width: 100%;
+      display: block;
+      margin-top: -2px;
+      color: var(--off-white);
+    }
+
+    /* ── Card container ── */
+    .content {
+      width: 100%;
+      max-width: 660px;
+      padding: 0 20px 60px;
+      margin-top: -8px;
+    }
+
+    /* ── Steps ── */
+    .section-label {
+      font-weight: bold;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin: 36px 0 14px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 18px 20px 18px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.5s both;
+    }
+
+    .step:nth-child(1) { animation-delay: 0.35s; }
+    .step:nth-child(2) { animation-delay: 0.45s; }
+    .step:nth-child(3) { animation-delay: 0.55s; }
+    .step:nth-child(4) { animation-delay: 0.65s; }
+    .step:nth-child(5) { animation-delay: 0.75s; }
+
+    .step-num {
+      min-width: 34px;
+      height: 34px;
+      background: var(--blue);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-body strong {
+      font-weight: bold;
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .step-body p {
+      font-size: 0.92rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    .step-body a {
+      color: var(--blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* highlight step */
+    .step.highlight {
+      border-left: 4px solid var(--yellow);
+    }
+
+    /* email tags */
+    .email-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+
+    .tag::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tag-stripe {
+      background: #f0f2ff;
+      color: #4A6CF7;
+      border: 1.5px solid #c5ccfa;
+    }
+
+    .tag-stripe::before { background: #4A6CF7; }
+
+    .tag-kll {
+      background: #f0fff0;
+      color: #3d9e3d;
+      border: 1.5px solid #b2e0b2;
+    }
+
+    .tag-kll::before { background: #5BBF5B; }
+
+    /* ── Footer CTA ── */
+    .footer-cta {
+      background: var(--green);
+      border-radius: 16px;
+      padding: 28px 28px;
+      margin-top: 36px;
+      text-align: center;
+      animation: fadeUp 0.5s 0.85s both;
+    }
+
+    .footer-cta p {
+      color: var(--white);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .footer-cta strong {
+      font-weight: bold;
+    }
+
+    .footer-cta .cta-link {
+      display: inline-block;
+      margin-top: 16px;
+      background: var(--white);
+      color: var(--green-dark);
+      font-weight: bold;
+      font-size: 0.97rem;
+      padding: 11px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+
+    .footer-cta .cta-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="check-wrap">
+      <svg viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="8,24 19,35 38,13" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>You're registered!<br>Welcome to Python Learning Lab</h1>
+    <p class="sub">We're excited to have you. Here's everything you need to know before your first class.</p>
+  </div>
+
+  <svg class="wave" viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 C360,48 1080,48 1440,0 L1440,48 L0,48 Z" fill="currentColor"/>
+  </svg>
+
+  <!-- Content -->
+  <div class="content">
+
+    <div class="section-label">Next Steps</div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Check your inbox for confirmation emails</strong>
+          <p>You'll receive two emails — check your spam folder if you don't see them within a few minutes.</p>
+          <div class="email-tags">
+            <span class="tag tag-stripe">Stripe – payment receipt</span>
+            <span class="tag tag-kll">Kids Learning Lab – registration confirmation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Details will be sent one week before class</strong>
+          <p>You'll receive the Zoom link, schedule reminder, and any class materials about a week before your first session. Keep an eye on your inbox!</p>
+        </div>
+      </div>
+
+      <div class="step highlight">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Install Python before your first class</strong>
+          <p>Download and install Python at <a href="https://python.org" target="_blank">python.org</a>. Choose the latest version and follow the installer instructions. Make sure to check <em>"Add Python to PATH"</em> during setup!</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Use IDLE as your code editor</strong>
+          <p>IDLE comes built-in with Python — no extra download needed. It's simple, beginner-friendly, and perfect for this course. We recommend it for all students.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Get the companion book</strong>
+          <p>Eshaan wrote a Python book for kids that follows along with the course. Pick it up at <a href="https://kidslearninglab.com/book" target="_blank">kidslearninglab.com/book</a> to read ahead and reinforce what you learn.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Have questions before class? We're happy to help.<br>
+      Reach us at <strong>hello@kidslearninglab.com</strong> anytime.</p>
+      <a class="cta-link" href="mailto:hello@kidslearninglab.com">Email Us</a>
+    </div>
+
+  </div>
+
+
+
+
+</body>
+</html>
