@@ -11,6 +11,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 
+    <!-- Early Bird date gate: adds class "eb-expired" to <html> if past May 14 2026 -->
+    <script>
+        (function() {
+            var deadline = new Date('2026-05-15T00:00:00'); // midnight after May 14
+            if (new Date() >= deadline) {
+                document.documentElement.classList.add('eb-expired');
+            }
+        })();
+    </script>
+
     <style>
         * { font-family: "DM Sans", sans-serif !important; box-sizing: border-box; }
 
@@ -21,6 +31,24 @@
         .bottom-cta h2,
         .hero h1 {
             font-family: "Space Grotesk", sans-serif !important;
+        }
+
+        /* ── Hide all early-bird elements when expired ── */
+        .eb-expired .early-bird-banner,
+        .eb-expired .early-sticker,
+        .eb-expired .plan-price-orig {
+            display: none !important;
+        }
+
+        /* When expired, show regular prices instead of discounted ones */
+        .eb-expired .plan-price[data-full]::before {
+            content: attr(data-full);
+        }
+        .eb-expired .plan-price[data-full] {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #111;
+            line-height: 1;
         }
 
         .content-box {
@@ -452,6 +480,27 @@
             .content-box { padding: 1.5rem 1.2rem; }
             .pricing-row { flex-direction: column; }
         }
+
+        /* ── Early-bird-expired overrides ── */
+
+        /* Hide banners, stickers, strikethroughs, "10% off" copy */
+        .eb-expired .early-bird-banner,
+        .eb-expired .early-sticker,
+        .eb-expired .plan-price-orig,
+        .eb-expired .bottom-cta-price-item .price-orig,
+        .eb-expired .bottom-cta-price-item .eb-note {
+            display: none !important;
+        }
+
+        /* Show full (non-discounted) prices instead of discounted ones */
+        .eb-expired .pricing-card .plan-price.discounted {
+            /* JS will swap text content */
+        }
+
+        /* Adjust bottom CTA text when no offer */
+        .eb-expired .bottom-cta-desc-offer { display: none !important; }
+        .eb-expired .bottom-cta-desc-normal { display: block !important; }
+        .bottom-cta-desc-normal { display: none; }
     </style>
 </head>
 <body>
@@ -503,7 +552,7 @@
                 A 10-week live coding course for kids and teens (ages 6–14). Start at any skill level and learn more every Sunday in summer.
             </p>
 
-            <!-- Early Bird Banner -->
+            <!-- Early Bird Banner — hidden after May 14 -->
             <div class="early-bird-banner">
                 <span class="eb-tag">🏷️ 10% Early Bird</span>
                 Save on both plans — offer ends <strong>May 14, 2026</strong>
@@ -514,7 +563,8 @@
                 <div class="pricing-card">
                     <div class="plan-name">Group Class</div>
                     <div class="plan-price-row">
-                        <div class="plan-price">$270</div>
+                        <!-- discounted price shown before May 14; full price shown after -->
+                        <div class="plan-price" id="groupPrice">$270</div>
                         <div class="plan-price-orig">$300</div>
                     </div>
                     <div class="early-sticker">10% off · Register before May 14</div>
@@ -526,7 +576,7 @@
                     <div class="badge-top">Personal</div>
                     <div class="plan-name">1-on-1 Class</div>
                     <div class="plan-price-row">
-                        <div class="plan-price">$405</div>
+                        <div class="plan-price" id="privatePrice">$405</div>
                         <div class="plan-price-orig">$450</div>
                     </div>
                     <div class="early-sticker">10% off · Register before May 14</div>
@@ -657,11 +707,14 @@
     <div class="content-box" style="padding: 0; background: transparent; box-shadow: none; margin-bottom: 3rem;">
         <div class="bottom-cta">
             <h2>Register Now</h2>
-            <p>Sign up now and get 10% off the price if you register before May 14!</p>
+            <!-- Shown before May 14 -->
+            <p class="bottom-cta-desc-offer">Sign up now and get 10% off the price if you register before May 14!</p>
+            <!-- Shown after May 14 -->
+            <p class="bottom-cta-desc-normal">Sign up now and secure your spot for the summer!</p>
             <div class="bottom-cta-pricing">
                 <div class="bottom-cta-price-item">
                     <div class="price-row">
-                        <div class="price">$270</div>
+                        <div class="price" id="bottomGroupPrice">$270</div>
                         <div class="price-orig">$300</div>
                     </div>
                     <div class="type">Group Class</div>
@@ -669,7 +722,7 @@
                 </div>
                 <div class="bottom-cta-price-item">
                     <div class="price-row">
-                        <div class="price">$405</div>
+                        <div class="price" id="bottomPrivatePrice">$405</div>
                         <div class="price-orig">$450</div>
                     </div>
                     <div class="type">1-on-1 Class</div>
@@ -691,6 +744,17 @@
 </script>
 
 <script>
+    // If early bird has expired, swap discounted prices for full prices
+    (function() {
+        var deadline = new Date('2026-05-15T00:00:00');
+        if (new Date() >= deadline) {
+            document.getElementById('groupPrice').textContent   = '$300';
+            document.getElementById('privatePrice').textContent = '$450';
+            document.getElementById('bottomGroupPrice').textContent   = '$300';
+            document.getElementById('bottomPrivatePrice').textContent = '$450';
+        }
+    })();
+
     function toggleMenu() {
         const nav = document.getElementById('navLinks');
         const container = document.getElementById('mobileNav');
