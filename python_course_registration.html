@@ -9,6 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js?render=6LeZGZssAAAAACQ_gRJe-b302vXmkA6jdi3kZHoW"></script>
 
+<!-- Early Bird date gate: adds class "eb-expired" to <html> if past May 14 2026 -->
+<script>
+    (function() {
+        var deadline = new Date('2026-05-15T00:00:00'); // midnight after May 14
+        if (new Date() >= deadline) {
+            document.documentElement.classList.add('eb-expired');
+        }
+    })();
+</script>
+
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -43,6 +53,15 @@ h1, h2, h3, h4, h5, h6,
 .countdown-text,
 .coupon-code {
   font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* ── Early-bird expired: hide all offer-related elements ── */
+.eb-expired .early-bird-banner,
+.eb-expired .coupon-box,
+.eb-expired .coupon-reminder,
+.eb-expired .class-card-eb,
+.eb-expired .class-card-price-orig {
+    display: none !important;
 }
 
 .page {
@@ -605,6 +624,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         <h2 class="slide-title">About the student</h2>
         <p class="slide-sub">Your child's information.</p>
 
+        <!-- Early Bird Banner — hidden after May 14 -->
         <div class="early-bird-banner">
           <span class="eb-tag">🏷️ 10% Early Bird</span>
           <p>Use code <strong>EARLYBIRD</strong> at Stripe checkout — offer ends May 14, 2026.</p>
@@ -683,7 +703,7 @@ input[type=range]::-webkit-slider-thumb:hover {
           <div class="class-card" id="card-1on1" onclick="selectClass('1on1')">
             <div class="class-card-title">1-on-1</div>
             <div class="class-card-price-row">
-              <div class="class-card-price">$405</div>
+              <div class="class-card-price" id="price1on1">$405</div>
               <div class="class-card-price-orig">$450</div>
             </div>
             <div class="class-card-eb">🏷️ 10% off with EARLYBIRD</div>
@@ -692,7 +712,7 @@ input[type=range]::-webkit-slider-thumb:hover {
           <div class="class-card" id="card-group" onclick="selectClass('group')">
             <div class="class-card-title">Group</div>
             <div class="class-card-price-row">
-              <div class="class-card-price">$270</div>
+              <div class="class-card-price" id="priceGroup">$270</div>
               <div class="class-card-price-orig">$300</div>
             </div>
             <div class="class-card-eb">🏷️ 10% off with EARLYBIRD</div>
@@ -701,7 +721,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         </div>
         <div class="error-msg" id="classTypeErr" style="margin-top:-2px;margin-bottom:12px;">Please select a class format.</div>
 
-        <!-- Coupon code box -->
+        <!-- Coupon code box — hidden after May 14 -->
         <div class="coupon-box">
           <div class="coupon-label">🏷️ Early Bird Discount — use at Stripe checkout</div>
           <div class="coupon-code">EARLYBIRD</div>
@@ -750,12 +770,12 @@ input[type=range]::-webkit-slider-thumb:hover {
             <span class="value" id="summaryFormat">—</span>
           </div>
           <div class="summary-row">
-            <span class="label">Full price</span>
+            <span class="label">Price</span>
             <span class="value" id="summaryAmount">—</span>
           </div>
         </div>
 
-        <!-- Coupon reminder -->
+        <!-- Coupon reminder — hidden after May 14 -->
         <div class="coupon-reminder">
           <span class="cr-label">🏷️ Coupon code</span>
           <span class="cr-code">EARLYBIRD</span>
@@ -797,10 +817,24 @@ const STRIPE_LINKS = {
   'group': 'https://buy.stripe.com/7sY3cv7KJeg31wk6YDcbC01',
 };
 
+// Full (non-discounted) prices
+const FULL_PRICES = { '1on1': '$450', 'group': '$300' };
+// Early-bird (discounted) prices
+const EB_PRICES   = { '1on1': '$405', 'group': '$270' };
+
 let currentSlide = 0;
 let selectedClass = null;
 const totalSlides = 6;
 let countdownTimer = null;
+
+// Determine if early bird has expired
+const ebExpired = new Date() >= new Date('2026-05-15T00:00:00');
+
+// If expired, swap the card prices to full prices
+if (ebExpired) {
+    document.getElementById('price1on1').textContent  = FULL_PRICES['1on1'];
+    document.getElementById('priceGroup').textContent = FULL_PRICES['group'];
+}
 
 const sliderLabels = {
   1: "Total beginner — never touched code",
@@ -935,7 +969,8 @@ async function submitRegistration() {
 
 function startCountdown() {
   const stripeUrl = STRIPE_LINKS[selectedClass];
-  const amount = selectedClass === '1on1' ? '$450' : '$300';
+  // Show full price in summary (Stripe applies the coupon separately if still valid)
+  const amount = ebExpired ? FULL_PRICES[selectedClass] : FULL_PRICES[selectedClass];
   const label = selectedClass === '1on1' ? '1-on-1 (Private)' : 'Group';
 
   document.getElementById('summaryFormat').textContent = label;

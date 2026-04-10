@@ -37,11 +37,95 @@
           margin-top: 1rem;
         }
         .cta-button {
-  display: inline-flex;       /* or flex */
-  justify-content: center;    /* center horizontally */
-  align-items: center;        /* center vertically */
-  text-align: center;         /* fallback for text */ /*bob*/
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
+
+        /* ── Course Ad Banner ── */
+        .course-ad {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            background: linear-gradient(135deg, #2196f3 0%, #87ceeb 100%);
+            border-radius: 16px;
+            padding: 1.6rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 6px 24px rgba(33,150,243,0.35);
+            text-decoration: none;
+            color: #000;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-wrap: wrap;
+        }
+
+        .course-ad:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(33,150,243,0.45);
+        }
+
+        .course-ad-logo {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .course-ad-text {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .course-ad-eyebrow {
+            display: inline-block;
+            background: rgba(0,0,0,0.15);
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.7rem;
+            border-radius: 999px;
+            margin-bottom: 0.45rem;
+            color: #000;
+        }
+
+        .course-ad-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #000;
+            margin: 0 0 0.25rem;
+            line-height: 1.25;
+        }
+
+        .course-ad-sub {
+            font-size: 0.85rem;
+            color: rgba(0,0,0,0.7);
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .course-ad-cta {
+            background: #000;
+            color: #87ceeb !important;
+            font-size: 0.9rem;
+            font-weight: 900;
+            padding: 0.65rem 1.4rem;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .course-ad-cta:hover {
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 560px) {
+            .course-ad { flex-direction: column; text-align: center; }
+            .course-ad-cta { width: 100%; text-align: center; display: block; }
+        }
     </style>
 </head>
 <body>
@@ -76,6 +160,17 @@
         </div>
     </nav>
 </header>
+
+<!-- ── Course Ad ── -->
+<a class="course-ad" href="/python_course">
+    <img class="course-ad-logo" src="https://stickypng.com/wp-content/uploads/2023/07/62a4bbf6fdee15d2905007bb.png" alt="Python logo">
+    <div class="course-ad-text">
+        <span class="course-ad-eyebrow">New this summer</span>
+        <div class="course-ad-title">Learn Python live with Eshaan — 10-week course for kids!</div>
+        <p class="course-ad-sub">Sundays, June 14 – Aug 16 &nbsp;·&nbsp; Ages 6–14 &nbsp;·&nbsp; 10% off if you register before May 14</p>
+    </div>
+    <span class="course-ad-cta">Learn more →</span>
+</a>
 
 <main class="content-box">
     <img src="https://kidslearninglab.com/uploads/PFE-Front.jpg" width="200">
