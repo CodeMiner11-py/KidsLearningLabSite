@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <style>
 /* ========== SCREEN BASE ========== */
-body{font-family:'DM Sans',sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#c3ecff,#90dffe);color:#333}
+body{font-family:'DM Sans',sans-serif!important;margin:0;padding:0;background:linear-gradient(135deg,#c3ecff,#90dffe);color:#333}
 header{background:linear-gradient(90deg,#4facfe,#00f2fe);color:#fff;text-align:center;padding:2rem 1rem;font-size:2rem;font-weight:700;border-bottom-left-radius:20px;border-bottom-right-radius:20px}
 section{margin:2rem auto;max-width:900px;padding:1.5rem;background:#fff;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,.1);border-left:8px solid #4facfe}
 h2{color:#4facfe}
@@ -21,7 +21,7 @@ a:hover{text-decoration:underline}
 /* ========== PRINT BAR ========== */
 .print-bar{position:sticky;top:0;z-index:999;background:linear-gradient(90deg,#003580,#0057b8);padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .print-bar span{color:#a8d4ff;font-size:.95rem}
-.print-btn{background:#fff;color:#003580;border:none;padding:.6rem 1.6rem;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;border-radius:50px;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .2s,transform .1s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.print-btn{background:#fff;color:#003580;border:none;padding:.6rem 1.6rem;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif!important;border-radius:50px;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .2s,transform .1s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .print-btn:hover{background:#e0f0ff;transform:translateY(-1px)}
 .print-btn svg{width:18px;height:18px}
 
@@ -50,7 +50,7 @@ a:hover{text-decoration:underline}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .print-bar,.cards-section,.footer{display:none!important}
-  body{background:#fff!important;color:#000!important;font-size:10pt;margin:0;padding:0;font-family:'DM Sans',sans-serif}
+  body{background:#fff!important;color:#000!important;font-size:10pt;margin:0;padding:0;font-family:'DM Sans',sans-serif!important}
   header{background:#003580!important;color:#fff!important;font-size:18pt;border-radius:0!important;padding:1.2rem 1rem}
   section{border-radius:0!important;box-shadow:none!important;max-width:100%!important;margin:0 0 .35rem!important;padding:.55rem 1rem!important;border-left:5px solid #003580!important;page-break-inside:avoid}
   .event{background:#f0f7ff!important;border-left:3px solid #003580!important;border-radius:0!important;padding:.35rem .6rem!important;margin:.25rem 0!important;page-break-inside:avoid}
@@ -60,7 +60,7 @@ a:hover{text-decoration:underline}
 
   /* COVER */
   .print-cover{display:flex!important;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;page-break-after:always;text-align:center;padding:3rem 2rem}
-  .print-cover .cl{font-size:34pt;font-family:'DM Sans',sans-serif;font-weight:700;color:#003580;line-height:1.2;margin-bottom:1rem}
+  .print-cover .cl{font-size:34pt;font-family:'DM Sans',sans-serif!important;font-weight:700;color:#003580;line-height:1.2;margin-bottom:1rem}
   .print-cover .cs{font-size:15pt;color:#555;margin-bottom:.4rem}
   .print-cover .cb2{display:inline-block;background:#003580;color:#fff!important;font-size:10pt;padding:.35rem 1.1rem;border-radius:4px;margin:.35rem 0}
   .print-cover .cdiv{width:70px;height:4px;background:#c04000;margin:1.3rem auto}
@@ -80,7 +80,7 @@ a:hover{text-decoration:underline}
 
   /* ========== PRINT PLACE CARDS ========== */
   .print-place-cards{display:block!important;page-break-before:always;padding:.5rem .8rem}
-  .ppc-title{font-size:16pt;font-family:'DM Sans',sans-serif;font-weight:700;color:#003580;border-bottom:3px solid #003580;padding-bottom:.4rem;margin:.3rem 0 .3rem}
+  .ppc-title{font-size:16pt;font-family:'DM Sans',sans-serif!important;font-weight:700;color:#003580;border-bottom:3px solid #003580;padding-bottom:.4rem;margin:.3rem 0 .3rem}
   .ppc-sub{font-size:8.5pt;color:#555;margin:0 0 .8rem}
   .pday-label{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#fff;background:#003580;display:inline-block;padding:2px 8px;border-radius:3px;margin:.6rem 0 .4rem}
   .pcgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem}

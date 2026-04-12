@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
+    *, *::before, *::after { font-family: 'DM Sans', sans-serif !important; }
     :root {
       --blue:    #1a4fa0;
       --blue-m:  #2563eb;
@@ -32,7 +33,7 @@
     }
 
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.6; }
+    body { font-family:'DM Sans',sans-serif !important; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.6; }
 
     /* ── Login ── */
     #login-screen {
@@ -166,7 +167,7 @@
     .f-label { font-size:0.74rem; font-weight:800; color:var(--ink-m); text-transform:uppercase; letter-spacing:0.05em; margin:0.9rem 0 0.3rem; }
     .f-input { width:100%; padding:0.68rem 0.9rem; border:1.5px solid var(--border); border-radius:var(--r-s); font-family:inherit; font-size:0.88rem; color:var(--ink); background:var(--surface); outline:none; transition:border-color 0.16s; }
     .f-input:focus { border-color:var(--blue-m); }
-    .f-textarea { width:100%; min-height:150px; padding:0.68rem 0.9rem; border:1.5px solid var(--border); border-radius:var(--r-s); font-family:'Courier New',monospace; font-size:0.85rem; color:var(--ink); background:var(--surface); outline:none; resize:vertical; transition:border-color 0.16s; }
+    .f-textarea { width:100%; min-height:150px; padding:0.68rem 0.9rem; border:1.5px solid var(--border); border-radius:var(--r-s); font-family:'Courier New',monospace !important; font-size:0.85rem; color:var(--ink); background:var(--surface); outline:none; resize:vertical; transition:border-color 0.16s; }
     .f-textarea:focus { border-color:var(--blue-m); }
     .f-hint { font-size:0.72rem; color:var(--ink-s); margin-top:0.22rem; }
     .save-bar { display:flex; align-items:center; gap:0.7rem; margin-top:0.9rem; }

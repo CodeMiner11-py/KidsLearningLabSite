@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
+    *, *::before, *::after { font-family: 'DM Sans', sans-serif !important; }
     :root {
       --blue:       #1a4fa0;
       --blue-m:     #2563eb;
@@ -35,7 +36,7 @@
     }
 
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.6; }
+    body { font-family:'DM Sans',sans-serif !important; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.6; }
 
     /* ── Auth ── */
     #auth-screen {
@@ -205,7 +206,7 @@
 
     .md-body { font-size:0.9rem; color:var(--ink-m); line-height:1.65; }
     .md-body h1,.md-body h2,.md-body h3 { color:var(--ink); font-weight:800; margin:0.9rem 0 0.35rem; }
-    .md-body code { background:#f1f5f9; border-radius:4px; padding:0.1em 0.38em; font-size:0.86em; font-family:'Courier New',monospace; }
+    .md-body code { background:#f1f5f9; border-radius:4px; padding:0.1em 0.38em; font-size:0.86em; font-family:'Courier New',monospace !important; }
     .md-body pre  { background:#0f172a; color:#e2e8f0; border-radius:var(--r-s); padding:0.9rem 1rem; overflow-x:auto; margin:0.7rem 0; }
     .md-body pre code { background:none; color:inherit; padding:0; }
     .md-body ul,.md-body ol { padding-left:1.4rem; margin:0.4rem 0; }
