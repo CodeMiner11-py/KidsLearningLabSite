@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parent Portal — Python Learning Lab</title>
+  <link rel="icon" href="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    @font-face { font-family:'Lab'; src:url('Font.otf') format('opentype'); font-weight:400; }
+    @font-face { font-family:'Lab'; src:url('FontBold.otf') format('opentype'); font-weight:700 900; }
+
+    :root {
+      --green:      #047857;
+      --green-m:    #059669;
+      --green-l:    #d1fae5;
+      --green-p:    #ecfdf5;
+      --teal:       #0f766e;
+      --teal-l:     #ccfbf1;
+      --blue:       #1d4ed8;
+      --blue-l:     #dbeafe;
+      --gold:       #d97706;
+      --gold-l:     #fef3c7;
+      --ink:        #0f172a;
+      --ink-m:      #334155;
+      --ink-s:      #64748b;
+      --border:     #e2e8f0;
+      --surface:    #f0fdf4;
+      --white:      #ffffff;
+      --r:          14px;
+      --r-s:        8px;
+      --shadow:     0 2px 16px rgba(15,23,42,0.07);
+      --shadow-l:   0 6px 32px rgba(15,23,42,0.12);
+    }
+
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Lab','DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.6; }
+
+    /* ── Auth ── */
+    #auth-screen {
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem;
+      background:linear-gradient(145deg, #051a0f 0%, #083d22 45%, #0a2d3a 100%);
+      position:relative; overflow:hidden;
+    }
+    #auth-screen::before {
+      content:''; position:absolute; inset:0;
+      background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size:28px 28px;
+    }
+
+    .auth-card {
+      background:var(--white); border-radius:20px; padding:2.4rem 2.6rem;
+      max-width:400px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,0.32);
+      position:relative; z-index:1;
+    }
+
+    .auth-logo { display:flex; align-items:center; gap:0.7rem; margin-bottom:1.8rem; }
+    .auth-logo img { width:42px; border-radius:10px; }
+    .auth-logo-name { font-weight:900; font-size:0.92rem; color:var(--green); line-height:1.25; }
+    .auth-logo-sub  { font-size:0.68rem; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:0.06em; }
+
+    .auth-title { font-size:1.55rem; font-weight:900; color:var(--ink); margin-bottom:0.35rem; }
+    .auth-sub   { font-size:0.88rem; color:var(--ink-s); margin-bottom:1.6rem; }
+
+    .field-label { display:block; font-size:0.76rem; font-weight:700; color:var(--ink-m); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:0.35rem; }
+    .field-input {
+      width:100%; padding:0.82rem 1rem; border:2px solid var(--border); border-radius:var(--r-s);
+      font-family:inherit; font-size:0.96rem; color:var(--ink); background:#f8fffe;
+      outline:none; transition:border-color 0.18s; margin-bottom:0.9rem;
+    }
+    .field-input:focus { border-color:var(--green-m); }
+    .field-input.otp { font-size:2rem; font-weight:900; text-align:center; letter-spacing:0.4em; }
+
+    .auth-btn {
+      width:100%; padding:0.88rem; background:linear-gradient(135deg,var(--green),var(--green-m));
+      color:#fff; border:none; border-radius:var(--r-s); font-family:inherit; font-size:0.96rem;
+      font-weight:800; cursor:pointer; transition:opacity 0.18s, transform 0.15s;
+    }
+    .auth-btn:hover { opacity:0.9; transform:translateY(-1px); }
+    .auth-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+    .auth-link { display:inline-block; margin-top:0.85rem; font-size:0.83rem; color:var(--green-m); font-weight:600; cursor:pointer; background:none; border:none; font-family:inherit; }
+    .auth-link:hover { text-decoration:underline; }
+
+    .msg-error   { background:#fee2e2; color:#991b1b; border-radius:var(--r-s); padding:0.65rem 0.9rem; font-size:0.83rem; font-weight:600; margin-bottom:0.8rem; }
+    .msg-success { background:var(--green-l); color:#065f46; border-radius:var(--r-s); padding:0.65rem 0.9rem; font-size:0.83rem; font-weight:600; margin-bottom:0.8rem; }
+
+    /* ── App shell ── */
+    #app { display:none; min-height:100vh; }
+    .layout { display:flex; min-height:100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width:230px; background:linear-gradient(180deg, #051a0f 0%, #083d22 100%);
+      position:fixed; top:0; left:0; height:100vh;
+      display:flex; flex-direction:column; z-index:100; transition:transform 0.28s;
+    }
+
+    .sb-logo {
+      display:flex; align-items:center; gap:0.7rem; padding:1.4rem 1.2rem 1.1rem;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+    }
+    .sb-logo img     { width:34px; border-radius:8px; }
+    .sb-logo-name    { font-size:0.82rem; font-weight:900; color:#fff; line-height:1.25; }
+    .sb-logo-sub     { font-size:0.62rem; font-weight:700; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.06em; }
+
+    .sb-nav   { flex:1; padding:0.8rem 0; overflow-y:auto; }
+
+    .nav-btn {
+      display:flex; align-items:center; gap:0.7rem; padding:0.72rem 1.2rem;
+      color:rgba(255,255,255,0.6); cursor:pointer; font-family:inherit;
+      font-size:0.87rem; font-weight:600; background:none; border:none;
+      width:100%; text-align:left; transition:all 0.14s;
+    }
+    .nav-btn:hover  { color:#fff; background:rgba(255,255,255,0.05); }
+    .nav-btn.active { color:#fff; background:rgba(4,120,87,0.35); border-right:3px solid #6ee7b7; }
+    .nav-btn svg    { width:16px; height:16px; flex-shrink:0; opacity:0.75; }
+    .nav-btn.active svg { opacity:1; }
+
+    .sb-footer { padding:1rem 1.2rem; border-top:1px solid rgba(255,255,255,0.07); }
+
+    .parent-chip {
+      background:rgba(255,255,255,0.07); border-radius:10px; padding:0.65rem 0.85rem; margin-bottom:0.7rem;
+    }
+    .parent-chip .pc-name { font-size:0.85rem; font-weight:900; color:#fff; }
+    .parent-chip .pc-sub  { font-size:0.68rem; font-weight:700; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.1rem; }
+
+    .logout-btn {
+      display:flex; align-items:center; gap:0.45rem; padding:0.55rem 0.85rem;
+      background:none; border:1px solid rgba(255,255,255,0.14); border-radius:var(--r-s);
+      color:rgba(255,255,255,0.55); font-family:inherit; font-size:0.8rem; font-weight:600;
+      cursor:pointer; width:100%; transition:all 0.14s;
+    }
+    .logout-btn:hover { background:rgba(255,255,255,0.07); color:#fff; }
+
+    /* ── Main ── */
+    .main { margin-left:230px; padding:2rem; flex:1; max-width:calc(100vw - 230px); }
+    .page         { display:none; }
+    .page.active  { display:block; }
+
+    .page-title { font-size:1.55rem; font-weight:900; color:var(--ink); margin-bottom:1.6rem; }
+    .page-title span { color:var(--green-m); }
+
+    /* ── Cards ── */
+    .card { background:var(--white); border-radius:var(--r); border:1px solid var(--border); box-shadow:var(--shadow); padding:1.4rem; margin-bottom:1.1rem; }
+    .card-title { font-size:0.95rem; font-weight:800; color:var(--ink); margin-bottom:0.8rem; }
+
+    /* ── Overview banner ── */
+    .overview-banner {
+      background:linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+      border-radius:var(--r); padding:1.6rem 1.8rem; color:#fff; margin-bottom:1.1rem;
+    }
+    .ob-greeting { font-size:1rem; font-weight:700; opacity:0.85; margin-bottom:0.2rem; }
+    .ob-child    { font-size:1.4rem; font-weight:900; margin-bottom:0.4rem; }
+    .ob-meta     { font-size:0.82rem; opacity:0.78; font-weight:600; }
+
+    /* ── Stats ── */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0.9rem; margin-bottom:1.1rem; }
+    .stat-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow); padding:1rem 1.2rem; }
+    .stat-num  { font-size:1.7rem; font-weight:900; color:var(--green-m); }
+    .stat-lbl  { font-size:0.76rem; color:var(--ink-s); font-weight:600; margin-top:0.1rem; }
+
+    /* ── Schedule ── */
+    .session-row { display:flex; align-items:center; gap:0.8rem; padding:0.75rem 0; border-bottom:1px solid var(--border); }
+    .session-row:last-child { border-bottom:none; }
+    .sr-num  { width:34px; height:34px; border-radius:9px; background:var(--green-l); color:var(--green); font-weight:900; font-size:0.85rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sr-num.done { background:var(--teal-l); color:var(--teal); }
+    .sr-num.next { background:var(--green); color:#fff; }
+    .sr-info { flex:1; }
+    .sr-title { font-size:0.9rem; font-weight:800; color:var(--ink); }
+    .sr-date  { font-size:0.76rem; color:var(--ink-s); }
+    .sr-badge { font-size:0.68rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:999px; }
+    .sr-badge.upcoming { background:var(--green-l); color:var(--green); }
+    .sr-badge.next-up  { background:var(--green); color:#fff; }
+    .sr-badge.done     { background:var(--teal-l); color:var(--teal); }
+
+    /* ── Announcements ── */
+    .ann-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow); padding:1.1rem 1.3rem; margin-bottom:0.7rem; }
+    .ann-card.pinned { border-left:4px solid var(--gold); }
+    .ann-pin  { display:inline-block; background:var(--gold-l); color:#92400e; font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; padding:0.18rem 0.55rem; border-radius:999px; margin-bottom:0.35rem; }
+    .ann-title { font-size:0.96rem; font-weight:800; color:var(--ink); margin-bottom:0.35rem; }
+    .ann-body  { font-size:0.88rem; color:var(--ink-m); line-height:1.55; }
+    .ann-date  { font-size:0.72rem; color:var(--ink-s); margin-top:0.45rem; font-weight:600; }
+
+    /* ── Message ── */
+    .msg-textarea { width:100%; min-height:130px; padding:0.85rem; border:2px solid var(--border); border-radius:var(--r-s); font-family:inherit; font-size:0.93rem; color:var(--ink); background:#f8fffe; resize:vertical; outline:none; transition:border-color 0.18s; }
+    .msg-textarea:focus { border-color:var(--green-m); }
+    .send-btn { display:inline-flex; align-items:center; gap:0.45rem; padding:0.75rem 1.6rem; background:linear-gradient(135deg,var(--green),var(--green-m)); color:#fff; border:none; border-radius:var(--r-s); font-family:inherit; font-size:0.92rem; font-weight:800; cursor:pointer; transition:opacity 0.18s,transform 0.14s; margin-top:0.9rem; }
+    .send-btn:hover { opacity:0.9; transform:translateY(-1px); }
+    .send-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+    /* ── md ── */
+    .md-body { font-size:0.9rem; color:var(--ink-m); line-height:1.65; }
+    .md-body h1,.md-body h2,.md-body h3 { color:var(--ink); font-weight:800; margin:0.9rem 0 0.35rem; }
+    .md-body code { background:#f1f5f9; border-radius:4px; padding:0.1em 0.38em; font-size:0.86em; font-family:'Courier New',monospace; }
+    .md-body pre  { background:#0f172a; color:#e2e8f0; border-radius:var(--r-s); padding:0.9rem 1rem; overflow-x:auto; margin:0.7rem 0; }
+    .md-body pre code { background:none; color:inherit; padding:0; }
+    .md-body ul,.md-body ol { padding-left:1.4rem; margin:0.4rem 0; }
+    .no-content { font-size:0.85rem; color:var(--ink-s); font-style:italic; }
+
+    .loading { display:flex; align-items:center; justify-content:center; padding:2.5rem; color:var(--ink-s); font-weight:600; font-size:0.9rem; }
+    .spinner { width:22px; height:22px; border:3px solid var(--border); border-top-color:var(--green-m); border-radius:50%; animation:spin 0.75s linear infinite; margin-right:0.65rem; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .ham-btn { display:none; position:fixed; top:0.9rem; left:0.9rem; z-index:200; background:var(--green); color:#fff; border:none; border-radius:var(--r-s); width:38px; height:38px; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); }
+    .overlay  { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.38); z-index:90; }
+    .overlay.show { display:block; }
+
+    @media(max-width:768px){
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .main { margin-left:0; max-width:100vw; padding:1rem; padding-top:3.5rem; }
+      .ham-btn { display:flex; }
+      .stats-row { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+      <div>
+        <div class="auth-logo-name">Kids Learning Lab</div>
+        <div class="auth-logo-sub">Parent Portal</div>
+      </div>
+    </div>
+
+    <div id="step-email">
+      <div class="auth-title">Parent Sign In</div>
+      <p class="auth-sub">Enter the parent email address used when registering your child for the course.</p>
+      <div id="e-err" class="msg-error" style="display:none;"></div>
+      <label class="field-label">Parent Email</label>
+      <input type="email" id="email-in" class="field-input" placeholder="parent@email.com" autocomplete="email">
+      <button class="auth-btn" id="send-btn" onclick="sendOTP()">Send Login Code</button>
+    </div>
+
+    <div id="step-otp" style="display:none;">
+      <div class="auth-title">Check your email</div>
+      <p class="auth-sub" id="otp-sub">We sent a 6-digit code to your email.</p>
+      <div id="otp-err" class="msg-error" style="display:none;"></div>
+      <label class="field-label">6-Digit Code</label>
+      <input type="text" id="otp-in" class="field-input otp" placeholder="------" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+      <button class="auth-btn" id="verify-btn" onclick="verifyOTP()">Sign In</button>
+      <br>
+      <button class="auth-link" onclick="backToEmail()">Use a different email</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<button class="ham-btn" onclick="toggleSidebar()">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div id="app">
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+        <div>
+          <div class="sb-logo-name">Kids Learning Lab</div>
+          <div class="sb-logo-sub">Parent Portal</div>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <button class="nav-btn active" onclick="showPage('overview')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </button>
+        <button class="nav-btn" onclick="showPage('schedule')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Course Schedule
+        </button>
+        <button class="nav-btn" onclick="showPage('announcements')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Announcements
+        </button>
+        <button class="nav-btn" onclick="showPage('message')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message Eshaan
+        </button>
+      </nav>
+      <div class="sb-footer">
+        <div class="parent-chip">
+          <div class="pc-name" id="sb-name">Loading...</div>
+          <div class="pc-sub">Parent</div>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- Overview -->
+      <div class="page active" id="page-overview">
+        <div class="page-title">Overview</div>
+        <div class="overview-banner">
+          <div class="ob-greeting">Your child is enrolled in</div>
+          <div class="ob-child" id="ob-child">Python Learning Lab</div>
+          <div class="ob-meta" id="ob-meta">Loading...</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num" id="ov-done">-</div><div class="stat-lbl">Sessions Done</div></div>
+          <div class="stat-card"><div class="stat-num" id="ov-left">-</div><div class="stat-lbl">Sessions Left</div></div>
+          <div class="stat-card"><div class="stat-num">10</div><div class="stat-lbl">Total Sessions</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Next Session</div>
+          <div id="ov-next">Loading...</div>
+        </div>
+        <div class="card" id="ov-ann" style="display:none;">
+          <div class="card-title">Latest Announcement</div>
+          <div id="ov-ann-body"></div>
+          <button onclick="showPage('announcements')" style="margin-top:0.6rem;background:none;border:none;color:var(--green-m);font-family:inherit;font-size:0.83rem;font-weight:700;cursor:pointer;padding:0;">View all announcements</button>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="page" id="page-schedule">
+        <div class="page-title">Course <span>Schedule</span></div>
+        <div class="card" id="sched-card">
+          <div id="schedule-list"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div class="page" id="page-announcements">
+        <div class="page-title"><span>Announcements</span></div>
+        <div id="ann-list"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+      </div>
+
+      <!-- Message -->
+      <div class="page" id="page-message">
+        <div class="page-title">Message <span>Eshaan</span></div>
+        <div class="card">
+          <div class="card-title">Send a message</div>
+          <p style="font-size:0.88rem;color:var(--ink-s);margin-bottom:1rem;">Questions about your child's progress, scheduling, or anything else? Eshaan will see this message.</p>
+          <div id="msg-err" class="msg-error" style="display:none;"></div>
+          <div id="msg-ok" class="msg-success" style="display:none;"></div>
+          <textarea class="msg-textarea" id="msg-text" placeholder="Type your message here..."></textarea>
+          <button class="send-btn" id="msg-btn" onclick="sendMessage()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Message
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const API   = 'https://pll-portal-api.nameless-cherry-998c.workers.dev';
+const DATES = ['June 14, 2026','June 21, 2026','June 28, 2026','July 5, 2026','July 12, 2026','July 19, 2026','July 26, 2026','August 2, 2026','August 9, 2026','August 16, 2026'];
+
+let token    = localStorage.getItem('pll_parent_token');
+let profile  = null;
+let sessions = [], announcements = [];
+let curEmail = '';
+
+(async () => {
+  if (token) {
+    try {
+      const d = await api('/api/parent/me');
+      profile = d.profile;
+      showApp();
+    } catch { localStorage.removeItem('pll_parent_token'); token = null; }
+  }
+})();
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}), ...(opts.headers||{}) },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const d = await res.json();
+  if (!res.ok) throw new Error(d.error || 'Request failed');
+  return d;
+}
+
+async function sendOTP() {
+  const email = document.getElementById('email-in').value.trim();
+  const errEl = document.getElementById('e-err');
+  errEl.style.display = 'none';
+  if (!email) { errEl.textContent='Please enter your email.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    await api('/api/auth/parent/otp', { method:'POST', body:{email} });
+    curEmail = email;
+    document.getElementById('step-email').style.display = 'none';
+    document.getElementById('step-otp').style.display = 'block';
+    document.getElementById('otp-sub').textContent = `We sent a 6-digit code to ${email}`;
+    document.getElementById('otp-in').focus();
+  } catch(e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+  finally { btn.disabled = false; btn.textContent = 'Send Login Code'; }
+}
+
+async function verifyOTP() {
+  const otp   = document.getElementById('otp-in').value.trim();
+  const errEl = document.getElementById('otp-err');
+  errEl.style.display = 'none';
+  if (otp.length !== 6) { errEl.textContent='Enter the 6-digit code.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('verify-btn');
+  btn.disabled = true; btn.textContent = 'Verifying...';
+  try {
+    const d = await api('/api/auth/parent/verify', { method:'POST', body:{email:curEmail, otp} });
+    token = d.token; profile = d.profile;
+    localStorage.setItem('pll_parent_token', token);
+    showApp();
+  } catch(e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+  finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+}
+
+function backToEmail() {
+  document.getElementById('step-otp').style.display = 'none';
+  document.getElementById('step-email').style.display = 'block';
+  document.getElementById('otp-err').style.display = 'none';
+  document.getElementById('otp-in').value = '';
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('sb-name').textContent = profile?.parentName || profile?.sub || 'Parent';
+  document.getElementById('ob-child').textContent = profile?.kidName || 'Your Child';
+  document.getElementById('ob-meta').textContent = (profile?.classType === '1on1' ? '1-on-1 Private Class' : 'Group Class') + ' · Sundays, June 14 – August 16, 2026';
+  Promise.all([loadSessions(), loadAnnouncements()]);
+}
+
+function logout() {
+  localStorage.removeItem('pll_parent_token');
+  token = null; profile = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('email-in').value = '';
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const map = {overview:0, schedule:1, announcements:2, message:3};
+  document.querySelectorAll('.nav-btn')[map[id]]?.classList.add('active');
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+async function loadSessions() {
+  try {
+    const d = await api('/api/parent/sessions');
+    sessions = d.sessions || [];
+    renderSchedule();
+    renderOverview();
+  } catch(e) {
+    document.getElementById('schedule-list').innerHTML = `<p style="color:#dc2626">Failed: ${e.message}</p>`;
+  }
+}
+
+function sessDate(n) {
+  const s = DATES[n-1];
+  return s ? new Date(s + ' 10:00:00') : null;
+}
+
+function renderSchedule() {
+  const now  = new Date();
+  const el   = document.getElementById('schedule-list');
+  const future = sessions.filter(s => { const d=sessDate(s.sessionNumber); return d&&d>now; }).sort((a,b)=>a.sessionNumber-b.sessionNumber);
+  const nextId = future[0]?.id;
+  el.innerHTML = sessions.map(s => {
+    const d    = sessDate(s.sessionNumber);
+    const past = d && d < now;
+    const next = s.id === nextId;
+    const numClass   = past ? 'done' : next ? 'next' : '';
+    const badgeClass = past ? 'done' : next ? 'next-up' : 'upcoming';
+    const badgeText  = past ? 'Done' : next ? 'Next' : 'Upcoming';
+    return `
+    <div class="session-row">
+      <div class="sr-num ${numClass}">${s.sessionNumber}</div>
+      <div class="sr-info">
+        <div class="sr-title">${s.title||'Session '+s.sessionNumber}</div>
+        <div class="sr-date">${DATES[s.sessionNumber-1]||''}</div>
+      </div>
+      <span class="sr-badge ${badgeClass}">${badgeText}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderOverview() {
+  const now    = new Date();
+  const past   = sessions.filter(s => { const d=sessDate(s.sessionNumber); return d&&d<now; });
+  const future = sessions.filter(s => { const d=sessDate(s.sessionNumber); return d&&d>now; }).sort((a,b)=>a.sessionNumber-b.sessionNumber);
+  document.getElementById('ov-done').textContent = past.length;
+  document.getElementById('ov-left').textContent = future.length;
+  if (future.length) {
+    const next = future[0];
+    document.getElementById('ov-next').innerHTML = `
+      <div style="font-size:0.96rem;font-weight:800;color:var(--ink);">Session ${next.sessionNumber}: ${next.title||''}</div>
+      <div style="font-size:0.8rem;color:var(--ink-s);margin-top:0.2rem;">${DATES[next.sessionNumber-1]||''}</div>
+      ${next.description?`<p style="margin-top:0.45rem;font-size:0.87rem;color:var(--ink-m);">${next.description}</p>`:''}`;
+  } else {
+    document.getElementById('ov-next').textContent = 'The course is complete.';
+  }
+}
+
+async function loadAnnouncements() {
+  try {
+    const d = await api('/api/parent/announcements');
+    announcements = d.announcements || [];
+    renderAnnouncements();
+  } catch(e) {
+    document.getElementById('ann-list').innerHTML = `<div class="card" style="color:#dc2626">Failed: ${e.message}</div>`;
+  }
+}
+
+function renderAnnouncements() {
+  const el = document.getElementById('ann-list');
+  if (!announcements.length) { el.innerHTML='<div class="card"><p class="no-content">No announcements yet.</p></div>'; return; }
+  el.innerHTML = announcements.map(a => `
+    <div class="ann-card ${a.pinned?'pinned':''}">
+      ${a.pinned?'<span class="ann-pin">Pinned</span>':''}
+      <div class="ann-title">${a.title}</div>
+      <div class="ann-body md-body">${marked.parse(a.body||'')}</div>
+      <div class="ann-date">${a.createdAt?new Date(a.createdAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):''}</div>
+    </div>`).join('');
+  if (announcements.length) {
+    const a = announcements[0];
+    document.getElementById('ov-ann').style.display = 'block';
+    document.getElementById('ov-ann-body').innerHTML = `<div class="ann-title">${a.title}</div><div style="font-size:0.86rem;color:var(--ink-m);">${(a.body||'').slice(0,200)}${(a.body||'').length>200?'...':''}</div>`;
+  }
+}
+
+async function sendMessage() {
+  const msg   = document.getElementById('msg-text').value.trim();
+  const errEl = document.getElementById('msg-err');
+  const okEl  = document.getElementById('msg-ok');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!msg) { errEl.textContent='Please write a message.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('msg-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    await api('/api/parent/messages', { method:'POST', body:{message:msg} });
+    okEl.textContent = 'Message sent. Eshaan will see it soon.';
+    okEl.style.display = 'block';
+    document.getElementById('msg-text').value = '';
+  } catch(e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('step-email').style.display !== 'none') sendOTP();
+  else if (document.getElementById('step-otp').style.display !== 'none') verifyOTP();
+});
+</script>
+</body>
+</html>
