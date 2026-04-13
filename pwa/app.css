@@ -1,0 +1,661 @@
+/* ─── Reset & Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-900: #0D2B6E;
+  --blue-800: #1565C0;
+  --blue-700: #1976D2;
+  --blue-600: #1E88E5;
+  --blue-100: #BBDEFB;
+  --blue-50:  #E3F2FD;
+  --accent:   #FFB300;
+  --accent-light: #FFF8E1;
+  --surface:  #FFFFFF;
+  --bg:       #F0F4FF;
+  --text-1:   #0D1B3E;
+  --text-2:   #3A4A6B;
+  --text-3:   #7B8DB5;
+  --border:   #D6E2F8;
+  --nav-h:    64px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+html { height: 100%; }
+
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: var(--nav-h);
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+img { display: block; }
+
+/* ─── Typography ─────────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 { font-family: 'Nunito', sans-serif; font-weight: 800; }
+h1 { font-size: 24px; line-height: 1.2; }
+h2 { font-size: 19px; line-height: 1.3; }
+h3 { font-size: 15px; }
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ─── Top App Bar ────────────────────────────────────────────────────────────── */
+.app-bar {
+  background: var(--blue-800);
+  color: #fff;
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-bar .logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.app-bar .logo-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--blue-700);
+}
+
+.app-bar .logo-text { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; color: #fff; }
+
+.app-bar .icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.85);
+  transition: background .15s;
+}
+.app-bar .icon-btn:hover { background: rgba(255,255,255,.15); }
+.app-bar .icon-btn .material-icons-round { font-size: 22px; }
+
+/* ─── Bottom Nav ─────────────────────────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 200;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-3);
+  transition: color .15s;
+  padding: 6px 0 4px;
+}
+.nav-item .material-icons-round { font-size: 24px; }
+.nav-item .nav-label { font-size: 10px; font-weight: 600; font-family: 'Nunito', sans-serif; }
+.nav-item.active { color: var(--blue-800); }
+.nav-item.active .material-icons-round {
+  background: var(--blue-50);
+  border-radius: 16px;
+  padding: 2px 16px;
+}
+
+/* ─── Hero Banner ────────────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(150deg, var(--blue-800) 0%, var(--blue-900) 100%);
+  padding: 20px 16px 24px;
+  color: #fff;
+}
+.hero-greeting { font-size: 13px; color: var(--blue-100); margin-bottom: 4px; }
+.hero h1 { font-size: 22px; color: #fff; margin-bottom: 6px; }
+.hero-sub { font-size: 13px; color: var(--blue-100); }
+
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  color: #5D3800;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 20px;
+  margin-top: 12px;
+}
+.new-badge .material-icons-round { font-size: 14px; }
+
+/* ─── Section Headers ────────────────────────────────────────────────────────── */
+.section {
+  padding: 16px 16px 0;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-header h2 { font-size: 16px; color: var(--text-1); }
+.section-header a { font-size: 12px; color: var(--blue-700); font-weight: 600; }
+
+/* ─── Featured Card (latest episode) ────────────────────────────────────────── */
+.featured-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: flex;
+  margin: -1px 16px 0;
+  cursor: pointer;
+  transition: box-shadow .2s;
+  position: relative;
+  top: -12px;
+}
+.featured-card:hover { box-shadow: 0 4px 20px rgba(21,101,192,.15); }
+
+.featured-art {
+  width: 110px;
+  min-height: 110px;
+  flex-shrink: 0;
+  background: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.featured-art img { width: 100%; height: 100%; object-fit: cover; }
+.featured-art .material-icons-round { font-size: 40px; color: var(--blue-600); }
+
+.featured-body {
+  padding: 12px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.featured-tag {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  color: var(--blue-800);
+  background: var(--blue-50);
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  align-self: flex-start;
+}
+.featured-body h3 {
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.3;
+}
+.featured-body p {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.featured-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.featured-meta .duration { font-size: 11px; color: var(--text-3); display: flex; align-items: center; gap: 3px; }
+.featured-meta .duration .material-icons-round { font-size: 13px; }
+
+.play-fab {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--blue-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.play-fab .material-icons-round { font-size: 18px; margin-left: 1px; }
+
+/* ─── Episode List Row ───────────────────────────────────────────────────────── */
+.ep-list { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; }
+
+.ep-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px 10px 10px;
+  cursor: pointer;
+  transition: box-shadow .15s;
+  text-decoration: none;
+  color: inherit;
+}
+.ep-row:hover { box-shadow: 0 2px 12px rgba(21,101,192,.12); }
+
+.ep-art {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  background: var(--blue-50);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ep-art img { width: 100%; height: 100%; object-fit: cover; }
+.ep-art .material-icons-round, .ep-art .art-fallback { font-size: 26px; color: var(--blue-600); }
+
+.ep-info { flex: 1; min-width: 0; }
+.ep-info .ep-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.ep-info .ep-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.ep-info .ep-meta .material-icons-round { font-size: 12px; }
+
+.ep-chevron { color: var(--text-3); }
+.ep-chevron .material-icons-round { font-size: 20px; }
+
+.fav-btn {
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color .15s, background .15s;
+}
+.fav-btn:hover { background: var(--blue-50); color: var(--blue-700); }
+.fav-btn.active { color: var(--accent); }
+.fav-btn .material-icons-round { font-size: 20px; }
+
+/* ─── Loading Skeleton ───────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #e0e9f9 25%, #c8d9f4 50%, #e0e9f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.skeleton-row {
+  display: flex;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+}
+.skel-art { width: 52px; height: 52px; border-radius: var(--radius-sm); flex-shrink: 0; }
+.skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.skel-line { height: 12px; }
+.skel-line.short { width: 60%; }
+
+/* ─── Error State ────────────────────────────────────────────────────────────── */
+.error-state {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-3);
+}
+.error-state .material-icons-round { font-size: 48px; margin-bottom: 12px; color: var(--blue-100); }
+.error-state p { font-size: 14px; color: var(--text-2); margin-bottom: 16px; }
+.error-state button {
+  background: var(--blue-800);
+  color: #fff;
+  border-radius: 24px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ─── Chips / Tags ───────────────────────────────────────────────────────────── */
+.chip-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 12px; scrollbar-width: none; }
+.chip-row::-webkit-scrollbar { display: none; }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .15s;
+}
+.chip.active, .chip:hover { background: var(--blue-800); color: #fff; border-color: var(--blue-800); }
+.chip .material-icons-round { font-size: 15px; }
+
+/* ─── Episode Detail Page ────────────────────────────────────────────────────── */
+.ep-header-full {
+  background: linear-gradient(150deg, var(--blue-800), var(--blue-900));
+  padding: 16px;
+  color: #fff;
+}
+.back-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue-100);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+.back-row .material-icons-round { font-size: 18px; }
+
+.ep-detail-art {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--blue-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.ep-detail-art img { width: 100%; height: 100%; object-fit: cover; }
+.ep-detail-art .material-icons-round, .ep-detail-art .art-fallback { font-size: 52px; color: var(--blue-100); }
+
+.ep-detail-title { font-size: 20px; font-family: 'Nunito', sans-serif; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.ep-detail-meta { font-size: 12px; color: var(--blue-100); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ep-detail-meta span { display: flex; align-items: center; gap: 3px; }
+.ep-detail-meta .material-icons-round { font-size: 13px; }
+
+/* ─── In-App Player ──────────────────────────────────────────────────────────── */
+.player-card {
+  background: var(--surface);
+  margin: 12px 16px;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+.player-progress { margin: 8px 0 4px; }
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--blue-50);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 4px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--blue-700);
+  border-radius: 4px;
+  width: 0%;
+  transition: width .3s linear;
+  pointer-events: none;
+}
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-3);
+}
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.ctrl-icon-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  transition: background .15s;
+}
+.ctrl-icon-btn:hover { background: var(--blue-50); }
+.ctrl-icon-btn .material-icons-round { font-size: 26px; }
+
+.ctrl-play-main {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--blue-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.ctrl-play-main:hover { background: var(--blue-700); }
+.ctrl-play-main .material-icons-round { font-size: 32px; }
+
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.volume-row .material-icons-round { font-size: 18px; color: var(--text-3); }
+.volume-row input[type=range] {
+  flex: 1;
+  accent-color: var(--blue-700);
+  height: 4px;
+}
+
+/* ─── Action Buttons ─────────────────────────────────────────────────────────── */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 16px 16px;
+}
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background .15s;
+}
+.action-btn:hover { background: var(--blue-50); }
+.action-btn .material-icons-round { font-size: 20px; color: var(--blue-700); }
+.action-btn.fav-active .material-icons-round { color: var(--accent); }
+
+/* ─── Platform Links ─────────────────────────────────────────────────────────── */
+.platforms-section { padding: 0 16px 16px; }
+.platforms-section h3 { font-size: 13px; color: var(--text-2); margin-bottom: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; }
+.platform-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.platform-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text-1);
+  cursor: pointer;
+  transition: all .15s;
+}
+.platform-chip:hover { background: var(--blue-50); border-color: var(--blue-600); color: var(--blue-800); }
+.platform-chip img { width: 16px; height: 16px; }
+
+/* ─── Description ────────────────────────────────────────────────────────────── */
+.ep-description {
+  padding: 0 16px 20px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+.ep-description h3 { font-size: 14px; margin-bottom: 8px; color: var(--text-1); }
+
+.read-more-btn {
+  color: var(--blue-700);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.read-more-btn .material-icons-round { font-size: 16px; }
+
+/* ─── Favorites Page ─────────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px 40px;
+  color: var(--text-3);
+}
+.empty-state .material-icons-round { font-size: 64px; color: var(--blue-100); margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; color: var(--text-2); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+
+/* ─── Contact Page ───────────────────────────────────────────────────────────── */
+.contact-form { padding: 0 16px 24px; }
+.form-field { margin-bottom: 14px; }
+.form-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 6px; font-family: 'Nunito', sans-serif; }
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-size: 14px;
+  font-family: 'Nunito Sans', sans-serif;
+  color: var(--text-1);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-field input:focus,
+.form-field textarea:focus { border-color: var(--blue-700); }
+.form-field textarea { resize: vertical; min-height: 100px; }
+
+.submit-btn {
+  width: 100%;
+  background: var(--blue-800);
+  color: #fff;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background .15s;
+}
+.submit-btn:hover { background: var(--blue-700); }
+.submit-btn .material-icons-round { font-size: 20px; }
+
+/* ─── Book Promo Card ────────────────────────────────────────────────────────── */
+.book-promo {
+  margin: 0 16px 20px;
+  background: linear-gradient(135deg, var(--accent-light) 0%, #FFF3CD 100%);
+  border: 1px solid #FFD54F;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow .15s;
+  text-decoration: none;
+}
+.book-promo:hover { box-shadow: 0 4px 16px rgba(255,179,0,.25); }
+.book-promo-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background: #FFB300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.book-promo-icon .material-icons-round { font-size: 30px; color: #5D3800; }
+.book-promo-body h3 { font-size: 14px; color: #5D3800; margin-bottom: 3px; }
+.book-promo-body p { font-size: 12px; color: #8D5B00; line-height: 1.5; }
+
+/* ─── Page Hero (non-home pages) ─────────────────────────────────────────────── */
+.page-hero {
+  background: linear-gradient(150deg, var(--blue-800), var(--blue-900));
+  padding: 20px 16px;
+  color: #fff;
+}
+.page-hero h1 { font-size: 22px; color: #fff; }
+.page-hero p { font-size: 13px; color: var(--blue-100); margin-top: 4px; }
+
+/* ─── Divider ────────────────────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 0 16px; }
+
+/* ─── Scrollable content area ────────────────────────────────────────────────── */
+.scroll-content { overflow-y: auto; }
