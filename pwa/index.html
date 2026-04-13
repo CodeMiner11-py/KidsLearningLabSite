@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kids Learning Lab</title>
+  <meta name="description" content="A podcast for kids, by a kid! Short episodes about science, history, tech, and more.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1565C0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KLL">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+  <!-- App Bar -->
+  <header class="app-bar">
+    <div class="logo-wrap">
+      <img class="logo-img" src="https://kidslearninglab.com/favicon.ico" alt="Kids Learning Lab logo" onerror="this.style.display='none'">
+      <span class="logo-text">Kids Learning Lab</span>
+    </div>
+    <a href="/contact.html" class="icon-btn" aria-label="Contact">
+      <span class="material-icons-round">mail_outline</span>
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-greeting">A podcast for kids, by a kid</div>
+    <h1>What will you learn today?</h1>
+    <div id="hero-badge" style="display:none;">
+      <div class="new-badge">
+        <span class="material-icons-round">fiber_new</span>
+        <span id="hero-badge-text">New episode available</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured (latest episode) -->
+  <div id="featured-wrap">
+    <div class="featured-card" style="margin:0 16px;top:0;margin-top:-12px;" id="featured-skeleton">
+      <div class="featured-art"><span class="material-icons-round">headphones</span></div>
+      <div class="featured-body">
+        <div class="skeleton skel-line" style="width:50%;height:10px;margin-bottom:6px;"></div>
+        <div class="skeleton skel-line" style="width:90%;height:14px;margin-bottom:4px;"></div>
+        <div class="skeleton skel-line short" style="height:11px;margin-bottom:4px;"></div>
+        <div class="skeleton skel-line" style="width:40%;height:10px;margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Promo -->
+  <div style="margin-top:20px;"></div>
+  <a href="https://kidslearninglab.com/python" target="_blank" class="book-promo" rel="noopener">
+    <div class="book-promo-icon">
+      <span class="material-icons-round">menu_book</span>
+    </div>
+    <div class="book-promo-body">
+      <h3>Python Learning Lab</h3>
+      <p>A coding book for kids — written by a kid! Learn Python step by step.</p>
+    </div>
+  </a>
+
+  <!-- Filter chips -->
+  <div class="chip-row" id="filter-chips">
+    <button class="chip active" data-filter="all">
+      <span class="material-icons-round">apps</span> All
+    </button>
+    <button class="chip" data-filter="science">
+      <span class="material-icons-round">science</span> Science
+    </button>
+    <button class="chip" data-filter="history">
+      <span class="material-icons-round">history_edu</span> History
+    </button>
+    <button class="chip" data-filter="technology">
+      <span class="material-icons-round">computer</span> Technology
+    </button>
+    <button class="chip" data-filter="space">
+      <span class="material-icons-round">rocket_launch</span> Space
+    </button>
+  </div>
+
+  <!-- Episode list -->
+  <div class="section" style="padding-bottom:0;">
+    <div class="section-header">
+      <h2>All Episodes</h2>
+      <span id="ep-count" style="font-size:12px;color:var(--text-3);"></span>
+    </div>
+  </div>
+
+  <div class="ep-list" id="ep-list">
+    <!-- Skeletons -->
+    <div class="skeleton-row"><div class="skeleton skel-art"></div><div class="skel-body"><div class="skeleton skel-line"></div><div class="skeleton skel-line short"></div></div></div>
+    <div class="skeleton-row"><div class="skeleton skel-art"></div><div class="skel-body"><div class="skeleton skel-line"></div><div class="skeleton skel-line short"></div></div></div>
+    <div class="skeleton-row"><div class="skeleton skel-art"></div><div class="skel-body"><div class="skeleton skel-line"></div><div class="skeleton skel-line short"></div></div></div>
+    <div class="skeleton-row"><div class="skeleton skel-art"></div><div class="skel-body"><div class="skeleton skel-line"></div><div class="skeleton skel-line short"></div></div></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="/index.html" data-page="index.html">
+      <span class="material-icons-round">home</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item" href="/index.html#all" data-page="episodes">
+      <span class="material-icons-round">headphones</span>
+      <span class="nav-label">Episodes</span>
+    </a>
+    <a class="nav-item" href="/favorites.html" data-page="favorites.html">
+      <span class="material-icons-round">favorite_border</span>
+      <span class="nav-label">Favorites</span>
+    </a>
+    <a class="nav-item" href="/contact.html" data-page="contact.html">
+      <span class="material-icons-round">mail_outline</span>
+      <span class="nav-label">Contact</span>
+    </a>
+  </nav>
+
+  <script src="/js/rss.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    let allEpisodes = [];
+    let activeFilter = 'all';
+
+    const TOPIC_KEYWORDS = {
+      science:    ['brain','volcano','tornado','earthquake','thunder','eclipse','plant','animal','ocean','biology','chemistry','physics','eye','see','hear','blood'],
+      history:    ['history','war','ancient','statue','liberty','eiffel','viking','civilization','medieval','revolution'],
+      technology: ['ai','artificial','computer','robot','internet','code','python','tech','minecraft','bitcoin','crypto','stock'],
+      space:      ['space','universe','black hole','solar','planet','star','moon','galaxy','nasa','rocket']
+    };
+
+    function detectTopic(ep) {
+      const text = (ep.title + ' ' + ep.description).toLowerCase();
+      for (const [topic, words] of Object.entries(TOPIC_KEYWORDS)) {
+        if (words.some(w => text.includes(w))) return topic;
+      }
+      return 'other';
+    }
+
+    function epRowHTML(ep) {
+      const fav = KLL.isFavorite(ep.id);
+      return `
+        <a class="ep-row" href="/episode.html?id=${encodeURIComponent(ep.id)}" data-topic="${detectTopic(ep)}">
+          <div class="ep-art">
+            ${ep.art
+              ? `<img src="${ep.art}" alt="${ep.title}" onerror="KLL.onArtError(this)">`
+              : `<span class="material-icons-round">headphones</span>`}
+          </div>
+          <div class="ep-info">
+            <div class="ep-title">${ep.title}</div>
+            <div class="ep-meta">
+              <span class="material-icons-round">schedule</span>${ep.duration || '—'}
+              &nbsp;·&nbsp;
+              ${ep.pubDateFormatted}
+            </div>
+          </div>
+          <button class="fav-btn ${fav ? 'active' : ''}" data-id="${ep.id}" onclick="event.preventDefault();toggleFav(this, '${ep.id}')">
+            <span class="material-icons-round">${fav ? 'favorite' : 'favorite_border'}</span>
+          </button>
+          <div class="ep-chevron"><span class="material-icons-round">chevron_right</span></div>
+        </a>`;
+    }
+
+    function renderFeatured(ep) {
+      const wrap = document.getElementById('featured-wrap');
+      wrap.innerHTML = `
+        <a class="featured-card" href="/episode.html?id=${encodeURIComponent(ep.id)}">
+          <div class="featured-art">
+            ${ep.art
+              ? `<img src="${ep.art}" alt="${ep.title}" onerror="KLL.onArtError(this)">`
+              : `<span class="material-icons-round">headphones</span>`}
+          </div>
+          <div class="featured-body">
+            <span class="featured-tag">Latest</span>
+            <h3>${ep.title}</h3>
+            <p>${ep.description}</p>
+            <div class="featured-meta">
+              <span class="duration">
+                <span class="material-icons-round">schedule</span>${ep.duration || ''}
+              </span>
+              <div class="play-fab">
+                <span class="material-icons-round">play_arrow</span>
+              </div>
+            </div>
+          </div>
+        </a>`;
+
+      // Show badge
+      const badge = document.getElementById('hero-badge');
+      const badgeText = document.getElementById('hero-badge-text');
+      badgeText.textContent = ep.title;
+      badge.style.display = 'block';
+    }
+
+    function renderList(episodes) {
+      const list = document.getElementById('ep-list');
+      const filtered = activeFilter === 'all'
+        ? episodes
+        : episodes.filter(ep => detectTopic(ep) === activeFilter);
+
+      document.getElementById('ep-count').textContent = `${filtered.length} episodes`;
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="error-state">
+          <span class="material-icons-round">search_off</span>
+          <p>No episodes found for this category.</p>
+        </div>`;
+        return;
+      }
+      list.innerHTML = filtered.map(epRowHTML).join('');
+    }
+
+    function toggleFav(btn, id) {
+      const ep = allEpisodes.find(e => e.id === id);
+      if (!ep) return;
+      KLL.toggleFavorite(ep);
+      const active = KLL.isFavorite(id);
+      btn.classList.toggle('active', active);
+      btn.querySelector('.material-icons-round').textContent = active ? 'favorite' : 'favorite_border';
+      KLL.showToast(active ? 'Added to favorites' : 'Removed from favorites');
+    }
+
+    // Filter chips
+    document.getElementById('filter-chips').addEventListener('click', e => {
+      const chip = e.target.closest('[data-filter]');
+      if (!chip) return;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      renderList(allEpisodes);
+    });
+
+    async function init() {
+      try {
+        allEpisodes = await KLL.fetchRSS();
+        if (allEpisodes.length) renderFeatured(allEpisodes[0]);
+        renderList(allEpisodes);
+      } catch (err) {
+        document.getElementById('ep-list').innerHTML = `
+          <div class="error-state">
+            <span class="material-icons-round">wifi_off</span>
+            <p>Couldn't load episodes. Check your connection.</p>
+            <button onclick="init()">Try again</button>
+          </div>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

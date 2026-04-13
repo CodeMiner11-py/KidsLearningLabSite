@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Episode — Kids Learning Lab</title>
+  <meta name="theme-color" content="#1565C0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+  <!-- App Bar -->
+  <header class="app-bar">
+    <a href="/index.html" class="icon-btn" aria-label="Back">
+      <span class="material-icons-round">arrow_back</span>
+    </a>
+    <div class="logo-wrap">
+      <span class="logo-text" style="font-size:15px;">Episode</span>
+    </div>
+    <button class="icon-btn" id="share-top-btn" aria-label="Share">
+      <span class="material-icons-round">share</span>
+    </button>
+  </header>
+
+  <!-- Episode Header -->
+  <div class="ep-header-full" id="ep-header">
+    <div class="ep-detail-art" id="ep-art-wrap">
+      <span class="material-icons-round">headphones</span>
+    </div>
+    <div class="ep-detail-title" id="ep-title">Loading...</div>
+    <div class="ep-detail-meta" id="ep-meta"></div>
+  </div>
+
+  <!-- In-App Player -->
+  <div class="player-card" id="player-card" style="display:none;">
+    <div style="font-size:12px;font-weight:700;color:var(--text-3);margin-bottom:8px;font-family:'Nunito',sans-serif;">Now Playing</div>
+    <div class="player-progress">
+      <div class="progress-track" id="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-times">
+        <span id="time-current">0:00</span>
+        <span id="time-total">–:––</span>
+      </div>
+    </div>
+    <div class="player-controls">
+      <button class="ctrl-icon-btn" id="btn-rewind" title="Rewind 15s">
+        <span class="material-icons-round">replay_15</span>
+      </button>
+      <button class="ctrl-play-main" id="btn-play">
+        <span class="material-icons-round" id="play-icon">play_arrow</span>
+      </button>
+      <button class="ctrl-icon-btn" id="btn-forward" title="Forward 30s">
+        <span class="material-icons-round">forward_30</span>
+      </button>
+    </div>
+    <div class="volume-row">
+      <span class="material-icons-round">volume_down</span>
+      <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
+      <span class="material-icons-round">volume_up</span>
+    </div>
+    <audio id="audio-player" preload="metadata"></audio>
+  </div>
+
+  <!-- No audio fallback -->
+  <div id="no-audio-msg" style="display:none;margin:12px 16px;padding:12px 14px;background:var(--blue-50);border-radius:var(--radius-md);border:1px solid var(--blue-100);font-size:13px;color:var(--blue-800);">
+    <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-family:'Nunito',sans-serif;margin-bottom:4px;">
+      <span class="material-icons-round" style="font-size:18px;">info</span> Listen on your favorite app
+    </div>
+    Audio streaming isn't available for this episode in-app. Use the links below to listen.
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-grid" id="action-grid" style="margin-top:12px;">
+    <button class="action-btn" id="btn-share">
+      <span class="material-icons-round">share</span> Share
+    </button>
+    <button class="action-btn" id="btn-fav">
+      <span class="material-icons-round" id="fav-icon">favorite_border</span>
+      <span id="fav-label">Save</span>
+    </button>
+  </div>
+
+  <!-- Platform Links -->
+  <div class="platforms-section">
+    <h3>Listen on</h3>
+    <div class="platform-chips">
+      <a class="platform-chip" id="link-spotify" href="https://open.spotify.com/show/0pBUPwmbW7DLUV66dCzLa3" target="_blank" rel="noopener">
+        Spotify
+      </a>
+      <a class="platform-chip" id="link-apple" href="https://podcasts.apple.com/us/podcast/kids-learning-lab-by-a-kid-for-kids/id1657069274" target="_blank" rel="noopener">
+        Apple Podcasts
+      </a>
+      <a class="platform-chip" id="link-amazon" href="https://music.amazon.com/podcasts/493467fb-447a-49e4-872a-6f3d9a52ee51/kids-learning-lab---by-a-kid-for-kids" target="_blank" rel="noopener">
+        Amazon Music
+      </a>
+      <button class="platform-chip" id="link-inapp" style="border-color:var(--blue-600);color:var(--blue-800);">
+        <span class="material-icons-round" style="font-size:16px;color:var(--blue-700);">play_circle</span>
+        Listen Here
+      </button>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="ep-description">
+    <h3>About this episode</h3>
+    <div id="ep-desc-text">Loading...</div>
+    <button class="read-more-btn" id="read-more-btn" style="display:none;">
+      Show more <span class="material-icons-round">expand_more</span>
+    </button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/index.html" data-page="index.html">
+      <span class="material-icons-round">home</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item active" href="#" data-page="episode.html">
+      <span class="material-icons-round">headphones</span>
+      <span class="nav-label">Episode</span>
+    </a>
+    <a class="nav-item" href="/favorites.html" data-page="favorites.html">
+      <span class="material-icons-round">favorite_border</span>
+      <span class="nav-label">Favorites</span>
+    </a>
+    <a class="nav-item" href="/contact.html" data-page="contact.html">
+      <span class="material-icons-round">mail_outline</span>
+      <span class="nav-label">Contact</span>
+    </a>
+  </nav>
+
+  <script src="/js/rss.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const episodeId = params.get('id');
+    let currentEp = null;
+    let descExpanded = false;
+
+    const audio = document.getElementById('audio-player');
+    const playIcon = document.getElementById('play-icon');
+    const progressFill = document.getElementById('progress-fill');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+
+    // ─── Render episode ──────────────────────────────────────────────────────
+    function renderEpisode(ep) {
+      currentEp = ep;
+      document.title = `${ep.title} — Kids Learning Lab`;
+
+      // Art
+      const artWrap = document.getElementById('ep-art-wrap');
+      if (ep.art) {
+        artWrap.innerHTML = `<img src="${ep.art}" alt="${ep.title}" onerror="KLL.onArtError(this)">`;
+      }
+
+      // Title & meta
+      document.getElementById('ep-title').textContent = ep.title;
+      document.getElementById('ep-meta').innerHTML = `
+        ${ep.duration ? `<span><span class="material-icons-round">schedule</span>${ep.duration}</span>` : ''}
+        ${ep.pubDateFormatted ? `<span><span class="material-icons-round">calendar_today</span>${ep.pubDateFormatted}</span>` : ''}
+        ${ep.season ? `<span><span class="material-icons-round">folder</span>Season ${ep.season}</span>` : ''}
+      `;
+
+      // Description
+      const fullDesc = ep.description || 'No description available.';
+      const SHORT_LEN = 200;
+      const descEl = document.getElementById('ep-desc-text');
+      const readMoreBtn = document.getElementById('read-more-btn');
+      if (fullDesc.length > SHORT_LEN) {
+        descEl.textContent = fullDesc.slice(0, SHORT_LEN) + '…';
+        readMoreBtn.style.display = 'inline-flex';
+        readMoreBtn.addEventListener('click', () => {
+          descExpanded = !descExpanded;
+          descEl.textContent = descExpanded ? fullDesc : fullDesc.slice(0, SHORT_LEN) + '…';
+          readMoreBtn.innerHTML = descExpanded
+            ? 'Show less <span class="material-icons-round">expand_less</span>'
+            : 'Show more <span class="material-icons-round">expand_more</span>';
+        });
+      } else {
+        descEl.textContent = fullDesc;
+      }
+
+      // Favorites
+      updateFavBtn();
+
+      // Audio
+      if (ep.audioUrl) {
+        document.getElementById('player-card').style.display = 'block';
+        audio.src = ep.audioUrl;
+        audio.load();
+      } else {
+        document.getElementById('no-audio-msg').style.display = 'block';
+      }
+    }
+
+    // ─── Favorites ───────────────────────────────────────────────────────────
+    function updateFavBtn() {
+      if (!currentEp) return;
+      const active = KLL.isFavorite(currentEp.id);
+      document.getElementById('fav-icon').textContent = active ? 'favorite' : 'favorite_border';
+      document.getElementById('fav-label').textContent = active ? 'Saved' : 'Save';
+      document.getElementById('btn-fav').classList.toggle('fav-active', active);
+    }
+
+    document.getElementById('btn-fav').addEventListener('click', () => {
+      if (!currentEp) return;
+      KLL.toggleFavorite(currentEp);
+      updateFavBtn();
+      KLL.showToast(KLL.isFavorite(currentEp.id) ? 'Added to favorites' : 'Removed from favorites');
+    });
+
+    // ─── Share ────────────────────────────────────────────────────────────────
+    function doShare() {
+      KLL.shareEpisode(currentEp?.title || 'Kids Learning Lab', window.location.href);
+    }
+    document.getElementById('btn-share').addEventListener('click', doShare);
+    document.getElementById('share-top-btn').addEventListener('click', doShare);
+
+    // ─── In-app player ───────────────────────────────────────────────────────
+    document.getElementById('btn-play').addEventListener('click', () => {
+      if (audio.paused) { audio.play(); } else { audio.pause(); }
+    });
+    document.getElementById('btn-rewind').addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+    document.getElementById('btn-forward').addEventListener('click', () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 30); });
+    document.getElementById('volume-slider').addEventListener('input', e => { audio.volume = e.target.value; });
+
+    document.getElementById('progress-track').addEventListener('click', e => {
+      if (!audio.duration) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    });
+
+    audio.addEventListener('play', () => { playIcon.textContent = 'pause'; });
+    audio.addEventListener('pause', () => { playIcon.textContent = 'play_arrow'; });
+    audio.addEventListener('ended', () => { playIcon.textContent = 'play_arrow'; });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = pct + '%';
+      timeCurrent.textContent = formatTime(audio.currentTime);
+    });
+    audio.addEventListener('durationchange', () => {
+      timeTotal.textContent = formatTime(audio.duration);
+    });
+
+    function formatTime(s) {
+      if (!isFinite(s)) return '–:––';
+      const m = Math.floor(s / 60);
+      return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+    }
+
+    // Listen Here button — scroll to player
+    document.getElementById('link-inapp').addEventListener('click', () => {
+      document.getElementById('player-card').scrollIntoView({ behavior: 'smooth' });
+      if (audio.src) audio.play();
+    });
+
+    // ─── Load episode ─────────────────────────────────────────────────────────
+    async function init() {
+      try {
+        const episodes = await KLL.fetchRSS();
+        const ep = episodes.find(e => e.id === episodeId) || episodes[0];
+        renderEpisode(ep);
+      } catch {
+        document.getElementById('ep-title').textContent = 'Could not load episode';
+        document.getElementById('ep-desc-text').textContent = 'Check your connection and try again.';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

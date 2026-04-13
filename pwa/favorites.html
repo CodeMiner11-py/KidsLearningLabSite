@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Favorites — Kids Learning Lab</title>
+  <meta name="theme-color" content="#1565C0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+  <!-- App Bar -->
+  <header class="app-bar">
+    <a href="/index.html" class="icon-btn" aria-label="Back">
+      <span class="material-icons-round">arrow_back</span>
+    </a>
+    <div class="logo-wrap">
+      <span class="logo-text" style="font-size:15px;">Favorites</span>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1>Your Favorites</h1>
+    <p>Episodes you've saved to listen again</p>
+  </div>
+
+  <!-- List -->
+  <div style="padding: 16px 16px 0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span id="fav-count" class="label"></span>
+      <button id="clear-btn" style="display:none;font-size:12px;color:var(--text-3);font-family:'Nunito',sans-serif;font-weight:600;">
+        Clear all
+      </button>
+    </div>
+  </div>
+
+  <div class="ep-list" id="fav-list"></div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/index.html" data-page="index.html">
+      <span class="material-icons-round">home</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item" href="/index.html" data-page="episodes">
+      <span class="material-icons-round">headphones</span>
+      <span class="nav-label">Episodes</span>
+    </a>
+    <a class="nav-item active" href="/favorites.html" data-page="favorites.html">
+      <span class="material-icons-round">favorite</span>
+      <span class="nav-label">Favorites</span>
+    </a>
+    <a class="nav-item" href="/contact.html" data-page="contact.html">
+      <span class="material-icons-round">mail_outline</span>
+      <span class="nav-label">Contact</span>
+    </a>
+  </nav>
+
+  <script src="/js/app.js"></script>
+  <script>
+    function render() {
+      const favs = KLL.getFavorites();
+      const list = document.getElementById('fav-list');
+      const countEl = document.getElementById('fav-count');
+      const clearBtn = document.getElementById('clear-btn');
+
+      countEl.textContent = `${favs.length} saved episode${favs.length !== 1 ? 's' : ''}`;
+      clearBtn.style.display = favs.length ? 'block' : 'none';
+
+      if (!favs.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="material-icons-round">favorite_border</span>
+            <h3>No favorites yet</h3>
+            <p>Tap the heart icon on any episode to save it here for easy access.</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = favs.map(ep => `
+        <a class="ep-row" href="/episode.html?id=${encodeURIComponent(ep.id)}">
+          <div class="ep-art">
+            ${ep.art
+              ? `<img src="${ep.art}" alt="${ep.title}" onerror="KLL.onArtError(this)">`
+              : `<span class="material-icons-round">headphones</span>`}
+          </div>
+          <div class="ep-info">
+            <div class="ep-title">${ep.title}</div>
+            <div class="ep-meta">
+              <span class="material-icons-round">schedule</span>${ep.duration || '—'}
+              &nbsp;·&nbsp;${ep.pubDateFormatted || ''}
+            </div>
+          </div>
+          <button class="fav-btn active" onclick="event.preventDefault();removeFav('${ep.id}')">
+            <span class="material-icons-round">favorite</span>
+          </button>
+          <div class="ep-chevron"><span class="material-icons-round">chevron_right</span></div>
+        </a>
+      `).join('');
+    }
+
+    function removeFav(id) {
+      const favs = KLL.getFavorites().filter(f => f.id !== id);
+      KLL.saveFavorites(favs);
+      KLL.showToast('Removed from favorites');
+      render();
+    }
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      if (confirm('Remove all favorites?')) {
+        KLL.saveFavorites([]);
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

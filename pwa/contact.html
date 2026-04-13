@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Contact — Kids Learning Lab</title>
+  <meta name="theme-color" content="#1565C0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+  <!-- App Bar -->
+  <header class="app-bar">
+    <a href="/index.html" class="icon-btn" aria-label="Back">
+      <span class="material-icons-round">arrow_back</span>
+    </a>
+    <div class="logo-wrap">
+      <span class="logo-text" style="font-size:15px;">Contact Us</span>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1>Say Hello</h1>
+    <p>Questions, topic ideas, or just want to share a fun fact? We'd love to hear from you!</p>
+  </div>
+
+  <!-- Info cards -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 16px 20px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+      <span class="material-icons-round" style="font-size:24px;color:var(--blue-700);">lightbulb</span>
+      <div style="font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--text-1);">Suggest a Topic</div>
+      <div style="font-size:11px;color:var(--text-3);">What do you want Eshaan to cover next?</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 12px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+      <span class="material-icons-round" style="font-size:24px;color:var(--blue-700);">star</span>
+      <div style="font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--text-1);">Leave a Review</div>
+      <div style="font-size:11px;color:var(--text-3);">Reviews help other kids discover the show!</div>
+    </div>
+  </div>
+
+  <!-- Contact Form -->
+  <div class="contact-form">
+
+    <div class="form-field">
+      <label for="field-name">Your name</label>
+      <input type="text" id="field-name" placeholder="e.g. Alex" autocomplete="name">
+    </div>
+
+    <div class="form-field">
+      <label for="field-email">Your email (optional)</label>
+      <input type="email" id="field-email" placeholder="so we can write back" autocomplete="email">
+    </div>
+
+    <div class="form-field">
+      <label for="field-subject">What's this about?</label>
+      <select id="field-subject">
+        <option value="topic-idea">I have a topic idea</option>
+        <option value="feedback">General feedback</option>
+        <option value="question">I have a question</option>
+        <option value="other">Something else</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="field-message">Your message</label>
+      <textarea id="field-message" placeholder="Tell Eshaan what's on your mind..." rows="5"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submit-btn">
+      <span class="material-icons-round">send</span>
+      Send Message
+    </button>
+
+    <p style="font-size:11px;color:var(--text-3);text-align:center;margin-top:12px;line-height:1.6;">
+      This sends an email to <strong>hello@kidslearninglab.com</strong>.<br>
+      Eshaan reads every message!
+    </p>
+  </div>
+
+  <!-- Success Message (hidden) -->
+  <div id="success-msg" style="display:none;margin:0 16px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-md);padding:20px;text-align:center;">
+    <span class="material-icons-round" style="font-size:40px;color:var(--blue-700);margin-bottom:10px;display:block;">check_circle</span>
+    <div style="font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;color:var(--blue-800);margin-bottom:6px;">Message sent!</div>
+    <div style="font-size:13px;color:var(--text-2);">Thanks for reaching out. Eshaan will get back to you soon!</div>
+    <button onclick="resetForm()" style="margin-top:14px;background:var(--blue-800);color:#fff;border-radius:20px;padding:8px 22px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;">Send another</button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="/index.html" data-page="index.html">
+      <span class="material-icons-round">home</span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item" href="/index.html" data-page="episodes">
+      <span class="material-icons-round">headphones</span>
+      <span class="nav-label">Episodes</span>
+    </a>
+    <a class="nav-item" href="/favorites.html" data-page="favorites.html">
+      <span class="material-icons-round">favorite_border</span>
+      <span class="nav-label">Favorites</span>
+    </a>
+    <a class="nav-item active" href="/contact.html" data-page="contact.html">
+      <span class="material-icons-round">mail</span>
+      <span class="nav-label">Contact</span>
+    </a>
+  </nav>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.getElementById('submit-btn').addEventListener('click', () => {
+      const name    = document.getElementById('field-name').value.trim();
+      const email   = document.getElementById('field-email').value.trim();
+      const subject = document.getElementById('field-subject');
+      const subjectText = subject.options[subject.selectedIndex].text;
+      const message = document.getElementById('field-message').value.trim();
+
+      if (!name) { KLL.showToast('Please enter your name'); return; }
+      if (!message) { KLL.showToast('Please enter a message'); return; }
+
+      const body = encodeURIComponent(
+        `Hi Eshaan,\n\n${message}\n\n— ${name}${email ? '\n' + email : ''}`
+      );
+      const subjectLine = encodeURIComponent(`[KLL App] ${subjectText}`);
+      const mailto = `mailto:hello@kidslearninglab.com?subject=${subjectLine}&body=${body}`;
+
+      window.location.href = mailto;
+
+      // Show success after brief delay (mailto may open native client)
+      setTimeout(() => {
+        document.querySelector('.contact-form').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+      }, 800);
+    });
+
+    function resetForm() {
+      document.getElementById('field-name').value = '';
+      document.getElementById('field-email').value = '';
+      document.getElementById('field-message').value = '';
+      document.querySelector('.contact-form').style.display = 'block';
+      document.getElementById('success-msg').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
