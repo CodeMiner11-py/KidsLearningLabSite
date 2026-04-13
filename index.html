@@ -469,7 +469,10 @@
                         container.innerHTML = `
                           <div class="kll-player">
                             <div class="kll-player-inner">
-                              <div class="kll-error">😔 ${msg}</div>
+                              <div class="kll-error">
+                                ${msg}
+                                ${msg.includes('Try again later') ? `<br><br><button class="kll-btn" onclick="fetchLatestEpisode()" style="margin: 0 auto; border-radius: 8px; width: auto; padding: 0 16px; background: rgba(255,255,255,0.18);">Reload</button>` : ''}
+                              </div>
                             </div>
                           </div>`;
                       }
