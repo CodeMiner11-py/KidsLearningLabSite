@@ -546,6 +546,13 @@
     return d.textContent || d.innerText || '';
   }
 
+  function slugify(title) {
+    return title
+      .toLowerCase()
+      .replace(/['']/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
   /* ── Parse RSS text ── */
   function parseRSS(text) {
     // Split into <item> blocks
@@ -610,6 +617,7 @@
 
     currentIndex = idx;
     const ep = filtered[idx];
+    history.replaceState(null, '', '?ep=' + slugify(ep.title));
 
     // Update list highlights
     document.querySelectorAll('.ep-item').forEach(el => {
@@ -725,6 +733,8 @@
 
   loadMoreBtn.addEventListener('click', appendItems);
 
+
+
   /* ── Load RSS ── */
 async function init() {
   try {
@@ -732,19 +742,13 @@ async function init() {
     const text = await res.text();
     allEpisodes = parseRSS(text);
     filtered    = allEpisodes;
-
-    // Get ?episode= from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const episodeDate = urlParams.get('episode');
+    const epSlug = urlParams.get('ep');
 
     renderList();
 
-    // If ?episode is present, try to find it
-    if (episodeDate) {
-      const targetIndex = filtered.findIndex(ep => {
-        // Compare only the date part (ignore time)
-        return new Date(ep.pubDate).toISOString().split('T')[0] === episodeDate;
-      });
+    if (epSlug) {
+      const targetIndex = filtered.findIndex(ep => slugify(ep.title) === epSlug);
       if (targetIndex >= 0) playEpisode(targetIndex);
     }
   } catch (e) {
