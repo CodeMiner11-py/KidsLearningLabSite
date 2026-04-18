@@ -1527,7 +1527,7 @@
 
     try {
       const data = await callWorker('/generate-image', { title, description: desc });
-      entry.imageDataUrl = data.imageDataUrl;
+      entry.imageDataUrl = data.imageUrl;
       renderGenQueue();
       setCardStatus(id, 'Image ready.', 'ok');
     } catch (err) {
