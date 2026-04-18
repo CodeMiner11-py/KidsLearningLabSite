@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pear · Admin Console</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafaf8;
+      --gray-1: #f0ede8;
+      --gray-2: #d8d4cc;
+      --gray-3: #a09890;
+      --gray-4: #5a5450;
+      --red: #8b1a1a;
+      --green: #1a4a1a;
+      --serif: 'Times New Roman', Georgia, serif;
+    }
+
+    body {
+      font-family: var(--serif);
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── Auth Screen ── */
+    #authScreen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--white);
+      z-index: 9999;
+      flex-direction: column;
+      gap: 24px;
+    }
+    #authScreen.hidden { display: none; }
+
+    .auth-box {
+      border: 1px solid var(--black);
+      padding: 48px 56px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    .auth-box h1 {
+      font-size: 1.8rem;
+      font-weight: normal;
+      margin-bottom: 6px;
+      letter-spacing: .04em;
+    }
+    .auth-box .subtitle {
+      font-style: italic;
+      color: var(--gray-4);
+      font-size: .95rem;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--gray-2);
+      padding-bottom: 24px;
+    }
+    .auth-error {
+      color: var(--red);
+      font-style: italic;
+      font-size: .88rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ── Inputs & Buttons ── */
+    input[type="email"], input[type="password"], input[type="text"], input[type="number"], textarea, select {
+      font-family: var(--serif);
+      font-size: .92rem;
+      border: 1px solid var(--black);
+      background: var(--white);
+      color: var(--black);
+      padding: 9px 12px;
+      width: 100%;
+      outline: none;
+      transition: background .15s;
+    }
+    input:focus, textarea:focus, select:focus { background: var(--gray-1); }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+
+    .btn {
+      font-family: var(--serif);
+      font-size: .9rem;
+      border: 1px solid var(--black);
+      background: var(--black);
+      color: var(--white);
+      padding: 10px 22px;
+      cursor: pointer;
+      letter-spacing: .04em;
+      transition: background .15s, color .15s;
+    }
+    .btn:hover { background: var(--gray-4); }
+    .btn.outline { background: var(--white); color: var(--black); }
+    .btn.outline:hover { background: var(--gray-1); }
+    .btn.danger { background: var(--red); border-color: var(--red); }
+    .btn.danger:hover { background: #6b1010; }
+    .btn.success { background: var(--green); border-color: var(--green); }
+    .btn.success:hover { background: #0f2e0f; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-family: var(--serif);
+      font-size: .92rem;
+      border: 1px solid var(--black);
+      background: var(--white);
+      color: var(--black);
+      padding: 11px 22px;
+      cursor: pointer;
+      width: 100%;
+      transition: background .15s;
+    }
+    .btn-google:hover { background: var(--gray-1); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 2px solid var(--black);
+      padding: 18px 40px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    header h1 { font-size: 1.5rem; font-weight: normal; letter-spacing: .06em; }
+    header h1 span { font-style: italic; }
+    .header-right { display: flex; align-items: center; gap: 16px; font-size: .82rem; color: var(--gray-4); }
+    #signedInAs { font-style: italic; }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 36px 40px 80px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .toolbar input[type="text"] { max-width: 280px; }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--black); }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: .88rem;
+    }
+    thead tr { border-bottom: 2px solid var(--black); background: var(--gray-1); }
+    th {
+      font-family: var(--serif);
+      font-weight: normal;
+      font-style: italic;
+      text-align: left;
+      padding: 10px 14px;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--gray-2); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-1); }
+    .td-title { font-weight: normal; max-width: 200px; }
+    .td-author { color: var(--gray-4); font-style: italic; font-size: .82rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .td-img { width: 56px; height: 40px; object-fit: cover; border: 1px solid var(--gray-2); display: block; }
+    .td-img-placeholder { width: 56px; height: 40px; border: 1px solid var(--gray-2); background: var(--gray-1); display: flex; align-items: center; justify-content: center; color: var(--gray-3); font-size: .7rem; font-style: italic; }
+    .td-actions { display: flex; gap: 8px; white-space: nowrap; }
+    .curated-badge {
+      display: inline-block;
+      font-size: .72rem;
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 2px 7px;
+      font-style: italic;
+      letter-spacing: .03em;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(10,10,10,.6);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: var(--white);
+      border: 1px solid var(--black);
+      width: 100%; max-width: 660px;
+      padding: 36px 40px 40px;
+      position: relative;
+    }
+    .modal h2 {
+      font-size: 1.4rem; font-weight: normal; font-style: italic;
+      margin-bottom: 6px; letter-spacing: .03em;
+    }
+    .modal-subtitle {
+      font-size: .82rem; color: var(--gray-4); margin-bottom: 28px;
+      padding-bottom: 18px; border-bottom: 1px solid var(--gray-2);
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 18px;
+      background: none; border: none; cursor: pointer;
+      font-family: var(--serif); font-size: 1.2rem; color: var(--gray-4);
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--black); }
+
+    .form-row { margin-bottom: 18px; }
+    .form-row label {
+      display: block; font-size: .78rem; letter-spacing: .07em;
+      text-transform: uppercase; margin-bottom: 6px; color: var(--gray-4);
+    }
+    .form-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Dynamic list rows */
+    .list-editor { display: flex; flex-direction: column; gap: 7px; }
+    .list-item-row { display: flex; gap: 7px; }
+    .list-item-row input { flex: 1; }
+    .list-item-row button {
+      font-family: var(--serif); border: 1px solid var(--gray-2);
+      background: var(--white); color: var(--red); cursor: pointer;
+      padding: 0 10px; font-size: 1rem;
+    }
+    .list-item-row button:hover { background: var(--gray-1); }
+    .add-item-btn {
+      font-family: var(--serif); font-size: .82rem; font-style: italic;
+      color: var(--gray-4); background: none; border: 1px dashed var(--gray-2);
+      padding: 7px 14px; cursor: pointer; text-align: left; width: 100%;
+    }
+    .add-item-btn:hover { border-color: var(--black); color: var(--black); }
+
+    /* Nutrition grid */
+    .nutrition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .nutrition-cell label { font-size: .7rem; }
+
+    .modal-actions {
+      margin-top: 28px; padding-top: 18px;
+      border-top: 1px solid var(--gray-2);
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+
+    .status-bar {
+      margin-top: 12px; font-size: .85rem; font-style: italic;
+      min-height: 1.2em;
+    }
+    .status-bar.ok { color: var(--green); }
+    .status-bar.err { color: var(--red); }
+
+    /* Confirm overlay */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 6000;
+      background: rgba(10,10,10,.65);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .confirm-overlay.hidden { display: none; }
+    .confirm-box {
+      background: var(--white); border: 1px solid var(--black);
+      padding: 32px 36px; max-width: 380px; width: 100%; text-align: center;
+    }
+    .confirm-box p { font-size: .95rem; line-height: 1.6; margin-bottom: 24px; }
+    .confirm-box .confirm-title { font-style: italic; font-size: 1.15rem; margin-bottom: 10px; }
+    .confirm-box .btn-row { display: flex; gap: 10px; justify-content: center; }
+
+    /* Loading */
+    .loading-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-4); }
+    .empty-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-3); border: 1px solid var(--gray-2); }
+  </style>
+</head>
+<body>
+
+<!-- ── Auth Screen ── -->
+<div id="authScreen">
+  <div class="auth-box">
+    <h1>Pear <span>Admin</span></h1>
+    <p class="subtitle">Community Recipe Console</p>
+    <button class="btn-google" id="googleSignInBtn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Sign in with Google
+    </button>
+    <p class="auth-error" id="authError">Access denied. This console is restricted to administrators.</p>
+  </div>
+</div>
+
+<!-- ── Header ── -->
+<header>
+  <h1>Pear <span>Admin Console</span></h1>
+  <div class="header-right">
+    <span id="signedInAs"></span>
+    <button class="btn outline" id="signOutBtn" style="display:none" onclick="doSignOut()">Sign Out</button>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<div class="container">
+  <div class="toolbar">
+    <button class="btn success" onclick="openNewRecipeModal()">+ Add Curated Recipe</button>
+    <button class="btn outline" onclick="loadRecipes()">↺ Refresh</button>
+    <input type="text" id="searchInput" placeholder="Search by title or author…" oninput="renderTable()">
+  </div>
+
+  <div id="tableWrap">
+    <div class="loading-row">Loading community recipes…</div>
+  </div>
+</div>
+
+<!-- ── Edit / Create Modal ── -->
+<div class="modal-overlay hidden" id="editModalOverlay" onclick="handleEditOverlayClick(event)">
+  <div class="modal" id="editModal">
+    <button class="modal-close" onclick="closeEditModal()">×</button>
+    <h2 id="editModalTitle">Edit Recipe</h2>
+    <p class="modal-subtitle" id="editModalSubtitle">Community Recipe</p>
+
+    <div class="form-row">
+      <label>Title</label>
+      <input type="text" id="fTitle" placeholder="Recipe title">
+    </div>
+    <div class="form-row">
+      <label>Description</label>
+      <textarea id="fDesc" placeholder="Short description"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Image URL</label>
+      <input type="text" id="fImage" placeholder="https://…">
+    </div>
+    <div class="form-row two-col">
+      <div>
+        <label>Meal Type</label>
+        <select id="fMealType">
+          <option value="">— select —</option>
+          <option>Breakfast</option>
+          <option>Lunch</option>
+          <option>Dinner</option>
+          <option>Snack</option>
+          <option>Dessert</option>
+        </select>
+      </div>
+      <div>
+        <label>Servings</label>
+        <input type="number" id="fServings" min="1" placeholder="4">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>Ingredients</label>
+      <div class="list-editor" id="ingredientsEditor"></div>
+      <button class="add-item-btn" onclick="addListItem('ingredientsEditor', '')">+ Add ingredient</button>
+    </div>
+
+    <div class="form-row">
+      <label>Steps / Procedures</label>
+      <div class="list-editor" id="proceduresEditor"></div>
+      <button class="add-item-btn" onclick="addListItem('proceduresEditor', '')">+ Add step</button>
+    </div>
+
+    <div class="form-row">
+      <label>Nutrition Facts <span style="font-style:italic;font-size:.8em;color:var(--gray-3)">(optional)</span></label>
+      <div class="nutrition-grid">
+        <div><label>Calories</label><input type="text" id="nCalories" placeholder="e.g. 320kcal"></div>
+        <div><label>Protein</label><input type="text" id="nProtein" placeholder="e.g. 12g"></div>
+        <div><label>Carbs</label><input type="text" id="nCarbs" placeholder="e.g. 45g"></div>
+        <div><label>Fat</label><input type="text" id="nFat" placeholder="e.g. 8g"></div>
+        <div><label>Fibre</label><input type="text" id="nFibre" placeholder="e.g. 4g"></div>
+        <div><label>Sugar</label><input type="text" id="nSugar" placeholder="e.g. 6g"></div>
+      </div>
+    </div>
+
+    <div class="form-row" id="curatedRow">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:.88rem">
+        <input type="checkbox" id="fCurated" style="width:auto"> Mark as Curated
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <div style="display:flex;gap:10px">
+        <button class="btn success" onclick="saveRecipe()">Save</button>
+        <button class="btn outline" onclick="closeEditModal()">Cancel</button>
+      </div>
+      <button class="btn danger" id="deleteInModalBtn" onclick="triggerDeleteFromModal()" style="display:none">Delete Recipe</button>
+    </div>
+    <div class="status-bar" id="editStatus"></div>
+  </div>
+</div>
+
+<!-- ── Confirm Delete ── -->
+<div class="confirm-overlay hidden" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title">Delete Recipe?</div>
+    <p id="confirmMsg">This will permanently remove the recipe from the community. This cannot be undone.</p>
+    <div class="btn-row">
+      <button class="btn danger" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="btn outline" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Firebase ── -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+    doc, query, orderBy, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── PASTE YOUR FIREBASE CONFIG HERE ──
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCgq_Bbsz6s9m3XwMZN2MLFMExBWLwvub4",
+  authDomain: "pear-ai-recipes.firebaseapp.com",
+  projectId: "pear-ai-recipes",
+  storageBucket: "pear-ai-recipes.firebasestorage.app",
+  messagingSenderId: "622273986823",
+  appId: "1:622273986823:web:095da8e22213d9c1a985a2",
+  measurementId: "G-67F06KZQVR"
+};
+
+  // ── YOUR ADMIN UID ──
+  const ADMIN_UID = "KPhXgjMlYJd8rfZxZxFyIAIqxwq2";
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  let currentUser = null;
+  let allRecipes  = [];
+  let editingDocId = null;
+  let pendingDeleteId = null;
+
+  /* ── Auth ── */
+  onAuthStateChanged(auth, user => {
+    if (user && user.uid === ADMIN_UID) {
+      currentUser = user;
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('signedInAs').textContent = user.email;
+      document.getElementById('signOutBtn').style.display = '';
+      window.loadRecipes();
+    } else if (user) {
+      // Signed in but NOT admin
+      document.getElementById('authError').style.display = 'block';
+      document.getElementById('authScreen').classList.remove('hidden');
+      signOut(auth);
+    } else {
+      currentUser = null;
+      document.getElementById('authScreen').classList.remove('hidden');
+    }
+  });
+
+  document.getElementById('googleSignInBtn').onclick = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      document.getElementById('authError').textContent = err.message;
+      document.getElementById('authError').style.display = 'block';
+    }
+  };
+
+  window.doSignOut = async () => { await signOut(auth); };
+
+  /* ── Load ── */
+  window.loadRecipes = async function() {
+    document.getElementById('tableWrap').innerHTML = '<div class="loading-row">Loading…</div>';
+    try {
+      const q = query(collection(db, "communityRecipes"), orderBy("publishedAt", "desc"));
+      const snap = await getDocs(q);
+      allRecipes = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+      renderTable();
+    } catch (err) {
+      document.getElementById('tableWrap').innerHTML = `<div class="loading-row" style="color:var(--red)">Error: ${err.message}</div>`;
+    }
+  };
+
+  /* ── Render Table ── */
+  window.renderTable = function() {
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    let list = allRecipes;
+    if (search) {
+      list = list.filter(r =>
+        (r.title || '').toLowerCase().includes(search) ||
+        (r.publishedByName || '').toLowerCase().includes(search) ||
+        (r.publishedByEmail || '').toLowerCase().includes(search)
+      );
+    }
+
+    if (!list.length) {
+      document.getElementById('tableWrap').innerHTML = '<div class="empty-row">No recipes found.</div>';
+      return;
+    }
+
+    const rows = list.map(r => `
+      <tr>
+        <td>
+          ${r.image
+            ? `<img class="td-img" src="${esc(r.image)}" alt="">`
+            : `<div class="td-img-placeholder">no img</div>`}
+        </td>
+        <td class="td-title">
+          ${esc(r.title || 'Untitled')}
+          ${r.curated ? '<br><span class="curated-badge">curated</span>' : ''}
+        </td>
+        <td class="td-author">${esc(r.publishedByName || '—')}<br>${esc(r.publishedByEmail || '')}</td>
+        <td>${esc(r.meal_type || '—')}</td>
+        <td>${r.likeCount || 0} ♥ &nbsp; ${r.commentCount || 0} ✎</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn outline" onclick="openEditModal('${r._docId}')">Edit</button>
+            <button class="btn danger" onclick="openDeleteConfirm('${r._docId}')">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+
+    document.getElementById('tableWrap').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th><th>Title</th><th>Author</th><th>Meal</th><th>Engagement</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  };
+
+  /* ── List Editor helpers ── */
+  window.addListItem = function(editorId, value = '') {
+    const container = document.getElementById(editorId);
+    const row = document.createElement('div');
+    row.className = 'list-item-row';
+    row.innerHTML = `
+      <input type="text" value="${esc(value)}" placeholder="…">
+      <button onclick="this.parentElement.remove()" title="Remove">×</button>`;
+    container.appendChild(row);
+  };
+
+  function getListValues(editorId) {
+    return [...document.querySelectorAll(`#${editorId} input`)]
+      .map(i => i.value.trim()).filter(Boolean);
+  }
+
+  function populateList(editorId, items) {
+    document.getElementById(editorId).innerHTML = '';
+    (items || []).forEach(v => addListItem(editorId, v));
+  }
+
+  /* ── Open Edit Modal ── */
+  window.openEditModal = function(docId) {
+    const recipe = allRecipes.find(r => r._docId === docId);
+    if (!recipe) return;
+    editingDocId = docId;
+
+    document.getElementById('editModalTitle').textContent = 'Edit Recipe';
+    document.getElementById('editModalSubtitle').textContent =
+      `ID: ${docId} · By ${recipe.publishedByName || '—'} (${recipe.publishedByEmail || '—'})`;
+    document.getElementById('deleteInModalBtn').style.display = 'inline-block';
+    document.getElementById('fTitle').value    = recipe.title || '';
+    document.getElementById('fDesc').value     = recipe.description || '';
+    document.getElementById('fImage').value    = recipe.image || '';
+    document.getElementById('fServings').value = recipe.servings || '';
+    document.getElementById('fCurated').checked = !!recipe.curated;
+
+    const mt = document.getElementById('fMealType');
+    mt.value = [...mt.options].some(o => o.value === recipe.meal_type) ? recipe.meal_type : '';
+
+    const ingr = Array.isArray(recipe.ingredients)
+      ? recipe.ingredients
+      : String(recipe.ingredients || '').split(',').map(s => s.trim()).filter(Boolean);
+    populateList('ingredientsEditor', ingr);
+
+    const proc = Array.isArray(recipe.procedures)
+      ? recipe.procedures
+      : String(recipe.procedures || '').split(',').map(s => s.trim()).filter(Boolean);
+    populateList('proceduresEditor', proc);
+
+    const n = recipe.nutrition || {};
+    document.getElementById('nCalories').value = n.calories || n.Calories || '';
+    document.getElementById('nProtein').value  = n.protein  || n.Protein  || '';
+    document.getElementById('nCarbs').value    = n.carbs    || n.Carbs    || '';
+    document.getElementById('nFat').value      = n.fat      || n.Fat      || '';
+    document.getElementById('nFibre').value    = n.fibre    || n.Fibre    || n.fiber || '';
+    document.getElementById('nSugar').value    = n.sugar    || n.Sugar    || '';
+
+    document.getElementById('editStatus').textContent = '';
+    document.getElementById('editModalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+
+  /* ── Open New Modal ── */
+  window.openNewRecipeModal = function() {
+    editingDocId = null;
+    document.getElementById('editModalTitle').textContent = 'Add Curated Recipe';
+    document.getElementById('editModalSubtitle').textContent = 'New community recipe created by admin';
+    document.getElementById('deleteInModalBtn').style.display = 'none';
+    document.getElementById('fTitle').value    = '';
+    document.getElementById('fDesc').value     = '';
+    document.getElementById('fImage').value    = '';
+    document.getElementById('fServings').value = '';
+    document.getElementById('fMealType').value = '';
+    document.getElementById('fCurated').checked = true;
+    populateList('ingredientsEditor', ['']);
+    populateList('proceduresEditor', ['']);
+    ['nCalories','nProtein','nCarbs','nFat','nFibre','nSugar'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('editStatus').textContent = '';
+    document.getElementById('editModalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeEditModal = function() {
+    document.getElementById('editModalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+    editingDocId = null;
+  };
+
+  window.handleEditOverlayClick = function(e) {
+    if (e.target === document.getElementById('editModalOverlay')) closeEditModal();
+  };
+
+  /* ── Save ── */
+  window.saveRecipe = async function() {
+    const status = document.getElementById('editStatus');
+    const saveBtn = document.querySelector('#editModal .btn.success');
+    status.textContent = 'Saving…';
+    status.className = 'status-bar';
+    saveBtn.disabled = true;
+
+    const nutrition = {};
+    const nFields = {
+      calories: 'nCalories', protein: 'nProtein', carbs: 'nCarbs',
+      fat: 'nFat', fibre: 'nFibre', sugar: 'nSugar'
+    };
+    let hasNutrition = false;
+    Object.entries(nFields).forEach(([key, id]) => {
+      const val = document.getElementById(id).value.trim();
+      if (val) { nutrition[key] = val; hasNutrition = true; }
+    });
+
+    const payload = {
+      title:       document.getElementById('fTitle').value.trim(),
+      description: document.getElementById('fDesc').value.trim(),
+      image:       document.getElementById('fImage').value.trim() || null,
+      meal_type:   document.getElementById('fMealType').value,
+      servings:    parseInt(document.getElementById('fServings').value) || 0,
+      ingredients: getListValues('ingredientsEditor'),
+      procedures:  getListValues('proceduresEditor'),
+      nutrition:   hasNutrition ? nutrition : null,
+      curated:     document.getElementById('fCurated').checked
+    };
+
+    if (!payload.title) {
+      status.textContent = 'Title is required.';
+      status.className = 'status-bar err';
+      saveBtn.disabled = false;
+      return;
+    }
+
+    try {
+      if (editingDocId) {
+        await updateDoc(doc(db, "communityRecipes", editingDocId), payload);
+        const idx = allRecipes.findIndex(r => r._docId === editingDocId);
+        if (idx >= 0) allRecipes[idx] = { ...allRecipes[idx], ...payload };
+        status.textContent = 'Saved successfully.';
+        status.className = 'status-bar ok';
+      } else {
+        const newDoc = {
+          ...payload,
+          publishedByUid:   currentUser.uid,
+          publishedByName:  currentUser.displayName || 'Admin',
+          publishedByEmail: currentUser.email || '',
+          publishedAt:      serverTimestamp(),
+          likeCount:        0,
+          commentCount:     0
+        };
+        const ref = await addDoc(collection(db, "communityRecipes"), newDoc);
+        allRecipes.unshift({ _docId: ref.id, ...newDoc });
+        status.textContent = 'Recipe added.';
+        status.className = 'status-bar ok';
+        editingDocId = ref.id;
+        document.getElementById('deleteInModalBtn').style.display = 'inline-block';
+        document.getElementById('editModalSubtitle').textContent =
+          `ID: ${ref.id} · By Admin`;
+      }
+      renderTable();
+    } catch (err) {
+      status.textContent = 'Error: ' + err.message;
+      status.className = 'status-bar err';
+    } finally {
+      saveBtn.disabled = false;
+    }
+  };
+
+  /* ── Delete ── */
+  window.openDeleteConfirm = function(docId) {
+    pendingDeleteId = docId;
+    const recipe = allRecipes.find(r => r._docId === docId);
+    document.getElementById('confirmMsg').textContent =
+      `Delete "${recipe?.title || 'this recipe'}"? This cannot be undone.`;
+    document.getElementById('confirmOverlay').classList.remove('hidden');
+  };
+
+  window.triggerDeleteFromModal = function() {
+    if (!editingDocId) return;
+    openDeleteConfirm(editingDocId);
+  };
+
+  window.confirmDelete = async function() {
+    if (!pendingDeleteId) return;
+    try {
+      await deleteDoc(doc(db, "communityRecipes", pendingDeleteId));
+      allRecipes = allRecipes.filter(r => r._docId !== pendingDeleteId);
+      renderTable();
+      closeConfirm();
+      if (editingDocId === pendingDeleteId) closeEditModal();
+    } catch (err) {
+      alert('Delete failed: ' + err.message);
+    }
+    pendingDeleteId = null;
+  };
+
+  window.closeConfirm = function() {
+    document.getElementById('confirmOverlay').classList.add('hidden');
+    pendingDeleteId = null;
+  };
+
+  /* ── Util ── */
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (!document.getElementById('confirmOverlay').classList.contains('hidden')) closeConfirm();
+      else closeEditModal();
+    }
+  });
+</script>
+</body>
+</html>
