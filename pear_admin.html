@@ -324,6 +324,16 @@
       <label>Description</label>
       <textarea id="fDesc" placeholder="Short description"></textarea>
     </div>
+    <div class="form-row two-col">
+        <div>
+          <label>Author Name</label>
+          <input type="text" id="fAuthorName" placeholder="Display name">
+        </div>
+        <div>
+          <label>Author Email</label>
+          <input type="email" id="fAuthorEmail" placeholder="author@example.com">
+        </div>
+      </div>
     <div class="form-row">
       <label>Image URL</label>
       <input type="text" id="fImage" placeholder="https://…">
@@ -557,15 +567,15 @@ const firebaseConfig = {
     if (!recipe) return;
     editingDocId = docId;
 
-    document.getElementById('editModalTitle').textContent = 'Edit Recipe';
-    document.getElementById('editModalSubtitle').textContent =
-      `ID: ${docId} · By ${recipe.publishedByName || '—'} (${recipe.publishedByEmail || '—'})`;
+    document.getElementById('editModalTitle').textContent = 'Edit Recipe';document.getElementById('editModalSubtitle').textContent = `ID: ${docId}`;
     document.getElementById('deleteInModalBtn').style.display = 'inline-block';
     document.getElementById('fTitle').value    = recipe.title || '';
     document.getElementById('fDesc').value     = recipe.description || '';
     document.getElementById('fImage').value    = recipe.image || '';
     document.getElementById('fServings').value = recipe.servings || '';
     document.getElementById('fCurated').checked = !!recipe.curated;
+    document.getElementById('fAuthorName').value  = recipe.publishedByName  || '';
+document.getElementById('fAuthorEmail').value = recipe.publishedByEmail || '';
 
     const mt = document.getElementById('fMealType');
     mt.value = [...mt.options].some(o => o.value === recipe.meal_type) ? recipe.meal_type : '';
@@ -600,6 +610,8 @@ const firebaseConfig = {
     document.getElementById('editModalSubtitle').textContent = 'New community recipe created by admin';
     document.getElementById('deleteInModalBtn').style.display = 'none';
     document.getElementById('fTitle').value    = '';
+    document.getElementById('fAuthorName').value  = '';
+document.getElementById('fAuthorEmail').value = '';
     document.getElementById('fDesc').value     = '';
     document.getElementById('fImage').value    = '';
     document.getElementById('fServings').value = '';
@@ -653,7 +665,9 @@ const firebaseConfig = {
       ingredients: getListValues('ingredientsEditor'),
       procedures:  getListValues('proceduresEditor'),
       nutrition:   hasNutrition ? nutrition : null,
-      curated:     document.getElementById('fCurated').checked
+      curated:     document.getElementById('fCurated').checked,
+      publishedByName:  document.getElementById('fAuthorName').value.trim(),
+publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
     };
 
     if (!payload.title) {
