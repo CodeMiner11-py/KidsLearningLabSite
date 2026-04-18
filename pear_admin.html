@@ -99,6 +99,8 @@
     .btn.danger:hover { background: #6b1010; }
     .btn.success { background: var(--green); border-color: var(--green); }
     .btn.success:hover { background: #0f2e0f; }
+    .btn.accent { background: #2a3a6a; border-color: #2a3a6a; }
+    .btn.accent:hover { background: #1a2850; }
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
     .btn-google {
@@ -265,6 +267,55 @@
     /* Loading */
     .loading-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-4); }
     .empty-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-3); border: 1px solid var(--gray-2); }
+
+    /* ── JSON Import Modal ── */
+    #jsonImportOverlay .modal { max-width: 720px; }
+
+    .json-textarea {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: .82rem;
+      min-height: 260px;
+      background: var(--gray-1);
+      border: 1px solid var(--black);
+      line-height: 1.6;
+    }
+
+    .json-example {
+      background: var(--gray-1);
+      border: 1px solid var(--gray-2);
+      border-left: 3px solid var(--black);
+      padding: 14px 16px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: .76rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre;
+      color: var(--gray-4);
+      margin-top: 8px;
+    }
+
+    .json-example-toggle {
+      font-family: var(--serif);
+      font-size: .8rem;
+      font-style: italic;
+      color: var(--gray-4);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .json-example-toggle:hover { color: var(--black); }
+
+    #jsonExampleBlock { display: none; margin-top: 10px; }
+    #jsonExampleBlock.visible { display: block; }
+
+    .import-parse-status {
+      font-size: .82rem; font-style: italic; margin-top: 10px; min-height: 1.2em;
+    }
+    .import-parse-status.ok { color: var(--green); }
+    .import-parse-status.err { color: var(--red); }
   </style>
 </head>
 <body>
@@ -300,6 +351,7 @@
 <div class="container">
   <div class="toolbar">
     <button class="btn success" onclick="openNewRecipeModal()">+ Add Curated Recipe</button>
+    <button class="btn accent" onclick="openJsonImportModal()">{ } Import from JSON</button>
     <button class="btn outline" onclick="loadRecipes()">↺ Refresh</button>
     <input type="text" id="searchInput" placeholder="Search by title or author…" oninput="renderTable()">
   </div>
@@ -397,6 +449,35 @@
   </div>
 </div>
 
+<!-- ── JSON Import Modal ── -->
+<div class="modal-overlay hidden" id="jsonImportOverlay" onclick="handleJsonOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeJsonImportModal()">×</button>
+    <h2>Import from JSON</h2>
+    <p class="modal-subtitle">Paste a recipe object in JSON format — fields will be mapped into the edit form for review before saving.</p>
+
+    <div class="form-row">
+      <label>JSON Payload</label>
+      <textarea class="json-textarea" id="jsonImportInput" placeholder='Paste your JSON here…' oninput="liveParseJson()"></textarea>
+      <div class="import-parse-status" id="jsonParseStatus"></div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:8px">
+      <button class="json-example-toggle" onclick="toggleJsonExample()">show example JSON ↓</button>
+      <div id="jsonExampleBlock">
+        <div class="json-example" id="jsonExampleContent"></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <div style="display:flex;gap:10px">
+        <button class="btn accent" id="jsonImportBtn" onclick="applyJsonImport()">Load into Form</button>
+        <button class="btn outline" onclick="closeJsonImportModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Confirm Delete ── -->
 <div class="confirm-overlay hidden" id="confirmOverlay">
   <div class="confirm-box">
@@ -420,19 +501,16 @@
     doc, query, orderBy, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // ── PASTE YOUR FIREBASE CONFIG HERE ──
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCgq_Bbsz6s9m3XwMZN2MLFMExBWLwvub4",
-  authDomain: "pear-ai-recipes.firebaseapp.com",
-  projectId: "pear-ai-recipes",
-  storageBucket: "pear-ai-recipes.firebasestorage.app",
-  messagingSenderId: "622273986823",
-  appId: "1:622273986823:web:095da8e22213d9c1a985a2",
-  measurementId: "G-67F06KZQVR"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgq_Bbsz6s9m3XwMZN2MLFMExBWLwvub4",
+    authDomain: "pear-ai-recipes.firebaseapp.com",
+    projectId: "pear-ai-recipes",
+    storageBucket: "pear-ai-recipes.firebasestorage.app",
+    messagingSenderId: "622273986823",
+    appId: "1:622273986823:web:095da8e22213d9c1a985a2",
+    measurementId: "G-67F06KZQVR"
+  };
 
-  // ── YOUR ADMIN UID ──
   const ADMIN_UID = "KPhXgjMlYJd8rfZxZxFyIAIqxwq2";
 
   const app  = initializeApp(firebaseConfig);
@@ -454,7 +532,6 @@ const firebaseConfig = {
       document.getElementById('signOutBtn').style.display = '';
       window.loadRecipes();
     } else if (user) {
-      // Signed in but NOT admin
       document.getElementById('authError').style.display = 'block';
       document.getElementById('authScreen').classList.remove('hidden');
       signOut(auth);
@@ -567,7 +644,8 @@ const firebaseConfig = {
     if (!recipe) return;
     editingDocId = docId;
 
-    document.getElementById('editModalTitle').textContent = 'Edit Recipe';document.getElementById('editModalSubtitle').textContent = `ID: ${docId}`;
+    document.getElementById('editModalTitle').textContent = 'Edit Recipe';
+    document.getElementById('editModalSubtitle').textContent = `ID: ${docId}`;
     document.getElementById('deleteInModalBtn').style.display = 'inline-block';
     document.getElementById('fTitle').value    = recipe.title || '';
     document.getElementById('fDesc').value     = recipe.description || '';
@@ -575,7 +653,7 @@ const firebaseConfig = {
     document.getElementById('fServings').value = recipe.servings || '';
     document.getElementById('fCurated').checked = !!recipe.curated;
     document.getElementById('fAuthorName').value  = recipe.publishedByName  || '';
-document.getElementById('fAuthorEmail').value = recipe.publishedByEmail || '';
+    document.getElementById('fAuthorEmail').value = recipe.publishedByEmail || '';
 
     const mt = document.getElementById('fMealType');
     mt.value = [...mt.options].some(o => o.value === recipe.meal_type) ? recipe.meal_type : '';
@@ -611,7 +689,7 @@ document.getElementById('fAuthorEmail').value = recipe.publishedByEmail || '';
     document.getElementById('deleteInModalBtn').style.display = 'none';
     document.getElementById('fTitle').value    = '';
     document.getElementById('fAuthorName').value  = '';
-document.getElementById('fAuthorEmail').value = '';
+    document.getElementById('fAuthorEmail').value = '';
     document.getElementById('fDesc').value     = '';
     document.getElementById('fImage').value    = '';
     document.getElementById('fServings').value = '';
@@ -667,7 +745,7 @@ document.getElementById('fAuthorEmail').value = '';
       nutrition:   hasNutrition ? nutrition : null,
       curated:     document.getElementById('fCurated').checked,
       publishedByName:  document.getElementById('fAuthorName').value.trim(),
-publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
+      publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
     };
 
     if (!payload.title) {
@@ -688,8 +766,8 @@ publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
         const newDoc = {
           ...payload,
           publishedByUid:   currentUser.uid,
-          publishedByName:  currentUser.displayName || 'Admin',
-          publishedByEmail: currentUser.email || '',
+          publishedByName:  payload.publishedByName  || currentUser.displayName || 'Admin',
+          publishedByEmail: payload.publishedByEmail || currentUser.email || '',
           publishedAt:      serverTimestamp(),
           likeCount:        0,
           commentCount:     0
@@ -700,8 +778,7 @@ publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
         status.className = 'status-bar ok';
         editingDocId = ref.id;
         document.getElementById('deleteInModalBtn').style.display = 'inline-block';
-        document.getElementById('editModalSubtitle').textContent =
-          `ID: ${ref.id} · By Admin`;
+        document.getElementById('editModalSubtitle').textContent = `ID: ${ref.id} · By Admin`;
       }
       renderTable();
     } catch (err) {
@@ -745,6 +822,173 @@ publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
     pendingDeleteId = null;
   };
 
+  /* ════════════════════════════════════════
+     ── JSON Import ──
+  ════════════════════════════════════════ */
+
+  const JSON_EXAMPLE = {
+    title: "Honey Lemon Ricotta Pancakes",
+    description: "Fluffy weekend pancakes with a bright citrus tang.",
+    publishedByName: "Jamie Chen",
+    publishedByEmail: "jamie@example.com",
+    image: "https://example.com/pancakes.jpg",
+    meal_type: "Breakfast",
+    servings: 4,
+    curated: true,
+    ingredients: [
+      "1 cup ricotta cheese",
+      "2 large eggs",
+      "2 tbsp honey",
+      "1 tbsp lemon zest",
+      "½ cup all-purpose flour",
+      "1 tsp baking powder",
+      "pinch of salt",
+      "butter for the pan"
+    ],
+    procedures: [
+      "Whisk together ricotta, eggs, honey, and lemon zest in a bowl.",
+      "Fold in flour, baking powder, and salt until just combined — don't overmix.",
+      "Heat a non-stick skillet over medium heat and melt a small knob of butter.",
+      "Pour ¼ cup batter per pancake and cook 2–3 min until bubbles form, then flip.",
+      "Cook 1–2 min more until golden. Serve with extra honey and fresh berries."
+    ],
+    nutrition: {
+      calories: "310kcal",
+      protein: "14g",
+      carbs: "32g",
+      fat: "13g",
+      fibre: "1g",
+      sugar: "10g"
+    }
+  };
+
+  // Populate example block on load
+  document.getElementById('jsonExampleContent').textContent =
+    JSON.stringify(JSON_EXAMPLE, null, 2);
+
+  window.openJsonImportModal = function() {
+    document.getElementById('jsonImportInput').value = '';
+    document.getElementById('jsonParseStatus').textContent = '';
+    document.getElementById('jsonParseStatus').className = 'import-parse-status';
+    document.getElementById('jsonExampleBlock').classList.remove('visible');
+    document.getElementById('jsonImportOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('jsonImportInput').focus(), 80);
+  };
+
+  window.closeJsonImportModal = function() {
+    document.getElementById('jsonImportOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  window.handleJsonOverlayClick = function(e) {
+    if (e.target === document.getElementById('jsonImportOverlay')) closeJsonImportModal();
+  };
+
+  window.toggleJsonExample = function() {
+    document.getElementById('jsonExampleBlock').classList.toggle('visible');
+    const btn = document.querySelector('.json-example-toggle');
+    btn.textContent = document.getElementById('jsonExampleBlock').classList.contains('visible')
+      ? 'hide example ↑'
+      : 'show example JSON ↓';
+  };
+
+  window.liveParseJson = function() {
+    const raw = document.getElementById('jsonImportInput').value.trim();
+    const status = document.getElementById('jsonParseStatus');
+    if (!raw) { status.textContent = ''; return; }
+    try {
+      const parsed = JSON.parse(raw);
+      const title = parsed.title || parsed.name || '(no title)';
+      status.textContent = `✓ Valid JSON — "${title}"`;
+      status.className = 'import-parse-status ok';
+    } catch (err) {
+      status.textContent = `✗ Invalid JSON: ${err.message}`;
+      status.className = 'import-parse-status err';
+    }
+  };
+
+  window.applyJsonImport = function() {
+    const raw = document.getElementById('jsonImportInput').value.trim();
+    const status = document.getElementById('jsonParseStatus');
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (err) {
+      status.textContent = `✗ Cannot parse: ${err.message}`;
+      status.className = 'import-parse-status err';
+      return;
+    }
+
+    // ── Map JSON fields into the New Recipe form ──
+    closeJsonImportModal();
+
+    // Reset / open new recipe modal first
+    editingDocId = null;
+    document.getElementById('editModalTitle').textContent = 'Add Curated Recipe';
+    document.getElementById('editModalSubtitle').textContent = 'Imported from JSON — review and save';
+    document.getElementById('deleteInModalBtn').style.display = 'none';
+
+    // Core fields — accept common aliases
+    document.getElementById('fTitle').value =
+      data.title || data.name || '';
+    document.getElementById('fDesc').value =
+      data.description || data.desc || data.summary || '';
+    document.getElementById('fImage').value =
+      data.image || data.imageUrl || data.image_url || data.photo || '';
+    document.getElementById('fServings').value =
+      data.servings || data.serves || data.yield || '';
+    document.getElementById('fAuthorName').value =
+      data.publishedByName || data.authorName || data.author || '';
+    document.getElementById('fAuthorEmail').value =
+      data.publishedByEmail || data.authorEmail || data.author_email || '';
+    document.getElementById('fCurated').checked =
+      data.curated !== undefined ? !!data.curated : true;
+
+    // Meal type — match against known options
+    const validMeals = ['Breakfast','Lunch','Dinner','Snack','Dessert'];
+    const rawMeal = data.meal_type || data.mealType || data.category || '';
+    const matchedMeal = validMeals.find(
+      m => m.toLowerCase() === String(rawMeal).toLowerCase()
+    ) || '';
+    document.getElementById('fMealType').value = matchedMeal;
+
+    // Ingredients — accept array or comma-string
+    const ingr = Array.isArray(data.ingredients)
+      ? data.ingredients
+      : String(data.ingredients || '').split(',').map(s => s.trim()).filter(Boolean);
+    populateList('ingredientsEditor', ingr.length ? ingr : ['']);
+
+    // Procedures — accept array or comma-string; also "steps" alias
+    const rawProc = data.procedures || data.steps || data.instructions || [];
+    const proc = Array.isArray(rawProc)
+      ? rawProc
+      : String(rawProc).split(',').map(s => s.trim()).filter(Boolean);
+    populateList('proceduresEditor', proc.length ? proc : ['']);
+
+    // Nutrition — works with nested object or flat keys
+    const n = data.nutrition || data.nutritionFacts || data.nutritional_info || {};
+    const pick = (obj, ...keys) => {
+      for (const k of keys) {
+        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return String(obj[k]);
+      }
+      return '';
+    };
+    // Also support flat top-level nutrition keys as fallback
+    const flatData = data;
+    document.getElementById('nCalories').value = pick(n,'calories','Calories','cal','kcal') || pick(flatData,'calories','Calories');
+    document.getElementById('nProtein').value  = pick(n,'protein','Protein')  || pick(flatData,'protein','Protein');
+    document.getElementById('nCarbs').value    = pick(n,'carbs','Carbs','carbohydrates')   || pick(flatData,'carbs','Carbs');
+    document.getElementById('nFat').value      = pick(n,'fat','Fat','totalFat')      || pick(flatData,'fat','Fat');
+    document.getElementById('nFibre').value    = pick(n,'fibre','Fibre','fiber','Fiber') || pick(flatData,'fibre','fiber');
+    document.getElementById('nSugar').value    = pick(n,'sugar','Sugar')    || pick(flatData,'sugar','Sugar');
+
+    document.getElementById('editStatus').textContent = 'Imported from JSON — review fields then save.';
+    document.getElementById('editStatus').className = 'status-bar ok';
+    document.getElementById('editModalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+
   /* ── Util ── */
   function esc(str) {
     return String(str ?? '')
@@ -755,6 +999,7 @@ publishedByEmail: document.getElementById('fAuthorEmail').value.trim()
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       if (!document.getElementById('confirmOverlay').classList.contains('hidden')) closeConfirm();
+      else if (!document.getElementById('jsonImportOverlay').classList.contains('hidden')) closeJsonImportModal();
       else closeEditModal();
     }
   });
