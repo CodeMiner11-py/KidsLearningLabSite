@@ -101,6 +101,8 @@
     .btn.success:hover { background: #0f2e0f; }
     .btn.accent { background: #2a3a6a; border-color: #2a3a6a; }
     .btn.accent:hover { background: #1a2850; }
+    .btn.gold { background: #7a5c1e; border-color: #7a5c1e; }
+    .btn.gold:hover { background: #5e4416; }
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
     .btn-google {
@@ -316,6 +318,175 @@
     }
     .import-parse-status.ok { color: var(--green); }
     .import-parse-status.err { color: var(--red); }
+
+    /* ══════════════════════════════════════
+       ── AI Generation Modal ──
+    ══════════════════════════════════════ */
+    #aiGenOverlay .modal { max-width: 780px; }
+
+    .ai-settings-strip {
+      background: var(--gray-1);
+      border: 1px solid var(--gray-2);
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .ai-settings-strip .form-row { margin-bottom: 0; }
+
+    .ai-worker-row {
+      display: flex; gap: 10px; align-items: flex-end; margin-bottom: 22px;
+    }
+    .ai-worker-row .form-row { margin-bottom: 0; flex: 1; }
+    .ai-worker-row input { font-family: 'Courier New', monospace; font-size: .82rem; }
+
+    /* Queue */
+    .gen-queue {
+      display: flex; flex-direction: column; gap: 14px;
+      max-height: 520px; overflow-y: auto;
+      padding-right: 4px;
+    }
+    .gen-queue:empty::after {
+      content: 'No recipes generated yet.';
+      display: block;
+      font-style: italic;
+      color: var(--gray-3);
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .gen-card {
+      border: 1px solid var(--gray-2);
+      background: var(--white);
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 0;
+      position: relative;
+      transition: border-color .2s;
+    }
+    .gen-card.approved { border-color: var(--green); }
+    .gen-card.denied   { border-color: var(--red); opacity: .55; }
+
+    .gen-card-img-col {
+      border-right: 1px solid var(--gray-2);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; padding: 12px 8px;
+      background: var(--gray-1);
+      min-height: 120px;
+    }
+    .gen-card-img-col img {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      border: 1px solid var(--gray-2);
+    }
+    .gen-card-img-col .img-placeholder {
+      width: 80px; height: 80px;
+      border: 1px dashed var(--gray-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; color: var(--gray-3); font-style: italic;
+      text-align: center; line-height: 1.4;
+    }
+    .gen-img-actions { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+    .gen-img-btn {
+      font-family: var(--serif); font-size: .7rem; font-style: italic;
+      border: 1px solid var(--gray-2); background: var(--white);
+      color: var(--gray-4); cursor: pointer; padding: 4px 6px;
+      text-align: center; width: 100%;
+      transition: background .12s, color .12s;
+    }
+    .gen-img-btn:hover { background: var(--gray-1); color: var(--black); }
+    .gen-img-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .gen-card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .gen-card-title {
+      font-size: 1rem; font-weight: normal;
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .gen-card-title input {
+      flex: 1; border: none; border-bottom: 1px dashed var(--gray-2);
+      background: transparent; font-size: 1rem; font-family: var(--serif);
+      padding: 2px 4px;
+    }
+    .gen-card-title input:focus { background: var(--gray-1); border-bottom-color: var(--black); outline: none; }
+
+    .gen-card-desc textarea {
+      border: none; border-bottom: 1px dashed var(--gray-2);
+      background: transparent; font-family: var(--serif); font-size: .85rem;
+      color: var(--gray-4); font-style: italic; width: 100%;
+      resize: none; min-height: 40px; padding: 2px 4px;
+      line-height: 1.5;
+    }
+    .gen-card-desc textarea:focus { background: var(--gray-1); border-bottom-color: var(--black); outline: none; }
+
+    .gen-card-meta {
+      display: flex; gap: 10px; flex-wrap: wrap; font-size: .78rem; color: var(--gray-4);
+    }
+    .gen-card-meta select, .gen-card-meta input[type="number"] {
+      font-size: .78rem; padding: 3px 7px; border-color: var(--gray-2);
+      width: auto;
+    }
+
+    .gen-card-nutrition {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+    }
+    .gen-card-nutrition .n-cell { display: flex; flex-direction: column; gap: 2px; }
+    .gen-card-nutrition .n-label { font-size: .65rem; color: var(--gray-3); text-transform: uppercase; letter-spacing: .05em; }
+    .gen-card-nutrition input {
+      font-size: .78rem; padding: 4px 6px; border-color: var(--gray-2);
+    }
+
+    .gen-card-actions {
+      display: flex; gap: 8px; margin-top: 4px; align-items: center; flex-wrap: wrap;
+    }
+    .gen-card-status {
+      font-size: .78rem; font-style: italic; margin-left: auto;
+    }
+    .gen-card-status.ok  { color: var(--green); }
+    .gen-card-status.err { color: var(--red); }
+    .gen-card-status.pending { color: var(--gray-4); }
+
+    .gen-card-toggle {
+      font-family: var(--serif); font-size: .72rem; font-style: italic;
+      color: var(--gray-4); background: none; border: none; cursor: pointer;
+      padding: 0; text-decoration: underline; text-underline-offset: 2px;
+    }
+    .gen-card-toggle:hover { color: var(--black); }
+
+    .gen-card-expanded { padding: 0 16px 14px; }
+    .gen-card-expanded.hidden { display: none; }
+
+    .gen-list-section { margin-bottom: 10px; }
+    .gen-list-section label {
+      display: block; font-size: .72rem; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--gray-4); margin-bottom: 5px;
+    }
+
+    .gen-progress {
+      font-style: italic; color: var(--gray-4); font-size: .82rem;
+      padding: 8px 0; text-align: center;
+      border: 1px dashed var(--gray-2);
+      margin-bottom: 14px;
+    }
+    .gen-progress.hidden { display: none; }
+
+    .ai-gen-controls {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      padding: 16px 0; border-bottom: 1px solid var(--gray-2); margin-bottom: 18px;
+    }
+    .ai-count-label { font-size: .82rem; color: var(--gray-4); font-style: italic; }
+    .ai-count-select { width: auto; padding: 7px 10px; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block; width: 12px; height: 12px;
+      border: 2px solid var(--gray-2); border-top-color: var(--gray-4);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle; margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -352,6 +523,7 @@
   <div class="toolbar">
     <button class="btn success" onclick="openNewRecipeModal()">+ Add Curated Recipe</button>
     <button class="btn accent" onclick="openJsonImportModal()">{ } Import from JSON</button>
+    <button class="btn gold" onclick="openAiGenModal()">✦ Generate with AI</button>
     <button class="btn outline" onclick="loadRecipes()">↺ Refresh</button>
     <input type="text" id="searchInput" placeholder="Search by title or author…" oninput="renderTable()">
   </div>
@@ -478,6 +650,80 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     ── AI Generation Modal ──
+═══════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="aiGenOverlay" onclick="handleAiOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAiGenModal()">×</button>
+    <h2>✦ Generate with AI</h2>
+    <p class="modal-subtitle">Auto-generate recipes using GROQ + Cloudflare Workers AI. Review each one, edit inline, then approve to publish or deny to discard.</p>
+
+    <!-- Worker URL + Secret -->
+    <div style="background:var(--gray-1);border:1px solid var(--gray-2);padding:16px 18px;margin-bottom:20px;">
+      <div style="font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-4);margin-bottom:10px;">Worker Settings</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+        <div>
+          <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:4px;">Worker URL</label>
+          <input type="text" id="aiWorkerUrl" placeholder="https://pear-recipe-worker.your-account.workers.dev" style="font-family:'Courier New',monospace;font-size:.82rem;">
+        </div>
+        <div>
+          <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:4px;">Admin Secret</label>
+          <input type="password" id="aiAdminSecret" placeholder="your-secret-token" style="font-family:'Courier New',monospace;font-size:.82rem;width:180px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Generation Controls -->
+    <div class="ai-gen-controls">
+      <div>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Meal Type</label>
+        <select id="aiMealType" style="width:auto;padding:7px 10px;">
+          <option value="">— any —</option>
+          <option>Breakfast</option>
+          <option>Lunch</option>
+          <option>Dinner</option>
+          <option>Snack</option>
+          <option>Dessert</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Cuisine</label>
+        <input type="text" id="aiCuisine" placeholder="e.g. Italian" style="width:140px;">
+      </div>
+      <div>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Dietary</label>
+        <input type="text" id="aiDietary" placeholder="e.g. vegetarian" style="width:140px;">
+      </div>
+      <div>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Prompt hint</label>
+        <input type="text" id="aiPrompt" placeholder="e.g. something comforting…" style="width:200px;">
+      </div>
+      <div>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Count</label>
+        <select id="aiCount" style="width:auto;padding:7px 10px;">
+          <option value="1">1</option>
+          <option value="3" selected>3</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+      <button class="btn gold" id="aiGenerateBtn" onclick="runAiGeneration()" style="align-self:flex-end;">Generate</button>
+    </div>
+
+    <div class="gen-progress hidden" id="genProgress">Generating recipes…</div>
+    <div class="gen-queue" id="genQueue"></div>
+
+    <div class="modal-actions" style="margin-top:20px;">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn success" id="approveAllBtn" onclick="approveAll()" disabled>✓ Approve All Pending</button>
+        <button class="btn outline" onclick="closeAiGenModal()">Close</button>
+      </div>
+      <span id="aiGenSummary" style="font-size:.82rem;font-style:italic;color:var(--gray-4);"></span>
+    </div>
+  </div>
+</div>
+
 <!-- ── Confirm Delete ── -->
 <div class="confirm-overlay hidden" id="confirmOverlay">
   <div class="confirm-box">
@@ -518,8 +764,8 @@
   const db   = getFirestore(app);
   const provider = new GoogleAuthProvider();
 
-  let currentUser = null;
-  let allRecipes  = [];
+  let currentUser  = null;
+  let allRecipes   = [];
   let editingDocId = null;
   let pendingDeleteId = null;
 
@@ -825,7 +1071,6 @@
   /* ════════════════════════════════════════
      ── JSON Import ──
   ════════════════════════════════════════ */
-
   const JSON_EXAMPLE = {
     title: "Honey Lemon Ricotta Pancakes",
     description: "Fluffy weekend pancakes with a bright citrus tang.",
@@ -834,16 +1079,11 @@
     image: "https://example.com/pancakes.jpg",
     meal_type: "Breakfast",
     servings: 4,
-    curated: true,
+    curated: false,
     ingredients: [
-      "1 cup ricotta cheese",
-      "2 large eggs",
-      "2 tbsp honey",
-      "1 tbsp lemon zest",
-      "½ cup all-purpose flour",
-      "1 tsp baking powder",
-      "pinch of salt",
-      "butter for the pan"
+      "1 cup ricotta cheese","2 large eggs","2 tbsp honey",
+      "1 tbsp lemon zest","½ cup all-purpose flour",
+      "1 tsp baking powder","pinch of salt","butter for the pan"
     ],
     procedures: [
       "Whisk together ricotta, eggs, honey, and lemon zest in a bowl.",
@@ -852,19 +1092,10 @@
       "Pour ¼ cup batter per pancake and cook 2–3 min until bubbles form, then flip.",
       "Cook 1–2 min more until golden. Serve with extra honey and fresh berries."
     ],
-    nutrition: {
-      calories: "310kcal",
-      protein: "14g",
-      carbs: "32g",
-      fat: "13g",
-      fibre: "1g",
-      sugar: "10g"
-    }
+    nutrition: { calories:"310kcal", protein:"14g", carbs:"32g", fat:"13g", fibre:"1g", sugar:"10g" }
   };
 
-  // Populate example block on load
-  document.getElementById('jsonExampleContent').textContent =
-    JSON.stringify(JSON_EXAMPLE, null, 2);
+  document.getElementById('jsonExampleContent').textContent = JSON.stringify(JSON_EXAMPLE, null, 2);
 
   window.openJsonImportModal = function() {
     document.getElementById('jsonImportInput').value = '';
@@ -889,8 +1120,7 @@
     document.getElementById('jsonExampleBlock').classList.toggle('visible');
     const btn = document.querySelector('.json-example-toggle');
     btn.textContent = document.getElementById('jsonExampleBlock').classList.contains('visible')
-      ? 'hide example ↑'
-      : 'show example JSON ↓';
+      ? 'hide example ↑' : 'show example JSON ↓';
   };
 
   window.liveParseJson = function() {
@@ -912,82 +1142,431 @@
     const raw = document.getElementById('jsonImportInput').value.trim();
     const status = document.getElementById('jsonParseStatus');
     let data;
-    try {
-      data = JSON.parse(raw);
-    } catch (err) {
+    try { data = JSON.parse(raw); }
+    catch (err) {
       status.textContent = `✗ Cannot parse: ${err.message}`;
       status.className = 'import-parse-status err';
       return;
     }
-
-    // ── Map JSON fields into the New Recipe form ──
     closeJsonImportModal();
+    loadRecipeIntoEditForm(data, 'Imported from JSON — review and save');
+  };
 
-    // Reset / open new recipe modal first
+  function loadRecipeIntoEditForm(data, subtitle) {
     editingDocId = null;
     document.getElementById('editModalTitle').textContent = 'Add Curated Recipe';
-    document.getElementById('editModalSubtitle').textContent = 'Imported from JSON — review and save';
+    document.getElementById('editModalSubtitle').textContent = subtitle || 'Review and save';
     document.getElementById('deleteInModalBtn').style.display = 'none';
 
-    // Core fields — accept common aliases
-    document.getElementById('fTitle').value =
-      data.title || data.name || '';
-    document.getElementById('fDesc').value =
-      data.description || data.desc || data.summary || '';
-    document.getElementById('fImage').value =
-      data.image || data.imageUrl || data.image_url || data.photo || '';
-    document.getElementById('fServings').value =
-      data.servings || data.serves || data.yield || '';
-    document.getElementById('fAuthorName').value =
-      data.publishedByName || data.authorName || data.author || '';
-    document.getElementById('fAuthorEmail').value =
-      data.publishedByEmail || data.authorEmail || data.author_email || '';
-    document.getElementById('fCurated').checked =
-      data.curated !== undefined ? !!data.curated : true;
+    document.getElementById('fTitle').value   = data.title || data.name || '';
+    document.getElementById('fDesc').value    = data.description || data.desc || '';
+    document.getElementById('fImage').value   = data.image || data.imageUrl || '';
+    document.getElementById('fServings').value= data.servings || data.serves || '';
+    document.getElementById('fAuthorName').value  = data.publishedByName  || data.authorName  || '';
+    document.getElementById('fAuthorEmail').value = data.publishedByEmail || data.authorEmail || '';
+    document.getElementById('fCurated').checked   = data.curated !== undefined ? !!data.curated : false;
 
-    // Meal type — match against known options
     const validMeals = ['Breakfast','Lunch','Dinner','Snack','Dessert'];
     const rawMeal = data.meal_type || data.mealType || data.category || '';
-    const matchedMeal = validMeals.find(
-      m => m.toLowerCase() === String(rawMeal).toLowerCase()
-    ) || '';
-    document.getElementById('fMealType').value = matchedMeal;
+    document.getElementById('fMealType').value =
+      validMeals.find(m => m.toLowerCase() === String(rawMeal).toLowerCase()) || '';
 
-    // Ingredients — accept array or comma-string
     const ingr = Array.isArray(data.ingredients)
       ? data.ingredients
-      : String(data.ingredients || '').split(',').map(s => s.trim()).filter(Boolean);
+      : String(data.ingredients||'').split(',').map(s=>s.trim()).filter(Boolean);
     populateList('ingredientsEditor', ingr.length ? ingr : ['']);
 
-    // Procedures — accept array or comma-string; also "steps" alias
     const rawProc = data.procedures || data.steps || data.instructions || [];
     const proc = Array.isArray(rawProc)
       ? rawProc
-      : String(rawProc).split(',').map(s => s.trim()).filter(Boolean);
+      : String(rawProc).split(',').map(s=>s.trim()).filter(Boolean);
     populateList('proceduresEditor', proc.length ? proc : ['']);
 
-    // Nutrition — works with nested object or flat keys
-    const n = data.nutrition || data.nutritionFacts || data.nutritional_info || {};
-    const pick = (obj, ...keys) => {
-      for (const k of keys) {
-        if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return String(obj[k]);
-      }
-      return '';
-    };
-    // Also support flat top-level nutrition keys as fallback
-    const flatData = data;
-    document.getElementById('nCalories').value = pick(n,'calories','Calories','cal','kcal') || pick(flatData,'calories','Calories');
-    document.getElementById('nProtein').value  = pick(n,'protein','Protein')  || pick(flatData,'protein','Protein');
-    document.getElementById('nCarbs').value    = pick(n,'carbs','Carbs','carbohydrates')   || pick(flatData,'carbs','Carbs');
-    document.getElementById('nFat').value      = pick(n,'fat','Fat','totalFat')      || pick(flatData,'fat','Fat');
-    document.getElementById('nFibre').value    = pick(n,'fibre','Fibre','fiber','Fiber') || pick(flatData,'fibre','fiber');
-    document.getElementById('nSugar').value    = pick(n,'sugar','Sugar')    || pick(flatData,'sugar','Sugar');
+    const n = data.nutrition || {};
+    const pick = (obj, ...keys) => { for (const k of keys) if (obj[k]) return String(obj[k]); return ''; };
+    document.getElementById('nCalories').value = pick(n,'calories','Calories') || pick(data,'calories');
+    document.getElementById('nProtein').value  = pick(n,'protein','Protein')   || pick(data,'protein');
+    document.getElementById('nCarbs').value    = pick(n,'carbs','Carbs')       || pick(data,'carbs');
+    document.getElementById('nFat').value      = pick(n,'fat','Fat')           || pick(data,'fat');
+    document.getElementById('nFibre').value    = pick(n,'fibre','Fibre','fiber')|| pick(data,'fibre','fiber');
+    document.getElementById('nSugar').value    = pick(n,'sugar','Sugar')       || pick(data,'sugar');
 
-    document.getElementById('editStatus').textContent = 'Imported from JSON — review fields then save.';
+    document.getElementById('editStatus').textContent = subtitle || '';
     document.getElementById('editStatus').className = 'status-bar ok';
     document.getElementById('editModalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+  }
+  window.loadRecipeIntoEditForm = loadRecipeIntoEditForm;
+
+  /* ════════════════════════════════════════
+     ── AI Generation ──
+  ════════════════════════════════════════ */
+
+  // Internal queue: array of { id, recipe, imageDataUrl, status: 'pending'|'approved'|'denied', saving: bool }
+  let genQueue = [];
+  let genIdCounter = 0;
+
+  window.openAiGenModal = function() {
+    document.getElementById('aiGenOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    updateApproveAllBtn();
   };
+
+  window.closeAiGenModal = function() {
+    document.getElementById('aiGenOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  window.handleAiOverlayClick = function(e) {
+    if (e.target === document.getElementById('aiGenOverlay')) closeAiGenModal();
+  };
+
+  function workerUrl() { return document.getElementById('aiWorkerUrl').value.trim().replace(/\/$/, ''); }
+  function adminSecret() { return document.getElementById('aiAdminSecret').value.trim(); }
+
+  async function callWorker(endpoint, body) {
+    const base = workerUrl();
+    if (!base) throw new Error('Worker URL is required.');
+    const secret = adminSecret();
+    if (!secret) throw new Error('Admin secret is required.');
+    const res = await fetch(`${base}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${secret}`,
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  }
+
+  window.runAiGeneration = async function() {
+    const count    = parseInt(document.getElementById('aiCount').value) || 1;
+    const meal_type= document.getElementById('aiMealType').value;
+    const cuisine  = document.getElementById('aiCuisine').value.trim();
+    const dietary  = document.getElementById('aiDietary').value.trim();
+    const prompt   = document.getElementById('aiPrompt').value.trim();
+
+    const btn = document.getElementById('aiGenerateBtn');
+    const progress = document.getElementById('genProgress');
+    btn.disabled = true;
+    progress.classList.remove('hidden');
+    progress.innerHTML = `<span class="spinner"></span> Generating ${count} recipe${count > 1 ? 's' : ''}…`;
+
+    const promises = Array.from({ length: count }, async () => {
+      try {
+        const data = await callWorker('/generate-recipe', { meal_type, cuisine, dietary, prompt });
+        const id = ++genIdCounter;
+        const entry = { id, recipe: data.recipe, imageDataUrl: null, status: 'pending', saving: false };
+        genQueue.unshift(entry);
+        renderGenQueue();
+        updateApproveAllBtn();
+        return entry;
+      } catch (err) {
+        const id = ++genIdCounter;
+        const entry = { id, recipe: null, error: err.message, status: 'error' };
+        genQueue.unshift(entry);
+        renderGenQueue();
+        return entry;
+      }
+    });
+
+    await Promise.all(promises);
+
+    btn.disabled = false;
+    progress.classList.add('hidden');
+    updateAiGenSummary();
+  };
+
+  function renderGenQueue() {
+    const container = document.getElementById('genQueue');
+    if (!genQueue.length) { container.innerHTML = ''; return; }
+
+    container.innerHTML = genQueue.map(entry => {
+      if (entry.status === 'error') {
+        return `<div class="gen-card" style="padding:14px 16px;">
+          <div style="color:var(--red);font-style:italic;font-size:.88rem;">✗ Generation failed: ${esc(entry.error)}</div>
+        </div>`;
+      }
+
+      const r = entry.recipe;
+      const n = r.nutrition || {};
+      const isApproved = entry.status === 'approved';
+      const isDenied   = entry.status === 'denied';
+
+      const cardClass = isApproved ? 'gen-card approved' : isDenied ? 'gen-card denied' : 'gen-card';
+      const expandId  = `expand-${entry.id}`;
+
+      return `<div class="${cardClass}" id="gen-card-${entry.id}">
+        <!-- Image column -->
+        <div class="gen-card-img-col">
+          ${entry.imageDataUrl
+            ? `<img src="${entry.imageDataUrl}" alt="${esc(r.title)}">`
+            : `<div class="img-placeholder">no image</div>`
+          }
+          <div class="gen-img-actions">
+            <button class="gen-img-btn" onclick="generateImageForCard(${entry.id})" ${isDenied ? 'disabled' : ''}>
+              ${entry.imageDataUrl ? '↻ regen image' : '+ gen image'}
+            </button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="gen-card-body">
+          <div class="gen-card-title">
+            <input type="text" value="${esc(r.title || '')}" id="gen-title-${entry.id}" placeholder="Recipe title">
+          </div>
+          <div class="gen-card-desc">
+            <textarea id="gen-desc-${entry.id}" rows="2">${esc(r.description || '')}</textarea>
+          </div>
+          <div class="gen-card-meta">
+            <select id="gen-meal-${entry.id}" style="width:auto;padding:4px 8px;font-size:.78rem;">
+              ${['','Breakfast','Lunch','Dinner','Snack','Dessert'].map(m =>
+                `<option value="${m}" ${r.meal_type === m ? 'selected' : ''}>${m || '— meal type —'}</option>`
+              ).join('')}
+            </select>
+            <span style="display:flex;align-items:center;gap:4px;">
+              <label style="font-size:.78rem;color:var(--gray-4);">Servings</label>
+              <input type="number" id="gen-servings-${entry.id}" value="${r.servings || ''}" min="1" style="width:54px;padding:4px 6px;font-size:.78rem;">
+            </span>
+          </div>
+          <div class="gen-card-nutrition">
+            ${[['calories','Calories'],['protein','Protein'],['carbs','Carbs'],['fat','Fat'],['fibre','Fibre'],['sugar','Sugar']].map(([key, label]) => `
+              <div class="n-cell">
+                <span class="n-label">${label}</span>
+                <input type="text" id="gen-n-${key}-${entry.id}" value="${esc(n[key] || '')}" placeholder="—">
+              </div>`).join('')}
+          </div>
+          <div class="gen-card-actions">
+            ${!isApproved && !isDenied ? `
+              <button class="btn success" style="padding:6px 14px;font-size:.82rem;" onclick="approveCard(${entry.id})">✓ Approve</button>
+              <button class="btn danger"  style="padding:6px 14px;font-size:.82rem;" onclick="denyCard(${entry.id})">✗ Deny</button>
+              <button class="btn outline" style="padding:6px 14px;font-size:.82rem;" onclick="regenerateCard(${entry.id})">↻ Regenerate</button>
+            ` : isApproved ? `
+              <span style="color:var(--green);font-style:italic;font-size:.82rem;">✓ Approved & saved</span>
+              <button class="btn outline" style="padding:4px 10px;font-size:.78rem;" onclick="undenyCard(${entry.id})">Undo</button>
+            ` : `
+              <span style="color:var(--red);font-style:italic;font-size:.82rem;">✗ Denied</span>
+              <button class="btn outline" style="padding:4px 10px;font-size:.78rem;" onclick="undenyCard(${entry.id})">Restore</button>
+            `}
+            <button class="gen-card-toggle" onclick="toggleCardExpand(${entry.id})">view details ↓</button>
+            <span class="gen-card-status" id="gen-status-${entry.id}"></span>
+          </div>
+
+          <!-- Expanded details -->
+          <div class="gen-card-expanded hidden" id="${expandId}">
+            <div class="gen-list-section" style="margin-top:10px;">
+              <label>Ingredients</label>
+              <div class="list-editor" id="gen-ingr-${entry.id}">
+                ${(r.ingredients || []).map(v => `
+                  <div class="list-item-row">
+                    <input type="text" value="${esc(v)}">
+                    <button onclick="this.parentElement.remove()">×</button>
+                  </div>`).join('')}
+              </div>
+              <button class="add-item-btn" onclick="addListItem('gen-ingr-${entry.id}','')">+ Add ingredient</button>
+            </div>
+            <div class="gen-list-section">
+              <label>Steps</label>
+              <div class="list-editor" id="gen-proc-${entry.id}">
+                ${(r.procedures || []).map(v => `
+                  <div class="list-item-row">
+                    <input type="text" value="${esc(v)}">
+                    <button onclick="this.parentElement.remove()">×</button>
+                  </div>`).join('')}
+              </div>
+              <button class="add-item-btn" onclick="addListItem('gen-proc-${entry.id}','')">+ Add step</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.toggleCardExpand = function(id) {
+    const el = document.getElementById(`expand-${id}`);
+    if (!el) return;
+    const isHidden = el.classList.contains('hidden');
+    el.classList.toggle('hidden');
+    // update toggle button text
+    const card = document.getElementById(`gen-card-${id}`);
+    if (card) {
+      const btn = card.querySelector('.gen-card-toggle');
+      if (btn) btn.textContent = isHidden ? 'hide details ↑' : 'view details ↓';
+    }
+  };
+
+  function readCardData(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry) return null;
+    const r = entry.recipe || {};
+    const n = {};
+    ['calories','protein','carbs','fat','fibre','sugar'].forEach(k => {
+      const el = document.getElementById(`gen-n-${k}-${id}`);
+      if (el && el.value.trim()) n[k] = el.value.trim();
+    });
+
+    // Ingredients / procedures from expanded list if rendered
+    const ingrContainer = document.getElementById(`gen-ingr-${id}`);
+    const procContainer = document.getElementById(`gen-proc-${id}`);
+    const ingredients = ingrContainer
+      ? [...ingrContainer.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean)
+      : (r.ingredients || []);
+    const procedures = procContainer
+      ? [...procContainer.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean)
+      : (r.procedures || []);
+
+    return {
+      title:            (document.getElementById(`gen-title-${id}`)?.value || r.title || '').trim(),
+      description:      (document.getElementById(`gen-desc-${id}`)?.value  || r.description || '').trim(),
+      meal_type:        document.getElementById(`gen-meal-${id}`)?.value || r.meal_type || '',
+      servings:         parseInt(document.getElementById(`gen-servings-${id}`)?.value) || r.servings || 0,
+      nutrition:        Object.keys(n).length ? n : null,
+      ingredients,
+      procedures,
+      publishedByName:  'Pear AI Curated Recipes',
+      publishedByEmail: 'hello@kidslearninglab.com',
+      image:            entry.imageDataUrl || null,
+      curated:          false,
+    };
+  }
+
+  window.approveCard = async function(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry || entry.saving) return;
+
+    const payload = readCardData(id);
+    if (!payload.title) {
+      setCardStatus(id, 'Title is required.', 'err');
+      return;
+    }
+
+    entry.saving = true;
+    setCardStatus(id, 'Saving…', 'pending');
+
+    try {
+      const newDoc = {
+        ...payload,
+        publishedByUid: currentUser.uid,
+        publishedAt:    serverTimestamp(),
+        likeCount:      0,
+        commentCount:   0,
+      };
+      const ref = await addDoc(collection(db, "communityRecipes"), newDoc);
+      allRecipes.unshift({ _docId: ref.id, ...newDoc });
+      entry.status = 'approved';
+      renderTable();
+      renderGenQueue();
+      updateApproveAllBtn();
+      updateAiGenSummary();
+    } catch (err) {
+      setCardStatus(id, 'Error: ' + err.message, 'err');
+    } finally {
+      entry.saving = false;
+    }
+  };
+
+  window.denyCard = function(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry) return;
+    entry.status = 'denied';
+    renderGenQueue();
+    updateApproveAllBtn();
+    updateAiGenSummary();
+  };
+
+  window.undenyCard = function(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry) return;
+    entry.status = 'pending';
+    renderGenQueue();
+    updateApproveAllBtn();
+    updateAiGenSummary();
+  };
+
+  window.regenerateCard = async function(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry) return;
+
+    const meal_type = document.getElementById('aiMealType').value;
+    const cuisine   = document.getElementById('aiCuisine').value.trim();
+    const dietary   = document.getElementById('aiDietary').value.trim();
+    const prompt    = document.getElementById('aiPrompt').value.trim();
+
+    setCardStatus(id, 'Regenerating…', 'pending');
+    // Visually show spinner on the card title area
+    const titleEl = document.getElementById(`gen-title-${id}`);
+    if (titleEl) titleEl.placeholder = 'Regenerating…';
+
+    try {
+      const data = await callWorker('/generate-recipe', { meal_type, cuisine, dietary, prompt });
+      entry.recipe = data.recipe;
+      entry.imageDataUrl = null; // clear old image
+      entry.status = 'pending';
+      renderGenQueue();
+      setCardStatus(id, 'Regenerated.', 'ok');
+      updateApproveAllBtn();
+    } catch (err) {
+      setCardStatus(id, 'Error: ' + err.message, 'err');
+    }
+  };
+
+  window.generateImageForCard = async function(id) {
+    const entry = genQueue.find(e => e.id === id);
+    if (!entry || !entry.recipe) return;
+
+    const titleEl = document.getElementById(`gen-title-${id}`);
+    const title = titleEl ? titleEl.value.trim() : entry.recipe.title;
+    const desc  = entry.recipe.description || '';
+
+    const btn = document.querySelector(`#gen-card-${id} .gen-img-btn`);
+    if (btn) { btn.disabled = true; btn.textContent = 'generating…'; }
+    setCardStatus(id, 'Generating image…', 'pending');
+
+    try {
+      const data = await callWorker('/generate-image', { title, description: desc });
+      entry.imageDataUrl = data.imageDataUrl;
+      renderGenQueue();
+      setCardStatus(id, 'Image ready.', 'ok');
+    } catch (err) {
+      setCardStatus(id, 'Image failed: ' + err.message, 'err');
+      if (btn) { btn.disabled = false; btn.textContent = '↻ retry image'; }
+    }
+  };
+
+  window.approveAll = async function() {
+    const pending = genQueue.filter(e => e.status === 'pending' && e.recipe);
+    for (const entry of pending) {
+      await approveCard(entry.id);
+    }
+  };
+
+  function updateApproveAllBtn() {
+    const btn = document.getElementById('approveAllBtn');
+    const pending = genQueue.filter(e => e.status === 'pending' && e.recipe).length;
+    btn.disabled = pending === 0;
+    btn.textContent = pending > 0 ? `✓ Approve All Pending (${pending})` : '✓ Approve All Pending';
+  }
+
+  function updateAiGenSummary() {
+    const approved = genQueue.filter(e => e.status === 'approved').length;
+    const denied   = genQueue.filter(e => e.status === 'denied').length;
+    const pending  = genQueue.filter(e => e.status === 'pending' && e.recipe).length;
+    const parts = [];
+    if (approved) parts.push(`${approved} approved`);
+    if (denied)   parts.push(`${denied} denied`);
+    if (pending)  parts.push(`${pending} pending`);
+    document.getElementById('aiGenSummary').textContent = parts.join(' · ');
+  }
+
+  function setCardStatus(id, msg, type) {
+    const el = document.getElementById(`gen-status-${id}`);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `gen-card-status ${type}`;
+  }
 
   /* ── Util ── */
   function esc(str) {
@@ -1000,6 +1579,7 @@
     if (e.key === 'Escape') {
       if (!document.getElementById('confirmOverlay').classList.contains('hidden')) closeConfirm();
       else if (!document.getElementById('jsonImportOverlay').classList.contains('hidden')) closeJsonImportModal();
+      else if (!document.getElementById('aiGenOverlay').classList.contains('hidden')) closeAiGenModal();
       else closeEditModal();
     }
   });
