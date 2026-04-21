@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pear AI — Privacy Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:     #2d6a2a;
+      --green-mid: #48a044;
+      --green-lt:  #b6ddb3;
+      --green-xs:  #eef6ec;
+      --cream:     #faf8f3;
+      --parchment: #f4f0e6;
+      --ink:       #1c1c18;
+      --ink-mid:   #3d3d30;
+      --ink-lt:    #7a7a62;
+      --rule:      #d4ceb8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 19px;
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    /* ── Decorative top border ── */
+    .top-rule {
+      height: 5px;
+      background: linear-gradient(90deg, var(--green) 0%, var(--green-mid) 50%, var(--green) 100%);
+    }
+
+    /* ── Header ── */
+    header {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 48px 0;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .header-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      box-shadow: 0 4px 16px rgba(45,106,42,.18);
+      flex-shrink: 0;
+    }
+
+    .header-wordmark {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: -.01em;
+      line-height: 1;
+    }
+
+    .header-tagline {
+      font-size: .95rem;
+      color: var(--ink-lt);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* ── Hero block ── */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 52px 48px 0;
+    }
+
+    .eyebrow {
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--green-mid);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eyebrow::before, .eyebrow::after {
+      content: '';
+      flex: 0 0 28px;
+      height: 1px;
+      background: var(--green-lt);
+    }
+
+    h1.doc-title {
+      font-size: clamp(2.6rem, 5vw, 3.8rem);
+      font-weight: 500;
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+    }
+
+    h1.doc-title em {
+      color: var(--green);
+      font-style: italic;
+    }
+
+    .doc-meta {
+      font-size: .95rem;
+      color: var(--ink-lt);
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      padding-bottom: 40px;
+      border-bottom: 1.5px solid var(--rule);
+    }
+
+    .doc-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .doc-meta strong {
+      color: var(--ink-mid);
+      font-weight: 500;
+    }
+
+    /* ── Summary card ── */
+    .summary-card {
+      max-width: 860px;
+      margin: 44px auto 0;
+      padding: 0 48px;
+    }
+
+    .summary-inner {
+      background: var(--parchment);
+      border: 1.5px solid var(--rule);
+      border-left: 4px solid var(--green);
+      border-radius: 4px;
+      padding: 32px 36px;
+    }
+
+    .summary-label {
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 14px;
+    }
+
+    .summary-inner p {
+      font-size: 1.05rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .summary-inner p:last-child { margin-bottom: 0; }
+
+    .summary-bullets {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      margin-top: 18px;
+    }
+
+    .summary-bullets li {
+      font-size: .95rem;
+      color: var(--ink-mid);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .summary-bullets li::before {
+      content: '✦';
+      color: var(--green-mid);
+      font-size: .7rem;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .summary-bullets { grid-template-columns: 1fr; }
+    }
+
+    /* ── Layout: sidebar + content ── */
+    .layout {
+      max-width: 860px;
+      margin: 52px auto 0;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      position: sticky;
+      top: 32px;
+    }
+
+    .toc-label {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink-lt);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc ol li {
+      counter-increment: toc;
+      margin-bottom: 6px;
+    }
+
+    .toc ol li a {
+      font-size: .88rem;
+      color: var(--ink-lt);
+      text-decoration: none;
+      line-height: 1.4;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      transition: color .15s;
+    }
+
+    .toc ol li a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: .72rem;
+      color: var(--green-lt);
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toc ol li a:hover { color: var(--green); }
+    .toc ol li a:hover::before { color: var(--green-mid); }
+
+    /* ── Main content ── */
+    .content section {
+      margin-bottom: 56px;
+    }
+
+    .content section:last-child { margin-bottom: 0; }
+
+    .section-number {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--green-mid);
+      margin-bottom: 6px;
+    }
+
+    .content h2 {
+      font-size: 1.65rem;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -.015em;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .content p {
+      margin-bottom: 16px;
+      color: var(--ink-mid);
+    }
+
+    .content p:last-child { margin-bottom: 0; }
+
+    .content ul, .content ol {
+      padding-left: 0;
+      list-style: none;
+      margin: 16px 0;
+    }
+
+    .content ul li, .content ol li {
+      padding-left: 22px;
+      position: relative;
+      margin-bottom: 8px;
+      color: var(--ink-mid);
+    }
+
+    .content ul li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--green-mid);
+    }
+
+    .content ol {
+      counter-reset: ol-items;
+    }
+
+    .content ol li {
+      counter-increment: ol-items;
+    }
+
+    .content ol li::before {
+      content: counter(ol-items) '.';
+      position: absolute;
+      left: 0;
+      color: var(--green-mid);
+      font-size: .9rem;
+    }
+
+    .content strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .content em {
+      color: var(--ink-mid);
+    }
+
+    .callout {
+      background: var(--green-xs);
+      border: 1px solid var(--green-lt);
+      border-left: 3px solid var(--green);
+      border-radius: 3px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: .95rem;
+      color: var(--ink-mid);
+      line-height: 1.65;
+    }
+
+    .callout strong { color: var(--green); }
+
+    a.inline-link {
+      color: var(--green);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    a.inline-link:hover { color: var(--green-mid); }
+
+    /* ── Contact block ── */
+    .contact-block {
+      background: var(--parchment);
+      border: 1.5px solid var(--rule);
+      border-radius: 4px;
+      padding: 28px 32px;
+      margin-top: 20px;
+    }
+
+    .contact-block p {
+      margin-bottom: 8px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      max-width: 860px;
+      margin: 72px auto 0;
+      padding: 32px 48px 60px;
+      border-top: 1.5px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      font-size: .9rem;
+      color: var(--ink-lt);
+      font-style: italic;
+    }
+
+    .footer-brand strong {
+      color: var(--green);
+      font-style: normal;
+    }
+
+    .footer-back {
+      font-size: .85rem;
+      color: var(--green);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity .15s;
+    }
+
+    .footer-back:hover { opacity: .7; }
+
+    /* ── Responsive ── */
+    @media (max-width: 760px) {
+      header, .hero, .summary-card, .layout, footer {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .toc {
+        position: static;
+        background: var(--parchment);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 20px 24px;
+        margin-bottom: 44px;
+      }
+    }
+
+    /* ── Scroll highlight ── */
+    :target {
+      scroll-margin-top: 24px;
+    }
+
+    :target h2 {
+      color: var(--green);
+      transition: color .4s;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<!-- Header -->
+<header>
+  <img class="header-logo" src="https://kidslearninglab.com/pear%201.png" alt="Pear logo">
+  <div>
+    <div class="header-wordmark">Pear AI</div>
+    <div class="header-tagline">AI-Powered Recipe Creator</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow">Legal</div>
+  <h1 class="doc-title">Privacy <em>Policy</em></h1>
+  <div class="doc-meta">
+    <span><strong>Effective date:</strong> April 20, 2025</span>
+    <span><strong>Last updated:</strong> April 20, 2025</span>
+    <span><strong>Applies to:</strong> Pear AI iOS App</span>
+  </div>
+</div>
+
+
+
+<!-- Main layout -->
+<div class="layout">
+
+  <!-- TOC -->
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#information-we-collect">Information We Collect</a></li>
+      <li><a href="#how-we-use-it">How We Use It</a></li>
+      <li><a href="#camera-photos">Camera &amp; Photos</a></li>
+      <li><a href="#data-storage">Data Storage</a></li>
+      <li><a href="#ai-processing">AI Processing</a></li>
+      <li><a href="#sharing">Sharing &amp; Disclosure</a></li>
+      <li><a href="#community">Community Features</a></li>
+      <li><a href="#your-rights">Your Rights</a></li>
+      <li><a href="#children">Children's Privacy</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#app-store">App Store Distribution</a></li>
+      <li><a href="#changes">Changes to This Policy</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+
+    <section id="information-we-collect">
+      <div class="section-number">01</div>
+      <h2>Information We Collect</h2>
+      <p>
+        When you use Pear AI, we collect the following categories of information:
+      </p>
+      <p><strong>Account information</strong></p>
+      <ul>
+        <li>Your name, email address, and profile photo from your Google account, provided when you sign in with Google</li>
+        <li>A unique user identifier assigned by Firebase Authentication</li>
+      </ul>
+      <p><strong>Recipe data</strong></p>
+      <ul>
+        <li>Recipes you generate, import, or scan — including titles, descriptions, ingredients, steps, nutrition data, and any generated images</li>
+        <li>Folders you create to organise recipes</li>
+        <li>Ratings and favourites you assign to recipes</li>
+      </ul>
+      <p><strong>Community data (optional)</strong></p>
+      <ul>
+        <li>If you choose to publish a recipe publicly, your display name, email address, and recipe content become visible to other users</li>
+        <li>Comments and likes you submit on community recipes</li>
+      </ul>
+      <p>
+        We do <strong>not</strong> collect location data, contacts, browsing history, payment information, health data, or any other sensitive personal information.
+      </p>
+    </section>
+
+    <section id="how-we-use-it">
+      <div class="section-number">02</div>
+      <h2>How We Use It</h2>
+      <p>We use the information we collect solely to provide and improve Pear AI:</p>
+      <ul>
+        <li>To authenticate your identity and keep your account secure</li>
+        <li>To save and sync your recipes across your devices</li>
+        <li>To display your name and photo in the app interface</li>
+        <li>To power community features (publishing, comments, likes)</li>
+        <li>To send recipe emails when you explicitly request it</li>
+        <li>To improve app performance and fix bugs</li>
+      </ul>
+      <div class="callout">
+        <strong>We never use your data for advertising.</strong> Pear AI contains no ads and we do not share your data with advertisers or data brokers.
+      </div>
+    </section>
+
+    <section id="camera-photos">
+      <div class="section-number">03</div>
+      <h2>Camera &amp; Photos</h2>
+      <p>
+        Pear AI requests access to your device camera and photo library for the purpose of scanning
+        ingredients. When you use the Scan feature:
+      </p>
+      <ul>
+        <li>The image is captured on your device and sent to our AI processing service to identify ingredients</li>
+        <li>Images are processed to generate a recipe and are <strong>not</strong> stored permanently on our servers</li>
+        <li>Generated recipe images (created by AI) may be stored alongside your recipe in Firestore</li>
+      </ul>
+      <p>
+        Camera access is entirely optional. You can use Pear to create recipes by typing ingredients
+        without ever granting camera permission.
+      </p>
+    </section>
+
+    <section id="data-storage">
+      <div class="section-number">04</div>
+      <h2>Data Storage</h2>
+      <p>
+        Your data is stored using <strong>Google Firebase</strong> (Firestore), a cloud database
+        service operated by Google LLC. Data is stored in Google's secure data centres.
+      </p>
+      <ul>
+        <li>Authentication is handled by Firebase Authentication</li>
+        <li>Recipes, folders, and community content are stored in Cloud Firestore</li>
+        <li>Data is associated with your Google account UID and is only accessible by you (except content you explicitly publish to the community)</li>
+      </ul>
+      <p>
+        You can review Google Firebase's privacy practices at
+        <a class="inline-link" href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/support/privacy</a>.
+      </p>
+    </section>
+
+    <section id="ai-processing">
+      <div class="section-number">05</div>
+      <h2>AI Processing</h2>
+      <p>
+        Pear AI uses AI to generate recipes and analyse ingredient photos. This processing is performed
+        by our backend services hosted on <strong>Cloudflare Workers</strong>, which use large
+        language models to generate recipe content.
+      </p>
+      <ul>
+        <li>Recipe generation requests include the ingredients and preferences you provide</li>
+        <li>Ingredient scan requests include the image you capture or upload</li>
+        <li>These requests are processed in real time and are not used to train AI models on your behalf</li>
+        <li>No personally identifiable information is included in AI requests</li>
+      </ul>
+    </section>
+
+    <section id="sharing">
+      <div class="section-number">06</div>
+      <h2>Sharing &amp; Disclosure</h2>
+      <p>
+        We do not sell, rent, or trade your personal information to any third party. We may share
+        information only in the following limited circumstances:
+      </p>
+      <ul>
+        <li><strong>Service providers:</strong> Google Firebase and Cloudflare, as described above, to operate the app</li>
+        <li><strong>Email delivery:</strong> When you use the Send Email feature, your recipe content and the recipient's address are passed to our email delivery service</li>
+        <li><strong>Legal obligation:</strong> If required by law, court order, or to protect the safety of users</li>
+      </ul>
+      <p>
+        All service providers are contractually required to use your data only to provide services to Pear AI.
+      </p>
+    </section>
+
+    <section id="community">
+      <div class="section-number">07</div>
+      <h2>Community Features</h2>
+      <p>
+        Pear AI includes an optional Community section where users can publish recipes publicly.
+        Please be aware:
+      </p>
+      <ul>
+        <li>Any recipe you publish will display your name, email address, and recipe content to all users of the app</li>
+        <li>Comments you post are visible to all users</li>
+        <li>You can take down your published recipes at any time from within the app</li>
+        <li>Do not publish content containing personal information you do not wish to share publicly</li>
+      </ul>
+    </section>
+
+    <section id="your-rights">
+      <div class="section-number">08</div>
+      <h2>Your Rights</h2>
+      <p>You have the following rights with respect to your personal data:</p>
+      <ul>
+        <li><strong>Access:</strong> You can view all recipes and data stored in your account within the app</li>
+        <li><strong>Deletion:</strong> You can delete individual recipes from within the app at any time. To request complete deletion of your account and all associated data, contact us at the address below</li>
+        <li><strong>Correction:</strong> You can edit recipe titles, descriptions, and other content directly in the app</li>
+        <li><strong>Portability:</strong> Your recipe content can be shared or exported using the app's Share and Print features</li>
+        <li><strong>Withdraw consent:</strong> You can sign out of Pear AI at any time from the Settings screen. Signing out stops any further data collection</li>
+      </ul>
+      <div class="callout">
+        To request full account deletion, email us at <strong>hello@kidslearninglab.com</strong> with the subject line "Delete My Pear AI Account." We will process your request within 30 days.
+      </div>
+    </section>
+
+    <section id="children">
+      <div class="section-number">09</div>
+      <h2>Children's Privacy</h2>
+      <p>
+        Pear AI is designed to be family-friendly. We do not knowingly collect personal information
+        from children under the age of 13 without verifiable parental consent. Sign-in requires
+        a Google account, which has its own age requirements.
+      </p>
+      <p>
+        If you are a parent or guardian and believe your child has provided personal information
+        through Pear AI without your consent, please contact us and we will promptly delete that information.
+      </p>
+    </section>
+
+    <section id="security">
+      <div class="section-number">10</div>
+      <h2>Security</h2>
+      <p>
+        We take reasonable technical and organisational measures to protect your information:
+      </p>
+      <ul>
+        <li>All data in transit is encrypted via HTTPS/TLS</li>
+        <li>Firestore security rules restrict data access to the owning user account</li>
+        <li>Authentication is handled entirely by Google — we never see or store your password</li>
+      </ul>
+      <p>
+        No method of transmission over the internet is 100% secure. While we strive to protect your
+        information, we cannot guarantee absolute security.
+      </p>
+    </section>
+
+    <section id="app-store">
+      <div class="section-number">11</div>
+      <h2>App Store Distribution</h2>
+      <p>
+        Pear AI is distributed exclusively through the <strong>Apple App Store</strong>. By downloading
+        and using Pear AI, you also agree to Apple's terms and privacy practices.
+      </p>
+      <ul>
+        <li>All app updates are delivered free of charge through the App Store — you will never be charged for an update to Pear AI</li>
+        <li>Apple may collect certain data related to your download and device as part of their standard App Store operations, independent of Pear AI</li>
+        <li>Apple's privacy policy governs any data collected by Apple in connection with your use of the App Store</li>
+      </ul>
+      <p>
+        You can review Apple's Privacy Policy at
+        <a class="inline-link" href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">apple.com/legal/privacy</a>.
+      </p>
+    </section>
+
+    <section id="changes">
+      <div class="section-number">13</div>
+      <h2>Changes to This Policy</h2>
+      <p>
+        We may update this Privacy Policy from time to time. When we do, we will revise the
+        "Last updated" date at the top of this page. For significant changes, we will make
+        reasonable efforts to notify users within the app.
+      </p>
+      <p>
+        Continued use of Pear after changes are posted constitutes your acceptance of the
+        revised policy.
+      </p>
+    </section>
+
+    <section id="contact">
+      <div class="section-number">14</div>
+      <h2>Contact</h2>
+      <p>
+        Pear AI is an app created by Eshaan Buddhisagar under <strong>Kids Learning Lab LLC</strong>,
+        a private company. If you have any questions, requests, or concerns about this Privacy Policy
+        or your personal data, please reach out:
+      </p>
+      <div class="contact-block">
+        <p><strong>Creator:</strong> Eshaan Buddhisagar</p>
+        <p><strong>Company:</strong> Kids Learning Lab LLC (private company)</p>
+        <p><strong>Email:</strong> <a class="inline-link" href="mailto:hello@kidslearninglab.com">hello@kidslearninglab.com</a></p>
+        <p><strong>Website:</strong> <a class="inline-link" href="https://kidslearninglab.com/about" target="_blank" rel="noopener">kidslearninglab.com/about</a></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-brand">
+    <strong>Pear AI</strong> — AI-Powered Recipe Creator &nbsp;·&nbsp; Kids Learning Lab LLC
+  </div>
+  <a class="footer-back" href="https://kidslearninglab.com">
+    ← kidslearninglab.com
+  </a>
+</footer>
+
+</body>
+</html>
