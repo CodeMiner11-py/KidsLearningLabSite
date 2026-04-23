@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eshaan's Plane Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-50: #e8f1fb;
+    --blue-100: #c3d9f4;
+    --blue-200: #9ac0ec;
+    --blue-300: #5e9de0;
+    --blue-400: #2f7fd4;
+    --blue-500: #1a65b8;
+    --blue-600: #114d99;
+    --blue-700: #0b3878;
+    --blue-800: #072657;
+    --blue-900: #03173a;
+    --surface: #f0f5fc;
+    --surface2: #e2ecf8;
+    --card-bg: #ffffff;
+    --border: rgba(30, 90, 180, 0.15);
+    --border-strong: rgba(30, 90, 180, 0.3);
+    --text-primary: #071e40;
+    --text-secondary: #3a5a8a;
+    --text-muted: #6b87b0;
+    --accent: #1a65b8;
+    --accent-light: #e8f1fb;
+    --slot-colors: #2f7fd4, #e0503a, #2daa72;
+    --slot-0-color: #2f7fd4;
+    --slot-0-fill: rgba(47, 127, 212, 0.18);
+    --slot-0-stroke: #1a65b8;
+    --slot-1-color: #e0503a;
+    --slot-1-fill: rgba(224, 80, 58, 0.18);
+    --slot-1-stroke: #c03020;
+    --slot-2-color: #2daa72;
+    --slot-2-fill: rgba(45, 170, 114, 0.18);
+    --slot-2-stroke: #1a7a50;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0b3878 0%, #1a65b8 60%, #2f7fd4 100%);
+    padding: 2rem 2.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .brand-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.35rem;
+  }
+  .brand-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .brand-icon svg { width: 22px; height: 22px; fill: white; }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.65);
+    font-weight: 400;
+    margin-top: 0.2rem;
+  }
+
+  /* ── Layout ── */
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100vh - 3rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-header {
+    padding: 1.1rem 1.25rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--accent-light);
+  }
+  .sidebar-header h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--blue-600);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Slot pickers */
+  .slots {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .slot.active-slot { border-color: var(--slot-active-color, var(--blue-400)); }
+  .slot-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .slot-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .slot-clear {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: none;
+    background: none;
+    line-height: 1;
+    transition: color 0.1s, background 0.1s;
+  }
+  .slot-clear:hover { color: #e0503a; background: #fdecea; }
+
+  /* Search */
+  .search-wrap {
+    padding: 0.85rem 1.25rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .search-input {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text-primary);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--blue-400); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  /* Category filter tabs */
+  .cat-filter {
+    padding: 0.5rem 1.25rem;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-filter::-webkit-scrollbar { display: none; }
+  .cat-btn {
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-strong);
+    background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .cat-btn:hover { background: var(--surface2); }
+  .cat-btn.active { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+
+  /* Plane list */
+  .plane-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0.5rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .plane-item {
+    padding: 0.45rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+    font-size: 0.83rem;
+    color: var(--text-primary);
+  }
+  .plane-item:hover { background: var(--surface2); }
+  .plane-item.selected-0 { border-left-color: var(--slot-0-stroke); background: rgba(47,127,212,0.07); }
+  .plane-item.selected-1 { border-left-color: var(--slot-1-stroke); background: rgba(224,80,58,0.07); }
+  .plane-item.selected-2 { border-left-color: var(--slot-2-stroke); background: rgba(45,170,114,0.07); }
+  .plane-item-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  .plane-item.selected-0 .plane-item-dot,
+  .plane-item.selected-1 .plane-item-dot,
+  .plane-item.selected-2 .plane-item-dot { opacity: 1; }
+  .plane-item.selected-0 .plane-item-dot { background: var(--slot-0-stroke); }
+  .plane-item.selected-1 .plane-item-dot { background: var(--slot-1-stroke); }
+  .plane-item.selected-2 .plane-item-dot { background: var(--slot-2-stroke); }
+  .cat-group-label {
+    padding: 0.7rem 1.25rem 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* ── Main canvas area ── */
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Info cards row */
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+  }
+  .info-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1rem 1.1rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 90px;
+  }
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .info-card.c0::before { background: var(--slot-0-stroke); }
+  .info-card.c1::before { background: var(--slot-1-stroke); }
+  .info-card.c2::before { background: var(--slot-2-stroke); }
+  .info-card.empty { opacity: 0.45; }
+  .info-card-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+    line-height: 1.3;
+  }
+  .info-card-empty {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .info-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .info-stat-val {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .info-stat-unit {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .info-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-bottom: 4px;
+  }
+  .info-badge.c0 { background: rgba(47,127,212,0.12); color: var(--slot-0-stroke); }
+  .info-badge.c1 { background: rgba(224,80,58,0.12); color: var(--slot-1-stroke); }
+  .info-badge.c2 { background: rgba(45,170,114,0.12); color: var(--slot-2-stroke); }
+
+  /* Viewport card */
+  .viewport-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .viewport-toolbar {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--accent-light);
+  }
+  .viewport-toolbar h2 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--blue-600);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    flex: 1;
+  }
+  .scale-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+  }
+  .vtbtn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-strong);
+    background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .vtbtn.active { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+
+  /* SVG canvas */
+  .canvas-wrap {
+    padding: 2rem;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(47,127,212,0.03) 0px,
+      rgba(47,127,212,0.03) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(47,127,212,0.03) 0px,
+      rgba(47,127,212,0.03) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+    position: relative;
+  }
+  #compare-svg {
+    width: 100%;
+    max-height: 600px;
+  }
+  .ruler-bar {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 2rem 0.75rem;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+  .ruler-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-strong);
+    position: relative;
+  }
+  .ruler-line::before, .ruler-line::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    width: 1px;
+    height: 8px;
+    background: var(--border-strong);
+  }
+  .ruler-line::before { left: 0; }
+  .ruler-line::after { right: 0; }
+
+  /* Stats bar */
+  .stats-bar {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1.1rem 1.5rem;
+  }
+  .stats-bar h3 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.85rem;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-item-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .stat-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-bar-bg {
+    flex: 1;
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .stat-bar-val {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 50px;
+    text-align: right;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+  .empty-state svg {
+    width: 48px; height: 48px;
+    opacity: 0.3;
+    fill: var(--blue-400);
+  }
+
+  /* No results */
+  .no-results {
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 1.25rem;
+    padding: 0 2rem 0.75rem;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+  .legend-swatch {
+    width: 24px; height: 10px;
+    border-radius: 3px;
+    border: 1.5px solid;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand-line">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+        </svg>
+      </div>
+      <h1>Eshaan's Plane Comparison</h1>
+    </div>
+    <p class="header-sub">Top-down silhouette comparison · Select up to 3 aircraft · True scale</p>
+  </div>
+</header>
+
+<div class="page">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Select Aircraft</h2>
+    </div>
+    <div class="slots" id="slots-container">
+      <!-- populated by JS -->
+    </div>
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="search" placeholder="Search aircraft…">
+    </div>
+    <div class="cat-filter" id="cat-filter"></div>
+    <div class="plane-list" id="plane-list"></div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="info-cards" id="info-cards"></div>
+
+    <div class="viewport-card">
+      <div class="viewport-toolbar">
+        <h2>Top-down view</h2>
+        <span class="scale-label" id="scale-label">True scale</span>
+        <div class="view-toggle">
+          <button class="vtbtn active" id="btn-aligned" onclick="setAlign('center')">Aligned</button>
+          <button class="vtbtn" id="btn-stacked" onclick="setAlign('stacked')">Stacked</button>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <svg id="compare-svg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(47,127,212,0.06)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="800" height="500" fill="url(#grid)"/>
+          <g id="svg-content"></g>
+        </svg>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="ruler-bar" id="ruler-bar">
+        <span>0 m</span>
+        <div class="ruler-line"></div>
+        <span id="ruler-end">100 m</span>
+      </div>
+    </div>
+
+    <div class="stats-bar" id="stats-bar">
+      <h3>Dimension comparison</h3>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ──────────────────────────────────────────
+// DATA: All 100 aircraft with real dimensions
+// wingspan (m), length (m), category, fuselage_width (m), tail_height (m)
+// ──────────────────────────────────────────
+const AIRCRAFT = [
+  // Wide-body Commercial
+  { id: 1, name: "Antonov An-225 Mriya", cat: "Wide-body", wingspan: 88.4, length: 84.0, fw: 8.4 },
+  { id: 2, name: "Boeing 747-8", cat: "Wide-body", wingspan: 68.4, length: 76.3, fw: 6.5 },
+  { id: 3, name: "Boeing 747-400", cat: "Wide-body", wingspan: 64.4, length: 70.7, fw: 6.5 },
+  { id: 4, name: "Airbus A380", cat: "Wide-body", wingspan: 79.75, length: 72.7, fw: 7.14 },
+  { id: 5, name: "Boeing 777X", cat: "Wide-body", wingspan: 71.8, length: 76.7, fw: 6.2 },
+  { id: 6, name: "Boeing 777-300ER", cat: "Wide-body", wingspan: 64.8, length: 73.9, fw: 6.2 },
+  { id: 7, name: "Boeing 777-200LR", cat: "Wide-body", wingspan: 64.8, length: 63.7, fw: 6.2 },
+  { id: 8, name: "Airbus A350-1000", cat: "Wide-body", wingspan: 64.75, length: 73.8, fw: 5.96 },
+  { id: 9, name: "Airbus A350-900", cat: "Wide-body", wingspan: 64.75, length: 66.8, fw: 5.96 },
+  { id: 10, name: "Boeing 787-10", cat: "Wide-body", wingspan: 60.1, length: 68.3, fw: 5.77 },
+  { id: 11, name: "Boeing 787-9", cat: "Wide-body", wingspan: 60.1, length: 62.8, fw: 5.77 },
+  { id: 12, name: "Boeing 787-8", cat: "Wide-body", wingspan: 60.1, length: 56.7, fw: 5.77 },
+  { id: 13, name: "Airbus A340-600", cat: "Wide-body", wingspan: 63.45, length: 75.3, fw: 5.64 },
+  { id: 14, name: "Airbus A340-300", cat: "Wide-body", wingspan: 60.3, length: 63.7, fw: 5.64 },
+  { id: 15, name: "Airbus A330-900neo", cat: "Wide-body", wingspan: 64.0, length: 63.7, fw: 5.64 },
+  { id: 16, name: "Airbus A330-300", cat: "Wide-body", wingspan: 60.3, length: 63.7, fw: 5.64 },
+  { id: 17, name: "Airbus A330-200", cat: "Wide-body", wingspan: 60.3, length: 58.8, fw: 5.64 },
+  { id: 18, name: "McDonnell Douglas MD-11", cat: "Wide-body", wingspan: 51.66, length: 61.2, fw: 6.02 },
+  { id: 19, name: "Boeing 767-400ER", cat: "Wide-body", wingspan: 51.9, length: 61.4, fw: 5.03 },
+  { id: 20, name: "Boeing 767-300ER", cat: "Wide-body", wingspan: 47.6, length: 54.9, fw: 5.03 },
+  { id: 21, name: "Boeing 767-200", cat: "Wide-body", wingspan: 47.6, length: 48.5, fw: 5.03 },
+  { id: 22, name: "Airbus A300-600ST Beluga", cat: "Wide-body", wingspan: 44.84, length: 56.2, fw: 7.4 },
+  { id: 23, name: "Lockheed L-1011 TriStar", cat: "Wide-body", wingspan: 47.35, length: 54.2, fw: 6.0 },
+  { id: 24, name: "McDonnell Douglas DC-10", cat: "Wide-body", wingspan: 50.42, length: 55.35, fw: 6.02 },
+  { id: 25, name: "Boeing 757-300", cat: "Wide-body", wingspan: 38.05, length: 54.5, fw: 3.76 },
+  { id: 26, name: "Boeing 757-200", cat: "Wide-body", wingspan: 38.05, length: 47.3, fw: 3.76 },
+  // Narrow-body
+  { id: 27, name: "Boeing 737 MAX 10", cat: "Narrow-body", wingspan: 35.9, length: 43.8, fw: 3.53 },
+  { id: 28, name: "Boeing 737 MAX 8", cat: "Narrow-body", wingspan: 35.9, length: 39.5, fw: 3.53 },
+  { id: 29, name: "Boeing 737-900ER", cat: "Narrow-body", wingspan: 35.8, length: 42.1, fw: 3.53 },
+  { id: 30, name: "Boeing 737-800", cat: "Narrow-body", wingspan: 35.8, length: 39.5, fw: 3.53 },
+  { id: 31, name: "Airbus A321neo", cat: "Narrow-body", wingspan: 35.8, length: 44.5, fw: 3.95 },
+  { id: 32, name: "Airbus A321", cat: "Narrow-body", wingspan: 34.1, length: 44.5, fw: 3.95 },
+  { id: 33, name: "Airbus A320neo", cat: "Narrow-body", wingspan: 35.8, length: 37.6, fw: 3.95 },
+  { id: 34, name: "Airbus A320", cat: "Narrow-body", wingspan: 34.1, length: 37.6, fw: 3.95 },
+  { id: 35, name: "Airbus A319", cat: "Narrow-body", wingspan: 34.1, length: 33.8, fw: 3.95 },
+  { id: 36, name: "Airbus A318", cat: "Narrow-body", wingspan: 34.1, length: 31.4, fw: 3.95 },
+  { id: 37, name: "Boeing 727-200", cat: "Narrow-body", wingspan: 32.9, length: 46.7, fw: 3.76 },
+  { id: 38, name: "Boeing 717", cat: "Narrow-body", wingspan: 28.4, length: 37.8, fw: 3.34 },
+  { id: 39, name: "McDonnell Douglas MD-90", cat: "Narrow-body", wingspan: 32.87, length: 46.5, fw: 3.34 },
+  { id: 40, name: "McDonnell Douglas MD-80", cat: "Narrow-body", wingspan: 32.87, length: 45.1, fw: 3.34 },
+  { id: 41, name: "Fokker 100", cat: "Narrow-body", wingspan: 28.08, length: 35.5, fw: 3.3 },
+  { id: 42, name: "BAe 146-300", cat: "Narrow-body", wingspan: 26.34, length: 30.99, fw: 3.56 },
+  { id: 43, name: "Comac C919", cat: "Narrow-body", wingspan: 35.8, length: 38.9, fw: 3.95 },
+  { id: 44, name: "IRKUT MC-21", cat: "Narrow-body", wingspan: 35.9, length: 42.2, fw: 4.06 },
+  // Regional Jets & Turboprops
+  { id: 45, name: "Bombardier CRJ-900", cat: "Regional", wingspan: 24.85, length: 36.2, fw: 2.69 },
+  { id: 46, name: "Bombardier CRJ-700", cat: "Regional", wingspan: 23.24, length: 32.5, fw: 2.69 },
+  { id: 47, name: "Bombardier CRJ-200", cat: "Regional", wingspan: 21.21, length: 26.8, fw: 2.69 },
+  { id: 48, name: "Embraer E195-E2", cat: "Regional", wingspan: 31.0, length: 41.5, fw: 2.95 },
+  { id: 49, name: "Embraer E190", cat: "Regional", wingspan: 28.72, length: 36.2, fw: 2.95 },
+  { id: 50, name: "Embraer E175", cat: "Regional", wingspan: 26.0, length: 31.7, fw: 2.95 },
+  { id: 51, name: "Embraer ERJ-145", cat: "Regional", wingspan: 20.04, length: 29.9, fw: 2.11 },
+  { id: 52, name: "Mitsubishi SpaceJet M90", cat: "Regional", wingspan: 28.05, length: 35.8, fw: 2.92 },
+  { id: 53, name: "ATR 72", cat: "Regional", wingspan: 27.05, length: 27.2, fw: 2.87 },
+  { id: 54, name: "ATR 42", cat: "Regional", wingspan: 24.57, length: 22.7, fw: 2.87 },
+  { id: 55, name: "Bombardier Dash 8 Q400", cat: "Regional", wingspan: 28.42, length: 32.8, fw: 2.69 },
+  { id: 56, name: "Saab 340", cat: "Regional", wingspan: 21.44, length: 19.7, fw: 2.31 },
+  { id: 57, name: "Fokker 50", cat: "Regional", wingspan: 29.0, length: 25.25, fw: 2.87 },
+  { id: 58, name: "Beechcraft 1900D", cat: "Regional", wingspan: 17.67, length: 17.6, fw: 1.96 },
+  { id: 59, name: "Embraer EMB 120 Brasilia", cat: "Regional", wingspan: 19.78, length: 20.0, fw: 2.28 },
+  // Cargo
+  { id: 60, name: "Antonov An-124 Ruslan", cat: "Cargo", wingspan: 73.3, length: 69.1, fw: 6.4 },
+  { id: 61, name: "Boeing 747-400F", cat: "Cargo", wingspan: 64.4, length: 70.7, fw: 6.5 },
+  { id: 62, name: "Boeing 767-300F", cat: "Cargo", wingspan: 47.6, length: 54.9, fw: 5.03 },
+  { id: 63, name: "Airbus A330-200F", cat: "Cargo", wingspan: 60.3, length: 58.8, fw: 5.64 },
+  { id: 64, name: "Boeing 737-800BCF", cat: "Cargo", wingspan: 35.8, length: 39.5, fw: 3.53 },
+  { id: 65, name: "Antonov An-12", cat: "Cargo", wingspan: 38.0, length: 33.1, fw: 4.0 },
+  { id: 66, name: "Lockheed C-130 Hercules", cat: "Cargo", wingspan: 40.41, length: 29.79, fw: 4.1 },
+  { id: 67, name: "Ilyushin Il-76", cat: "Cargo", wingspan: 50.5, length: 46.6, fw: 5.0 },
+  // Business Jets Large
+  { id: 68, name: "Gulfstream G700", cat: "Biz Large", wingspan: 31.39, length: 33.84, fw: 2.49 },
+  { id: 69, name: "Gulfstream G650ER", cat: "Biz Large", wingspan: 30.36, length: 30.41, fw: 2.49 },
+  { id: 70, name: "Bombardier Global 7500", cat: "Biz Large", wingspan: 31.39, length: 33.9, fw: 2.49 },
+  { id: 71, name: "Bombardier Global 6000", cat: "Biz Large", wingspan: 28.65, length: 30.3, fw: 2.49 },
+  { id: 72, name: "Dassault Falcon 10X", cat: "Biz Large", wingspan: 33.3, length: 35.3, fw: 2.54 },
+  { id: 73, name: "Dassault Falcon 8X", cat: "Biz Large", wingspan: 26.21, length: 24.46, fw: 2.34 },
+  { id: 74, name: "Embraer Lineage 1000E", cat: "Biz Large", wingspan: 28.72, length: 36.2, fw: 2.95 },
+  { id: 75, name: "Boeing Business Jet BBJ", cat: "Biz Large", wingspan: 35.8, length: 39.5, fw: 3.53 },
+  // Business Jets Mid
+  { id: 76, name: "Gulfstream G280", cat: "Biz Mid", wingspan: 22.14, length: 21.01, fw: 2.24 },
+  { id: 77, name: "Bombardier Challenger 650", cat: "Biz Mid", wingspan: 19.61, length: 20.14, fw: 2.46 },
+  { id: 78, name: "Bombardier Challenger 350", cat: "Biz Mid", wingspan: 21.0, length: 20.9, fw: 2.18 },
+  { id: 79, name: "Cessna Citation Longitude", cat: "Biz Mid", wingspan: 22.04, length: 22.23, fw: 2.13 },
+  { id: 80, name: "Dassault Falcon 2000LXS", cat: "Biz Mid", wingspan: 21.38, length: 20.23, fw: 2.34 },
+  { id: 81, name: "Embraer Praetor 600", cat: "Biz Mid", wingspan: 22.86, length: 20.28, fw: 2.1 },
+  { id: 82, name: "Hawker 900XP", cat: "Biz Mid", wingspan: 16.56, length: 15.6, fw: 1.93 },
+  // Business Jets Light
+  { id: 83, name: "Cessna Citation CJ4", cat: "Biz Light", wingspan: 15.49, length: 15.87, fw: 1.65 },
+  { id: 84, name: "Cessna Citation XLS+", cat: "Biz Light", wingspan: 17.11, length: 16.0, fw: 1.78 },
+  { id: 85, name: "Embraer Phenom 300E", cat: "Biz Light", wingspan: 16.0, length: 15.9, fw: 1.65 },
+  { id: 86, name: "Bombardier Learjet 75", cat: "Biz Light", wingspan: 15.55, length: 17.77, fw: 1.73 },
+  { id: 87, name: "Pilatus PC-24", cat: "Biz Light", wingspan: 16.96, length: 16.95, fw: 1.85 },
+  { id: 88, name: "HondaJet Elite II", cat: "Biz Light", wingspan: 12.15, length: 13.0, fw: 1.41 },
+  { id: 89, name: "Eclipse 550", cat: "Biz Light", wingspan: 11.38, length: 10.0, fw: 1.35 },
+  // Turboprop
+  { id: 90, name: "Pilatus PC-12", cat: "Turboprop", wingspan: 16.23, length: 14.4, fw: 1.7 },
+  { id: 91, name: "Daher TBM 960", cat: "Turboprop", wingspan: 12.68, length: 10.64, fw: 1.31 },
+  { id: 92, name: "Beechcraft King Air 350", cat: "Turboprop", wingspan: 17.65, length: 14.22, fw: 1.83 },
+  { id: 93, name: "Piper Meridian M500", cat: "Turboprop", wingspan: 10.79, length: 9.02, fw: 1.18 },
+  { id: 94, name: "Socata TBM 700", cat: "Turboprop", wingspan: 12.68, length: 10.64, fw: 1.31 },
+  // Piston GA
+  { id: 95, name: "Piper PA-46 Malibu Mirage", cat: "Piston GA", wingspan: 13.11, length: 8.71, fw: 1.22 },
+  { id: 96, name: "Beechcraft Bonanza G36", cat: "Piston GA", wingspan: 10.21, length: 8.38, fw: 1.07 },
+  { id: 97, name: "Piper Seneca V", cat: "Piston GA", wingspan: 11.84, length: 8.73, fw: 1.19 },
+  { id: 98, name: "Mooney Ovation M20U", cat: "Piston GA", wingspan: 11.0, length: 8.18, fw: 1.07 },
+  { id: 99, name: "Cirrus SR22", cat: "Piston GA", wingspan: 11.68, length: 7.92, fw: 1.26 },
+  { id: 100, name: "Cessna 172 Skyhawk", cat: "Piston GA", wingspan: 11.0, length: 8.28, fw: 1.12 },
+];
+
+const CATS = ["All", "Wide-body", "Narrow-body", "Regional", "Cargo", "Biz Large", "Biz Mid", "Biz Light", "Turboprop", "Piston GA"];
+
+const SLOT_COLORS = [
+  { color: '#2f7fd4', fill: 'rgba(47,127,212,0.22)', stroke: '#1a65b8', label: 'Aircraft 1' },
+  { color: '#e0503a', fill: 'rgba(224,80,58,0.22)', stroke: '#c03020', label: 'Aircraft 2' },
+  { color: '#2daa72', fill: 'rgba(45,170,114,0.22)', stroke: '#1a7a50', label: 'Aircraft 3' },
+];
+
+let selectedSlots = [null, null, null];
+let activeSlot = 0;
+let activeFilter = 'All';
+let searchQuery = '';
+let alignMode = 'center';
+
+// ── Build sidebar categories ──
+function buildCatFilter() {
+  const el = document.getElementById('cat-filter');
+  el.innerHTML = CATS.map(c =>
+    `<button class="cat-btn${c === activeFilter ? ' active' : ''}" onclick="setFilter('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  buildCatFilter();
+  renderList();
+}
+
+// ── Build slots ──
+function buildSlots() {
+  const el = document.getElementById('slots-container');
+  el.innerHTML = selectedSlots.map((pid, i) => {
+    const plane = pid !== null ? AIRCRAFT.find(a => a.id === pid) : null;
+    const sc = SLOT_COLORS[i];
+    return `<div class="slot${activeSlot === i ? ' active-slot' : ''}" 
+      style="--slot-active-color: ${sc.stroke}" onclick="setActiveSlot(${i})">
+      <div class="slot-dot" style="background: ${sc.color}"></div>
+      <span class="slot-label" style="color: ${plane ? 'var(--text-primary)' : 'var(--text-muted)'}">
+        ${plane ? plane.name : `Slot ${i+1} — click to select`}
+      </span>
+      ${plane ? `<button class="slot-clear" onclick="clearSlot(event, ${i})">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function setActiveSlot(i) {
+  activeSlot = i;
+  buildSlots();
+}
+
+function clearSlot(e, i) {
+  e.stopPropagation();
+  selectedSlots[i] = null;
+  buildSlots();
+  renderList();
+  renderSVG();
+  renderInfoCards();
+  renderStats();
+}
+
+// ── Build plane list ──
+function renderList() {
+  const el = document.getElementById('plane-list');
+  const q = searchQuery.toLowerCase();
+  let filtered = AIRCRAFT.filter(a =>
+    (activeFilter === 'All' || a.cat === activeFilter) &&
+    (q === '' || a.name.toLowerCase().includes(q))
+  );
+
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="no-results">No aircraft found</div>';
+    return;
+  }
+
+  const grouped = {};
+  filtered.forEach(a => {
+    if (!grouped[a.cat]) grouped[a.cat] = [];
+    grouped[a.cat].push(a);
+  });
+
+  let html = '';
+  const showCatLabels = activeFilter === 'All' && q === '';
+  Object.entries(grouped).forEach(([cat, planes]) => {
+    if (showCatLabels) html += `<div class="cat-group-label">${cat}</div>`;
+    planes.forEach(a => {
+      const slotIdx = selectedSlots.indexOf(a.id);
+      const sc = slotIdx >= 0 ? SLOT_COLORS[slotIdx] : null;
+      html += `<div class="plane-item${slotIdx >= 0 ? ` selected-${slotIdx}` : ''}" onclick="selectPlane(${a.id})">
+        <div class="plane-item-dot" ${sc ? `style="background:${sc.stroke}"` : ''}></div>
+        ${a.name}
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function selectPlane(id) {
+  const existing = selectedSlots.indexOf(id);
+  if (existing >= 0) {
+    selectedSlots[existing] = null;
+  } else {
+    selectedSlots[activeSlot] = id;
+    for (let i = 0; i < 3; i++) {
+      const next = (activeSlot + 1 + i) % 3;
+      if (selectedSlots[next] === null) { activeSlot = next; break; }
+    }
+  }
+  buildSlots();
+  renderList();
+  renderSVG();
+  renderInfoCards();
+  renderStats();
+}
+
+// ── Info cards ──
+function renderInfoCards() {
+  const el = document.getElementById('info-cards');
+  el.innerHTML = selectedSlots.map((pid, i) => {
+    const sc = SLOT_COLORS[i];
+    if (pid === null) {
+      return `<div class="info-card c${i} empty">
+        <div class="info-card-empty">No aircraft selected</div>
+      </div>`;
+    }
+    const a = AIRCRAFT.find(p => p.id === pid);
+    return `<div class="info-card c${i}">
+      <div class="info-badge c${i}">${a.cat}</div>
+      <div class="info-card-name">${a.name}</div>
+      <div class="info-stat"><span class="info-stat-val">↔ ${a.wingspan} m</span><span class="info-stat-unit">wingspan</span></div>
+      <div class="info-stat"><span class="info-stat-val">↕ ${a.length} m</span><span class="info-stat-unit">length</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── Stats bars ──
+function renderStats() {
+  const el = document.getElementById('stats-grid');
+  const active = selectedSlots.map((pid,i) => pid !== null ? { plane: AIRCRAFT.find(p=>p.id===pid), slot: i } : null).filter(Boolean);
+  if (active.length === 0) { el.innerHTML = '<span style="font-size:0.8rem;color:var(--text-muted)">Select aircraft to see comparison</span>'; return; }
+
+  const maxWs = Math.max(...active.map(x => x.plane.wingspan));
+  const maxLen = Math.max(...active.map(x => x.plane.length));
+
+  let html = '';
+  active.forEach(({ plane, slot }) => {
+    const sc = SLOT_COLORS[slot];
+    const wsw = Math.round((plane.wingspan / maxWs) * 100);
+    const lw = Math.round((plane.length / maxLen) * 100);
+    html += `
+      <div class="stat-item">
+        <div class="stat-item-label" style="color:${sc.stroke}">${plane.name.length > 22 ? plane.name.slice(0,20)+'…' : plane.name}</div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:3px">Wingspan</div>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${wsw}%;background:${sc.color}"></div></div>
+          <span class="stat-bar-val">${plane.wingspan} m</span>
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:3px;margin-top:4px">Length</div>
+        <div class="stat-bar-wrap">
+          <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${lw}%;background:${sc.color}"></div></div>
+          <span class="stat-bar-val">${plane.length} m</span>
+        </div>
+      </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SILHOUETTE ENGINE
+// ══════════════════════════════════════════════════════════════
+
+function p(x,y){ return `${x.toFixed(2)},${y.toFixed(2)}`; }
+
+function fuselageElliptic(cx, cy, hw, hl, noseTaper=0.08) {
+  const nr = hw * noseTaper;
+  return `M ${p(cx, cy-hl)}
+    C ${p(cx+nr*2,cy-hl)} ${p(cx+hw,cy-hl*0.88)} ${p(cx+hw,cy-hl*0.55)}
+    L ${p(cx+hw,cy+hl*0.6)}
+    C ${p(cx+hw,cy+hl*0.82)} ${p(cx+hw*0.4,cy+hl)} ${p(cx,cy+hl)}
+    C ${p(cx-hw*0.4,cy+hl)} ${p(cx-hw,cy+hl*0.82)} ${p(cx-hw,cy+hl*0.6)}
+    L ${p(cx-hw,cy-hl*0.55)}
+    C ${p(cx-hw,cy-hl*0.88)} ${p(cx-nr*2,cy-hl)} ${p(cx,cy-hl)} Z`;
+}
+
+function sweptWing(cx, cy, fhw, hw, hl, sweep, chordRoot, chordTip, rootYoff) {
+  const ry = cy + rootYoff;
+  const r = [
+    `M ${p(cx+fhw, ry)}`,
+    `L ${p(cx+hw, ry+sweep)}`,
+    `L ${p(cx+hw, ry+sweep+chordTip)}`,
+    `L ${p(cx+fhw, ry+chordRoot)} Z`
+  ].join(' ');
+  const l = [
+    `M ${p(cx-fhw, ry)}`,
+    `L ${p(cx-hw, ry+sweep)}`,
+    `L ${p(cx-hw, ry+sweep+chordTip)}`,
+    `L ${p(cx-fhw, ry+chordRoot)} Z`
+  ].join(' ');
+  return [r, l];
+}
+
+function straightWing(cx, cy, fhw, hw, hl, chordRoot, chordTip, rootYoff, sweep=0) {
+  const ry = cy + rootYoff;
+  const r = `M ${p(cx+fhw,ry)} L ${p(cx+hw,ry+sweep)} L ${p(cx+hw,ry+sweep+chordTip)} L ${p(cx+fhw,ry+chordRoot)} Z`;
+  const l = `M ${p(cx-fhw,ry)} L ${p(cx-hw,ry+sweep)} L ${p(cx-hw,ry+sweep+chordTip)} L ${p(cx-fhw,ry+chordRoot)} Z`;
+  return [r, l];
+}
+
+function hStab(cx, cy, hl, span, chordRoot, chordTip, sweep, yFrac) {
+  const sy = cy + hl * yFrac;
+  const r = `M ${p(cx+span*0.12,sy)} L ${p(cx+span,sy+sweep)} L ${p(cx+span,sy+sweep+chordTip)} L ${p(cx+span*0.12,sy+chordRoot)} Z`;
+  const l = `M ${p(cx-span*0.12,sy)} L ${p(cx-span,sy+sweep)} L ${p(cx-span,sy+sweep+chordTip)} L ${p(cx-span*0.12,sy+chordRoot)} Z`;
+  return [r, l];
+}
+
+function enginePod(cx, cy, ex, ey, podLen, podW) {
+  const hl = podLen/2, hw = podW/2;
+  return `M ${p(ex,ey-hl)} C ${p(ex+hw,ey-hl)} ${p(ex+hw,ey+hl)} ${p(ex,ey+hl)} C ${p(ex-hw,ey+hl)} ${p(ex-hw,ey-hl)} ${p(ex,ey-hl)} Z`;
+}
+
+function shapeWideBody(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.20, cRoot=L*0.26, cTip=L*0.055, rootY=-hl*0.06;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const ex=hw*0.55, ey=cy+rootY+sweep*0.5, pL=L*0.10, pW=FW*0.28;
+  parts.push(enginePod(cx,cy,cx+ex,ey,pL,pW));
+  parts.push(enginePod(cx,cy,cx-ex,ey,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.30,L*0.08,L*0.03,hw*0.06,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeNarrowBody(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.17, cRoot=L*0.23, cTip=L*0.05, rootY=-hl*0.08;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const ex=hw*0.52, ey=cy+rootY+sweep*0.45, pL=L*0.085, pW=FW*0.22;
+  parts.push(enginePod(cx,cy,cx+ex,ey,pL,pW));
+  parts.push(enginePod(cx,cy,cx-ex,ey,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.075,L*0.028,hw*0.055,0.78);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeRegionalJet(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.14, cRoot=L*0.22, cTip=L*0.045, rootY=-hl*0.10;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const rearEngine = (a.wingspan / a.length) < 0.75;
+  if (rearEngine) {
+    const reY=cy+hl*0.45, reX=hfw*1.6, pL=L*0.09, pW=FW*0.28;
+    parts.push(enginePod(cx,cy,cx+reX,reY,pL,pW));
+    parts.push(enginePod(cx,cy,cx-reX,reY,pL,pW));
+  } else {
+    const ex=hw*0.48, ey=cy+rootY+sweep*0.4, pL=L*0.075, pW=FW*0.22;
+    parts.push(enginePod(cx,cy,cx+ex,ey,pL,pW));
+    parts.push(enginePod(cx,cy,cx-ex,ey,pL,pW));
+  }
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.26,L*0.07,L*0.025,hw*0.05,0.78);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeRegionalTurboprop(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.06));
+  const cRoot=L*0.26, cTip=L*0.12, rootY=-hl*0.05;
+  const [wR,wL] = straightWing(cx,cy,hfw,hw,hl,cRoot,cTip,rootY,hw*0.04);
+  parts.push(wR,wL);
+  const px=hw*0.42, py=cy+rootY+cRoot*0.38, pr=FW*0.42;
+  parts.push(`M ${p(cx+px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px+pr,py)} Z`);
+  parts.push(`M ${p(cx-px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px+pr,py)} Z`);
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.08,L*0.04,hw*0.03,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeBizLarge(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.03));
+  const sweep=hw*0.22, cRoot=L*0.20, cTip=L*0.04, rootY=-hl*0.08;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const reY=cy+hl*0.42, reX=hfw*1.55, pL=L*0.09, pW=FW*0.26;
+  parts.push(enginePod(cx,cy,cx+reX,reY,pL,pW));
+  parts.push(enginePod(cx,cy,cx-reX,reY,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.24,L*0.065,L*0.022,hw*0.04,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeBizMid(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.04));
+  const sweep=hw*0.20, cRoot=L*0.22, cTip=L*0.045, rootY=-hl*0.09;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const reY=cy+hl*0.44, reX=hfw*1.5, pL=L*0.095, pW=FW*0.25;
+  parts.push(enginePod(cx,cy,cx+reX,reY,pL,pW));
+  parts.push(enginePod(cx,cy,cx-reX,reY,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.22,L*0.068,L*0.024,hw*0.04,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeBizLight(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.04));
+  const sweep=hw*0.18, cRoot=L*0.21, cTip=L*0.05, rootY=-hl*0.10;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const reY=cy+hl*0.46, reX=hfw*1.45, pL=L*0.10, pW=FW*0.24;
+  parts.push(enginePod(cx,cy,cx+reX,reY,pL,pW));
+  parts.push(enginePod(cx,cy,cx-reX,reY,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.20,L*0.07,L*0.025,hw*0.035,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeTurboprop(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.07));
+  const cRoot=L*0.28, cTip=L*0.13, rootY=-hl*0.04;
+  const [wR,wL] = straightWing(cx,cy,hfw,hw,hl,cRoot,cTip,rootY,hw*0.05);
+  parts.push(wR,wL);
+  const isTwin = a.wingspan > 15;
+  if (isTwin) {
+    const px=hw*0.40, py=cy+rootY+cRoot*0.35, pr=FW*0.40;
+    parts.push(`M ${p(cx+px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px+pr,py)} Z`);
+    parts.push(`M ${p(cx-px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px+pr,py)} Z`);
+  } else {
+    const pr=FW*0.50, py=cy-hl-pr*0.1;
+    parts.push(`M ${p(cx+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+pr,py)} Z`);
+  }
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.26,L*0.09,L*0.04,hw*0.03,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapePistonGA(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.08));
+  const cRoot=L*0.27, cTip=L*0.16, rootY=-hl*0.06;
+  const [wR,wL] = straightWing(cx,cy,hfw,hw,hl,cRoot,cTip,rootY,hw*0.04);
+  parts.push(wR,wL);
+  const pr=FW*0.48, py=cy-hl-pr*0.05;
+  parts.push(`M ${p(cx+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+pr,py)} Z`);
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.10,L*0.05,hw*0.02,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeMilCargo(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.09));
+  const cRoot=L*0.30, cTip=L*0.12, rootY=-hl*0.12;
+  const [wR,wL] = straightWing(cx,cy,hfw,hw,hl,cRoot,cTip,rootY,hw*0.06);
+  parts.push(wR,wL);
+  const pr=FW*0.30, py=cy+rootY+cRoot*0.38;
+  [0.30,0.62].forEach(frac => {
+    const px=hw*frac;
+    parts.push(`M ${p(cx+px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px+pr,py)} Z`);
+    parts.push(`M ${p(cx-px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px+pr,py)} Z`);
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.30,L*0.09,L*0.04,hw*0.04,0.78);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeAn225(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.08));
+  const cRoot=L*0.28, cTip=L*0.07, sweep=hw*0.18, rootY=-hl*0.08;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.48, pL=L*0.095, pW=FW*0.24;
+  [0.30,0.55,0.78].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const tsSpan=hw*0.36, tsCR=L*0.09, tsCT=L*0.035, tsSweep=tsSpan*0.3;
+  const [hR,hL]=hStab(cx,cy,hl,tsSpan,tsCR,tsCT,tsSweep,0.72);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shape747(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const humpLen=L*0.28, humpW=hfw*0.72, humpY=cy-hl+L*0.05;
+  parts.push(`M ${p(cx,humpY-humpLen*0.08)}
+    C ${p(cx+humpW,humpY-humpLen*0.08)} ${p(cx+humpW,humpY+humpLen)} ${p(cx,humpY+humpLen)}
+    C ${p(cx-humpW,humpY+humpLen)} ${p(cx-humpW,humpY-humpLen*0.08)} ${p(cx,humpY-humpLen*0.08)} Z`);
+  const sweep=hw*0.22, cRoot=L*0.25, cTip=L*0.055, rootY=-hl*0.06;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.20;
+  [0.40,0.68].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.08,L*0.03,hw*0.055,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeA380(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.06));
+  const sweep=hw*0.24, cRoot=L*0.28, cTip=L*0.05, rootY=-hl*0.04;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.22;
+  [0.38,0.65].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.09,L*0.035,hw*0.06,0.77);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeA340(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.20, cRoot=L*0.26, cTip=L*0.05, rootY=-hl*0.06;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.20;
+  [0.38,0.66].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.08,L*0.03,hw*0.055,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeTrijet(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const teY=cy-hl*0.82, teW=hfw*0.55, teL=L*0.12;
+  parts.push(`M ${p(cx,teY-teL*0.5)} C ${p(cx+teW,teY-teL*0.5)} ${p(cx+teW,teY+teL*0.5)} ${p(cx,teY+teL*0.5)} C ${p(cx-teW,teY+teL*0.5)} ${p(cx-teW,teY-teL*0.5)} ${p(cx,teY-teL*0.5)} Z`);
+  const sweep=hw*0.21, cRoot=L*0.26, cTip=L*0.055, rootY=-hl*0.07;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.22;
+  [0.50].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.08,L*0.03,hw*0.05,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shape727(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.17, cRoot=L*0.23, cTip=L*0.05, rootY=-hl*0.08;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const reY=cy+hl*0.42, reX=hfw*1.55, pL=L*0.09, pW=FW*0.22;
+  parts.push(enginePod(cx,cy,cx+reX,reY,pL,pW));
+  parts.push(enginePod(cx,cy,cx-reX,reY,pL,pW));
+  const teY=cy-hl*0.80, teW=hfw*0.42, teL=L*0.10;
+  parts.push(`M ${p(cx,teY-teL*0.5)} C ${p(cx+teW,teY-teL*0.5)} ${p(cx+teW,teY+teL*0.5)} ${p(cx,teY+teL*0.5)} C ${p(cx-teW,teY+teL*0.5)} ${p(cx-teW,teY-teL*0.5)} ${p(cx,teY-teL*0.5)} Z`);
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.075,L*0.028,hw*0.05,0.78);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeBeluga(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.06));
+  const bubW=hfw*1.8, bubL=L*0.62, bubY=cy-hl*0.25;
+  parts.push(`M ${p(cx,bubY-bubL*0.45)}
+    C ${p(cx+bubW,bubY-bubL*0.45)} ${p(cx+bubW,bubY+bubL*0.55)} ${p(cx,bubY+bubL*0.55)}
+    C ${p(cx-bubW,bubY+bubL*0.55)} ${p(cx-bubW,bubY-bubL*0.45)} ${p(cx,bubY-bubL*0.45)} Z`);
+  const sweep=hw*0.14, cRoot=L*0.22, cTip=L*0.05, rootY=-hl*0.06;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.22;
+  parts.push(enginePod(cx,cy,cx+hw*0.52,py,pL,pW));
+  parts.push(enginePod(cx,cy,cx-hw*0.52,py,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.28,L*0.08,L*0.03,hw*0.05,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeBAe146(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.055));
+  const sweep=hw*0.10, cRoot=L*0.24, cTip=L*0.08, rootY=-hl*0.08;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.45, pL=L*0.075, pW=FW*0.20;
+  [0.32,0.60].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.24,L*0.07,L*0.025,hw*0.03,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeAn124(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.07));
+  const sweep=hw*0.20, cRoot=L*0.28, cTip=L*0.06, rootY=-hl*0.07;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const py=cy+rootY+sweep*0.5, pL=L*0.09, pW=FW*0.22;
+  [0.35,0.62].forEach(frac => {
+    const px=hw*frac;
+    parts.push(enginePod(cx,cy,cx+px,py,pL,pW));
+    parts.push(enginePod(cx,cy,cx-px,py,pL,pW));
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.30,L*0.09,L*0.035,hw*0.055,0.76);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeHondaJet(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.05));
+  const sweep=hw*0.16, cRoot=L*0.22, cTip=L*0.06, rootY=-hl*0.09;
+  const [wR,wL] = sweptWing(cx,cy,hfw,hw,hl,sweep,cRoot,cTip,rootY);
+  parts.push(wR,wL);
+  const oeY=cy+rootY+sweep*0.35, oeX=hw*0.40, pL=L*0.12, pW=FW*0.22;
+  parts.push(enginePod(cx,cy,cx+oeX,oeY,pL,pW));
+  parts.push(enginePod(cx,cy,cx-oeX,oeY,pL,pW));
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.20,L*0.08,L*0.03,hw*0.04,0.80);
+  parts.push(hR,hL);
+  return parts;
+}
+
+function shapeC130(a, cx, cy, s) {
+  const W=a.wingspan*s, L=a.length*s, FW=a.fw*s;
+  const hw=W/2, hl=L/2, hfw=FW/2;
+  const parts = [];
+  parts.push(fuselageElliptic(cx,cy,hfw,hl,0.10));
+  const cRoot=L*0.32, cTip=L*0.14, rootY=-hl*0.15;
+  const [wR,wL] = straightWing(cx,cy,hfw,hw,hl,cRoot,cTip,rootY,hw*0.05);
+  parts.push(wR,wL);
+  const pr=FW*0.32, py=cy+rootY+cRoot*0.38;
+  [0.28,0.60].forEach(frac => {
+    const px=hw*frac;
+    parts.push(`M ${p(cx+px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx+px+pr,py)} Z`);
+    parts.push(`M ${p(cx-px+pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px-pr,py)} A ${pr} ${pr} 0 1 1 ${p(cx-px+pr,py)} Z`);
+  });
+  const [hR,hL]=hStab(cx,cy,hl,hw*0.32,L*0.10,L*0.05,hw*0.04,0.78);
+  parts.push(hR,hL);
+  return parts;
+}
+
+// ── DISPATCH ──
+function getSilhouetteParts(a, cx, cy, s) {
+  switch(a.id) {
+    case 1:  return shapeAn225(a,cx,cy,s);
+    case 2:  case 3: case 61: return shape747(a,cx,cy,s);
+    case 4:  return shapeA380(a,cx,cy,s);
+    case 13: case 14: return shapeA340(a,cx,cy,s);
+    case 18: case 24: return shapeTrijet(a,cx,cy,s);
+    case 22: return shapeBeluga(a,cx,cy,s);
+    case 23: return shapeTrijet(a,cx,cy,s);
+    case 37: return shape727(a,cx,cy,s);
+    case 42: return shapeBAe146(a,cx,cy,s);
+    case 60: return shapeAn124(a,cx,cy,s);
+    case 66: return shapeC130(a,cx,cy,s);
+    case 88: return shapeHondaJet(a,cx,cy,s);
+  }
+  switch(a.cat) {
+    case 'Wide-body':  return shapeWideBody(a,cx,cy,s);
+    case 'Narrow-body':return shapeNarrowBody(a,cx,cy,s);
+    case 'Regional':
+      if ([53,54,55,56,57,58,59].includes(a.id)) return shapeRegionalTurboprop(a,cx,cy,s);
+      return shapeRegionalJet(a,cx,cy,s);
+    case 'Cargo':
+      if ([65,66,67].includes(a.id)) return shapeMilCargo(a,cx,cy,s);
+      return shapeWideBody(a,cx,cy,s);
+    case 'Biz Large':  return shapeBizLarge(a,cx,cy,s);
+    case 'Biz Mid':    return shapeBizMid(a,cx,cy,s);
+    case 'Biz Light':  return shapeBizLight(a,cx,cy,s);
+    case 'Turboprop':  return shapeTurboprop(a,cx,cy,s);
+    case 'Piston GA':  return shapePistonGA(a,cx,cy,s);
+    default:           return shapeWideBody(a,cx,cy,s);
+  }
+}
+
+function setAlign(mode) {
+  alignMode = mode;
+  document.getElementById('btn-aligned').classList.toggle('active', mode === 'center');
+  document.getElementById('btn-stacked').classList.toggle('active', mode === 'stacked');
+  renderSVG();
+}
+
+// ── RENDER SVG — uses getSilhouetteParts (fixed) ──
+function renderSVG() {
+  const svg = document.getElementById('compare-svg');
+  const g = document.getElementById('svg-content');
+  const legendEl = document.getElementById('legend');
+  const rulerEnd = document.getElementById('ruler-end');
+
+  const active = selectedSlots.map((pid,i) => pid !== null ? { plane: AIRCRAFT.find(p=>p.id===pid), slot: i } : null).filter(Boolean);
+
+  if (active.length === 0) {
+    g.innerHTML = `<g>
+      <text x="400" y="230" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="15" fill="rgba(47,127,212,0.35)">Select aircraft from the list to compare</text>
+      <text x="400" y="255" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="rgba(47,127,212,0.2)">Up to 3 aircraft shown to scale</text>
+    </g>`;
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  const maxWs = Math.max(...active.map(x => x.plane.wingspan));
+  const maxLen = Math.max(...active.map(x => x.plane.length));
+
+  const SVG_W = 800;
+  const SVG_H = 500;
+  const MARGIN = 50;
+
+  // Helper: render all parts for a plane at position/scale
+  function renderParts(plane, cx, cy, scale, sc) {
+    const parts = getSilhouetteParts(plane, cx, cy, scale);
+    return parts.map(d =>
+      `<path d="${d}" fill="${sc.fill}" stroke="${sc.stroke}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`
+    ).join('');
+  }
+
+  let svgHTML = '';
+  let legendHTML = '';
+
+  if (alignMode === 'center') {
+    const sorted = [...active].sort((a,b) => b.plane.wingspan - a.plane.wingspan);
+    const usableW = SVG_W - MARGIN * 2;
+    const usableH = SVG_H - MARGIN * 2;
+    const scale = Math.min(usableW / maxWs, usableH / maxLen) * 0.82;
+
+    const cx = SVG_W / 2;
+    const cy = SVG_H / 2;
+
+    sorted.forEach(({ plane, slot }) => {
+      const sc = SLOT_COLORS[slot];
+      svgHTML += `<g opacity="0.9">${renderParts(plane, cx, cy, scale, sc)}</g>`;
+    });
+
+    const rulerM = 50;
+    const rulerPx = rulerM * scale;
+    rulerEnd.textContent = `${rulerM} m`;
+    const rx = cx - rulerPx / 2;
+    svgHTML += `<line x1="${rx}" y1="${SVG_H - 18}" x2="${rx + rulerPx}" y2="${SVG_H - 18}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <line x1="${rx}" y1="${SVG_H - 22}" x2="${rx}" y2="${SVG_H - 14}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <line x1="${rx + rulerPx}" y1="${SVG_H - 22}" x2="${rx + rulerPx}" y2="${SVG_H - 14}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <text x="${cx}" y="${SVG_H - 6}" text-anchor="middle" font-size="9" fill="rgba(47,127,212,0.5)" font-family="DM Sans,sans-serif">${rulerM} m reference</text>`;
+
+  } else {
+    const n = active.length;
+    const slotH = (SVG_H - MARGIN * 2) / n;
+    const usableW = SVG_W - MARGIN * 2;
+    const scale = Math.min(usableW / maxWs, slotH * 0.8 / maxLen) * 0.82;
+    const cx = SVG_W / 2;
+
+    active.forEach(({ plane, slot }, idx) => {
+      const sc = SLOT_COLORS[slot];
+      const cy = MARGIN + slotH * idx + slotH / 2;
+      svgHTML += `<g>${renderParts(plane, cx, cy, scale, sc)}</g>`;
+      svgHTML += `<text x="${MARGIN}" y="${cy - plane.length * scale / 2 - 4}" font-size="10" fill="${sc.stroke}" font-family="DM Sans,sans-serif" font-weight="500">${plane.name}</text>`;
+    });
+
+    const rulerM = 10;
+    const rulerPx = rulerM * scale;
+    rulerEnd.textContent = `${rulerM} m`;
+    const rx = SVG_W - MARGIN - rulerPx;
+    svgHTML += `<line x1="${rx}" y1="${SVG_H - 18}" x2="${rx + rulerPx}" y2="${SVG_H - 18}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <line x1="${rx}" y1="${SVG_H - 22}" x2="${rx}" y2="${SVG_H - 14}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <line x1="${rx + rulerPx}" y1="${SVG_H - 22}" x2="${rx + rulerPx}" y2="${SVG_H - 14}" stroke="rgba(47,127,212,0.4)" stroke-width="1.5"/>
+      <text x="${rx + rulerPx/2}" y="${SVG_H - 6}" text-anchor="middle" font-size="9" fill="rgba(47,127,212,0.5)" font-family="DM Sans,sans-serif">${rulerM} m</text>`;
+  }
+
+  g.innerHTML = svgHTML;
+
+  legendHTML = active.map(({ plane, slot }) => {
+    const sc = SLOT_COLORS[slot];
+    return `<div class="legend-item">
+      <div class="legend-swatch" style="background:${sc.fill};border-color:${sc.stroke}"></div>
+      <span>${plane.name}</span>
+    </div>`;
+  }).join('');
+  legendEl.innerHTML = legendHTML;
+}
+
+// ── Search ──
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderList();
+});
+
+// ── Init ──
+buildCatFilter();
+buildSlots();
+renderList();
+renderInfoCards();
+renderStats();
+renderSVG();
+</script>
+</body>
+</html>
