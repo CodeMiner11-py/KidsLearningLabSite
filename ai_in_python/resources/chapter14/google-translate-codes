@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Translate Language Codes</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --muted: #888;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --border: #e5e5e5;
+    --code-bg: #f0f0ec;
+  }
+
+  body {
+    font-family: 'EB Garamond', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  header {
+    max-width: 900px;
+    margin: 0 auto 48px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  .controls {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  .count {
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    cursor: pointer;
+    animation: fadeUp 0.4s ease both;
+    position: relative;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+    transform: translateY(-2px);
+  }
+
+  .copy-hint {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+  }
+
+  .card:hover .copy-hint {
+    opacity: 1;
+  }
+
+  .code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--code-bg);
+    color: var(--accent);
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .lang-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 520px;
+    width: calc(100% - 48px);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+    animation: modalIn 0.2s ease both;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .modal-lang {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .modal-close {
+    background: var(--code-bg);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover {
+    background: var(--border);
+  }
+
+  .modal-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .modal-code-wrap {
+    background: #1e1e2e;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .modal-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: #cdd6f4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .modal-code .hl-func { color: #89b4fa; }
+  .modal-code .hl-str { color: #a6e3a1; }
+  .modal-code .hl-kw { color: #cba6f7; }
+  .modal-code .hl-comment { color: #6c7086; font-style: italic; }
+  .modal-code .hl-code { color: #f38ba8; }
+
+  .modal-copy-btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .modal-copy-btn:hover {
+    background: #1d4ed8;
+  }
+
+  .modal-copy-btn:active {
+    transform: scale(0.98);
+  }
+
+  .modal-copy-btn.success {
+    background: #16a34a;
+  }
+
+  .hidden { display: none; }
+
+  .no-results {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+    font-size: 15px;
+    display: none;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  footer {
+    max-width: 900px;
+    margin: 48px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Google Translate<br>Language Codes</h1>
+  <p class="subtitle">All supported two-letter ISO 639-1 language codes</p>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search languages or codes…" oninput="filter()">
+  </div>
+  <span class="count" id="count"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="no-results" id="no-results">No languages found.</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-lang" id="modal-lang-name"></span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-subtitle">Click below to copy the gTTS code line</div>
+    <div class="modal-code-wrap">
+      <div class="modal-code" id="modal-code"></div>
+    </div>
+    <button class="modal-copy-btn" id="modal-copy-btn" onclick="copyCode()">Copy Code</button>
+  </div>
+</div>
+
+<footer>
+  Two-letter codes follow the ISO 639-1 standard. Source: Google Translate supported languages.
+</footer>
+
+<script>
+const languages = [
+  { code: "af", name: "Afrikaans" },
+  { code: "sq", name: "Albanian" },
+  { code: "am", name: "Amharic" },
+  { code: "ar", name: "Arabic" },
+  { code: "hy", name: "Armenian" },
+  { code: "as", name: "Assamese" },
+  { code: "ay", name: "Aymara" },
+  { code: "az", name: "Azerbaijani" },
+  { code: "bm", name: "Bambara" },
+  { code: "eu", name: "Basque" },
+  { code: "be", name: "Belarusian" },
+  { code: "bn", name: "Bengali" },
+  { code: "bho", name: "Bhojpuri" },
+  { code: "bs", name: "Bosnian" },
+  { code: "bg", name: "Bulgarian" },
+  { code: "ca", name: "Catalan" },
+  { code: "zh", name: "Chinese (Simplified)" },
+  { code: "co", name: "Corsican" },
+  { code: "hr", name: "Croatian" },
+  { code: "cs", name: "Czech" },
+  { code: "da", name: "Danish" },
+  { code: "dv", name: "Dhivehi" },
+  { code: "doi", name: "Dogri" },
+  { code: "nl", name: "Dutch" },
+  { code: "en", name: "English" },
+  { code: "eo", name: "Esperanto" },
+  { code: "et", name: "Estonian" },
+  { code: "ee", name: "Ewe" },
+  { code: "fi", name: "Finnish" },
+  { code: "fr", name: "French" },
+  { code: "fy", name: "Frisian" },
+  { code: "gl", name: "Galician" },
+  { code: "ka", name: "Georgian" },
+  { code: "de", name: "German" },
+  { code: "el", name: "Greek" },
+  { code: "gn", name: "Guarani" },
+  { code: "gu", name: "Gujarati" },
+  { code: "ht", name: "Haitian Creole" },
+  { code: "ha", name: "Hausa" },
+  { code: "haw", name: "Hawaiian" },
+  { code: "he", name: "Hebrew" },
+  { code: "hi", name: "Hindi" },
+  { code: "hmn", name: "Hmong" },
+  { code: "hu", name: "Hungarian" },
+  { code: "is", name: "Icelandic" },
+  { code: "ig", name: "Igbo" },
+  { code: "ilo", name: "Ilocano" },
+  { code: "id", name: "Indonesian" },
+  { code: "ga", name: "Irish" },
+  { code: "it", name: "Italian" },
+  { code: "ja", name: "Japanese" },
+  { code: "jv", name: "Javanese" },
+  { code: "kn", name: "Kannada" },
+  { code: "kk", name: "Kazakh" },
+  { code: "km", name: "Khmer" },
+  { code: "rw", name: "Kinyarwanda" },
+  { code: "ko", name: "Korean" },
+  { code: "ku", name: "Kurdish" },
+  { code: "ky", name: "Kyrgyz" },
+  { code: "lo", name: "Lao" },
+  { code: "la", name: "Latin" },
+  { code: "lv", name: "Latvian" },
+  { code: "ln", name: "Lingala" },
+  { code: "lt", name: "Lithuanian" },
+  { code: "lg", name: "Luganda" },
+  { code: "lb", name: "Luxembourgish" },
+  { code: "mk", name: "Macedonian" },
+  { code: "mai", name: "Maithili" },
+  { code: "mg", name: "Malagasy" },
+  { code: "ms", name: "Malay" },
+  { code: "ml", name: "Malayalam" },
+  { code: "mt", name: "Maltese" },
+  { code: "mi", name: "Maori" },
+  { code: "mr", name: "Marathi" },
+  { code: "mn", name: "Mongolian" },
+  { code: "my", name: "Myanmar (Burmese)" },
+  { code: "ne", name: "Nepali" },
+  { code: "no", name: "Norwegian" },
+  { code: "ny", name: "Nyanja (Chichewa)" },
+  { code: "or", name: "Odia (Oriya)" },
+  { code: "om", name: "Oromo" },
+  { code: "ps", name: "Pashto" },
+  { code: "fa", name: "Persian" },
+  { code: "pl", name: "Polish" },
+  { code: "pt", name: "Portuguese" },
+  { code: "pa", name: "Punjabi" },
+  { code: "qu", name: "Quechua" },
+  { code: "ro", name: "Romanian" },
+  { code: "ru", name: "Russian" },
+  { code: "sm", name: "Samoan" },
+  { code: "sa", name: "Sanskrit" },
+  { code: "gd", name: "Scots Gaelic" },
+  { code: "nso", name: "Sepedi" },
+  { code: "sr", name: "Serbian" },
+  { code: "st", name: "Sesotho" },
+  { code: "sn", name: "Shona" },
+  { code: "sd", name: "Sindhi" },
+  { code: "si", name: "Sinhala" },
+  { code: "sk", name: "Slovak" },
+  { code: "sl", name: "Slovenian" },
+  { code: "so", name: "Somali" },
+  { code: "es", name: "Spanish" },
+  { code: "su", name: "Sundanese" },
+  { code: "sw", name: "Swahili" },
+  { code: "sv", name: "Swedish" },
+  { code: "tl", name: "Tagalog (Filipino)" },
+  { code: "tg", name: "Tajik" },
+  { code: "ta", name: "Tamil" },
+  { code: "tt", name: "Tatar" },
+  { code: "te", name: "Telugu" },
+  { code: "th", name: "Thai" },
+  { code: "ti", name: "Tigrinya" },
+  { code: "ts", name: "Tsonga" },
+  { code: "tr", name: "Turkish" },
+  { code: "tk", name: "Turkmen" },
+  { code: "ak", name: "Twi (Akan)" },
+  { code: "uk", name: "Ukrainian" },
+  { code: "ur", name: "Urdu" },
+  { code: "ug", name: "Uyghur" },
+  { code: "uz", name: "Uzbek" },
+  { code: "vi", name: "Vietnamese" },
+  { code: "cy", name: "Welsh" },
+  { code: "xh", name: "Xhosa" },
+  { code: "yi", name: "Yiddish" },
+  { code: "yo", name: "Yoruba" },
+  { code: "zu", name: "Zulu" },
+];
+
+// Only truly two-letter codes
+const twoLetter = languages.filter(l => l.code.length === 2);
+
+const grid = document.getElementById('grid');
+const countEl = document.getElementById('count');
+const noResults = document.getElementById('no-results');
+
+let currentCode = '';
+
+function openModal(lang) {
+  currentCode = `tts = gTTS(text=text, lang='${lang.code}') # ${lang.name}`;
+  document.getElementById('modal-lang-name').textContent = lang.name;
+  document.getElementById('modal-code').innerHTML =
+    `<span class="hl-kw">tts</span> = <span class="hl-func">gTTS</span>(text=text, lang=<span class="hl-str">'${lang.code}'</span>) <span class="hl-comment"># ${lang.name}</span>`;
+  const btn = document.getElementById('modal-copy-btn');
+  btn.textContent = 'Copy Code';
+  btn.classList.remove('success');
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function copyCode() {
+  const btn = document.getElementById('modal-copy-btn');
+  const ta = document.createElement('textarea');
+  ta.value = currentCode;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('success');
+  setTimeout(() => {
+    btn.textContent = 'Copy Code';
+    btn.classList.remove('success');
+  }, 2000);
+}
+
+// Close on overlay click
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function render(list) {
+  grid.innerHTML = '';
+  list.forEach((lang, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = `${Math.min(i * 15, 300)}ms`;
+    card.innerHTML = `<span class="code">${lang.code}</span><span class="lang-name">${lang.name}</span><span class="copy-hint">view code</span>`;
+    card.addEventListener('click', () => openModal(lang));
+    grid.appendChild(card);
+  });
+  countEl.textContent = `${list.length} language${list.length !== 1 ? 's' : ''}`;
+  noResults.style.display = list.length === 0 ? 'block' : 'none';
+}
+
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const filtered = twoLetter.filter(l =>
+    l.name.toLowerCase().includes(q) || l.code.toLowerCase().includes(q)
+  );
+  render(filtered);
+}
+
+render(twoLetter);
+</script>
+</body>
+</html>
