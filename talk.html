@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --border: #222;
+    --text: #e8e4dc;
+    --muted: #555;
+    --accent: #c8f060;
+    --accent-dim: #8aad2a;
+    --user-wave: #c8f060;
+    --ai-wave: #60c8f0;
+    --danger: #f06060;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow: hidden;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .model-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  /* Transcript */
+  .transcript {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .transcript::-webkit-scrollbar { width: 3px; }
+  .transcript::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: fadeUp 0.2s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding-top: 3px;
+    min-width: 28px;
+    flex-shrink: 0;
+  }
+  .msg.user .msg-role { color: var(--accent-dim); }
+  .msg.ai .msg-role   { color: #3a8cad; }
+  .msg-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .msg.user .msg-text { color: #d0ccbe; }
+
+  .thinking {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .thinking .msg-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: #3a8cad;
+    min-width: 28px;
+  }
+  .dots { display: flex; gap: 4px; }
+  .dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%       { opacity: 1;   transform: scale(1.1); }
+  }
+
+  /* Waveform area */
+  .wave-area {
+    flex-shrink: 0;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .wave-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    height: 12px;
+    transition: color 0.3s;
+  }
+  .wave-label.listening { color: var(--accent-dim); }
+  .wave-label.speaking  { color: #3a8cad; }
+
+  canvas#waveform {
+    width: 100%;
+    height: 56px;
+    display: block;
+    border-radius: 4px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .mic-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+    position: relative;
+    outline: none;
+  }
+  .mic-btn:hover { border-color: var(--accent-dim); }
+  .mic-btn:active { transform: scale(0.95); }
+  .mic-btn.listening {
+    border-color: var(--accent);
+    background: rgba(200, 240, 96, 0.07);
+  }
+  .mic-btn.listening::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    opacity: 0;
+    animation: ripple 1.4s ease-out infinite;
+  }
+  @keyframes ripple {
+    0%   { inset: -2px; opacity: 0.5; }
+    100% { inset: -12px; opacity: 0; }
+  }
+  .mic-btn.speaking {
+    border-color: #60c8f0;
+    background: rgba(96, 200, 240, 0.07);
+  }
+  .mic-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .mic-icon { width: 20px; height: 20px; fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .mic-btn.listening .mic-icon { stroke: var(--accent); }
+  .mic-btn.speaking  .mic-icon { stroke: #60c8f0; }
+
+  .status-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .status-text.listening { color: var(--accent); }
+  .status-text.speaking  { color: #60c8f0; }
+  .status-text.error     { color: var(--danger); }
+
+  .stop-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    display: none;
+  }
+  .stop-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .stop-btn.visible { display: block; }
+
+  /* Empty state */
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-inner {
+    text-align: center;
+  }
+  .empty-glyph {
+    font-family: 'DM Mono', monospace;
+    font-size: 32px;
+    color: var(--border);
+    margin-bottom: 12px;
+  }
+  .empty-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <span class="header-title">Voice</span>
+    <span class="model-badge">llama-3.3-70b · groq</span>
+  </div>
+
+  <div class="transcript" id="transcript">
+    <div class="empty" id="empty-state">
+      <div class="empty-inner">
+        <div class="empty-glyph">◎</div>
+        <div class="empty-hint">Press the mic and start talking.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wave-area">
+    <div class="wave-label" id="wave-label">ready</div>
+    <canvas id="waveform"></canvas>
+  </div>
+
+  <div class="controls">
+    <button class="mic-btn" id="mic-btn" title="Hold to talk">
+      <svg class="mic-icon" viewBox="0 0 24 24">
+        <rect x="9" y="2" width="6" height="12" rx="3"/>
+        <path d="M5 10a7 7 0 0 0 14 0"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+        <line x1="9" y1="21" x2="15" y2="21"/>
+      </svg>
+    </button>
+    <span class="status-text" id="status-text">tap to speak</span>
+    <button class="stop-btn" id="stop-btn">stop</button>
+  </div>
+</div>
+
+<script>
+const WORKER_URL = 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/';
+
+// --- State ---
+let state = 'idle'; // idle | listening | thinking | speaking
+let recognition = null;
+let synth = window.speechSynthesis;
+let utterance = null;
+let audioCtx = null;
+let analyser = null;
+let micSource = null;
+let micStream = null;
+let animFrame = null;
+let history = []; // { role, content }
+
+// --- DOM ---
+const micBtn    = document.getElementById('mic-btn');
+const statusEl  = document.getElementById('status-text');
+const stopBtn   = document.getElementById('stop-btn');
+const waveLabel = document.getElementById('wave-label');
+const canvas    = document.getElementById('waveform');
+const ctx2d     = canvas.getContext('2d');
+const transcript= document.getElementById('transcript');
+const emptyState= document.getElementById('empty-state');
+
+// --- Canvas sizing ---
+function resizeCanvas() {
+  canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// --- Waveform drawing ---
+function drawIdle() {
+  resizeCanvas();
+  const w = canvas.width, h = canvas.height;
+  ctx2d.clearRect(0, 0, w, h);
+  const mid = h / 2;
+  ctx2d.strokeStyle = '#222';
+  ctx2d.lineWidth = 1;
+  ctx2d.beginPath();
+  ctx2d.moveTo(0, mid);
+  ctx2d.lineTo(w, mid);
+  ctx2d.stroke();
+}
+
+function drawWave(color) {
+  if (!analyser) return;
+  const bufLen = analyser.frequencyBinCount;
+  const data   = new Uint8Array(bufLen);
+  analyser.getByteTimeDomainData(data);
+
+  const w = canvas.width, h = canvas.height;
+  ctx2d.clearRect(0, 0, w, h);
+
+  ctx2d.strokeStyle = color;
+  ctx2d.lineWidth   = 1.5 * window.devicePixelRatio;
+  ctx2d.lineJoin    = 'round';
+  ctx2d.beginPath();
+
+  const sliceW = w / bufLen;
+  let x = 0;
+  for (let i = 0; i < bufLen; i++) {
+    const v = data[i] / 128.0;
+    const y = (v * h) / 2;
+    i === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+    x += sliceW;
+  }
+  ctx2d.lineTo(w, h / 2);
+  ctx2d.stroke();
+
+  animFrame = requestAnimationFrame(() => drawWave(color));
+}
+
+function stopWave() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  drawIdle();
+}
+
+// --- Mic AudioContext ---
+async function startMicAnalyser() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    micSource = audioCtx.createMediaStreamSource(micStream);
+    analyser  = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.8;
+    micSource.connect(analyser);
+    drawWave('#c8f060');
+  } catch(e) {
+    setStatus('mic access denied', 'error');
+  }
+}
+
+function stopMicAnalyser() {
+  if (micSource) { micSource.disconnect(); micSource = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  stopWave();
+}
+
+// --- TTS analyser (for AI waveform) ---
+let ttsSource = null;
+let ttsDestination = null;
+
+function setupTTSAnalyser() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 1024;
+  analyser.smoothingTimeConstant = 0.85;
+  ttsDestination = audioCtx.createMediaStreamDestination();
+  analyser.connect(audioCtx.destination);
+}
+
+// --- UI state transitions ---
+function setState(s) {
+  state = s;
+  micBtn.className    = 'mic-btn';
+  statusEl.className  = 'status-text';
+  waveLabel.className = 'wave-label';
+
+  stopBtn.classList.remove('visible');
+
+  if (s === 'idle') {
+    statusEl.textContent   = 'tap to speak';
+    waveLabel.textContent  = 'ready';
+    stopWave();
+  } else if (s === 'listening') {
+    micBtn.classList.add('listening');
+    statusEl.classList.add('listening');
+    waveLabel.classList.add('listening');
+    statusEl.textContent   = 'listening...';
+    waveLabel.textContent  = 'microphone';
+    stopBtn.classList.add('visible');
+  } else if (s === 'thinking') {
+    statusEl.textContent   = 'thinking...';
+    waveLabel.textContent  = 'processing';
+    stopWave();
+    stopBtn.classList.add('visible');
+  } else if (s === 'speaking') {
+    micBtn.classList.add('speaking');
+    statusEl.classList.add('speaking');
+    waveLabel.classList.add('speaking');
+    statusEl.textContent   = 'speaking...';
+    waveLabel.textContent  = 'ai voice';
+    stopBtn.classList.add('visible');
+  }
+}
+
+function setStatus(msg, cls) {
+  statusEl.textContent = msg;
+  statusEl.className   = 'status-text' + (cls ? ' ' + cls : '');
+}
+
+// --- Transcript rendering ---
+function addMessage(role, text) {
+  emptyState.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `
+    <span class="msg-role">${role === 'user' ? 'you' : 'ai'}</span>
+    <span class="msg-text">${escHtml(text)}</span>
+  `;
+  transcript.appendChild(div);
+  transcript.scrollTop = transcript.scrollHeight;
+}
+
+function showThinking() {
+  emptyState.style.display = 'none';
+  const div = document.createElement('div');
+  div.className = 'thinking';
+  div.id = 'thinking-indicator';
+  div.innerHTML = `
+    <span class="msg-role">ai</span>
+    <div class="dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  `;
+  transcript.appendChild(div);
+  transcript.scrollTop = transcript.scrollHeight;
+}
+
+function removeThinking() {
+  const el = document.getElementById('thinking-indicator');
+  if (el) el.remove();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// --- Speech recognition ---
+function startListening() {
+  if (state === 'speaking') stopSpeaking();
+  if (state !== 'idle') return;
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { setStatus('speech API not supported — use Chrome/Edge', 'error'); return; }
+
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    setState('listening');
+    startMicAnalyser();
+  };
+
+  recognition.onresult = async (e) => {
+    const text = e.results[0][0].transcript.trim();
+    stopMicAnalyser();
+    if (!text) { setState('idle'); return; }
+    addMessage('user', text);
+    history.push({ role: 'user', content: text });
+    await fetchAndSpeak(text);
+  };
+
+  recognition.onerror = (e) => {
+    stopMicAnalyser();
+    setStatus('error: ' + e.error, 'error');
+    setState('idle');
+  };
+
+  recognition.onend = () => {
+    if (state === 'listening') { stopMicAnalyser(); setState('idle'); }
+  };
+
+  recognition.start();
+}
+
+function stopListening() {
+  if (recognition) { recognition.stop(); recognition = null; }
+  stopMicAnalyser();
+}
+
+// --- Groq fetch ---
+async function fetchAndSpeak(userText) {
+  setState('thinking');
+  showThinking();
+
+  // Build full conversation as a single prompt (worker only takes ?prompt=)
+  // Send last few turns for context
+  const last = history.slice(-6); // keep context window light
+  const promptText = last.map(m =>
+    (m.role === 'user' ? 'Human: ' : 'Assistant: ') + m.content
+  ).join('\n') + '\nAssistant:';
+
+  try {
+    const url = WORKER_URL + '?prompt=' + encodeURIComponent(promptText);
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error('Worker error ' + res.status);
+    const data = await res.json();
+    const reply = data.response || '(no response)';
+
+    history.push({ role: 'assistant', content: reply });
+    removeThinking();
+    addMessage('ai', reply);
+    await speak(reply);
+  } catch(err) {
+    removeThinking();
+    setStatus('error: ' + err.message, 'error');
+    setTimeout(() => setState('idle'), 3000);
+  }
+}
+
+// --- TTS with waveform ---
+async function speak(text) {
+  setState('speaking');
+
+  return new Promise((resolve) => {
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate  = 1.05;
+    utterance.pitch = 1.0;
+
+    // Try to get a natural English voice
+    const voices = synth.getVoices();
+    const preferred = voices.find(v =>
+      v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.localService === false)
+    ) || voices.find(v => v.lang.startsWith('en'));
+    if (preferred) utterance.voice = preferred;
+
+    // Fake waveform for TTS (Web Speech API doesn't expose audio nodes)
+    // We animate a sine-based oscillation to give life to the waveform
+    startFakeTTSWave();
+
+    utterance.onend = () => {
+      stopWave();
+      setState('idle');
+      resolve();
+    };
+    utterance.onerror = () => {
+      stopWave();
+      setState('idle');
+      resolve();
+    };
+
+    synth.cancel();
+    synth.speak(utterance);
+  });
+}
+
+// Animated waveform for TTS — oscilloscope-style fake that reacts to "time"
+function startFakeTTSWave() {
+  let t = 0;
+  function frame() {
+    const w = canvas.width, h = canvas.height;
+    ctx2d.clearRect(0, 0, w, h);
+
+    ctx2d.strokeStyle = '#60c8f0';
+    ctx2d.lineWidth   = 1.5 * window.devicePixelRatio;
+    ctx2d.lineJoin    = 'round';
+    ctx2d.beginPath();
+
+    const segments = 200;
+    for (let i = 0; i <= segments; i++) {
+      const x = (i / segments) * w;
+      const phase  = (i / segments) * Math.PI * 8 + t;
+      const amp    = (h / 2) * 0.6;
+      const noise  = Math.sin(phase * 1.7 + t * 0.5) * 0.3
+                   + Math.sin(phase * 3.1 - t * 0.3) * 0.15
+                   + Math.sin(phase * 0.4 + t * 1.1) * 0.55;
+      const y = h / 2 + amp * noise;
+      i === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+    }
+    ctx2d.stroke();
+    t += 0.12;
+    animFrame = requestAnimationFrame(frame);
+  }
+  stopWave();
+  frame();
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  stopWave();
+  setState('idle');
+}
+
+// --- Controls ---
+micBtn.addEventListener('click', () => {
+  if (state === 'idle')      startListening();
+  else if (state === 'listening') { stopListening(); setState('idle'); }
+  else if (state === 'speaking')  stopSpeaking();
+});
+
+stopBtn.addEventListener('click', () => {
+  if (state === 'listening') { stopListening(); setState('idle'); }
+  else if (state === 'speaking') stopSpeaking();
+  else if (state === 'thinking') {
+    // can't cancel fetch easily, just reset UI
+    removeThinking();
+    setState('idle');
+  }
+});
+
+// Pre-load voices
+synth.onvoiceschanged = () => synth.getVoices();
+
+// Draw idle line on load
+drawIdle();
+</script>
+</body>
+</html>
