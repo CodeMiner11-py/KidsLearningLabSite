@@ -1,0 +1,778 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .zoomable {
+  cursor: pointer;
+}
+
+  .img-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+
+.img-modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  transform: scale(1);
+}
+
+.img-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+}
+
+  .pear-page {
+    font-family: 'DM Sans', sans-serif;
+    background: #f7f9f4;
+    color: #1a241a;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  .pear-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(247,249,244,0.9);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(182,221,179,0.4);
+  }
+  .pear-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #2d6a2a;
+    letter-spacing: -0.02em;
+  }
+  .pear-logo img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+  .pear-nav-cta {
+    background: #2d6a2a;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.18s, transform 0.15s;
+    text-decoration: none;
+  }
+  .pear-nav-cta:hover { background: #1e4f1b; transform: translateY(-1px); }
+
+  /* HERO */
+  .pear-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 48px;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 80px 48px 64px;
+  }
+
+  .pear-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff;
+    border: 1.5px solid #b6ddb3;
+    color: #2d6a2a;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 5px 14px 5px 8px;
+    margin-bottom: 24px;
+  }
+  .pear-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #48a044;
+    display: inline-block;
+  }
+
+  .pear-hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.6rem, 4vw, 3.9rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: #1a241a;
+    margin-bottom: 20px;
+  }
+  .pear-hero h1 em {
+    font-style: italic;
+    color: #2d6a2a;
+  }
+
+  .pear-hero-desc {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #4a5e48;
+    max-width: 460px;
+    margin-bottom: 36px;
+  }
+
+  .pear-cta-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .pear-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 14px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .pear-btn-primary:hover { background: #2d2d2d; transform: translateY(-2px); }
+  .pear-btn-primary svg { flex-shrink: 0; }
+
+  .pear-btn-sub {
+    font-size: 0.78rem;
+    color: #7a9278;
+    margin-top: 4px;
+  }
+
+  /* HERO VISUAL */
+  .pear-hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 380px;
+  }
+
+  .phone-mockup {
+    width: 200px;
+    height: 360px;
+    background: #1a241a;
+    border-radius: 36px;
+    border: 3px solid #2d6a2a;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(45,106,42,0.22), 0 0 0 1px rgba(255,255,255,0.06);
+    z-index: 2;
+  }
+  .phone-notch {
+    width: 60px;
+    height: 10px;
+    background: #0d1a0d;
+    border-radius: 0 0 10px 10px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 3;
+  }
+  .phone-screen {
+    background: #f7f9f4;
+    height: calc(100% - 10px);
+    border-radius: 0 0 34px 34px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .phone-topbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .phone-topbar img { width: 20px; height: 20px; border-radius: 50%; }
+  .phone-topbar-title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: #2d6a2a;
+  }
+  .phone-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #b6ddb3;
+    padding: 11px 12px;
+  }
+  .phone-card-title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: #1a241a;
+    margin-bottom: 5px;
+  }
+  .phone-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 7px;
+  }
+  .phone-pill {
+    background: #e8f5e6;
+    border: 1px solid #b6ddb3;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 600;
+    color: #2d6a2a;
+  }
+  .phone-step {
+    display: flex;
+    gap: 7px;
+    align-items: flex-start;
+    margin-bottom: 5px;
+  }
+  .phone-step-num {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #2d6a2a;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .phone-step-text {
+    font-size: 9px;
+    color: #4a5e48;
+    line-height: 1.5;
+  }
+  .phone-btn {
+    background: #2d6a2a;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 0;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    text-align: center;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .phone-mini-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1.5px solid #b6ddb3;
+    padding: 9px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phone-mini-icon {
+    width: 30px;
+    height: 30px;
+    background: #e8f5e6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .phone-mini-label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    color: #1a241a;
+  }
+  .phone-mini-sub {
+    font-size: 8.5px;
+    color: #7a9278;
+    margin-top: 1px;
+  }
+
+  .floating-chip {
+    position: absolute;
+    background: #fff;
+    border: 1.5px solid #b6ddb3;
+    border-radius: 14px;
+    padding: 9px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #1a241a;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(45,106,42,0.1);
+    z-index: 1;
+  }
+  .chip-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* FEATURES */
+  .pear-features {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+  .pear-features-label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #48a044;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .pear-features h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 800;
+    text-align: center;
+    color: #1a241a;
+    letter-spacing: -0.025em;
+    margin-bottom: 48px;
+    line-height: 1.15;
+  }
+  .pear-features h2 em { font-style: italic; color: #2d6a2a; }
+
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .feat-card {
+    background: #fff;
+    border-radius: 22px;
+    border: 1.5px solid #b6ddb3;
+    padding: 30px 26px;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .feat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px rgba(45,106,42,0.12);
+  }
+  .feat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .feat-icon-green { background: #e8f5e6; }
+  .feat-icon-amber { background: #fff8e6; }
+  .feat-icon-teal  { background: #e6f7f4; }
+  .feat-card h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #1a241a;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .feat-card p {
+    font-size: 0.88rem;
+    color: #4a5e48;
+    line-height: 1.65;
+  }
+
+  /* STATS */
+  .pear-stats {
+    background: #1a241a;
+    padding: 64px 48px;
+    text-align: center;
+  }
+  .stats-inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .pear-stats h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.7rem, 3vw, 2.6rem);
+    font-weight: 800;
+    color: #f7f9f4;
+    margin-bottom: 48px;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+  .pear-stats h2 em { font-style: italic; color: #b6ddb3; }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .stat-card {
+    background: rgba(72,160,68,0.12);
+    border: 1.5px solid rgba(182,221,179,0.2);
+    border-radius: 20px;
+    padding: 32px 24px;
+  }
+  .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #b6ddb3;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+  .stat-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: #7a9278;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* HOW IT WORKS */
+  .pear-how {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 80px 48px;
+  }
+  .pear-how-label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #48a044;
+    margin-bottom: 16px;
+  }
+  .pear-how h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #1a241a;
+    margin-bottom: 48px;
+    line-height: 1.15;
+  }
+  .pear-how h2 em { font-style: italic; color: #2d6a2a; }
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .how-step {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .how-step-num {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e8f5e6;
+    border: 2px solid #b6ddb3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: #2d6a2a;
+  }
+  .how-step h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #1a241a;
+  }
+  .how-step p {
+    font-size: 0.88rem;
+    color: #4a5e48;
+    line-height: 1.65;
+  }
+
+  /* CTA SECTION */
+  .pear-cta-section {
+    background: linear-gradient(135deg, #e8f5e6 0%, #f0f9ee 100%);
+    border-top: 1.5px solid #b6ddb3;
+    border-bottom: 1.5px solid #b6ddb3;
+    padding: 80px 48px;
+    text-align: center;
+  }
+  .pear-cta-section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #1a241a;
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .pear-cta-section h2 em { font-style: italic; color: #2d6a2a; }
+  .pear-cta-section p {
+    font-size: 1rem;
+    color: #4a5e48;
+    margin-bottom: 36px;
+    line-height: 1.65;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .appstore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 13px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 16px 28px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .appstore-btn:hover { background: #2a2a2a; transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.24); }
+  .appstore-btn-label { text-align: left; }
+  .appstore-btn-small { font-size: 0.7rem; opacity: 0.7; letter-spacing: 0.02em; display: block; }
+  .appstore-btn-big { font-size: 1.1rem; font-weight: 800; display: block; letter-spacing: -0.01em; }
+
+  /* FOOTER */
+  .pear-footer {
+    text-align: center;
+    padding: 28px 48px;
+    font-size: 0.82rem;
+    color: #7a9278;
+    border-top: 1px solid #d8e8d5;
+  }
+  .pear-footer a { color: #2d6a2a; font-weight: 600; text-decoration: none; }
+
+  @media (max-width: 800px) {
+    .pear-nav { padding: 16px 24px; }
+    .pear-hero { grid-template-columns: 1fr; padding: 40px 24px 48px; }
+    .pear-hero-visual { height: 280px; }
+    .pear-features { padding: 0 24px 60px; }
+    .feat-grid { grid-template-columns: 1fr; }
+    .pear-stats { padding: 48px 24px; }
+    .stats-row { grid-template-columns: 1fr; gap: 14px; }
+    .pear-how { padding: 60px 24px; }
+    .how-steps { grid-template-columns: 1fr; }
+    .pear-cta-section { padding: 60px 24px; }
+    .floating-chip { display: none; }
+  }
+</style>
+
+<div class="pear-page">
+
+  <nav class="pear-nav">
+    <div class="pear-logo">
+      <img src="https://kidslearninglab.com/pear%201.png" alt="Pear logo">
+      Pear
+    </div>
+    <a href="#" class="pear-nav-cta">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.36.07 2.3.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.32 2.99-2.53 3.97zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="white"/>
+      </svg>
+      Get on iOS
+    </a>
+  </nav>
+
+  <section class="pear-hero">
+    <div>
+      <div class="pear-badge">
+        <span class="pear-badge-dot"></span>
+        On the Apple App Store
+      </div>
+      <h1>Custom recipes in <em>5 seconds.</em></h1>
+      <p class="pear-hero-desc">Tell Pear what's in your fridge, and it crafts a beautiful custom recipe in seconds. Scan, create, cook — all from your iPhone.</p>
+      <div class="pear-cta-row">
+        <a href="#" class="appstore-btn" style="font-size:inherit;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.36.07 2.3.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.32 2.99-2.53 3.97zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="white"/>
+          </svg>
+          <div class="appstore-btn-label">
+            <span class="appstore-btn-small">Download on the</span>
+            <span class="appstore-btn-big">App Store</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="pear-hero-visual">
+      <img class="zoomable" src="http://kidslearninglab.com/Pear-iPhoneDemo-Hand.png"
+      style="width: 120%; border-radius: 12px; border: 2px solid #2d6a2a;">
+
+    </div>
+  </section>
+
+  <section class="pear-features">
+    <div class="pear-features-label">ALL FEATURES FREE</div>
+    <h2>Features that come <em>for free</em></h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-green"><span class="material-symbols-outlined">psychology</span></div>
+        <h3>AI Recipe Generation</h3>
+        <p>Describe your ingredients, budget, time, and preferences. Pear generates a unique, delicious recipe in seconds — every single time.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-amber"><span class="material-symbols-outlined">photo_camera</span></div>
+        <h3>Scan Your Fridge</h3>
+        <p>Point your camera at ingredients and Pear instantly identifies what you have, then crafts the perfect meal around it.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-teal"><span class="material-symbols-outlined">skillet</span></div>
+        <h3>Cook Mode</h3>
+        <p>Step-by-step guided cooking with voice narration, a live ingredient checklist, and an AI Sous Chef you can ask anything.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-green"><span class="material-symbols-outlined">analytics</span></div>
+        <h3>Nutrition Facts</h3>
+        <p>Every recipe comes with a full breakdown — calories, protein, carbs, fats — so you always know what you're eating.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-amber"><span class="material-symbols-outlined">folder_open</span></div>
+        <h3>Recipe Collections</h3>
+        <p>Organize saved recipes into folders, star your favorites, and rate what you've made. Your collection syncs across all your devices.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon feat-icon-teal"><span class="material-symbols-outlined">public</span></div>
+        <h3>Community Recipes</h3>
+        <p>Publish your creations and discover recipes from other Pear chefs. Like, comment, and save anything that looks good.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pear-stats">
+    <div class="stats-inner">
+      <h2>Cooking made <em>easy</em></h2>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">4 sec</div>
+          <div class="stat-label">Average time to generate a full recipe</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">Infinite</div>
+          <div class="stat-label">Unique recipes you can create — never repeated</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num"><span class="material-symbols-outlined" style="font-size: 40px;">ios_share</span></div>
+          <div class="stat-label">Share via email, share the image, share the recipe</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pear-how">
+    <div class="pear-how-label">How it works</div>
+    <h2>From fridge to fork <em>in three steps</em></h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <h3>Tell Pear what you have</h3>
+        <p>Type in your ingredients or snap a photo of your fridge. Add your time, budget, servings, and any dietary preferences.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <h3>Get a recipe in seconds</h3>
+        <p>Pear's AI generates a complete, beautiful recipe with ingredients, step-by-step instructions, and full nutrition facts.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <h3>Cook with confidence</h3>
+        <p>Enter Cook Mode for guided voice narration, tick off ingredients as you go, and ask your AI Sous Chef for help any time.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pear-cta-section">
+    <h2>Need something to eat today?<br><em>Get Pear now</em></h2>
+    <p>Pear is completely free to download & use, no hidden fees. All capabilities included.</p>
+    <a href="#" class="appstore-btn">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.36.07 2.3.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.32 2.99-2.53 3.97zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="white"/>
+      </svg>
+      <div class="appstore-btn-label">
+        <span class="appstore-btn-small">Download on the</span>
+        <span class="appstore-btn-big">App Store</span>
+      </div>
+    </a>
+  </section>
+
+  <footer class="pear-footer">
+    Created by <a href="https://kidslearninglab.com/about" target="_blank">Eshaan Buddhisagar</a></a>
+  </footer>
+  <div id="imgModal" class="img-modal">
+    <span class="img-close">&times;</span>
+    <img id="modalImg" class="img-modal-content">
+  </div>
+
+</div>
+
+<style>
+  @keyframes floatA {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes floatB {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+</style>
+
+<script>
+  const modal = document.getElementById("imgModal");
+  const modalImg = document.getElementById("modalImg");
+  
+  document.querySelector(".zoomable").onclick = function () {
+    modal.style.display = "flex";
+    modalImg.src = this.src;
+  };
+  
+  document.querySelector(".img-close").onclick = function () {
+    modal.style.display = "none";
+  };
+  
+  modal.onclick = function (e) {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+  </script>
