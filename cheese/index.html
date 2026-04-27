@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPICY CHEEEEEEEEEEEESE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF6B00;
+    --yellow: #FFD600;
+    --red: #E8001A;
+    --cream: #FFF8E7;
+    --dark: #1A0A00;
+    --gold: #C8860A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    background: radial-gradient(ellipse at center, #3D1500 0%, #1A0A00 70%);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg,transparent,transparent 60px,rgba(255,107,0,0.03) 60px,rgba(255,107,0,0.03) 61px);
+  }
+  .flame-bg {
+    position: absolute; bottom: -20px; left: 50%;
+    transform: translateX(-50%);
+    width: 120vw; height: 40vh;
+    background: radial-gradient(ellipse at center bottom, rgba(255,107,0,0.35) 0%, transparent 70%);
+    filter: blur(40px);
+    animation: flicker 2s ease-in-out infinite alternate;
+  }
+  @keyframes flicker {
+    0%   { opacity: 0.7; transform: translateX(-50%) scaleY(1); }
+    100% { opacity: 1;   transform: translateX(-50%) scaleY(1.08); }
+  }
+  .hero-eyebrow {
+    font-size: clamp(10px, 1.5vw, 13px); font-weight: 700;
+    letter-spacing: 0.55em; text-transform: uppercase; color: var(--orange);
+    margin-bottom: 1.4rem; opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-size: clamp(36px, 8vw, 115px); font-weight: 900;
+    line-height: 0.88; text-align: center; letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 50%, var(--red) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+    position: relative; z-index: 1; padding: 0 1rem;
+  }
+  .hero-sub {
+    font-size: clamp(12px, 1.8vw, 17px); font-weight: 300;
+    letter-spacing: 0.18em; color: rgba(255,248,231,0.55);
+    margin-top: 1.4rem; text-transform: uppercase;
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-buttons {
+    display: flex; gap: 1rem; margin-top: 2.8rem;
+    flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.95rem 2rem; border: none; cursor: pointer; border-radius: 4px;
+    transition: all 0.2s ease; display: flex; align-items: center; gap: 0.55rem;
+  }
+  .btn-audio { background: var(--orange); color: var(--dark); }
+  .btn-audio:hover { background: var(--yellow); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,0,0.5); }
+  .btn-audio.playing { background: var(--red); color: #fff; }
+  .btn-image { background: transparent; color: var(--yellow); border: 2px solid var(--yellow); }
+  .btn-image:hover { background: var(--yellow); color: var(--dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,214,0,0.4); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.93); z-index: 1000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    position: relative; max-width: 90vw; max-height: 90vh;
+    border-radius: 8px; overflow: hidden;
+    box-shadow: 0 40px 120px rgba(255,107,0,0.3);
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .modal-box canvas { display: block; max-width: 90vw; max-height: 85vh; }
+  .modal-close {
+    position: absolute; top: 10px; right: 10px;
+    width: 34px; height: 34px;
+    background: rgba(0,0,0,0.75); border: none; border-radius: 50%;
+    color: #fff; font-size: 18px; font-family: 'Inter', sans-serif;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: var(--red); }
+
+  /* LAYOUT */
+  .divider {
+    display: flex; align-items: center; gap: 1.5rem;
+    max-width: 900px; margin: 0 auto; padding: 0 2rem;
+  }
+  .divider-line { flex: 1; height: 1px; background: rgba(255,107,0,0.3); }
+  .divider-icon { color: var(--orange); font-size: 22px; }
+
+  section { padding: 5rem 2rem; max-width: 960px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.55em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(26px, 5vw, 50px); font-weight: 900;
+    letter-spacing: -0.02em; line-height: 1;
+    background: linear-gradient(90deg, var(--yellow), var(--orange));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 2.5rem;
+  }
+
+  /* FACTS */
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .fact-card {
+    background: rgba(255,107,0,0.07);
+    border: 1px solid rgba(255,107,0,0.2);
+    border-radius: 8px; padding: 1.6rem 1.8rem;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .fact-card:hover { border-color: var(--orange); transform: translateY(-4px); }
+  .fact-num {
+    font-size: 40px; font-weight: 900; letter-spacing: -0.03em;
+    color: var(--orange); line-height: 1; margin-bottom: 0.6rem; opacity: 0.5;
+  }
+  .fact-text { font-size: 15px; font-weight: 400; line-height: 1.65; color: rgba(255,248,231,0.85); }
+  .fact-text strong { color: var(--yellow); font-weight: 700; }
+
+  /* RECIPE */
+  .recipe-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  @media (max-width: 640px) { .recipe-wrap { grid-template-columns: 1fr; } }
+  .recipe-col-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem;
+  }
+  .ingredient-list { list-style: none; }
+  .ingredient-list li {
+    font-size: 15px; font-weight: 400; color: rgba(255,248,231,0.85);
+    padding: 0.55rem 0; border-bottom: 1px solid rgba(255,107,0,0.12);
+    display: flex; align-items: baseline; gap: 0.6rem; line-height: 1.5;
+  }
+  .ingredient-list li::before { content: '—'; color: var(--orange); font-weight: 700; flex-shrink: 0; }
+  .step-list { list-style: none; counter-reset: steps; }
+  .step-list li {
+    font-size: 15px; font-weight: 400; color: rgba(255,248,231,0.85);
+    padding: 0.9rem 0 0.9rem 3rem;
+    border-bottom: 1px solid rgba(255,107,0,0.12);
+    line-height: 1.65; position: relative; counter-increment: steps;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute; left: 0; top: 0.85rem;
+    width: 26px; height: 26px;
+    background: var(--orange); color: var(--dark);
+    border-radius: 50%; font-size: 12px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 3rem 2rem;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.3em;
+    text-transform: uppercase; color: rgba(255,248,231,0.2);
+    border-top: 1px solid rgba(255,107,0,0.1);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="flame-bg"></div>
+  <p class="hero-eyebrow">🔥 Warning: Extremely Dairy 🔥</p>
+  <h1 class="hero-title">SPICY<br>CHEEEEEEEEEEEESE</h1>
+  <p class="hero-sub">The holiest of holy dairy experiences</p>
+  <div class="hero-buttons">
+    <button class="btn btn-audio" id="audioBtn" onclick="toggleAudio()">
+      <span>▶</span> Play the Anthem
+    </button>
+    <button class="btn btn-image" onclick="openModal()">
+      <span>🧀</span> Behold the CHEEEEEEEEEEEESE
+    </button>
+  </div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div class="modal-overlay" id="imgModal" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <canvas id="cheeseCanvas"></canvas>
+  </div>
+</div>
+
+<audio id="cheeseAudio" src="SpicyCheese.aifc"></audio>
+
+<!-- FACTS -->
+<div class="divider" style="padding-top:3rem">
+  <div class="divider-line"></div>
+  <span class="divider-icon">🧀</span>
+  <div class="divider-line"></div>
+</div>
+
+<section>
+  <p class="section-label">Did you know?</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE Facts</h2>
+  <div class="facts-grid">
+    <div class="fact-card">
+      <div class="fact-num">01</div>
+      <p class="fact-text">It takes roughly <strong>10 pounds of milk</strong> to make just 1 pound of CHEEEEEEEEEEEESE. That is a staggering amount of dairy devotion.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">02</div>
+      <p class="fact-text"><strong>Over 1,800 varieties</strong> of CHEEEEEEEEEEEESE exist worldwide. And yet, spicy CHEEEEEEEEEEEESE reigns supreme above them all.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">03</div>
+      <p class="fact-text">The word "CHEEEEEEEEEEEESE" comes from the Latin <em>caseus</em>. The Romans were dedicated CHEEEEEEEEEEEESE enthusiasts, and we deeply respect that.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">04</div>
+      <p class="fact-text">The oldest known CHEEEEEEEEEEEESE ever found was discovered in an <strong>Egyptian tomb</strong>, approximately 3,200 years old. Ancient and glorious.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">05</div>
+      <p class="fact-text">CHEEEEEEEEEEEESE is the <strong>most stolen food in the world</strong>, accounting for around 4% of all food theft globally. Completely understandable.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">06</div>
+      <p class="fact-text">Capsaicin — the compound that makes peppers hot — <strong>binds to fat molecules</strong> in CHEEEEEEEEEEEESE, making the heat linger longer and go deeper.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">07</div>
+      <p class="fact-text"><strong>Pepper Jack</strong> is perhaps the most iconic spicy CHEEEEEEEEEEEESE, blending Monterey Jack with jalapeños, habaneros, and fire into one legendary slab.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">08</div>
+      <p class="fact-text">CHEEEEEEEEEEEESE contains <strong>tryptophan</strong>, a chemical that triggers relaxation and happiness. Spicy CHEEEEEEEEEEEESE is therefore clinically blissful.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">09</div>
+      <p class="fact-text">The <strong>iconic stretchy pull</strong> of melted CHEEEEEEEEEEEESE is caused by long protein chains called caseins. Spicy melted CHEEEEEEEEEEEESE stretches both physically and spiritually.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">10</div>
+      <p class="fact-text">Wisconsin, USA produces over <strong>3 billion pounds</strong> of CHEEEEEEEEEEEESE per year. That is an inspiring and righteous number.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">11</div>
+      <p class="fact-text">Spicy Mexican varieties like <strong>Cotija con chile</strong> and <strong>Oaxacan CHEEEEEEEEEEEESE</strong> have been crafted for centuries, combining fiery chili with creamy dairy perfection.</p>
+    </div>
+    <div class="fact-card">
+      <div class="fact-num">12</div>
+      <p class="fact-text">CHEEEEEEEEEEEESE rind is <strong>completely edible</strong> on most varieties. On spicy ones especially, the rind carries concentrated heat and flavour. Always eat the rind.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-line"></div>
+  <span class="divider-icon">🌶️</span>
+  <div class="divider-line"></div>
+</div>
+
+<!-- RECIPE -->
+<section>
+  <p class="section-label">Chef's Special</p>
+  <h2 class="section-title">Spicy CHEEEEEEEEEEEESE Omelette</h2>
+  <div class="recipe-wrap">
+    <div>
+      <p class="recipe-col-title">Ingredients</p>
+      <ul class="ingredient-list">
+        <li>3 large free-range eggs</li>
+        <li>2 tbsp whole milk or cream</li>
+        <li>½ cup grated Pepper Jack CHEEEEEEEEEEEESE</li>
+        <li>¼ cup grated sharp cheddar CHEEEEEEEEEEEESE</li>
+        <li>1 fresh jalapeño, thinly sliced</li>
+        <li>½ tsp smoked paprika</li>
+        <li>¼ tsp cayenne pepper (more if you dare)</li>
+        <li>Pinch of red chili flakes</li>
+        <li>1 tbsp unsalted butter</li>
+        <li>Salt &amp; black pepper to taste</li>
+        <li>Fresh chives or cilantro, to finish</li>
+        <li>Hot sauce, for serving</li>
+      </ul>
+    </div>
+    <div>
+      <p class="recipe-col-title">Method</p>
+      <ol class="step-list">
+        <li>Crack eggs into a bowl. Add milk, smoked paprika, cayenne, a pinch of salt, and plenty of black pepper. Whisk vigorously until fully combined and slightly frothy.</li>
+        <li>Heat a non-stick pan over medium heat. Add butter and let it foam, tilting the pan to coat evenly. Once the foam subsides, you are ready.</li>
+        <li>Pour in the egg mixture. Let it sit undisturbed for 20 seconds, then use a spatula to gently push cooked egg toward the centre, letting raw egg flow to the edges.</li>
+        <li>When the egg is just barely set but still glossy on top, scatter both CHEEEEEEEEEEEEESEs and jalapeño slices over one half.</li>
+        <li>Fold the omelette over the CHEEEEEEEEEEEESE side and slide onto a warm plate. The residual heat will finish melting everything into molten, spicy perfection.</li>
+        <li>Finish with red chili flakes, fresh chives or cilantro, and a fearless pour of your favourite hot sauce. Serve immediately and devour with reverence.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  🧀 In CHEEEEEEEEEEEESE We Trust 🧀 &nbsp;·&nbsp; All hail the spicy dairy gods
+</footer>
+
+<script>
+  // AUDIO
+  const audio    = document.getElementById('cheeseAudio');
+  const audioBtn = document.getElementById('audioBtn');
+
+  function toggleAudio() {
+    if (audio.paused) {
+      audio.play();
+      audioBtn.classList.add('playing');
+      audioBtn.innerHTML = '<span>■</span> Stop the Anthem';
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
+      audioBtn.classList.remove('playing');
+      audioBtn.innerHTML = '<span>▶</span> Play the Anthem';
+    }
+  }
+
+  audio.addEventListener('ended', () => {
+    audioBtn.classList.remove('playing');
+    audioBtn.innerHTML = '<span>▶</span> Play the Anthem';
+  });
+
+  // IMAGE MODAL — auto-crop white (#fff) padding
+  function openModal() {
+    const modal  = document.getElementById('imgModal');
+    const canvas = document.getElementById('cheeseCanvas');
+    const ctx    = canvas.getContext('2d');
+    const img    = new Image();
+
+    img.src = 'Spicy Cheese.png';
+
+    img.onload = () => {
+      const tmp = document.createElement('canvas');
+      tmp.width = img.width; tmp.height = img.height;
+      const tc = tmp.getContext('2d');
+      tc.drawImage(img, 0, 0);
+      const data = tc.getImageData(0, 0, img.width, img.height);
+      const px = data.data;
+      const w = img.width, h = img.height;
+
+      let top = h, left = w, bottom = 0, right = 0;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const r = px[i], g = px[i+1], b = px[i+2], a = px[i+3];
+          const isWhiteOrTransparent = a < 10 || (r > 240 && g > 240 && b > 240);
+          if (!isWhiteOrTransparent) {
+            if (y < top)    top    = y;
+            if (y > bottom) bottom = y;
+            if (x < left)   left   = x;
+            if (x > right)  right  = x;
+          }
+        }
+      }
+
+      // Fallback if nothing found
+      if (top >= bottom || left >= right) {
+        top = 0; left = 0; bottom = h - 1; right = w - 1;
+      }
+
+      const pad = 8;
+      top    = Math.max(0, top - pad);
+      left   = Math.max(0, left - pad);
+      bottom = Math.min(h - 1, bottom + pad);
+      right  = Math.min(w - 1, right + pad);
+
+      const cw = right - left + 1;
+      const ch = bottom - top + 1;
+      canvas.width  = cw;
+      canvas.height = ch;
+      ctx.drawImage(img, left, top, cw, ch, 0, 0, cw, ch);
+
+      modal.classList.add('open');
+    };
+
+    img.onerror = () => {
+      canvas.width = 440; canvas.height = 200;
+      const c2 = canvas.getContext('2d');
+      c2.fillStyle = '#1A0A00';
+      c2.fillRect(0, 0, 440, 200);
+      c2.fillStyle = '#FF6B00';
+      c2.font = 'bold 16px Inter, sans-serif';
+      c2.textAlign = 'center';
+      c2.fillText('Could not load "Spicy Cheese.png"', 220, 90);
+      c2.fillStyle = 'rgba(255,248,231,0.6)';
+      c2.font = '14px Inter, sans-serif';
+      c2.fillText('Make sure the file is in the same folder as this HTML.', 220, 120);
+      modal.classList.add('open');
+    };
+  }
+
+  function closeModal() {
+    document.getElementById('imgModal').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('imgModal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
