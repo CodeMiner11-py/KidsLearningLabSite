@@ -1213,7 +1213,8 @@ const SPICE_LEVELS = [
   { max:55,  label:'Habanero heat. Your eyes water. You smile.', color:'#FF6600', flames:'🔥🔥🔥' },
   { max:70,  label:'Ghost pepper zone. This is who you are now.', color:'#FF3300', flames:'🔥🔥🔥🔥' },
   { max:85,  label:'Carolina Reaper level. The CHEEEEEEEEEEEESE has you.', color:'#E8001A', flames:'🔥🔥🔥🔥🔥' },
-  { max:100, label:'MAXIMUM CHEESE HEAT. You are the CHEEEEEEEEEEEESE.', color:'#9B0000', flames:'🔥🔥🔥🔥🔥🔥' },
+  { max:95, label:'MAXIMUM CHEESE HEAT. You are the CHEEEEEEEEEEEESE.', color:'#9B0000', flames:'🔥🔥🔥🔥🔥🔥' },
+  { max:100, label:'SPICY CHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEESE.', color:'#9B0000', flames:'🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥'}
 ];
 function updateMeter(v) {
   const level = SPICE_LEVELS.find(l => v <= l.max) || SPICE_LEVELS.at(-1);
