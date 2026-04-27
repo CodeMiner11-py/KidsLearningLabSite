@@ -1,223 +1,719 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPICY CHEEEEEEEEEEEESE</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --orange: #FF6B00;
-    --yellow: #FFD600;
-    --red: #E8001A;
-    --cream: #FFF8E7;
-    --dark: #1A0A00;
-    --gold: #C8860A;
-  }
+/* ═══════════════════════════════════════════
+   THEME VARIABLES
+═══════════════════════════════════════════ */
+:root {
+  --orange: #FF6B00;
+  --yellow: #FFD600;
+  --red: #E8001A;
+  --cream: #FFF8E7;
+  --dark: #1A0A00;
+  --gold: #C8860A;
+  --bg: #1A0A00;
+  --surface: rgba(255,107,0,0.07);
+  --border: rgba(255,107,0,0.2);
+  --text: #FFF8E7;
+  --text-muted: rgba(255,248,231,0.55);
+  --hero-grad-inner: #3D1500;
+  --hero-grad-outer: #1A0A00;
+}
+[data-theme="light"] {
+  --bg: #FFF8E7;
+  --surface: rgba(200,80,0,0.07);
+  --border: rgba(200,80,0,0.25);
+  --text: #2A0E00;
+  --text-muted: rgba(42,14,0,0.55);
+  --hero-grad-inner: #FFD580;
+  --hero-grad-outer: #FF9A00;
+  --dark: #2A0E00;
+  --cream: #2A0E00;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
+}
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--dark);
-    color: var(--cream);
-    overflow-x: hidden;
-  }
+/* ═══════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════ */
+.theme-toggle {
+  position: fixed; top: 1.2rem; right: 1.2rem; z-index: 500;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 18px; width: 44px; height: 44px;
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; backdrop-filter: blur(8px);
+}
+.theme-toggle:hover { border-color: var(--orange); transform: scale(1.1); }
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    position: relative;
-    background: radial-gradient(ellipse at center, #3D1500 0%, #1A0A00 70%);
-    overflow: hidden;
-  }
-  .hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg,transparent,transparent 60px,rgba(255,107,0,0.03) 60px,rgba(255,107,0,0.03) 61px);
-  }
-  .flame-bg {
-    position: absolute; bottom: -20px; left: 50%;
-    transform: translateX(-50%);
-    width: 120vw; height: 40vh;
-    background: radial-gradient(ellipse at center bottom, rgba(255,107,0,0.35) 0%, transparent 70%);
-    filter: blur(40px);
-    animation: flicker 2s ease-in-out infinite alternate;
-  }
-  @keyframes flicker {
-    0%   { opacity: 0.7; transform: translateX(-50%) scaleY(1); }
-    100% { opacity: 1;   transform: translateX(-50%) scaleY(1.08); }
-  }
-  .hero-eyebrow {
-    font-size: clamp(10px, 1.5vw, 13px); font-weight: 700;
-    letter-spacing: 0.55em; text-transform: uppercase; color: var(--orange);
-    margin-bottom: 1.4rem; opacity: 0;
-    animation: fadeUp 0.8s 0.2s forwards;
-  }
-  .hero-title {
-    font-size: clamp(36px, 8vw, 115px); font-weight: 900;
-    line-height: 0.88; text-align: center; letter-spacing: -0.03em;
-    background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 50%, var(--red) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
-    position: relative; z-index: 1; padding: 0 1rem;
-  }
-  .hero-sub {
-    font-size: clamp(12px, 1.8vw, 17px); font-weight: 300;
-    letter-spacing: 0.18em; color: rgba(255,248,231,0.55);
-    margin-top: 1.4rem; text-transform: uppercase;
-    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
-  }
-  .hero-buttons {
-    display: flex; gap: 1rem; margin-top: 2.8rem;
-    flex-wrap: wrap; justify-content: center;
-    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(28px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+/* ═══════════════════════════════════════════
+   EMOJI RAIN
+═══════════════════════════════════════════ */
+#emoji-rain { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
+.emoji-drop {
+  position: absolute; top: -60px; font-size: 28px;
+  animation: fall linear forwards;
+  user-select: none;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
 
-  /* BUTTONS */
-  .btn {
-    font-family: 'Inter', sans-serif; font-weight: 700;
-    font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.95rem 2rem; border: none; cursor: pointer; border-radius: 4px;
-    transition: all 0.2s ease; display: flex; align-items: center; gap: 0.55rem;
-  }
-  .btn-audio { background: var(--orange); color: var(--dark); }
-  .btn-audio:hover { background: var(--yellow); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,0,0.5); }
-  .btn-audio.playing { background: var(--red); color: #fff; }
-  .btn-image { background: transparent; color: var(--yellow); border: 2px solid var(--yellow); }
-  .btn-image:hover { background: var(--yellow); color: var(--dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,214,0,0.4); }
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+  background: radial-gradient(ellipse at center, var(--hero-grad-inner) 0%, var(--hero-grad-outer) 70%);
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg,transparent,transparent 60px,rgba(255,107,0,0.03) 60px,rgba(255,107,0,0.03) 61px);
+}
+.flame-bg {
+  position: absolute; bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  width: 120vw; height: 40vh;
+  background: radial-gradient(ellipse at center bottom, rgba(255,107,0,0.35) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: flicker 2s ease-in-out infinite alternate;
+}
+@keyframes flicker {
+  0%   { opacity: 0.7; transform: translateX(-50%) scaleY(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scaleY(1.08); }
+}
 
-  /* MODAL */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.93); z-index: 1000;
-    align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    position: relative; max-width: 90vw; max-height: 90vh;
-    border-radius: 8px; overflow: hidden;
-    box-shadow: 0 40px 120px rgba(255,107,0,0.3);
-    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes popIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
-  }
-  .modal-box canvas { display: block; max-width: 90vw; max-height: 85vh; }
-  .modal-close {
-    position: absolute; top: 10px; right: 10px;
-    width: 34px; height: 34px;
-    background: rgba(0,0,0,0.75); border: none; border-radius: 50%;
-    color: #fff; font-size: 18px; font-family: 'Inter', sans-serif;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
-  }
-  .modal-close:hover { background: var(--red); }
+/* MELTING CHEESE DRIP */
+.drip-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 80px; overflow: visible; pointer-events: none;
+}
+.drip-svg { width: 100%; height: 80px; overflow: visible; }
 
-  /* LAYOUT */
-  .divider {
-    display: flex; align-items: center; gap: 1.5rem;
-    max-width: 900px; margin: 0 auto; padding: 0 2rem;
-  }
-  .divider-line { flex: 1; height: 1px; background: rgba(255,107,0,0.3); }
-  .divider-icon { color: var(--orange); font-size: 22px; }
+.hero-eyebrow {
+  font-size: clamp(10px, 1.5vw, 13px); font-weight: 700;
+  letter-spacing: 0.55em; text-transform: uppercase; color: var(--orange);
+  margin-bottom: 1.4rem; opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-title {
+  font-size: clamp(36px, 8vw, 115px); font-weight: 900;
+  line-height: 0.88; text-align: center; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 50%, var(--red) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  position: relative; z-index: 1; padding: 0 1rem;
+}
+.hero-sub {
+  font-size: clamp(12px, 1.8vw, 17px); font-weight: 300;
+  letter-spacing: 0.18em; color: var(--text-muted);
+  margin-top: 1.4rem; text-transform: uppercase;
+  opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+}
+.hero-buttons {
+  display: flex; gap: 1rem; margin-top: 2.8rem;
+  flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+}
 
-  section { padding: 5rem 2rem; max-width: 960px; margin: 0 auto; }
+/* COUNTDOWN */
+.countdown-bar {
+  display: flex; gap: 2rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: fadeUp 0.8s 1s forwards;
+}
+.cd-unit { text-align: center; }
+.cd-num {
+  font-size: clamp(28px, 5vw, 56px); font-weight: 900; letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--yellow), var(--orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1;
+}
+.cd-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--text-muted); margin-top: 4px;
+}
 
-  .section-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.55em;
-    text-transform: uppercase; color: var(--orange); margin-bottom: 1rem;
-  }
-  .section-title {
-    font-size: clamp(26px, 5vw, 50px); font-weight: 900;
-    letter-spacing: -0.02em; line-height: 1;
-    background: linear-gradient(90deg, var(--yellow), var(--orange));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 2.5rem;
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  /* FACTS */
-  .facts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
-  .fact-card {
-    background: rgba(255,107,0,0.07);
-    border: 1px solid rgba(255,107,0,0.2);
-    border-radius: 8px; padding: 1.6rem 1.8rem;
-    transition: border-color 0.25s, transform 0.25s;
-  }
-  .fact-card:hover { border-color: var(--orange); transform: translateY(-4px); }
-  .fact-num {
-    font-size: 40px; font-weight: 900; letter-spacing: -0.03em;
-    color: var(--orange); line-height: 1; margin-bottom: 0.6rem; opacity: 0.5;
-  }
-  .fact-text { font-size: 15px; font-weight: 400; line-height: 1.65; color: rgba(255,248,231,0.85); }
-  .fact-text strong { color: var(--yellow); font-weight: 700; }
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn {
+  font-family: 'Inter', sans-serif; font-weight: 700;
+  font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.95rem 2rem; border: none; cursor: pointer; border-radius: 4px;
+  transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.55rem;
+}
+.btn-orange { background: var(--orange); color: #1A0A00; }
+.btn-orange:hover { background: var(--yellow); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,0,0.5); }
+.btn-orange.playing { background: var(--red); color: #fff; }
+.btn-outline { background: transparent; color: var(--yellow); border: 2px solid var(--yellow); }
+.btn-outline:hover { background: var(--yellow); color: #1A0A00; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,214,0,0.4); }
+.btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--orange); transform: translateY(-2px); }
+.btn-sm { padding: 0.6rem 1.2rem; font-size: 11px; }
 
-  /* RECIPE */
-  .recipe-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
-  @media (max-width: 640px) { .recipe-wrap { grid-template-columns: 1fr; } }
-  .recipe-col-title {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.3em;
-    text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem;
-  }
-  .ingredient-list { list-style: none; }
-  .ingredient-list li {
-    font-size: 15px; font-weight: 400; color: rgba(255,248,231,0.85);
-    padding: 0.55rem 0; border-bottom: 1px solid rgba(255,107,0,0.12);
-    display: flex; align-items: baseline; gap: 0.6rem; line-height: 1.5;
-  }
-  .ingredient-list li::before { content: '—'; color: var(--orange); font-weight: 700; flex-shrink: 0; }
-  .step-list { list-style: none; counter-reset: steps; }
-  .step-list li {
-    font-size: 15px; font-weight: 400; color: rgba(255,248,231,0.85);
-    padding: 0.9rem 0 0.9rem 3rem;
-    border-bottom: 1px solid rgba(255,107,0,0.12);
-    line-height: 1.65; position: relative; counter-increment: steps;
-  }
-  .step-list li::before {
-    content: counter(steps);
-    position: absolute; left: 0; top: 0.85rem;
-    width: 26px; height: 26px;
-    background: var(--orange); color: var(--dark);
-    border-radius: 50%; font-size: 12px; font-weight: 900;
-    display: flex; align-items: center; justify-content: center;
-  }
+/* ═══════════════════════════════════════════
+   IMAGE MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.93); z-index: 1000;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  position: relative; max-width: 90vw; max-height: 90vh;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 40px 120px rgba(255,107,0,0.3);
+  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.modal-box canvas { display: block; max-width: 90vw; max-height: 85vh; }
+.modal-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 34px;
+  background: rgba(0,0,0,0.75); border: none; border-radius: 50%;
+  color: #fff; font-size: 18px; font-family: 'Inter', sans-serif;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: var(--red); }
 
-  /* FOOTER */
-  footer {
-    text-align: center; padding: 3rem 2rem;
-    font-size: 12px; font-weight: 500; letter-spacing: 0.3em;
-    text-transform: uppercase; color: rgba(255,248,231,0.2);
-    border-top: 1px solid rgba(255,107,0,0.1);
-  }
+/* ═══════════════════════════════════════════
+   LAYOUT HELPERS
+═══════════════════════════════════════════ */
+.divider {
+  display: flex; align-items: center; gap: 1.5rem;
+  max-width: 960px; margin: 0 auto; padding: 0 2rem;
+}
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-icon { color: var(--orange); font-size: 22px; }
+
+.page-section { padding: 5rem 2rem; max-width: 960px; margin: 0 auto; }
+
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.55em;
+  text-transform: uppercase; color: var(--orange); margin-bottom: 1rem;
+}
+.section-title {
+  font-size: clamp(26px, 5vw, 50px); font-weight: 900;
+  letter-spacing: -0.02em; line-height: 1;
+  background: linear-gradient(90deg, var(--yellow), var(--orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 2.5rem;
+}
+
+/* ═══════════════════════════════════════════
+   CHEESE-O-METER
+═══════════════════════════════════════════ */
+.meter-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.meter-track {
+  position: relative; height: 24px; border-radius: 12px;
+  background: rgba(255,107,0,0.1); border: 1px solid var(--border);
+  margin: 1.5rem 0; overflow: visible;
+}
+.meter-fill {
+  height: 100%; border-radius: 12px;
+  background: linear-gradient(90deg, #FFD600, #FF6B00, #E8001A);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px rgba(255,107,0,0.6);
+}
+.meter-thumb {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 50%;
+  background: white; border: 3px solid var(--orange);
+  cursor: grab; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: left 0.0s; z-index: 2;
+}
+input[type=range].spice-slider {
+  width: 100%; margin: 1rem 0;
+  -webkit-appearance: none; background: transparent; cursor: pointer;
+}
+input[type=range].spice-slider::-webkit-slider-track {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, #FFD600, #FF6B00, #E8001A);
+}
+input[type=range].spice-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px;
+  border-radius: 50%; background: white; border: 3px solid var(--orange);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4); cursor: grab;
+}
+.meter-label {
+  font-size: clamp(20px, 4vw, 36px); font-weight: 900;
+  text-align: center; letter-spacing: -0.02em;
+  margin-top: 1rem; min-height: 2em;
+  transition: color 0.3s;
+}
+.spice-flames {
+  text-align: center; font-size: clamp(20px, 3vw, 32px);
+  letter-spacing: 4px; min-height: 1.5em; margin-top: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════
+   RANDOM FACT
+═══════════════════════════════════════════ */
+.fact-spotlight {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem; text-align: center;
+}
+.fact-spotlight-num {
+  font-size: 72px; font-weight: 900; letter-spacing: -0.05em;
+  color: var(--orange); opacity: 0.25; line-height: 1;
+}
+.fact-spotlight-text {
+  font-size: clamp(16px, 2.5vw, 22px); font-weight: 400;
+  line-height: 1.7; color: var(--text);
+  margin: 1rem 0 2rem;
+  min-height: 4em;
+  transition: opacity 0.3s;
+}
+.fact-spotlight-text strong { color: var(--yellow); font-weight: 700; }
+.fact-spotlight-text.fading { opacity: 0; }
+
+/* ═══════════════════════════════════════════
+   FACTS GRID
+═══════════════════════════════════════════ */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.fact-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1.6rem 1.8rem;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.fact-card:hover { border-color: var(--orange); transform: translateY(-4px); }
+.fact-num {
+  font-size: 40px; font-weight: 900; letter-spacing: -0.03em;
+  color: var(--orange); line-height: 1; margin-bottom: 0.6rem; opacity: 0.5;
+}
+.fact-text { font-size: 15px; font-weight: 400; line-height: 1.65; color: var(--text); }
+.fact-text strong { color: var(--yellow); font-weight: 700; }
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+.quiz-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.quiz-question {
+  font-size: clamp(16px, 2.5vw, 22px); font-weight: 700;
+  line-height: 1.5; margin-bottom: 1.5rem; color: var(--text);
+}
+.quiz-options {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 500px) { .quiz-options { grid-template-columns: 1fr; } }
+.quiz-opt {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  padding: 0.85rem 1.2rem; border: 2px solid var(--border);
+  background: transparent; color: var(--text); border-radius: 6px;
+  cursor: pointer; transition: all 0.2s; text-align: left;
+}
+.quiz-opt:hover { border-color: var(--orange); color: var(--orange); }
+.quiz-opt.selected { border-color: var(--orange); background: rgba(255,107,0,0.15); color: var(--orange); }
+.quiz-progress {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5rem;
+}
+.quiz-result {
+  text-align: center; display: none;
+}
+.quiz-result-emoji { font-size: 60px; margin-bottom: 1rem; }
+.quiz-result-title {
+  font-size: clamp(22px, 4vw, 38px); font-weight: 900; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--yellow), var(--orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 1rem;
+}
+.quiz-result-desc { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 2rem; }
+
+/* ═══════════════════════════════════════════
+   HALL OF FAME
+═══════════════════════════════════════════ */
+.hof-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+}
+.hof-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.8rem; transition: all 0.25s;
+}
+.hof-card:hover { border-color: var(--orange); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(255,107,0,0.15); }
+.hof-name {
+  font-size: 18px; font-weight: 800; letter-spacing: -0.01em;
+  color: var(--yellow); margin-bottom: 0.3rem;
+}
+.hof-origin { font-size: 11px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem; }
+.hof-desc { font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 1rem; }
+.heat-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.heat-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.25rem 0.6rem; border-radius: 3px;
+  background: rgba(255,107,0,0.15); color: var(--orange); border: 1px solid rgba(255,107,0,0.3);
+}
+.heat-badge.hot { background: rgba(232,0,26,0.15); color: var(--red); border-color: rgba(232,0,26,0.3); }
+.heat-badge.mild { background: rgba(255,214,0,0.15); color: var(--gold); border-color: rgba(200,134,10,0.3); }
+.hof-rating { font-size: 20px; margin-top: 0.5rem; }
+
+/* ═══════════════════════════════════════════
+   PAIRING GENERATOR
+═══════════════════════════════════════════ */
+.pairing-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.pairing-selects { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.pairing-select {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  padding: 0.75rem 1.2rem; border: 2px solid var(--border);
+  background: var(--bg); color: var(--text); border-radius: 6px;
+  cursor: pointer; transition: border-color 0.2s; flex: 1; min-width: 160px;
+}
+.pairing-select:focus { outline: none; border-color: var(--orange); }
+.pairing-result {
+  background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.3);
+  border-radius: 8px; padding: 1.5rem;
+  font-size: 16px; line-height: 1.7; color: var(--text);
+  min-height: 80px; display: none;
+}
+.pairing-result strong { color: var(--yellow); }
+.pairing-result.visible { display: block; }
+
+/* ═══════════════════════════════════════════
+   SPICE ROULETTE
+═══════════════════════════════════════════ */
+.roulette-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem; text-align: center;
+}
+.roulette-display {
+  font-size: clamp(36px, 7vw, 80px); font-weight: 900; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--yellow), var(--orange), var(--red));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  min-height: 1.2em; margin: 1rem 0; transition: all 0.1s;
+}
+.roulette-dare {
+  font-size: 16px; line-height: 1.7; color: var(--text); margin: 1rem 0 2rem;
+  min-height: 3em;
+}
+.roulette-dare em { color: var(--orange); font-style: normal; font-weight: 700; }
+
+/* ═══════════════════════════════════════════
+   HOT TAKE GENERATOR
+═══════════════════════════════════════════ */
+.hottake-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem; text-align: center;
+}
+.hottake-text {
+  font-size: clamp(18px, 3vw, 28px); font-weight: 800; line-height: 1.5;
+  letter-spacing: -0.01em; color: var(--text);
+  margin: 1.5rem 0; min-height: 3em;
+}
+.hottake-text .highlight { color: var(--orange); }
+
+/* ═══════════════════════════════════════════
+   CHEESE HAIKU
+═══════════════════════════════════════════ */
+.haiku-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem; text-align: center;
+}
+.haiku-text {
+  font-size: clamp(16px, 2.5vw, 24px); font-weight: 300; font-style: italic;
+  line-height: 2.2; color: var(--text); margin: 1.5rem 0;
+  min-height: 6em; letter-spacing: 0.03em;
+}
+.haiku-text .line { display: block; }
+.haiku-text .line.orange { color: var(--orange); font-weight: 600; font-style: normal; }
+
+/* ═══════════════════════════════════════════
+   CHEESE AGING TRACKER
+═══════════════════════════════════════════ */
+.aging-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.aging-input-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.aging-input {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  padding: 0.75rem 1.2rem; border: 2px solid var(--border);
+  background: var(--bg); color: var(--text); border-radius: 6px;
+  flex: 1; transition: border-color 0.2s;
+}
+.aging-input:focus { outline: none; border-color: var(--orange); }
+.aging-result {
+  background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.3);
+  border-radius: 8px; padding: 1.5rem;
+  font-size: 15px; line-height: 1.8; color: var(--text);
+  display: none;
+}
+.aging-result.visible { display: block; }
+.aging-result strong { color: var(--yellow); }
+
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+.testimonials-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+}
+.testimonial-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.8rem; position: relative;
+  transition: all 0.25s;
+}
+.testimonial-card:hover { border-color: var(--orange); transform: translateY(-3px); }
+.testimonial-quote {
+  font-size: 48px; color: var(--orange); opacity: 0.3;
+  font-weight: 900; line-height: 1; margin-bottom: -0.5rem;
+}
+.testimonial-text { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 1.2rem; font-style: italic; }
+.testimonial-author { font-size: 13px; font-weight: 700; color: var(--yellow); }
+.testimonial-title { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+.stars { color: var(--orange); font-size: 14px; margin-bottom: 0.8rem; }
+
+/* ═══════════════════════════════════════════
+   CHEESE MAP
+═══════════════════════════════════════════ */
+.map-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.map-svg-container {
+  position: relative; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); background: rgba(0,0,0,0.2);
+}
+.map-svg { width: 100%; height: auto; display: block; }
+.map-pin {
+  cursor: pointer; transition: all 0.2s;
+}
+.map-pin:hover circle { r: 8; }
+.map-pin circle { fill: var(--orange); stroke: var(--yellow); stroke-width: 2; r: 6; transition: r 0.2s; }
+.map-pin text { fill: white; font-size: 8px; font-weight: 700; font-family: 'Inter', sans-serif; pointer-events: none; }
+.map-tooltip {
+  background: var(--dark); border: 1px solid var(--orange);
+  border-radius: 6px; padding: 0.8rem 1rem;
+  font-size: 13px; color: var(--cream); line-height: 1.5;
+  margin-top: 1rem; display: none;
+}
+.map-tooltip.visible { display: block; }
+.map-tooltip strong { color: var(--yellow); font-size: 15px; display: block; margin-bottom: 0.3rem; }
+
+/* ═══════════════════════════════════════════
+   CHEESE OF THE DAY
+═══════════════════════════════════════════ */
+.cotd-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+  display: flex; gap: 2rem; flex-wrap: wrap; align-items: center;
+}
+.cotd-emoji { font-size: 80px; flex-shrink: 0; }
+.cotd-content { flex: 1; min-width: 220px; }
+.cotd-name {
+  font-size: clamp(22px, 4vw, 36px); font-weight: 900; letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--yellow), var(--orange));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 0.5rem;
+}
+.cotd-origin { font-size: 11px; font-weight: 700; letter-spacing: 0.35em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem; }
+.cotd-desc { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 1rem; }
+.cotd-pairing { font-size: 13px; color: var(--orange); font-weight: 600; }
+
+/* ═══════════════════════════════════════════
+   SHOPPING LIST
+═══════════════════════════════════════════ */
+.shopping-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem;
+}
+.shop-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.7rem 0; border-bottom: 1px solid var(--border);
+  font-size: 15px; color: var(--text); cursor: pointer;
+  transition: opacity 0.2s;
+}
+.shop-item.checked { opacity: 0.4; text-decoration: line-through; }
+.shop-cb {
+  width: 22px; height: 22px; border-radius: 4px;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; background: transparent;
+}
+.shop-item.checked .shop-cb { background: var(--orange); border-color: var(--orange); color: white; font-size: 14px; }
+.shop-actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.shop-count { font-size: 13px; color: var(--text-muted); margin-top: 1rem; }
+
+/* ═══════════════════════════════════════════
+   RECIPE
+═══════════════════════════════════════════ */
+.recipe-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+@media (max-width: 640px) { .recipe-wrap { grid-template-columns: 1fr; } }
+.recipe-col-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem;
+}
+.ingredient-list { list-style: none; }
+.ingredient-list li {
+  font-size: 15px; font-weight: 400; color: var(--text);
+  padding: 0.55rem 0; border-bottom: 1px solid var(--border);
+  display: flex; align-items: baseline; gap: 0.6rem; line-height: 1.5;
+}
+.ingredient-list li::before { content: '—'; color: var(--orange); font-weight: 700; flex-shrink: 0; }
+.step-list { list-style: none; counter-reset: steps; }
+.step-list li {
+  font-size: 15px; font-weight: 400; color: var(--text);
+  padding: 0.9rem 0 0.9rem 3rem;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.65; position: relative; counter-increment: steps;
+}
+.step-list li::before {
+  content: counter(steps);
+  position: absolute; left: 0; top: 0.85rem;
+  width: 26px; height: 26px;
+  background: var(--orange); color: #1A0A00;
+  border-radius: 50%; font-size: 12px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  text-align: center; padding: 3rem 2rem;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ═══════════════════════════════════════════
+   AI LOADING SPINNER
+═══════════════════════════════════════════ */
+.ai-loading {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid rgba(255,107,0,0.3); border-top-color: var(--orange);
+  border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
+<!-- THEME TOGGLE -->
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeBtn">🌙</button>
+
+<!-- EMOJI RAIN CONTAINER -->
+<div id="emoji-rain"></div>
+
+<!-- ═══ HERO ═══ -->
 <div class="hero">
   <div class="flame-bg"></div>
+
+  <!-- Melting cheese drip SVG -->
+  <div class="drip-bar">
+    <svg class="drip-svg" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,0 L1440,0 L1440,20
+        Q1400,20 1390,45 Q1380,70 1370,20
+        Q1340,20 1330,55 Q1320,78 1310,20
+        Q1270,20 1260,60 Q1250,80 1240,20
+        Q1200,20 1190,50 Q1180,72 1170,20
+        Q1120,20 1110,65 Q1100,80 1090,20
+        Q1050,20 1040,48 Q1030,70 1020,20
+        Q980,20 970,58 Q960,80 950,20
+        Q910,20 900,45 Q890,68 880,20
+        Q830,20 820,62 Q810,80 800,20
+        Q760,20 750,52 Q740,75 730,20
+        Q690,20 680,44 Q670,65 660,20
+        Q620,20 610,60 Q600,80 590,20
+        Q550,20 540,50 Q530,72 520,20
+        Q470,20 460,65 Q450,80 440,20
+        Q400,20 390,48 Q380,70 370,20
+        Q330,20 320,58 Q310,80 300,20
+        Q260,20 250,45 Q240,68 230,20
+        Q180,20 170,62 Q160,80 150,20
+        Q110,20 100,52 Q90,75 80,20
+        Q40,20 30,44 Q20,65 10,20
+        L0,20 Z"
+        fill="#FFD600" opacity="0.85"/>
+      <path d="M0,0 L1440,0 L1440,14
+        Q1410,14 1405,35 Q1398,55 1392,14
+        Q1360,14 1355,42 Q1348,62 1342,14
+        Q1305,14 1300,48 Q1293,70 1287,14
+        Q1250,14 1245,38 Q1238,58 1232,14
+        Q1190,14 1185,50 Q1178,72 1172,14
+        Q1135,14 1130,40 Q1123,60 1117,14
+        Q1075,14 1070,45 Q1063,68 1057,14
+        Q1015,14 1010,36 Q1003,55 997,14
+        Q955,14 950,48 Q943,70 937,14
+        Q895,14 890,40 Q883,60 877,14
+        Q835,14 830,50 Q823,72 817,14
+        Q775,14 770,38 Q763,58 757,14
+        Q715,14 710,45 Q703,68 697,14
+        Q655,14 650,36 Q643,55 637,14
+        Q595,14 590,48 Q583,70 577,14
+        Q535,14 530,40 Q523,60 517,14
+        Q475,14 470,50 Q463,72 457,14
+        Q415,14 410,38 Q403,58 397,14
+        Q355,14 350,45 Q343,68 337,14
+        Q295,14 290,36 Q283,55 277,14
+        Q235,14 230,48 Q223,70 217,14
+        Q175,14 170,40 Q163,60 157,14
+        Q115,14 110,50 Q103,72 97,14
+        Q55,14 50,38 Q43,58 37,14
+        L0,14 Z"
+        fill="#FF9500" opacity="0.6"/>
+    </svg>
+  </div>
+
   <p class="hero-eyebrow">🔥 Warning: Extremely Dairy 🔥</p>
   <h1 class="hero-title">SPICY<br>CHEEEEEEEEEEEESE</h1>
   <p class="hero-sub">The holiest of holy dairy experiences</p>
+
   <div class="hero-buttons">
-    <button class="btn btn-audio" id="audioBtn" onclick="toggleAudio()">
-      <span>▶</span> Play the Anthem
-    </button>
-    <button class="btn btn-image" onclick="openModal()">
-      <span>🧀</span> Behold the CHEEEEEEEEEEEESE
-    </button>
+    <button class="btn btn-orange" id="audioBtn" onclick="toggleAudio()">▶ Play the Anthem</button>
+    <button class="btn btn-outline" onclick="openModal()">🧀 Behold the CHEEEEEEEEEEEESE</button>
+    <button class="btn btn-ghost" onclick="toggleRain()" id="rainBtn">🧀 Emoji Rain</button>
   </div>
+
+  <!-- Countdown -->
+  <div class="countdown-bar">
+    <div class="cd-unit"><div class="cd-num" id="cd-y">0</div><div class="cd-label">Years</div></div>
+    <div class="cd-unit"><div class="cd-num" id="cd-d">0</div><div class="cd-label">Days</div></div>
+    <div class="cd-unit"><div class="cd-num" id="cd-h">0</div><div class="cd-label">Hours</div></div>
+    <div class="cd-unit"><div class="cd-num" id="cd-m">0</div><div class="cd-label">Minutes</div></div>
+    <div class="cd-unit"><div class="cd-num" id="cd-s">0</div><div class="cd-label">Seconds</div></div>
+  </div>
+  <p style="font-size:11px;letter-spacing:0.4em;text-transform:uppercase;color:var(--text-muted);margin-top:0.8rem;opacity:0;animation:fadeUp 0.8s 1.2s forwards">Time since humanity discovered spicy CHEEEEEEEEEEEESE (est. 7000 BCE)</p>
 </div>
 
 <!-- IMAGE MODAL -->
@@ -230,76 +726,246 @@
 
 <audio id="cheeseAudio" src="SpicyCheese.mp3"></audio>
 
-<!-- FACTS -->
-<div class="divider" style="padding-top:3rem">
-  <div class="divider-line"></div>
-  <span class="divider-icon">🧀</span>
-  <div class="divider-line"></div>
-</div>
-
-<section>
-  <p class="section-label">Did you know?</p>
-  <h2 class="section-title">CHEEEEEEEEEEEESE Facts</h2>
-  <div class="facts-grid">
-    <div class="fact-card">
-      <div class="fact-num">01</div>
-      <p class="fact-text">It takes roughly <strong>10 pounds of milk</strong> to make just 1 pound of CHEEEEEEEEEEEESE. That is a staggering amount of dairy devotion.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">02</div>
-      <p class="fact-text"><strong>Over 1,800 varieties</strong> of CHEEEEEEEEEEEESE exist worldwide. And yet, spicy CHEEEEEEEEEEEESE reigns supreme above them all.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">03</div>
-      <p class="fact-text">The word "CHEEEEEEEEEEEESE" comes from the Latin <em>caseus</em>. The Romans were dedicated CHEEEEEEEEEEEESE enthusiasts, and we deeply respect that.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">04</div>
-      <p class="fact-text">The oldest known CHEEEEEEEEEEEESE ever found was discovered in an <strong>Egyptian tomb</strong>, approximately 3,200 years old. Ancient and glorious.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">05</div>
-      <p class="fact-text">CHEEEEEEEEEEEESE is the <strong>most stolen food in the world</strong>, accounting for around 4% of all food theft globally. Completely understandable.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">06</div>
-      <p class="fact-text">Capsaicin — the compound that makes peppers hot — <strong>binds to fat molecules</strong> in CHEEEEEEEEEEEESE, making the heat linger longer and go deeper.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">07</div>
-      <p class="fact-text"><strong>Pepper Jack</strong> is perhaps the most iconic spicy CHEEEEEEEEEEEESE, blending Monterey Jack with jalapeños, habaneros, and fire into one legendary slab.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">08</div>
-      <p class="fact-text">CHEEEEEEEEEEEESE contains <strong>tryptophan</strong>, a chemical that triggers relaxation and happiness. Spicy CHEEEEEEEEEEEESE is therefore clinically blissful.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">09</div>
-      <p class="fact-text">The <strong>iconic stretchy pull</strong> of melted CHEEEEEEEEEEEESE is caused by long protein chains called caseins. Spicy melted CHEEEEEEEEEEEESE stretches both physically and spiritually.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">10</div>
-      <p class="fact-text">Wisconsin, USA produces over <strong>3 billion pounds</strong> of CHEEEEEEEEEEEESE per year. That is an inspiring and righteous number.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">11</div>
-      <p class="fact-text">Spicy Mexican varieties like <strong>Cotija con chile</strong> and <strong>Oaxacan CHEEEEEEEEEEEESE</strong> have been crafted for centuries, combining fiery chili with creamy dairy perfection.</p>
-    </div>
-    <div class="fact-card">
-      <div class="fact-num">12</div>
-      <p class="fact-text">CHEEEEEEEEEEEESE rind is <strong>completely edible</strong> on most varieties. On spicy ones especially, the rind carries concentrated heat and flavour. Always eat the rind.</p>
-    </div>
+<!-- ═══ CHEESE-O-METER ═══ -->
+<div class="divider" style="padding-top:3rem"><div class="divider-line"></div><span class="divider-icon">🌡️</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">How Hot Are You?</p>
+  <h2 class="section-title">Cheese-O-Meter</h2>
+  <div class="meter-wrap">
+    <input type="range" class="spice-slider" id="spiceSlider" min="0" max="100" value="0" oninput="updateMeter(this.value)">
+    <div class="meter-label" id="meterLabel">Drag to set your spice level...</div>
+    <div class="spice-flames" id="spiceFlames"></div>
   </div>
-</section>
-
-<div class="divider">
-  <div class="divider-line"></div>
-  <span class="divider-icon">🌶️</span>
-  <div class="divider-line"></div>
 </div>
 
-<!-- RECIPE -->
-<section>
+<!-- ═══ CHEESE OF THE DAY ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">📅</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Daily Devotion</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE of the Day</h2>
+  <div class="cotd-wrap" id="cotdWrap"></div>
+</div>
+
+<!-- ═══ RANDOM FACT ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">💡</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Enlighten Me</p>
+  <h2 class="section-title">Random CHEEEEEEEEEEEESE Fact</h2>
+  <div class="fact-spotlight">
+    <div class="fact-spotlight-num" id="randFactNum">?</div>
+    <div class="fact-spotlight-text" id="randFactText">Press the button to receive sacred CHEEEEEEEEEEEESE wisdom.</div>
+    <button class="btn btn-orange" onclick="showRandomFact()">🎲 Give Me a Fact</button>
+  </div>
+</div>
+
+<!-- ═══ ALL FACTS ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🧀</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Did You Know?</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE Facts</h2>
+  <div class="facts-grid" id="factsGrid"></div>
+</div>
+
+<!-- ═══ HALL OF FAME ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🏆</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">The Greats</p>
+  <h2 class="section-title">Hall of Fame</h2>
+  <div class="hof-grid" id="hofGrid"></div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🎯</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Soul Test</p>
+  <h2 class="section-title">Which Spicy CHEEEEEEEEEEEESE Are You?</h2>
+  <div class="quiz-wrap" id="quizWrap">
+    <div id="quizInner"></div>
+  </div>
+</div>
+
+<!-- ═══ SPICE ROULETTE ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🎰</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Dare You?</p>
+  <h2 class="section-title">Spice Roulette</h2>
+  <div class="roulette-wrap">
+    <div class="roulette-display" id="rouletteDisplay">???</div>
+    <div class="roulette-dare" id="rouletteDare">Spin to receive your cheesy fate.</div>
+    <button class="btn btn-orange" onclick="spinRoulette()">🎰 SPIN THE WHEEL</button>
+  </div>
+</div>
+
+<!-- ═══ PAIRING GENERATOR ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🍷</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Perfect Match</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE Pairing Generator</h2>
+  <div class="pairing-wrap">
+    <div class="pairing-selects">
+      <select class="pairing-select" id="pairDrink">
+        <option value="">Choose a drink...</option>
+        <option>Red Wine</option>
+        <option>White Wine</option>
+        <option>Beer (IPA)</option>
+        <option>Beer (Stout)</option>
+        <option>Whiskey</option>
+        <option>Tequila</option>
+        <option>Coffee</option>
+        <option>Hot Chocolate</option>
+        <option>Sparkling Water</option>
+      </select>
+      <select class="pairing-select" id="pairSnack">
+        <option value="">Choose a snack...</option>
+        <option>Crackers</option>
+        <option>Pretzels</option>
+        <option>Grapes</option>
+        <option>Cured Meats</option>
+        <option>Dark Chocolate</option>
+        <option>Honey</option>
+        <option>Jalapeños</option>
+        <option>Olives</option>
+      </select>
+    </div>
+    <button class="btn btn-orange" onclick="generatePairing()">🧀 Find My Perfect CHEEEEEEEEEEEESE</button>
+    <div class="pairing-result" id="pairingResult"></div>
+  </div>
+</div>
+
+<!-- ═══ CHEESE MAP ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🗺️</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Origins</p>
+  <h2 class="section-title">Spicy CHEEEEEEEEEEEESE World Map</h2>
+  <div class="map-wrap">
+    <div class="map-svg-container">
+      <!-- Simplified world map with spicy cheese pins -->
+      <svg class="map-svg" viewBox="0 0 900 450" xmlns="http://www.w3.org/2000/svg">
+        <rect width="900" height="450" fill="#0d1f2d"/>
+        <!-- Simplified continent shapes -->
+        <!-- North America -->
+        <path d="M80,80 L200,70 L240,100 L260,140 L250,200 L220,220 L200,240 L180,260 L160,260 L140,240 L120,200 L100,160 L80,120 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- South America -->
+        <path d="M180,270 L230,260 L260,280 L270,320 L260,370 L240,400 L210,410 L190,390 L175,350 L170,310 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Europe -->
+        <path d="M390,60 L450,55 L480,70 L490,90 L470,110 L450,120 L420,115 L400,100 L385,80 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Africa -->
+        <path d="M400,130 L460,120 L490,140 L500,180 L495,230 L480,270 L460,300 L430,310 L405,290 L390,250 L385,200 L390,160 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Asia -->
+        <path d="M490,50 L650,45 L720,60 L750,90 L730,130 L700,150 L650,155 L600,145 L560,130 L520,110 L490,90 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Middle East -->
+        <path d="M490,140 L560,135 L580,160 L570,200 L540,210 L510,200 L490,175 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- India -->
+        <path d="M580,160 L620,155 L635,180 L625,220 L605,240 L585,225 L575,195 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Southeast Asia -->
+        <path d="M680,150 L730,145 L750,170 L740,200 L715,205 L695,190 L680,170 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+        <!-- Australia -->
+        <path d="M700,270 L790,265 L820,285 L820,330 L800,355 L760,360 L720,340 L700,310 Z" fill="#1a3040" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+
+        <!-- Grid lines -->
+        <line x1="0" y1="225" x2="900" y2="225" stroke="rgba(255,107,0,0.08)" stroke-width="1"/>
+        <line x1="450" y1="0" x2="450" y2="450" stroke="rgba(255,107,0,0.08)" stroke-width="1"/>
+
+        <!-- CHEESE PINS — each calls showMapTooltip(id) -->
+        <!-- Mexico -->
+        <g class="map-pin" onclick="showMapTooltip('mx')">
+          <circle cx="155" cy="175" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="155" y="163" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- USA (Wisconsin) -->
+        <g class="map-pin" onclick="showMapTooltip('us')">
+          <circle cx="160" cy="130" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="160" y="118" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- Italy -->
+        <g class="map-pin" onclick="showMapTooltip('it')">
+          <circle cx="440" cy="90" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="440" y="78" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- Spain -->
+        <g class="map-pin" onclick="showMapTooltip('es')">
+          <circle cx="405" cy="82" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="405" y="70" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- Morocco/N. Africa -->
+        <g class="map-pin" onclick="showMapTooltip('ma')">
+          <circle cx="408" cy="140" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="408" y="128" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- India -->
+        <g class="map-pin" onclick="showMapTooltip('in')">
+          <circle cx="600" cy="185" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="600" y="173" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- Korea -->
+        <g class="map-pin" onclick="showMapTooltip('kr')">
+          <circle cx="705" cy="105" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="705" y="93" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+        <!-- Ethiopia -->
+        <g class="map-pin" onclick="showMapTooltip('et')">
+          <circle cx="465" cy="205" r="6" fill="#FF6B00" stroke="#FFD600" stroke-width="2"/>
+          <text x="465" y="193" text-anchor="middle" fill="white" font-size="9" font-weight="700">🧀</text>
+        </g>
+      </svg>
+    </div>
+    <div class="map-tooltip" id="mapTooltip"></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:1rem;">Click a 🧀 pin to learn about that region's spicy CHEEEEEEEEEEEESE tradition.</p>
+  </div>
+</div>
+
+<!-- ═══ HOT TAKE GENERATOR ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🔥</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Controversial Opinions</p>
+  <h2 class="section-title">Hot Take Generator</h2>
+  <div class="hottake-wrap">
+    <div class="hottake-text" id="hottakeText">Press the button to unleash an unhinged spicy CHEEEEEEEEEEEESE opinion.</div>
+    <button class="btn btn-orange" id="hottakeBtn" onclick="generateHotTake()">🔥 Generate Hot Take</button>
+  </div>
+</div>
+
+<!-- ═══ CHEESE HAIKU ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🎋</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Poetry Corner</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE Haiku Generator</h2>
+  <div class="haiku-wrap">
+    <div class="haiku-text" id="haikuText">
+      <span class="line">Await the wisdom</span>
+      <span class="line orange">Press the sacred button below</span>
+      <span class="line">CHEEEEEEEEEEEESE shall speak</span>
+    </div>
+    <button class="btn btn-outline" id="haikuBtn" onclick="generateHaiku()">🎋 Generate Haiku</button>
+  </div>
+</div>
+
+<!-- ═══ AGING TRACKER ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">⏳</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Time Machine</p>
+  <h2 class="section-title">CHEEEEEEEEEEEESE Aging Tracker</h2>
+  <div class="aging-wrap">
+    <p style="font-size:15px;color:var(--text);margin-bottom:1.5rem;line-height:1.7;">Enter any date and discover what legendary CHEEEEEEEEEEEESE was being aged or crafted at that moment in history.</p>
+    <div class="aging-input-row">
+      <input type="date" class="aging-input" id="agingDate" value="1969-07-20">
+      <button class="btn btn-orange" onclick="lookupAging()">🧀 What Was Aging?</button>
+    </div>
+    <div class="aging-result" id="agingResult"></div>
+  </div>
+</div>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">⭐</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">True Believers</p>
+  <h2 class="section-title">Testimonials</h2>
+  <div class="testimonials-grid" id="testimonialsGrid"></div>
+</div>
+
+<!-- ═══ RECIPE ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🌶️</span><div class="divider-line"></div></div>
+<div class="page-section">
   <p class="section-label">Chef's Special</p>
   <h2 class="section-title">Spicy CHEEEEEEEEEEEESE Omelette</h2>
   <div class="recipe-wrap">
@@ -327,119 +993,592 @@
         <li>Heat a non-stick pan over medium heat. Add butter and let it foam, tilting the pan to coat evenly. Once the foam subsides, you are ready.</li>
         <li>Pour in the egg mixture. Let it sit undisturbed for 20 seconds, then use a spatula to gently push cooked egg toward the centre, letting raw egg flow to the edges.</li>
         <li>When the egg is just barely set but still glossy on top, scatter both CHEEEEEEEEEEEEESEs and jalapeño slices over one half.</li>
-        <li>Fold the omelette over the CHEEEEEEEEEEEESE side and slide onto a warm plate. The residual heat will finish melting everything into molten, spicy perfection.</li>
-        <li>Finish with red chili flakes, fresh chives or cilantro, and a fearless pour of your favourite hot sauce. Serve immediately and devour with reverence.</li>
+        <li>Fold the omelette over the CHEEEEEEEEEEEESE side and slide onto a warm plate. The residual heat finishes melting everything into molten, spicy perfection.</li>
+        <li>Finish with red chili flakes, fresh chives, and a fearless pour of hot sauce. Devour with reverence.</li>
       </ol>
     </div>
   </div>
-</section>
+</div>
+
+<!-- ═══ SHOPPING LIST ═══ -->
+<div class="divider"><div class="divider-line"></div><span class="divider-icon">🛒</span><div class="divider-line"></div></div>
+<div class="page-section">
+  <p class="section-label">Get Shopping</p>
+  <h2 class="section-title">Shopping List Builder</h2>
+  <div class="shopping-wrap">
+    <div id="shopList"></div>
+    <div class="shop-count" id="shopCount"></div>
+    <div class="shop-actions">
+      <button class="btn btn-orange btn-sm" onclick="printShopList()">🖨️ Print List</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetShopList()">↺ Reset</button>
+    </div>
+  </div>
+</div>
 
 <footer>
   🧀 In CHEEEEEEEEEEEESE We Trust 🧀 &nbsp;·&nbsp; All hail the spicy dairy gods
 </footer>
 
 <script>
-  // AUDIO
-  const audio    = document.getElementById('cheeseAudio');
-  const audioBtn = document.getElementById('audioBtn');
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const FACTS = [
+  { n:'01', t:'It takes roughly <strong>10 pounds of milk</strong> to make just 1 pound of CHEEEEEEEEEEEESE. That is a staggering amount of dairy devotion.' },
+  { n:'02', t:'<strong>Over 1,800 varieties</strong> of CHEEEEEEEEEEEESE exist worldwide. And yet, spicy CHEEEEEEEEEEEESE reigns supreme above them all.' },
+  { n:'03', t:'The word "CHEEEEEEEEEEEESE" comes from the Latin <em>caseus</em>. The Romans were dedicated CHEEEEEEEEEEEESE enthusiasts, and we deeply respect that.' },
+  { n:'04', t:'The oldest known CHEEEEEEEEEEEESE ever found was discovered in an <strong>Egyptian tomb</strong>, approximately 3,200 years old. Ancient and glorious.' },
+  { n:'05', t:'CHEEEEEEEEEEEESE is the <strong>most stolen food in the world</strong>, accounting for around 4% of all food theft globally. Completely understandable.' },
+  { n:'06', t:'Capsaicin — the compound that makes peppers hot — <strong>binds to fat molecules</strong> in CHEEEEEEEEEEEESE, making the heat linger longer and go deeper.' },
+  { n:'07', t:'<strong>Pepper Jack</strong> is perhaps the most iconic spicy CHEEEEEEEEEEEESE, blending Monterey Jack with jalapeños, habaneros, and fire into one legendary slab.' },
+  { n:'08', t:'CHEEEEEEEEEEEESE contains <strong>tryptophan</strong>, a chemical that triggers relaxation and happiness. Spicy CHEEEEEEEEEEEESE is therefore clinically blissful.' },
+  { n:'09', t:'The <strong>iconic stretchy pull</strong> of melted CHEEEEEEEEEEEESE is caused by long protein chains called caseins. Spicy melted CHEEEEEEEEEEEESE stretches both physically and spiritually.' },
+  { n:'10', t:'Wisconsin, USA produces over <strong>3 billion pounds</strong> of CHEEEEEEEEEEEESE per year. That is an inspiring and righteous number.' },
+  { n:'11', t:'Spicy Mexican varieties like <strong>Cotija con chile</strong> and <strong>Oaxacan CHEEEEEEEEEEEESE</strong> have been crafted for centuries, combining fiery chili with creamy dairy perfection.' },
+  { n:'12', t:'CHEEEEEEEEEEEESE rind is <strong>completely edible</strong> on most varieties. On spicy ones especially, the rind carries concentrated heat and flavour. Always eat the rind.' },
+];
 
-  function toggleAudio() {
-    if (audio.paused) {
-      audio.play();
-      audioBtn.classList.add('playing');
-      audioBtn.innerHTML = '<span>■</span> Stop the Anthem';
-    } else {
-      audio.pause();
-      audio.currentTime = 0;
-      audioBtn.classList.remove('playing');
-      audioBtn.innerHTML = '<span>▶</span> Play the Anthem';
+const HOF = [
+  { name:'Pepper Jack', origin:'United States', emoji:'🧀', heat:'Medium', desc:'The quintessential American spicy CHEEEEEEEEEEEESE. Creamy Monterey Jack studded with jalapeños and habaneros. A crowd-destroying, personality-defining choice.', rating:'🔥🔥🔥🔥', tags:['Medium Heat','Melts Beautifully','All-Purpose'] },
+  { name:'Cotija con Chile', origin:'Mexico', emoji:'🌶️', heat:'Mild-Medium', desc:'A crumbly, salty Mexican CHEEEEEEEEEEEESE blended with ancho or chipotle chilis. Earthy, smoky, and dangerously good on everything.', rating:'🔥🔥🔥', tags:['Mild-Medium','Crumbly','Smoky'] },
+  { name:"Époisses Pimenté", origin:'France', emoji:'🇫🇷', heat:'Mild', desc:'A washed-rind French CHEEEEEEEEEEEESE infused with black pepper and spices. Pungent, runny, and absolutely unhinged. You will need a spoon.', rating:'🔥🔥', tags:['Mild Heat','Runny','Pungent'] },
+  { name:'Ghost Pepper Cheddar', origin:'England / USA', emoji:'👻', heat:'Extreme', desc:'Aged cheddar loaded with ghost pepper extract. One of the most dangerous CHEEEEEEEEEEEEESEs in existence. Proceed only if you have made peace with your body.', rating:'🔥🔥🔥🔥🔥', tags:['Extreme Heat','Aged','Not For Cowards'] },
+  { name:'Queso Oaxaca con Jalapeño', origin:'Mexico', emoji:'🎊', heat:'Medium', desc:'Stringy, stretchy, glorious Oaxacan CHEEEEEEEEEEEESE laced with fresh jalapeño. The ultimate quesadilla CHEEEEEEEEEEEESE. Life-changing in a tortilla.', rating:'🔥🔥🔥', tags:['Medium','Stringy','Melt King'] },
+  { name:"Brie au Poivre", origin:'France', emoji:'🥐', heat:'Mild', desc:'Creamy brie covered in a crust of black pepper and dried herbs. Elegant and spicy in a very refined, French, "I am better than you" sort of way.', rating:'🔥🔥', tags:['Mild','Creamy','Sophisticated'] },
+];
+
+const CHEESES_OF_DAY = [
+  { name:'Pepper Jack', origin:'United States', emoji:'🧀', desc:'America\'s spicy sweetheart. Creamy, stretchy, and laced with jalapeño fire. Perfect for every single meal without exception.', pairing:'Pairs with: cold beer, pulled pork, regret-free snacking' },
+  { name:'Ghost Pepper Cheddar', origin:'England', emoji:'👻', desc:'Aged cheddar meets the world\'s most notorious pepper. Sharp, crumbly, and absolutely unapologetic about its life choices.', pairing:'Pairs with: milk (a lot of it), brave crackers, last words' },
+  { name:'Cotija con Chile', origin:'Mexico', emoji:'🌶️', desc:'Crumbly and salty with deep ancho chili richness. Sprinkle it on literally everything you own.', pairing:'Pairs with: corn, tacos, elote, your entire personality' },
+  { name:'Époisses Pimenté', origin:'France', emoji:'🇫🇷', desc:'Washed-rind, runny, pungent, and gently spiced. France\'s contribution to the spicy CHEEEEEEEEEEEESE pantheon.', pairing:'Pairs with: crusty baguette, burgundy wine, a strong will' },
+  { name:'Queso con Habanero', origin:'Mexico', emoji:'🔥', desc:'Melty Chihuahua cheese loaded with habanero. Warning: you will pour this on things you never expected to pour anything on.', pairing:'Pairs with: nachos, enchiladas, uncontrollable joy' },
+  { name:'Brie au Poivre', origin:'France', emoji:'🥐', desc:'Velvet-soft brie in a cracked black pepper crust. Spice with elegance. Elegance with CHEEEEEEEEEEEESE.', pairing:'Pairs with: champagne, fig jam, feeling fancy' },
+  { name:'Manchego Picante', origin:'Spain', emoji:'🇪🇸', desc:'Aged Spanish sheep\'s CHEEEEEEEEEEEESE with pimentón. Nutty, firm, with a warming kick that builds slowly and magnificently.', pairing:'Pairs with: Spanish ham, Rioja wine, flamenco music' },
+];
+
+const TESTIMONIALS = [
+  { quote: 'I put spicy CHEEEEEEEEEEEESE on my cereal and my life has never been more complete. Five stars, would recommend to everyone including enemies.', author: 'Gary Fromageworth', title: 'Professional Cheese Appreciator', stars: 5 },
+  { quote: 'The ghost pepper cheddar made me cry. Good tears. Dairy tears. Tears of enlightenment. I have not been the same since and that is a good thing.', author: 'Dr. Melinda Curdsworth', title: 'Cheese Scientist, Unaccredited', stars: 5 },
+  { quote: 'I lost three friends to Pepper Jack. They became better people. Cheeseheads. I am proud of what we became together.', author: 'Reginald Brie-Patterson', title: 'Former Accountant, Current Cheese Monk', stars: 5 },
+  { quote: 'A wheel of spicy Cotija fell on my foot. It was the best day of my life. 10/10, no notes.', author: 'Francesca Moltenino', title: 'Cheese Incident Survivor', stars: 5 },
+  { quote: 'I served ghost pepper cheddar at my wedding. No one left. We are still there. The CHEEEEEEEEEEEESE has us.', author: 'Brad & Linda Fromage', title: 'Married Cheese Devotees', stars: 5 },
+  { quote: 'My therapist said I talk about spicy CHEEEEEEEEEEEESE too much. I fired my therapist. CHEEEEEEEEEEEESE cannot be a problem. It is the solution.', author: 'Anonymous', title: 'Cheese Liberation Advocate', stars: 5 },
+];
+
+const ROULETTE_CHEESES = [
+  'Pepper Jack', 'Ghost Pepper Cheddar', 'Habanero Gouda', 'Cotija con Chile',
+  'Sriracha Havarti', 'Jalapeño Cream Cheese', 'Red Chili Manchego', 'Fiery Brie',
+  'Carolina Reaper Cheddar', 'Chipotle Smoked Gouda'
+];
+const ROULETTE_DARES = [
+  c => `Eat <em>${c}</em> plain, no crackers, no water, standing in your kitchen alone contemplating your choices.`,
+  c => `Melt <em>${c}</em> on toast and eat it before it cools. Race the cheese. Win or lose with dignity.`,
+  c => `Call someone you love and describe the taste of <em>${c}</em> to them for at least 60 seconds.`,
+  c => `Eat <em>${c}</em> with hot sauce. All the hot sauce you own. Every bottle. This is the way.`,
+  c => `Make a grilled cheese using only <em>${c}</em> and evaluate your life as it melts.`,
+  c => `Eat <em>${c}</em> while maintaining unbroken eye contact with your own reflection.`,
+];
+
+const HOT_TAKES = [
+  'Mild cheese is not cheese. It is a concept. An idea. A lie told to children.',
+  'Spicy CHEEEEEEEEEEEESE on ice cream is not weird. The rest of the world is simply not ready.',
+  'Ghost pepper cheddar is a love language and I will die on this hill, crying dairy tears.',
+  'If you have never sweated from eating CHEEEEEEEEEEEESE, you have never truly lived.',
+  'Pepper Jack is objectively the greatest food humanity has ever produced. All other foods are footnotes.',
+  'CHEEEEEEEEEEEESE should be its own food group. It should be five food groups. It should be all the groups.',
+  'A world without spicy CHEEEEEEEEEEEESE is not a world I am interested in inhabiting.',
+  'You don\'t eat spicy CHEEEEEEEEEEEESE. Spicy CHEEEEEEEEEEEESE eats you, from the inside, with love.',
+  'The melting point of CHEEEEEEEEEEEESE is the only temperature that matters in physics.',
+  'Every sandwich without spicy CHEEEEEEEEEEEESE is just bread having an existential crisis.',
+  'Habanero Gouda is proof that the universe wants us to be happy and also slightly in pain.',
+  'Crackers are just vehicles for CHEEEEEEEEEEEESE. The cracker is not the point. The CHEEEEEEEEEEEESE is always the point.',
+];
+
+const HAIKUS = [
+  ['Molten pepper jack', 'Cascades down in orange fire', 'Cheese finds its true form'],
+  ['Ghost pepper cheddar', 'One bite and the world goes white', 'This was always fate'],
+  ['The jalapeño', 'Weeps tears of joy inside me', 'We are one, us two'],
+  ['Aged and fierce and proud', 'The cheddar waits on the board', 'Touch it and transcend'],
+  ['Sharp heat fills my mouth', 'Ten thousand Scoville suns bloom', 'I bought two more wheels'],
+  ['You said it was mild', 'You said it would not be hot', 'You said. You were wrong.'],
+  ['Pepper Jack at dawn', 'Melting slow on sourdough', 'This is the best life'],
+  ['Every cheese is good', 'But spicy CHEEEEEEEEEEEESE is divine', 'I have no regrets'],
+];
+
+const AGING_DATA = [
+  { year: 1969, text: 'While Neil Armstrong was walking on the moon on <strong>July 20, 1969</strong>, wheels of <strong>Manchego Picante</strong> were quietly aging in caves in La Mancha, Spain — absorbing decades of spice and developing the nutty heat that would later make grown adults weep with gratitude.' },
+  { year: 1945, text: 'In <strong>1945</strong>, as WWII ended and the world exhaled, Spanish cheesemakers in the Basque region were pressing their first wheels of <strong>Idiazabal</strong>, the smoked sheep\'s cheese that would one day be rubbed with peppers and become a national treasure.' },
+  { year: 2000, text: 'At the turn of the millennium in <strong>2000</strong>, artisan creameries in Wisconsin were experimenting with the first mass-market <strong>Ghost Pepper Cheddar</strong> — an event that would permanently alter the course of American snacking.' },
+  { year: 1066, text: 'In <strong>1066</strong>, while William the Conqueror was invading England, Norman cheesemakers were aging their first <strong>Époisses</strong> — a ripe, pungent, eventually-pimenté cheese that would one day be called "the king of cheeses" by Napoleon himself.' },
+  { year: 1776, text: 'In <strong>1776</strong>, as the American founders signed the Declaration of Independence, Mexican cheesemakers in Oaxaca were perfecting the stringy, jalapeño-laced <strong>Queso Oaxaca</strong> that would one day define an entire cuisine.' },
+  { year: 1400, text: 'In <strong>1400</strong>, during the Ming Dynasty in China, trade routes were carrying dried chili peppers westward — the very chilies that would eventually be pressed into the first spicy European CHEEEEEEEEEEEEESEs centuries later.' },
+];
+
+const MAP_DATA = {
+  mx: { name: 'Cotija con Chile & Queso Oaxaca', region: 'Mexico', text: 'Mexico\'s spicy cheese traditions stretch back centuries. Oaxacan string cheese laced with jalapeño and crumbly Cotija dusted with ancho chili are national treasures of dairy excellence.' },
+  us: { name: 'Pepper Jack & Ghost Pepper Cheddar', region: 'Wisconsin & California, USA', text: 'America\'s contribution to spicy CHEEEEEEEEEEEESE is enormous. From the jalapeño-studded Pepper Jack of Monterey to the terrifying Ghost Pepper Cheddars of the midwest, the USA takes its spice seriously.' },
+  it: { name: 'Pecorino Pepato', region: 'Sicily, Italy', text: 'Pecorino Pepato is a firm sheep\'s cheese studded with whole black peppercorns. Aged and sharp, it is Sicily\'s ancient answer to the question: what if CHEEEEEEEEEEEESE had a bite?' },
+  es: { name: 'Manchego Picante & Idiazabal', region: 'Spain', text: 'Spain produces some of the finest aged spicy cheeses in Europe. Manchego rubbed with pimentón and smoky Idiazabal from the Basque Country are the pride of the Iberian Peninsula.' },
+  ma: { name: 'Jben with Harissa', region: 'Morocco & North Africa', text: 'North African fresh cheese (Jben) is traditionally served with harissa — a fiery chili paste — creating a spicy dairy combination that has been eaten for millennia across the Maghreb.' },
+  in: { name: 'Chili Paneer', region: 'India', text: 'Paneer — the fresh, unaged Indian cheese — is most famously consumed as Chili Paneer, cooked in an incendiary sauce of green chilies, garlic, and soy. A spicy cheese experience unlike any other.' },
+  kr: { name: 'Spicy Cheese Tteokbokki', region: 'South Korea', text: 'Korea has embraced CHEEEEEEEEEEEESE with passionate intensity. Melted cheese poured over fiery tteokbokki (rice cakes in gochujang sauce) is one of Seoul\'s most beloved street foods.' },
+  et: { name: 'Ayib with Berbere', region: 'Ethiopia', text: 'Ethiopian fresh cheese Ayib is frequently served alongside dishes spiced with Berbere — one of the world\'s great spice blends. The mild, crumbly cheese perfectly offsets the volcanic heat.' },
+};
+
+const PAIRINGS = {
+  'Red Wine+Crackers': { cheese: 'Aged Manchego Picante', why: 'The tannins in red wine cut through the fat while the heat of the Manchego amplifies the fruit. The crackers add texture to this extremely correct combination.' },
+  'Red Wine+Cured Meats': { cheese: 'Pecorino Pepato', why: 'Sicily in your mouth. The peppercorn-studded Pecorino with cured meats and red wine is the kind of combination that makes you want to buy a vineyard.' },
+  'Red Wine+Dark Chocolate': { cheese: 'Ghost Pepper Cheddar', why: 'Bold call. The bitterness of dark chocolate, the fruit of red wine, and the volcanic heat of Ghost Pepper Cheddar create a trinity that is either genius or madness. Possibly both.' },
+  'White Wine+Crackers': { cheese: 'Habanero Gouda', why: 'Crisp white wine soothes the habanero heat while the Gouda\'s butteriness marries beautifully with a dry Sauvignon Blanc. Crackers are ceremonial here.' },
+  'White Wine+Grapes': { cheese: 'Jalapeño Cream Cheese', why: 'Fruity, light, and surprisingly harmonious. The grape\'s sweetness tempers the jalapeño while the white wine ties it all together with cheerful acidity.' },
+  'Beer (IPA)+Crackers': { cheese: 'Pepper Jack', why: 'A match made in a sports bar in heaven. The bitter hops of an IPA contrast the creamy heat of Pepper Jack in a way that makes watching literally anything more enjoyable.' },
+  'Beer (IPA)+Jalapeños': { cheese: 'Sriracha Havarti', why: 'You are not afraid. You are ready. IPA + Sriracha Havarti + fresh jalapeño is a combination that will reorganize your priorities and improve your decision-making.' },
+  'Beer (Stout)+Crackers': { cheese: 'Smoked Chipotle Gouda', why: 'The roasty, chocolatey depth of a stout with smoky chipotle Gouda is one of the great underrated pairings. Dark, complex, and completely satisfying.' },
+  'Whiskey+Cured Meats': { cheese: 'Aged Cheddar with Chili', why: 'Whiskey and aged cheddar is a classic. Add chili to the cheddar and you have something that tastes like a campfire, ambition, and wisdom all at once.' },
+  'Tequila+Jalapeños': { cheese: 'Cotija con Chile', why: 'This is Mexico on a plate. Blanco tequila, fresh jalapeño, and crumbly Cotija with ancho chili. You will immediately want to make this combination permanent in your life.' },
+  'Coffee+Crackers': { cheese: 'Black Pepper Brie', why: 'Morning cheese. The bitterness of coffee against the creaminess of Brie with its black pepper crust is an unexpectedly refined breakfast move.' },
+  'Hot Chocolate+Dark Chocolate': { cheese: 'Chili Cheddar', why: 'Mexican hot chocolate vibes. The chocolate amplifies the chili in a way that confuses and delights the brain. This is dessert. This is CHEEEEEEEEEEEESE. There is no difference.' },
+  'Sparkling Water+Crackers': { cheese: 'Jalapeño Jack', why: 'A neutral, palate-cleansing companion for Jalapeño Jack lets the cheese\'s subtle heat and creamy tang fully shine without competition. Pure and honest CHEEEEEEEEEEEESE appreciation.' },
+};
+
+const SHOP_ITEMS = [
+  '3 large free-range eggs',
+  '2 tbsp whole milk or cream',
+  '½ cup Pepper Jack CHEEEEEEEEEEEESE',
+  '¼ cup sharp cheddar CHEEEEEEEEEEEESE',
+  '1 fresh jalapeño',
+  '½ tsp smoked paprika',
+  '¼ tsp cayenne pepper',
+  'Red chili flakes',
+  '1 tbsp unsalted butter',
+  'Salt & black pepper',
+  'Fresh chives or cilantro',
+  'Hot sauce',
+];
+
+let shopChecked = new Array(SHOP_ITEMS.length).fill(false);
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildFactsGrid();
+  buildHOF();
+  buildTestimonials();
+  buildShopList();
+  buildQuiz();
+  setCOTD();
+  startCountdown();
+});
+
+/* ═══════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌕' : '🌙';
+}
+
+/* ═══════════════════════════════════════════
+   COUNTDOWN — since 7000 BCE
+═══════════════════════════════════════════ */
+function startCountdown() {
+  function update() {
+    const start = new Date(-7000, 0, 1).getTime();
+    const now = Date.now();
+    let diff = Math.floor((now - start) / 1000);
+    const s = diff % 60; diff = Math.floor(diff / 60);
+    const m = diff % 60; diff = Math.floor(diff / 60);
+    const h = diff % 24; diff = Math.floor(diff / 24);
+    const d = diff % 365; const y = Math.floor(diff / 365);
+    document.getElementById('cd-y').textContent = y.toLocaleString();
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = h;
+    document.getElementById('cd-m').textContent = m;
+    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+  }
+  update(); setInterval(update, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   CHEESE-O-METER
+═══════════════════════════════════════════ */
+const SPICE_LEVELS = [
+  { max:10,  label:'You chose cheese over spice. Respectable.', color:'#FFD600', flames:'' },
+  { max:25,  label:'Baby heat. Your tongue is curious.', color:'#FFAA00', flames:'🔥' },
+  { max:40,  label:'Jalapeño territory. You are brave-ish.', color:'#FF8800', flames:'🔥🔥' },
+  { max:55,  label:'Habanero heat. Your eyes water. You smile.', color:'#FF6600', flames:'🔥🔥🔥' },
+  { max:70,  label:'Ghost pepper zone. This is who you are now.', color:'#FF3300', flames:'🔥🔥🔥🔥' },
+  { max:85,  label:'Carolina Reaper level. The CHEEEEEEEEEEEESE has you.', color:'#E8001A', flames:'🔥🔥🔥🔥🔥' },
+  { max:100, label:'MAXIMUM CHEESE HEAT. You are the CHEEEEEEEEEEEESE.', color:'#9B0000', flames:'🔥🔥🔥🔥🔥🔥' },
+];
+function updateMeter(v) {
+  const level = SPICE_LEVELS.find(l => v <= l.max) || SPICE_LEVELS.at(-1);
+  document.getElementById('meterLabel').textContent = level.label;
+  document.getElementById('meterLabel').style.color = level.color;
+  document.getElementById('spiceFlames').textContent = level.flames;
+}
+
+/* ═══════════════════════════════════════════
+   CHEESE OF THE DAY
+═══════════════════════════════════════════ */
+function setCOTD() {
+  const today = new Date();
+  const idx = (today.getFullYear() * 365 + today.getMonth() * 31 + today.getDate()) % CHEESES_OF_DAY.length;
+  const c = CHEESES_OF_DAY[idx];
+  document.getElementById('cotdWrap').innerHTML = `
+    <div class="cotd-emoji">${c.emoji}</div>
+    <div class="cotd-content">
+      <div class="cotd-name">${c.name}</div>
+      <div class="cotd-origin">${c.origin}</div>
+      <div class="cotd-desc">${c.desc}</div>
+      <div class="cotd-pairing">🍷 ${c.pairing}</div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   RANDOM FACT
+═══════════════════════════════════════════ */
+let lastFactIdx = -1;
+function showRandomFact() {
+  let idx;
+  do { idx = Math.floor(Math.random() * FACTS.length); } while (idx === lastFactIdx);
+  lastFactIdx = idx;
+  const el = document.getElementById('randFactText');
+  el.classList.add('fading');
+  setTimeout(() => {
+    document.getElementById('randFactNum').textContent = FACTS[idx].n;
+    el.innerHTML = FACTS[idx].t;
+    el.classList.remove('fading');
+  }, 300);
+}
+
+/* ═══════════════════════════════════════════
+   FACTS GRID
+═══════════════════════════════════════════ */
+function buildFactsGrid() {
+  document.getElementById('factsGrid').innerHTML = FACTS.map(f =>
+    `<div class="fact-card"><div class="fact-num">${f.n}</div><p class="fact-text">${f.t}</p></div>`
+  ).join('');
+}
+
+/* ═══════════════════════════════════════════
+   HALL OF FAME
+═══════════════════════════════════════════ */
+function buildHOF() {
+  document.getElementById('hofGrid').innerHTML = HOF.map(c => `
+    <div class="hof-card">
+      <div style="font-size:36px;margin-bottom:0.6rem">${c.emoji}</div>
+      <div class="hof-name">${c.name}</div>
+      <div class="hof-origin">${c.origin}</div>
+      <div class="hof-desc">${c.desc}</div>
+      <div class="hof-rating">${c.rating}</div>
+      <div class="heat-badges" style="margin-top:0.8rem">
+        ${c.tags.map(t => `<span class="heat-badge ${t.toLowerCase().includes('extreme')||t.toLowerCase().includes('hot')?'hot':t.toLowerCase().includes('mild')?'mild':''}">${t}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+const QUIZ_DATA = {
+  questions: [
+    { q: 'Your ideal Saturday involves:', opts: ['Hiking a volcano','A cheese board and a movie','Aggressively cooking something','Napping with snacks nearby'] },
+    { q: 'How do you handle confrontation?', opts: ['Head-on, immediately','With wit and strategic heat','By melting into a situation','I become the confrontation'] },
+    { q: 'Your food philosophy is:', opts: ['More heat = more living','Balance is everything','Comfort over everything','If it isn\'t melted, why bother'] },
+    { q: 'Pick a vibe:', opts: ['Campfire at midnight','Sunday farmers market','Street food at 2am','A cheese cave in France'] },
+    { q: 'Your spirit animal is:', opts: ['A jalapeño','A patient wheel of aged cheddar','A runny brie','A ghost pepper disguised as food'] },
+  ],
+  results: [
+    { emoji:'👻', title:'Ghost Pepper Cheddar', desc:'You are extreme, uncompromising, and memorable. People describe encounters with you as "transformative" and "not entirely comfortable." You are not for everyone, and that is your greatest strength. You melt under pressure and reveal something magnificent.' },
+    { emoji:'🧀', title:'Pepper Jack', desc:'You are the life of the party — warm, approachable, and secretly fiercer than anyone expects. You work in every situation. Everyone loves you. You are the correct choice, always.' },
+    { emoji:'🥐', title:'Brie au Poivre', desc:'Sophisticated on the outside, molten and surprising within. You dress calmly and then hit people with unexpected depth. You are the plot twist. You pair with everything.' },
+    { emoji:'🌶️', title:'Cotija con Chile', desc:'Salty, earthy, and packed with character. You don\'t need to melt to make an impact — your presence alone elevates every room you enter. Crumble with dignity. Always.' },
+  ]
+};
+let quizAnswers = [];
+let currentQ = 0;
+function buildQuiz() { renderQuestion(); }
+function renderQuestion() {
+  const wrap = document.getElementById('quizInner');
+  if (currentQ >= QUIZ_DATA.questions.length) { showQuizResult(); return; }
+  const q = QUIZ_DATA.questions[currentQ];
+  wrap.innerHTML = `
+    <div class="quiz-progress">Question ${currentQ + 1} of ${QUIZ_DATA.questions.length}</div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">${q.opts.map((o,i) => `<button class="quiz-opt" onclick="answerQuiz(${i})">${o}</button>`).join('')}</div>`;
+}
+function answerQuiz(i) {
+  quizAnswers.push(i);
+  currentQ++;
+  renderQuestion();
+}
+function showQuizResult() {
+  const tally = [0,0,0,0];
+  quizAnswers.forEach((a,qi) => tally[a % 4]++);
+  const winner = tally.indexOf(Math.max(...tally));
+  const r = QUIZ_DATA.results[winner];
+  document.getElementById('quizInner').style.display = 'none';
+  const res = document.createElement('div');
+  res.className = 'quiz-result'; res.style.display = 'block';
+  res.innerHTML = `
+    <div class="quiz-result-emoji">${r.emoji}</div>
+    <div class="quiz-result-title">You are ${r.title}</div>
+    <div class="quiz-result-desc">${r.desc}</div>
+    <button class="btn btn-ghost" onclick="resetQuiz()">↺ Retake Quiz</button>`;
+  document.getElementById('quizWrap').appendChild(res);
+}
+function resetQuiz() {
+  quizAnswers = []; currentQ = 0;
+  document.getElementById('quizWrap').querySelectorAll('.quiz-result').forEach(e=>e.remove());
+  document.getElementById('quizInner').style.display = '';
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════
+   SPICE ROULETTE
+═══════════════════════════════════════════ */
+let rouletteSpinning = false;
+function spinRoulette() {
+  if (rouletteSpinning) return;
+  rouletteSpinning = true;
+  const display = document.getElementById('rouletteDisplay');
+  const dare = document.getElementById('rouletteDare');
+  dare.innerHTML = '&nbsp;';
+  let ticks = 0; const total = 20 + Math.floor(Math.random()*15);
+  const interval = setInterval(() => {
+    display.textContent = ROULETTE_CHEESES[Math.floor(Math.random()*ROULETTE_CHEESES.length)];
+    ticks++;
+    if (ticks >= total) {
+      clearInterval(interval);
+      const cheese = ROULETTE_CHEESES[Math.floor(Math.random()*ROULETTE_CHEESES.length)];
+      const dareTemplate = ROULETTE_DARES[Math.floor(Math.random()*ROULETTE_DARES.length)];
+      display.textContent = cheese;
+      dare.innerHTML = dareTemplate(cheese);
+      rouletteSpinning = false;
     }
-  }
+  }, 80);
+}
 
-  audio.addEventListener('ended', () => {
+/* ═══════════════════════════════════════════
+   PAIRING GENERATOR
+═══════════════════════════════════════════ */
+function generatePairing() {
+  const drink = document.getElementById('pairDrink').value;
+  const snack = document.getElementById('pairSnack').value;
+  const result = document.getElementById('pairingResult');
+  if (!drink || !snack) { result.innerHTML = 'Please select both a drink and a snack first.'; result.classList.add('visible'); return; }
+  const key = `${drink}+${snack}`;
+  const data = PAIRINGS[key];
+  if (data) {
+    result.innerHTML = `🧀 <strong>${data.cheese}</strong><br><br>${data.why}`;
+  } else {
+    const allCheeses = HOF.map(h=>h.name);
+    const cheese = allCheeses[Math.floor(Math.random()*allCheeses.length)];
+    result.innerHTML = `🧀 <strong>${cheese}</strong><br><br>An unconventional pairing — but spicy CHEEEEEEEEEEEESE rewards the bold. Trust the combination. Trust the cheese.`;
+  }
+  result.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════
+   MAP
+═══════════════════════════════════════════ */
+function showMapTooltip(id) {
+  const d = MAP_DATA[id];
+  const tt = document.getElementById('mapTooltip');
+  tt.innerHTML = `<strong>${d.name}</strong><em style="display:block;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--orange);margin-bottom:0.5rem">${d.region}</em>${d.text}`;
+  tt.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════
+   HOT TAKE GENERATOR
+═══════════════════════════════════════════ */
+let lastTakeIdx = -1;
+function generateHotTake() {
+  let idx;
+  do { idx = Math.floor(Math.random()*HOT_TAKES.length); } while(idx===lastTakeIdx);
+  lastTakeIdx = idx;
+  const el = document.getElementById('hottakeText');
+  el.style.opacity = 0;
+  setTimeout(()=>{ el.textContent = HOT_TAKES[idx]; el.style.opacity = 1; el.style.transition='opacity 0.4s'; }, 200);
+}
+
+/* ═══════════════════════════════════════════
+   HAIKU GENERATOR
+═══════════════════════════════════════════ */
+let lastHaikuIdx = -1;
+function generateHaiku() {
+  let idx;
+  do { idx = Math.floor(Math.random()*HAIKUS.length); } while(idx===lastHaikuIdx);
+  lastHaikuIdx = idx;
+  const [l1,l2,l3] = HAIKUS[idx];
+  const el = document.getElementById('haikuText');
+  el.style.opacity = 0;
+  setTimeout(()=>{
+    el.innerHTML = `<span class="line">${l1}</span><span class="line orange">${l2}</span><span class="line">${l3}</span>`;
+    el.style.opacity = 1; el.style.transition='opacity 0.4s';
+  }, 200);
+}
+
+/* ═══════════════════════════════════════════
+   AGING TRACKER
+═══════════════════════════════════════════ */
+function lookupAging() {
+  const val = document.getElementById('agingDate').value;
+  if (!val) return;
+  const year = new Date(val).getFullYear();
+  const result = document.getElementById('agingResult');
+  let entry = AGING_DATA.find(e => Math.abs(e.year - year) < 50);
+  if (!entry) {
+    const yearStr = year < 0 ? `${Math.abs(year)} BCE` : `${year} CE`;
+    const cheeses = ['Cotija con Chile', 'Manchego Picante', 'Pecorino Pepato', 'Pepper Jack', 'Époisses Pimenté'];
+    const cheese = cheeses[Math.abs(year) % cheeses.length];
+    result.innerHTML = `In <strong>${yearStr}</strong>, cheesemakers somewhere in the world were carefully tending to what would eventually become the noble tradition of spicy CHEEEEEEEEEEEESE. At this precise moment in history, a wheel of something very much like <strong>${cheese}</strong> was almost certainly aging in a cool, dark place — dreaming of heat, dreaming of you.`;
+  } else {
+    result.innerHTML = entry.text;
+  }
+  result.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+function buildTestimonials() {
+  document.getElementById('testimonialsGrid').innerHTML = TESTIMONIALS.map(t => `
+    <div class="testimonial-card">
+      <div class="stars">${'⭐'.repeat(t.stars)}</div>
+      <div class="testimonial-quote">"</div>
+      <div class="testimonial-text">${t.quote}</div>
+      <div class="testimonial-author">${t.author}</div>
+      <div class="testimonial-title">${t.title}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   SHOPPING LIST
+═══════════════════════════════════════════ */
+function buildShopList() {
+  document.getElementById('shopList').innerHTML = SHOP_ITEMS.map((item,i) => `
+    <div class="shop-item ${shopChecked[i]?'checked':''}" onclick="toggleShop(${i})">
+      <div class="shop-cb">${shopChecked[i]?'✓':''}</div>
+      <span>${item}</span>
+    </div>`).join('');
+  updateShopCount();
+}
+function toggleShop(i) {
+  shopChecked[i] = !shopChecked[i];
+  buildShopList();
+}
+function updateShopCount() {
+  const done = shopChecked.filter(Boolean).length;
+  document.getElementById('shopCount').textContent = `${done} of ${SHOP_ITEMS.length} items checked`;
+}
+function resetShopList() { shopChecked.fill(false); buildShopList(); }
+function printShopList() {
+  const items = SHOP_ITEMS.filter((_,i)=>!shopChecked[i]);
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><title>Spicy CHEEEEEEEEEEEESE Shopping List</title>
+    <style>body{font-family:Inter,sans-serif;padding:2rem;max-width:400px}h1{font-size:20px;margin-bottom:1rem}li{padding:0.5rem 0;border-bottom:1px solid #eee;font-size:15px}</style></head>
+    <body><h1>🧀 Spicy CHEEEEEEEEEEEESE Omelette</h1><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul></body></html>`);
+  w.document.close(); w.print();
+}
+
+/* ═══════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════ */
+const audio    = document.getElementById('cheeseAudio');
+const audioBtn = document.getElementById('audioBtn');
+function toggleAudio() {
+  if (audio.paused) {
+    audio.play();
+    audioBtn.classList.add('playing');
+    audioBtn.innerHTML = '■ Stop the Anthem';
+  } else {
+    audio.pause(); audio.currentTime = 0;
     audioBtn.classList.remove('playing');
-    audioBtn.innerHTML = '<span>▶</span> Play the Anthem';
-  });
+    audioBtn.innerHTML = '▶ Play the Anthem';
+  }
+}
+audio.addEventListener('ended', () => {
+  audioBtn.classList.remove('playing');
+  audioBtn.innerHTML = '▶ Play the Anthem';
+});
 
-  // IMAGE MODAL — auto-crop white (#fff) padding
-  function openModal() {
-    const modal  = document.getElementById('imgModal');
-    const canvas = document.getElementById('cheeseCanvas');
-    const ctx    = canvas.getContext('2d');
-    const img    = new Image();
-
-    img.src = 'Spicy Cheese.png';
-
-    img.onload = () => {
-      const tmp = document.createElement('canvas');
-      tmp.width = img.width; tmp.height = img.height;
-      const tc = tmp.getContext('2d');
-      tc.drawImage(img, 0, 0);
-      const data = tc.getImageData(0, 0, img.width, img.height);
-      const px = data.data;
-      const w = img.width, h = img.height;
-
-      let top = h, left = w, bottom = 0, right = 0;
-
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const i = (y * w + x) * 4;
-          const r = px[i], g = px[i+1], b = px[i+2], a = px[i+3];
-          const isWhiteOrTransparent = a < 10 || (r > 240 && g > 240 && b > 240);
-          if (!isWhiteOrTransparent) {
-            if (y < top)    top    = y;
-            if (y > bottom) bottom = y;
-            if (x < left)   left   = x;
-            if (x > right)  right  = x;
-          }
-        }
+/* ═══════════════════════════════════════════
+   IMAGE MODAL
+═══════════════════════════════════════════ */
+function openModal() {
+  const modal  = document.getElementById('imgModal');
+  const canvas = document.getElementById('cheeseCanvas');
+  const ctx    = canvas.getContext('2d');
+  const img    = new Image();
+  img.src = 'Spicy Cheese.png';
+  img.onload = () => {
+    const tmp = document.createElement('canvas');
+    tmp.width = img.width; tmp.height = img.height;
+    const tc = tmp.getContext('2d');
+    tc.drawImage(img, 0, 0);
+    const data = tc.getImageData(0, 0, img.width, img.height);
+    const px = data.data; const w = img.width, h = img.height;
+    let top = h, left = w, bottom = 0, right = 0;
+    for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
+      const i=(y*w+x)*4, r=px[i], g=px[i+1], b=px[i+2], a=px[i+3];
+      if (!(a<10||(r>240&&g>240&&b>240))) {
+        if(y<top)top=y; if(y>bottom)bottom=y; if(x<left)left=x; if(x>right)right=x;
       }
+    }
+    if(top>=bottom||left>=right){top=0;left=0;bottom=h-1;right=w-1;}
+    const pad=8;
+    top=Math.max(0,top-pad); left=Math.max(0,left-pad);
+    bottom=Math.min(h-1,bottom+pad); right=Math.min(w-1,right+pad);
+    const cw=right-left+1, ch=bottom-top+1;
+    canvas.width=cw; canvas.height=ch;
+    ctx.drawImage(img,left,top,cw,ch,0,0,cw,ch);
+    modal.classList.add('open');
+  };
+  img.onerror = () => {
+    canvas.width=440; canvas.height=200;
+    const c2=canvas.getContext('2d');
+    c2.fillStyle='#1A0A00'; c2.fillRect(0,0,440,200);
+    c2.fillStyle='#FF6B00'; c2.font='bold 16px Inter,sans-serif'; c2.textAlign='center';
+    c2.fillText('Could not load "Spicy Cheese.png"',220,90);
+    c2.fillStyle='rgba(255,248,231,0.6)'; c2.font='14px Inter,sans-serif';
+    c2.fillText('Make sure the file is in the same folder.',220,120);
+    modal.classList.add('open');
+  };
+}
+function closeModal() { document.getElementById('imgModal').classList.remove('open'); }
+function closeModalOutside(e) { if(e.target===document.getElementById('imgModal'))closeModal(); }
+document.addEventListener('keydown', e => { if(e.key==='Escape')closeModal(); });
 
-      // Fallback if nothing found
-      if (top >= bottom || left >= right) {
-        top = 0; left = 0; bottom = h - 1; right = w - 1;
-      }
-
-      const pad = 8;
-      top    = Math.max(0, top - pad);
-      left   = Math.max(0, left - pad);
-      bottom = Math.min(h - 1, bottom + pad);
-      right  = Math.min(w - 1, right + pad);
-
-      const cw = right - left + 1;
-      const ch = bottom - top + 1;
-      canvas.width  = cw;
-      canvas.height = ch;
-      ctx.drawImage(img, left, top, cw, ch, 0, 0, cw, ch);
-
-      modal.classList.add('open');
-    };
-
-    img.onerror = () => {
-      canvas.width = 440; canvas.height = 200;
-      const c2 = canvas.getContext('2d');
-      c2.fillStyle = '#1A0A00';
-      c2.fillRect(0, 0, 440, 200);
-      c2.fillStyle = '#FF6B00';
-      c2.font = 'bold 16px Inter, sans-serif';
-      c2.textAlign = 'center';
-      c2.fillText('Could not load "Spicy Cheese.png"', 220, 90);
-      c2.fillStyle = 'rgba(255,248,231,0.6)';
-      c2.font = '14px Inter, sans-serif';
-      c2.fillText('Make sure the file is in the same folder as this HTML.', 220, 120);
-      modal.classList.add('open');
-    };
+/* ═══════════════════════════════════════════
+   EMOJI RAIN
+═══════════════════════════════════════════ */
+let rainActive = false; let rainInterval = null;
+function toggleRain() {
+  rainActive = !rainActive;
+  document.getElementById('rainBtn').textContent = rainActive ? '🚫 Stop Rain' : '🧀 Emoji Rain';
+  if (rainActive) {
+    rainInterval = setInterval(spawnEmoji, 200);
+  } else {
+    clearInterval(rainInterval);
   }
-
-  function closeModal() {
-    document.getElementById('imgModal').classList.remove('open');
-  }
-
-  function closeModalOutside(e) {
-    if (e.target === document.getElementById('imgModal')) closeModal();
-  }
-
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+}
+function spawnEmoji() {
+  const emojis = ['🧀','🌶️','🔥','🧀','🧀','🌶️','🔥'];
+  const el = document.createElement('div');
+  el.className = 'emoji-drop';
+  el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  el.style.left = Math.random()*100 + 'vw';
+  el.style.animationDuration = (2 + Math.random()*3) + 's';
+  el.style.fontSize = (20 + Math.random()*20) + 'px';
+  document.getElementById('emoji-rain').appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
 </script>
 </body>
 </html>
