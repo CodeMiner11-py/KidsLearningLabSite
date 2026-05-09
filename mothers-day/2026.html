@@ -1,361 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>mothers</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download PDF</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #fff;
-    --fg: #000;
-    --border: #000;
-    --muted: #888;
-    --flip-dur: 600ms;
-  }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fdf6f0;
+      font-family: 'Jost', sans-serif;
+    }
 
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: 'Georgia', serif;
-    overflow: hidden;
-  }
+    .card {
+      text-align: center;
+      padding: 3rem 4rem;
+      background: #fff;
+      border: 1px solid #e8ddd5;
+      border-radius: 4px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+    }
 
-  /* ── Layout ── */
-  #app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    gap: 20px;
-    padding: 24px;
-  }
+    h1 {
+      font-family: 'EB Garamond', serif;
+      font-weight: 300;
+      font-size: 2.4rem;
+      color: #2a1f1a;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+    }
 
-  /* ── Flip stage ── */
-  #stage {
-    position: relative;
-    perspective: 1800px;
-    flex-shrink: 0;
-  }
+    a.btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 0.75rem 2rem;
+      background: #2a1f1a;
+      color: #fdf6f0;
+      font-family: 'EB Garamond', serif;
+      font-weight: 400;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.15s;
+    }
 
-  /* The two visible canvases sit stacked; only one shows at a time */
-  .page-face {
-    display: block;
-    border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 0 var(--fg);
-    background: var(--bg);
-    /* sizing set dynamically */
-  }
+    a.btn:hover {
+      background: #5c3d2e;
+      transform: translateY(-1px);
+    }
 
-  /* ── 3-D flip card ── */
-  #flipCard {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    transform-style: preserve-3d;
-    pointer-events: none;
-    opacity: 0; /* hidden until a flip starts */
-  }
-  #flipCard.flipping { opacity: 1; }
-
-  .flip-face {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    overflow: hidden;
-  }
-  #flipFront { transform: rotateY(0deg); }
-  #flipBack  { transform: rotateY(180deg); }
-
-  /* Forward flip: 0 → -180 */
-  @keyframes flipForward {
-    from { transform: rotateY(0deg); }
-    to   { transform: rotateY(-180deg); }
-  }
-  /* Backward flip: 0 → +180 */
-  @keyframes flipBackward {
-    from { transform: rotateY(0deg); }
-    to   { transform: rotateY(180deg); }
-  }
-
-  #flipCard.flip-forward  { animation: flipForward  var(--flip-dur) cubic-bezier(.4,0,.2,1) forwards; }
-  #flipCard.flip-backward { animation: flipBackward var(--flip-dur) cubic-bezier(.4,0,.2,1) forwards; }
-
-  /* Shine overlay during flip */
-  #flipCard.flipping #flipFront::after,
-  #flipCard.flipping #flipBack::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.45) 50%, transparent 60%);
-    pointer-events: none;
-  }
-
-  /* ── Controls ── */
-  #controls {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    user-select: none;
-  }
-
-  .btn {
-    width: 44px; height: 44px;
-    border: 1.5px solid var(--fg);
-    background: var(--bg);
-    color: var(--fg);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .12s, color .12s;
-    flex-shrink: 0;
-  }
-  .btn:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
-  .btn:disabled { opacity: .2; cursor: default; }
-  .btn svg { width: 18px; height: 18px; }
-
-  #pageLabel {
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    letter-spacing: .08em;
-    min-width: 90px;
-    text-align: center;
-    color: var(--muted);
-  }
-
-  /* ── Loading / error ── */
-  #loader {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    letter-spacing: .12em;
-    color: var(--muted);
-    z-index: 99;
-    transition: opacity .3s;
-  }
-  #loader.hidden { opacity: 0; pointer-events: none; }
-</style>
+    a.btn:active {
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
-
-<div id="loader">loading…</div>
-
-<div id="app">
-  <div id="stage">
-    <!-- Current visible page -->
-    <canvas id="pageCanvas" class="page-face"></canvas>
-
-    <!-- 3-D flip card (sits on top during animation) -->
-    <div id="flipCard">
-      <div class="flip-face" id="flipFront"><canvas id="frontCanvas"></canvas></div>
-      <div class="flip-face" id="flipBack" ><canvas id="backCanvas"></canvas></div>
-    </div>
+  <div class="card">
+    <h1>Download PDF</h1>
+    <a class="btn" href="mothers.pdf" download="mothers.pdf">Click here to download Mothers' Day PDF.</a>
   </div>
-
-  <div id="controls">
-    <button class="btn" id="prevBtn" disabled aria-label="Previous page">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </button>
-    <span id="pageLabel">— / —</span>
-    <button class="btn" id="nextBtn" disabled aria-label="Next page">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
-    </button>
-  </div>
-</div>
-
-<script>
-// ── PDF.js worker ──
-console.log('[reader] script start');
-console.log('[reader] pdfjsLib available:', typeof pdfjsLib !== 'undefined');
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-console.log('[reader] worker src set');
-
-// ── DOM refs ──
-const loader     = document.getElementById('loader');
-const stage      = document.getElementById('stage');
-const pageCanvas = document.getElementById('pageCanvas');
-const flipCard   = document.getElementById('flipCard');
-const frontCanvas= document.getElementById('frontCanvas');
-const backCanvas = document.getElementById('backCanvas');
-const prevBtn    = document.getElementById('prevBtn');
-const nextBtn    = document.getElementById('nextBtn');
-const pageLabel  = document.getElementById('pageLabel');
-console.log('[reader] DOM refs:', { loader, stage, pageCanvas, flipCard, prevBtn, nextBtn });
-
-// ── State ──
-let pdfDoc    = null;
-let curPage   = 1;
-let numPages  = 0;
-let flipping  = false;
-
-// ── Render cache: pageNum → ImageBitmap ──
-// Each page is rasterised at most once; subsequent draws are a fast blit.
-const cache        = {};   // pageNum → ImageBitmap
-const cacheInFlight = {};  // pageNum → Promise<ImageBitmap>
-
-// ── Compute display scale (fits 85vw / 88vh) ──
-function calcScale(viewport) {
-  const maxW  = window.innerWidth  * 0.85;
-  const maxH  = (window.innerHeight - 100) * 0.88;
-  const scale = Math.min(maxW / viewport.width, maxH / viewport.height, 1.8);
-  console.log(`[calcScale] vp=${viewport.width.toFixed(0)}x${viewport.height.toFixed(0)} → scale=${scale.toFixed(3)}`);
-  return scale;
-}
-
-// ── Rasterise page → ImageBitmap (cached) ──
-async function rasterise(pageNum) {
-  if (cache[pageNum]) {
-    console.log(`[rasterise] page ${pageNum} — cache HIT`);
-    return cache[pageNum];
-  }
-  if (cacheInFlight[pageNum]) {
-    console.log(`[rasterise] page ${pageNum} — already in-flight, awaiting`);
-    return cacheInFlight[pageNum];
-  }
-  console.log(`[rasterise] page ${pageNum} — rendering…`);
-  cacheInFlight[pageNum] = (async () => {
-    const page     = await pdfDoc.getPage(pageNum);
-    const baseVP   = page.getViewport({ scale: 1 });
-    const scale    = calcScale(baseVP);
-    const viewport = page.getViewport({ scale });
-
-    const offscreen = document.createElement('canvas');
-    offscreen.width  = viewport.width;
-    offscreen.height = viewport.height;
-    await page.render({ canvasContext: offscreen.getContext('2d'), viewport }).promise;
-
-    const bmp = await createImageBitmap(offscreen);
-    cache[pageNum] = bmp;
-    delete cacheInFlight[pageNum];
-    console.log(`[rasterise] page ${pageNum} done — ${offscreen.width.toFixed(0)}x${offscreen.height.toFixed(0)}`);
-    return bmp;
-  })();
-  return cacheInFlight[pageNum];
-}
-
-// ── Draw a cached bitmap onto a canvas ──
-function drawBitmap(bmp, canvas) {
-  canvas.width  = bmp.width;
-  canvas.height = bmp.height;
-  canvas.style.width  = bmp.width  + 'px';
-  canvas.style.height = bmp.height + 'px';
-  canvas.getContext('2d').drawImage(bmp, 0, 0);
-}
-
-// ── Prefetch neighbours in the background ──
-function prefetch(n) {
-  [n - 1, n + 1].forEach(p => {
-    if (p >= 1 && p <= numPages && !cache[p] && !cacheInFlight[p]) {
-      console.log(`[prefetch] queuing page ${p}`);
-      rasterise(p);
-    }
-  });
-}
-
-// ── Update label & button states ──
-function updateUI() {
-  pageLabel.textContent = `${curPage} / ${numPages}`;
-  prevBtn.disabled = curPage <= 1 || flipping;
-  nextBtn.disabled = curPage >= numPages || flipping;
-  console.log(`[updateUI] page=${curPage}/${numPages} flipping=${flipping} prev.disabled=${prevBtn.disabled} next.disabled=${nextBtn.disabled}`);
-}
-
-// ── Show page without animation (initial load / after flip done) ──
-async function showPage(n) {
-  console.log(`[showPage] → page ${n}`);
-  const bmp = await rasterise(n);
-  drawBitmap(bmp, pageCanvas);
-  stage.style.width  = bmp.width  + 'px';
-  stage.style.height = bmp.height + 'px';
-  curPage = n;
-  updateUI();
-  prefetch(n);
-  console.log(`[showPage] done, stage=${bmp.width}x${bmp.height}`);
-}
-
-// ── Animated flip ──
-async function flipTo(n, direction) {
-  console.log(`[flipTo] ${curPage} → ${n} direction=${direction} (flipping=${flipping})`);
-  if (flipping) { console.warn('[flipTo] already flipping, ignoring'); return; }
-  flipping = true;
-  prevBtn.disabled = true;
-  nextBtn.disabled = true;
-
-  // Both pages should already be cached; rasterise() returns instantly if so
-  console.log('[flipTo] fetching bitmaps (should be cached)...');
-  const [frontBmp, backBmp] = await Promise.all([rasterise(curPage), rasterise(n)]);
-
-  drawBitmap(frontBmp, frontCanvas);
-  drawBitmap(backBmp,  backCanvas);
-
-  console.log(`[flipTo] flip card size: ${frontBmp.width}x${frontBmp.height}`);
-
-  pageCanvas.style.visibility = 'hidden';
-  const animClass = direction === 'forward' ? 'flip-forward' : 'flip-backward';
-  flipCard.classList.add('flipping', animClass);
-  console.log(`[flipTo] added classes: flipping, ${animClass}`);
-
-  flipCard.addEventListener('animationend', async (e) => {
-    console.log(`[flipTo] animationend fired on`, e.target.id || e.target.className);
-    await showPage(n);
-    flipCard.classList.remove('flipping', 'flip-forward', 'flip-backward');
-    pageCanvas.style.visibility = 'visible';
-    flipping = false;
-    updateUI();
-    console.log('[flipTo] flip complete');
-  }, { once: true });
-}
-
-// ── Button handlers ──
-prevBtn.addEventListener('click', () => {
-  console.log(`[btn] PREV clicked, curPage=${curPage}`);
-  if (curPage > 1) flipTo(curPage - 1, 'backward');
-});
-nextBtn.addEventListener('click', () => {
-  console.log(`[btn] NEXT clicked, curPage=${curPage}`);
-  if (curPage < numPages) flipTo(curPage + 1, 'forward');
-});
-
-// ── Keyboard ──
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  nextBtn.click();
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    prevBtn.click();
-});
-
-// ── Load PDF ──
-(async () => {
-  console.log('[load] fetching mothers.pdf...');
-  try {
-    const loadTask = pdfjsLib.getDocument('mothers.pdf');
-    loadTask.onProgress = (p) => {
-      if (p.total) console.log(`[load] progress: ${p.loaded}/${p.total} bytes`);
-    };
-    pdfDoc   = await loadTask.promise;
-    numPages = pdfDoc.numPages;
-    console.log(`[load] PDF loaded OK — ${numPages} pages`);
-    await showPage(1);
-    loader.classList.add('hidden');
-    console.log('[load] ready');
-  } catch (err) {
-    console.error('[load] FAILED to load mothers.pdf:', err);
-    console.error('[load] name:', err.name, '| message:', err.message);
-    loader.textContent = 'could not load mothers.pdf — place it in the same folder as this file.';
-  }
-})();
-</script>
 </body>
 </html>
