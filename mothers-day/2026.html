@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mothers' Day.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fff;
+    --fg: #000;
+    --border: #000;
+    --muted: #888;
+    --flip-dur: 600ms;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Georgia', serif;
+    overflow: hidden;
+  }
+
+  /* ── Layout ── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  /* ── Flip stage ── */
+  #stage {
+    position: relative;
+    perspective: 1800px;
+    flex-shrink: 0;
+  }
+
+  /* The two visible canvases sit stacked; only one shows at a time */
+  .page-face {
+    display: block;
+    border: 1px solid var(--border);
+    box-shadow: 4px 4px 0 0 var(--fg);
+    background: var(--bg);
+    /* sizing set dynamically */
+  }
+
+  /* ── 3-D flip card ── */
+  #flipCard {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    pointer-events: none;
+    opacity: 0; /* hidden until a flip starts */
+  }
+  #flipCard.flipping { opacity: 1; }
+
+  .flip-face {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  #flipFront { transform: rotateY(0deg); }
+  #flipBack  { transform: rotateY(180deg); }
+
+  /* Forward flip: 0 → -180 */
+  @keyframes flipForward {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(-180deg); }
+  }
+  /* Backward flip: 0 → +180 */
+  @keyframes flipBackward {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(180deg); }
+  }
+
+  #flipCard.flip-forward  { animation: flipForward  var(--flip-dur) cubic-bezier(.4,0,.2,1) forwards; }
+  #flipCard.flip-backward { animation: flipBackward var(--flip-dur) cubic-bezier(.4,0,.2,1) forwards; }
+
+  /* Shine overlay during flip */
+  #flipCard.flipping #flipFront::after,
+  #flipCard.flipping #flipBack::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.45) 50%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── Controls ── */
+  #controls {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    user-select: none;
+  }
+
+  .btn {
+    width: 44px; height: 44px;
+    border: 1.5px solid var(--fg);
+    background: var(--bg);
+    color: var(--fg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s;
+    flex-shrink: 0;
+  }
+  .btn:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
+  .btn:disabled { opacity: .2; cursor: default; }
+  .btn svg { width: 18px; height: 18px; }
+
+  #pageLabel {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: .08em;
+    min-width: 90px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  /* ── Loading / error ── */
+  #loader {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    z-index: 99;
+    transition: opacity .3s;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div id="loader">loading…</div>
+
+<div id="app">
+  <div id="stage">
+    <!-- Current visible page -->
+    <canvas id="pageCanvas" class="page-face"></canvas>
+
+    <!-- 3-D flip card (sits on top during animation) -->
+    <div id="flipCard">
+      <div class="flip-face" id="flipFront"><canvas id="frontCanvas"></canvas></div>
+      <div class="flip-face" id="flipBack" ><canvas id="backCanvas"></canvas></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button class="btn" id="prevBtn" disabled aria-label="Previous page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <span id="pageLabel">— / —</span>
+    <button class="btn" id="nextBtn" disabled aria-label="Next page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── PDF.js worker ──
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── DOM refs ──
+const loader     = document.getElementById('loader');
+const stage      = document.getElementById('stage');
+const pageCanvas = document.getElementById('pageCanvas');
+const flipCard   = document.getElementById('flipCard');
+const frontCanvas= document.getElementById('frontCanvas');
+const backCanvas = document.getElementById('backCanvas');
+const prevBtn    = document.getElementById('prevBtn');
+const nextBtn    = document.getElementById('nextBtn');
+const pageLabel  = document.getElementById('pageLabel');
+
+// ── State ──
+let pdfDoc    = null;
+let curPage   = 1;
+let numPages  = 0;
+let flipping  = false;
+let targetW   = 0;
+let targetH   = 0;
+
+// ── Compute display size (max 85vw / 80vh) ──
+function calcSize(viewport) {
+  const maxW = window.innerWidth  * 0.85;
+  const maxH = (window.innerHeight - 100) * 0.88; // leave room for controls
+  const scale = Math.min(maxW / viewport.width, maxH / viewport.height, 1.8);
+  return scale;
+}
+
+// ── Render a page to a given canvas ──
+async function renderPage(pageNum, canvas) {
+  const page     = await pdfDoc.getPage(pageNum);
+  const baseVP   = page.getViewport({ scale: 1 });
+  const scale    = calcSize(baseVP);
+  const viewport = page.getViewport({ scale });
+
+  canvas.width  = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.width  = viewport.width  + 'px';
+  canvas.style.height = viewport.height + 'px';
+
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+  return { w: viewport.width, h: viewport.height };
+}
+
+// ── Update label & button states ──
+function updateUI() {
+  pageLabel.textContent = `${curPage} / ${numPages}`;
+  prevBtn.disabled = curPage <= 1 || flipping;
+  nextBtn.disabled = curPage >= numPages || flipping;
+}
+
+// ── Show page without animation (initial load / after flip done) ──
+async function showPage(n) {
+  const { w, h } = await renderPage(n, pageCanvas);
+  stage.style.width  = w + 'px';
+  stage.style.height = h + 'px';
+  curPage = n;
+  updateUI();
+}
+
+// ── Animated flip ──
+async function flipTo(n, direction) {
+  if (flipping) return;
+  flipping = true;
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
+
+  // Render outgoing page to front, incoming to back
+  await renderPage(curPage, frontCanvas);
+  await renderPage(n, backCanvas);
+
+  const w = frontCanvas.width;
+  const h = frontCanvas.height;
+
+  // Size the flip card canvases to match
+  [frontCanvas, backCanvas].forEach(c => {
+    c.style.width  = w + 'px';
+    c.style.height = h + 'px';
+  });
+
+  // Show flip card, hide main canvas
+  pageCanvas.style.visibility = 'hidden';
+  flipCard.classList.add('flipping');
+  flipCard.classList.add(direction === 'forward' ? 'flip-forward' : 'flip-backward');
+
+  // Wait for animation to finish
+  flipCard.addEventListener('animationend', async () => {
+    // Show new page on main canvas
+    await showPage(n);
+    // Clean up flip card
+    flipCard.classList.remove('flipping', 'flip-forward', 'flip-backward');
+    pageCanvas.style.visibility = 'visible';
+    flipping = false;
+    updateUI();
+  }, { once: true });
+}
+
+// ── Button handlers ──
+prevBtn.addEventListener('click', () => {
+  if (curPage > 1) flipTo(curPage - 1, 'backward');
+});
+nextBtn.addEventListener('click', () => {
+  if (curPage < numPages) flipTo(curPage + 1, 'forward');
+});
+
+// ── Keyboard ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  nextBtn.click();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    prevBtn.click();
+});
+
+// ── Load PDF ──
+(async () => {
+  try {
+    pdfDoc   = await pdfjsLib.getDocument('mothers.pdf').promise;
+    numPages = pdfDoc.numPages;
+    await showPage(1);
+    loader.classList.add('hidden');
+  } catch (err) {
+    loader.textContent = 'could not load mothers.pdf — place it in the same folder as this file.';
+    console.error(err);
+  }
+})();
+</script>
+</body>
+</html>
