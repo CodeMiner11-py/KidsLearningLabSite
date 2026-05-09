@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mothers' Day.</title>
+<title>mothers</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -178,8 +178,11 @@
 
 <script>
 // ── PDF.js worker ──
+console.log('[reader] script start');
+console.log('[reader] pdfjsLib available:', typeof pdfjsLib !== 'undefined');
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+console.log('[reader] worker src set');
 
 // ── DOM refs ──
 const loader     = document.getElementById('loader');
@@ -191,37 +194,76 @@ const backCanvas = document.getElementById('backCanvas');
 const prevBtn    = document.getElementById('prevBtn');
 const nextBtn    = document.getElementById('nextBtn');
 const pageLabel  = document.getElementById('pageLabel');
+console.log('[reader] DOM refs:', { loader, stage, pageCanvas, flipCard, prevBtn, nextBtn });
 
 // ── State ──
 let pdfDoc    = null;
 let curPage   = 1;
 let numPages  = 0;
 let flipping  = false;
-let targetW   = 0;
-let targetH   = 0;
 
-// ── Compute display size (max 85vw / 80vh) ──
-function calcSize(viewport) {
-  const maxW = window.innerWidth  * 0.85;
-  const maxH = (window.innerHeight - 100) * 0.88; // leave room for controls
+// ── Render cache: pageNum → ImageBitmap ──
+// Each page is rasterised at most once; subsequent draws are a fast blit.
+const cache        = {};   // pageNum → ImageBitmap
+const cacheInFlight = {};  // pageNum → Promise<ImageBitmap>
+
+// ── Compute display scale (fits 85vw / 88vh) ──
+function calcScale(viewport) {
+  const maxW  = window.innerWidth  * 0.85;
+  const maxH  = (window.innerHeight - 100) * 0.88;
   const scale = Math.min(maxW / viewport.width, maxH / viewport.height, 1.8);
+  console.log(`[calcScale] vp=${viewport.width.toFixed(0)}x${viewport.height.toFixed(0)} → scale=${scale.toFixed(3)}`);
   return scale;
 }
 
-// ── Render a page to a given canvas ──
-async function renderPage(pageNum, canvas) {
-  const page     = await pdfDoc.getPage(pageNum);
-  const baseVP   = page.getViewport({ scale: 1 });
-  const scale    = calcSize(baseVP);
-  const viewport = page.getViewport({ scale });
+// ── Rasterise page → ImageBitmap (cached) ──
+async function rasterise(pageNum) {
+  if (cache[pageNum]) {
+    console.log(`[rasterise] page ${pageNum} — cache HIT`);
+    return cache[pageNum];
+  }
+  if (cacheInFlight[pageNum]) {
+    console.log(`[rasterise] page ${pageNum} — already in-flight, awaiting`);
+    return cacheInFlight[pageNum];
+  }
+  console.log(`[rasterise] page ${pageNum} — rendering…`);
+  cacheInFlight[pageNum] = (async () => {
+    const page     = await pdfDoc.getPage(pageNum);
+    const baseVP   = page.getViewport({ scale: 1 });
+    const scale    = calcScale(baseVP);
+    const viewport = page.getViewport({ scale });
 
-  canvas.width  = viewport.width;
-  canvas.height = viewport.height;
-  canvas.style.width  = viewport.width  + 'px';
-  canvas.style.height = viewport.height + 'px';
+    const offscreen = document.createElement('canvas');
+    offscreen.width  = viewport.width;
+    offscreen.height = viewport.height;
+    await page.render({ canvasContext: offscreen.getContext('2d'), viewport }).promise;
 
-  await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-  return { w: viewport.width, h: viewport.height };
+    const bmp = await createImageBitmap(offscreen);
+    cache[pageNum] = bmp;
+    delete cacheInFlight[pageNum];
+    console.log(`[rasterise] page ${pageNum} done — ${offscreen.width.toFixed(0)}x${offscreen.height.toFixed(0)}`);
+    return bmp;
+  })();
+  return cacheInFlight[pageNum];
+}
+
+// ── Draw a cached bitmap onto a canvas ──
+function drawBitmap(bmp, canvas) {
+  canvas.width  = bmp.width;
+  canvas.height = bmp.height;
+  canvas.style.width  = bmp.width  + 'px';
+  canvas.style.height = bmp.height + 'px';
+  canvas.getContext('2d').drawImage(bmp, 0, 0);
+}
+
+// ── Prefetch neighbours in the background ──
+function prefetch(n) {
+  [n - 1, n + 1].forEach(p => {
+    if (p >= 1 && p <= numPages && !cache[p] && !cacheInFlight[p]) {
+      console.log(`[prefetch] queuing page ${p}`);
+      rasterise(p);
+    }
+  });
 }
 
 // ── Update label & button states ──
@@ -229,59 +271,62 @@ function updateUI() {
   pageLabel.textContent = `${curPage} / ${numPages}`;
   prevBtn.disabled = curPage <= 1 || flipping;
   nextBtn.disabled = curPage >= numPages || flipping;
+  console.log(`[updateUI] page=${curPage}/${numPages} flipping=${flipping} prev.disabled=${prevBtn.disabled} next.disabled=${nextBtn.disabled}`);
 }
 
 // ── Show page without animation (initial load / after flip done) ──
 async function showPage(n) {
-  const { w, h } = await renderPage(n, pageCanvas);
-  stage.style.width  = w + 'px';
-  stage.style.height = h + 'px';
+  console.log(`[showPage] → page ${n}`);
+  const bmp = await rasterise(n);
+  drawBitmap(bmp, pageCanvas);
+  stage.style.width  = bmp.width  + 'px';
+  stage.style.height = bmp.height + 'px';
   curPage = n;
   updateUI();
+  prefetch(n);
+  console.log(`[showPage] done, stage=${bmp.width}x${bmp.height}`);
 }
 
 // ── Animated flip ──
 async function flipTo(n, direction) {
-  if (flipping) return;
+  console.log(`[flipTo] ${curPage} → ${n} direction=${direction} (flipping=${flipping})`);
+  if (flipping) { console.warn('[flipTo] already flipping, ignoring'); return; }
   flipping = true;
   prevBtn.disabled = true;
   nextBtn.disabled = true;
 
-  // Render outgoing page to front, incoming to back
-  await renderPage(curPage, frontCanvas);
-  await renderPage(n, backCanvas);
+  // Both pages should already be cached; rasterise() returns instantly if so
+  console.log('[flipTo] fetching bitmaps (should be cached)...');
+  const [frontBmp, backBmp] = await Promise.all([rasterise(curPage), rasterise(n)]);
 
-  const w = frontCanvas.width;
-  const h = frontCanvas.height;
+  drawBitmap(frontBmp, frontCanvas);
+  drawBitmap(backBmp,  backCanvas);
 
-  // Size the flip card canvases to match
-  [frontCanvas, backCanvas].forEach(c => {
-    c.style.width  = w + 'px';
-    c.style.height = h + 'px';
-  });
+  console.log(`[flipTo] flip card size: ${frontBmp.width}x${frontBmp.height}`);
 
-  // Show flip card, hide main canvas
   pageCanvas.style.visibility = 'hidden';
-  flipCard.classList.add('flipping');
-  flipCard.classList.add(direction === 'forward' ? 'flip-forward' : 'flip-backward');
+  const animClass = direction === 'forward' ? 'flip-forward' : 'flip-backward';
+  flipCard.classList.add('flipping', animClass);
+  console.log(`[flipTo] added classes: flipping, ${animClass}`);
 
-  // Wait for animation to finish
-  flipCard.addEventListener('animationend', async () => {
-    // Show new page on main canvas
+  flipCard.addEventListener('animationend', async (e) => {
+    console.log(`[flipTo] animationend fired on`, e.target.id || e.target.className);
     await showPage(n);
-    // Clean up flip card
     flipCard.classList.remove('flipping', 'flip-forward', 'flip-backward');
     pageCanvas.style.visibility = 'visible';
     flipping = false;
     updateUI();
+    console.log('[flipTo] flip complete');
   }, { once: true });
 }
 
 // ── Button handlers ──
 prevBtn.addEventListener('click', () => {
+  console.log(`[btn] PREV clicked, curPage=${curPage}`);
   if (curPage > 1) flipTo(curPage - 1, 'backward');
 });
 nextBtn.addEventListener('click', () => {
+  console.log(`[btn] NEXT clicked, curPage=${curPage}`);
   if (curPage < numPages) flipTo(curPage + 1, 'forward');
 });
 
@@ -293,14 +338,22 @@ document.addEventListener('keydown', e => {
 
 // ── Load PDF ──
 (async () => {
+  console.log('[load] fetching mothers.pdf...');
   try {
-    pdfDoc   = await pdfjsLib.getDocument('mothers.pdf').promise;
+    const loadTask = pdfjsLib.getDocument('mothers.pdf');
+    loadTask.onProgress = (p) => {
+      if (p.total) console.log(`[load] progress: ${p.loaded}/${p.total} bytes`);
+    };
+    pdfDoc   = await loadTask.promise;
     numPages = pdfDoc.numPages;
+    console.log(`[load] PDF loaded OK — ${numPages} pages`);
     await showPage(1);
     loader.classList.add('hidden');
+    console.log('[load] ready');
   } catch (err) {
+    console.error('[load] FAILED to load mothers.pdf:', err);
+    console.error('[load] name:', err.name, '| message:', err.message);
     loader.textContent = 'could not load mothers.pdf — place it in the same folder as this file.';
-    console.error(err);
   }
 })();
 </script>
