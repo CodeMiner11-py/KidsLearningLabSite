@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share a photo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f2ed;
+    --surface: #fffefa;
+    --ink: #1a1814;
+    --muted: #7a7570;
+    --accent: #c84b2f;
+    --border: #e0dbd4;
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 480px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .drop-zone {
+    width: 100%;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+    background: var(--bg);
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: #fdf5f3;
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    width: 44px;
+    height: 44px;
+    color: var(--muted);
+  }
+
+  .drop-label {
+    font-size: 0.95rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .drop-label strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .preview-wrap {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .preview-wrap.visible { display: flex; }
+
+  .preview-img {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .file-name {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 9px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  button:active { transform: scale(0.97); }
+
+  .btn-share {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-share:hover { opacity: 0.9; }
+  .btn-share:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .btn-clear {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-clear:hover { background: var(--bg); }
+
+  .no-share-note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Share a photo</h1>
+
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*">
+    <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="3"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <path d="M21 15l-5-5L5 21"/>
+    </svg>
+    <p class="drop-label"><strong>Choose a photo</strong> or drop it here</p>
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <img class="preview-img" id="previewImg" src="" alt="Preview">
+    <p class="file-name" id="fileName"></p>
+  </div>
+
+  <div class="actions">
+    <button class="btn-share" id="shareBtn" disabled>Share</button>
+    <button class="btn-clear" id="clearBtn" style="display:none">Clear</button>
+  </div>
+
+  <p class="no-share-note" id="noShareNote">
+    Your browser doesn't support the Web Share API. Try on a mobile device or a supported browser.
+  </p>
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const dropZone = document.getElementById('dropZone');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+  const fileName = document.getElementById('fileName');
+  const shareBtn = document.getElementById('shareBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const noShareNote = document.getElementById('noShareNote');
+
+  let currentFile = null;
+
+  if (!navigator.share) {
+    noShareNote.style.display = 'block';
+  }
+
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) loadFile(file);
+  });
+
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadFile(file);
+  });
+
+  function loadFile(file) {
+    currentFile = file;
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    fileName.textContent = file.name;
+    previewWrap.classList.add('visible');
+    shareBtn.disabled = false;
+    clearBtn.style.display = 'block';
+    dropZone.style.display = 'none';
+  }
+
+  shareBtn.addEventListener('click', async () => {
+    if (!currentFile) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          files: [currentFile],
+          title: currentFile.name,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error(err);
+      }
+    } else {
+      noShareNote.style.display = 'block';
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    currentFile = null;
+    previewImg.src = '';
+    fileName.textContent = '';
+    previewWrap.classList.remove('visible');
+    shareBtn.disabled = true;
+    clearBtn.style.display = 'none';
+    dropZone.style.display = '';
+    fileInput.value = '';
+  });
+</script>
+</body>
+</html>
