@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI in Python — Code Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#fff; --border:#e0e0e0;
+  --text:#000; --muted:#666; --accent:#000;
+  --py:#f5fff5; --py-b:#cceacc;
+  --sh:#f5f5ff; --sh-b:#ccccea;
+  --out:#f9f9f9; --out-b:#ddd;
+  --pr:#fff5f5; --pr-b:#eacccc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6}
+
+/* ── Password screen ── */
+#password-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+#password-screen h1{font-family:'IBM Plex Mono',monospace;font-size:1.6rem;font-weight:600;margin-bottom:8px}
+#password-screen p{color:var(--muted);font-size:.95rem;margin-bottom:28px}
+.pw-box{display:flex;gap:8px;width:100%;max-width:380px}
+.pw-box input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .15s}
+.pw-box input:focus{border-color:#999}
+.pw-box button{padding:10px 20px;background:#000;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:opacity .15s}
+.pw-box button:hover{opacity:.8}
+#pw-error{color:#c00;font-size:.85rem;margin-top:10px;min-height:18px}
+
+/* ── App (hidden until unlocked) ── */
+#app{display:none}
+header{padding:50px 40px 36px;border-bottom:1px solid var(--border);max-width:960px;margin:0 auto}
+header h1{font-family:'IBM Plex Mono',monospace;font-size:1.8rem;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px}
+header p{color:var(--muted);font-size:.95rem}
+.search-wrap{margin-top:18px;position:relative;max-width:420px}
+.search-wrap input{width:100%;padding:9px 14px 9px 38px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .15s}
+.search-wrap input:focus{border-color:#aaa}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+.layout{display:flex;max-width:1140px;margin:0 auto}
+nav{width:220px;flex-shrink:0;padding:36px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--border)}
+nav a{display:block;font-size:.75rem;color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid transparent;transition:all .15s;line-height:1.4;margin-bottom:3px}
+nav a:hover{color:#000;border-left-color:#000}
+main{flex:1;padding:40px 48px;min-width:0}
+#no-results{display:none;color:var(--muted);font-style:italic;font-size:.9rem;margin-bottom:24px}
+.chapter{margin-bottom:56px;padding-bottom:56px;border-bottom:1px solid var(--border)}
+.chapter:last-child{border-bottom:none}
+h2{font-size:1rem;font-weight:600;margin-bottom:22px;text-transform:uppercase;letter-spacing:.06em}
+.code-block{margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.block-python{background:var(--py);border-color:var(--py-b)}
+.block-shell{background:var(--sh);border-color:var(--sh-b)}
+.block-output{background:var(--out);border-color:var(--out-b)}
+.block-prompt{background:var(--pr);border-color:var(--pr-b)}
+.block-label{font-family:'IBM Plex Mono',monospace;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:5px 14px;opacity:.8}
+.block-python .block-label{color:#1a6b1a;border-bottom:1px solid var(--py-b)}
+.block-shell .block-label{color:#1a1a8a;border-bottom:1px solid var(--sh-b)}
+.block-output .block-label{color:#444;border-bottom:1px solid var(--out-b)}
+.block-prompt .block-label{color:#8a1a1a;border-bottom:1px solid var(--pr-b)}
+pre{padding:16px 14px;overflow-x:auto}
+code{font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:1.75;white-space:pre;color:#000}
+mark{background:#ffe58a;border-radius:2px;padding:0 1px}
+@media(max-width:700px){nav{display:none}main{padding:24px 18px}}
+</style>
+</head>
+<body>
+
+<!-- Password screen -->
+<div id="password-screen">
+<img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="20%" style="margin-bottom:20px;">
+  <h1>AI in Python Online Code Access</h1>
+  <p>Enter the password from the book to access all the code.</p>
+  <div class="pw-box">
+    <input type="text" id="pw-input" placeholder="Password" autocomplete="off">
+    <button onclick="unlock()">Unlock</button>
+  </div>
+  <div id="pw-error"></div>
+</div>
+
+<!-- Main app -->
+<div id="app">
+  <header>
+    <h1>AI in Python</h1>
+    <p>Code reference — all code blocks from every chapter</p>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search" placeholder="Search code blocks…" autocomplete="off">
+    </div>
+  </header>
+  <div class="layout">
+    <nav id="nav"></nav>
+    <main>
+      <p id="no-results">No results found.</p>
+      <div id="content"></div>
+    </main>
+  </div>
+</div>
+
+<script>
+const WORKER_URL = 'https://cool-king-3890.nameless-cherry-998c.workers.dev/';
+
+const pw = document.getElementById('pw-input');
+pw.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+async function unlock() {
+  const password = pw.value.trim();
+  if (!password) return;
+  document.getElementById('pw-error').textContent = '';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const json = await res.json();
+
+    if (!res.ok) {
+      document.getElementById('pw-error').textContent = json.error || 'Incorrect password.';
+      return;
+    }
+
+    document.getElementById('password-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render(json.blocks);
+  } catch (e) {
+    document.getElementById('pw-error').textContent = 'Could not connect. Check your internet.';
+  }
+}
+
+function blockClass(label) {
+  const l = label.toLowerCase();
+  if (l.includes('output') || l.includes('response')) return 'block-output';
+  if (l.includes('shell') || l.includes('macos') || l.includes('windows') || l.includes('powershell')) return 'block-shell';
+  if (l.includes('prompt') || l.includes('syntax') || l.includes('html')) return 'block-prompt';
+  return 'block-python';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function chId(ch) {
+  return ch.replace(/[^a-zA-Z0-9]/g, '-');
+}
+
+function render(blocks) {
+  // Group by chapter preserving order
+  const chapters = [];
+  const map = {};
+  blocks.forEach(b => {
+    if (!map[b.chapter]) {
+      map[b.chapter] = [];
+      chapters.push(b.chapter);
+    }
+    map[b.chapter].push(b);
+  });
+
+  // Nav
+  const nav = document.getElementById('nav');
+  nav.innerHTML = chapters.map(ch =>
+    `<a href="#${chId(ch)}">${escHtml(ch)}</a>`
+  ).join('\n');
+
+  // Content
+  const content = document.getElementById('content');
+  content.innerHTML = chapters.map(ch => {
+    const chBlocks = map[ch].map(b => `
+<div class="code-block ${blockClass(b.label)}">
+  <div class="block-label">${escHtml(b.label)}</div>
+  <pre><code>${escHtml(b.code)}</code></pre>
+</div>`).join('');
+    return `<section class="chapter" id="${chId(ch)}"><h2>${escHtml(ch)}</h2>${chBlocks}</section>`;
+  }).join('\n');
+
+  // Search
+  const searchInput = document.getElementById('search');
+  const noResults = document.getElementById('no-results');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    const chapterEls = document.querySelectorAll('.chapter');
+    if (!q) {
+      chapterEls.forEach(c => {
+        c.style.display = '';
+        c.querySelectorAll('.code-block').forEach(b => {
+          b.style.display = '';
+          const raw = b.querySelector('code').textContent;
+          b.querySelector('code').innerHTML = escHtml(raw);
+        });
+      });
+      noResults.style.display = 'none';
+      return;
+    }
+    let any = false;
+    chapterEls.forEach(c => {
+      let hit = false;
+      c.querySelectorAll('.code-block').forEach(b => {
+        const raw = b.querySelector('code').textContent;
+        const lbl = b.querySelector('.block-label').textContent.toLowerCase();
+        if (raw.toLowerCase().includes(q) || lbl.includes(q)) {
+          b.style.display = '';
+          hit = true; any = true;
+          const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+          b.querySelector('code').innerHTML = escHtml(raw).replace(re, m => `<mark>${m}</mark>`);
+        } else {
+          b.style.display = 'none';
+        }
+      });
+      c.style.display = hit ? '' : 'none';
+    });
+    noResults.style.display = any ? 'none' : 'block';
+  });
+}
+</script>
+</body>
+</html>
