@@ -136,30 +136,8 @@
     <div class="shape"></div>
 </div>
 
-<header>
-    <nav class="container">
-        <div class="logo"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40"><span>Kids Learning Lab™</span></div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="episodes.html">Episodes</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="python.html">Python Learning Lab</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="availability.html">Where to Listen</a></li>
-        </ul>
-        <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
-        <div class="mobile-nav-container" id="mobileNav">
-            <ul class="nav-links" id="navLinks">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="episodes.html">Episodes</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="python.html">Python Learning Lab</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="availability.html">Where to Listen</a></li>
-            </ul>
-        </div>
-    </nav>
-</header>
+<div id="header"></div>
+
 
 <!-- ── Course Ad ── -->
 <a class="course-ad" href="/python_course">
@@ -189,16 +167,6 @@
     </div>
 </main>
 
-<div id="footer"></div> <script>   fetch("footer.html")     .then(response => response.text())     .then(data => {       document.getElementById("footer").innerHTML = data;     }); </script>
-
-<script>
-    function toggleMenu() {
-        const nav = document.getElementById('navLinks');
-        const container = document.getElementById('mobileNav');
-        const hamburger = document.querySelector('.hamburger');
-
-        container.classList.toggle('show');
-        hamburger.classList.toggle('open');
-    }
-</script><script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
+<div id="footer"></div> <script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
+<script src="kll-includes.js"></script>
 </body></html>

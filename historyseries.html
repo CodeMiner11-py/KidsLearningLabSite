@@ -77,23 +77,8 @@
 </div>
 
 
-<header>
-    <nav class="container">
-        <div class="logo">
-            <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40">
-            <span>Kids Learning Lab™</span>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="episodes.html">Episodes</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="python.html">Python Learning Lab</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="availability.html">Where to Listen</a></li>
-        </ul>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
-    </nav>
-</header>
+<div id="header"></div>
+
 
 <main class="content-box">
     <h2>History Series: Kids Learning Lab</h2>
@@ -124,13 +109,8 @@
     </div>
 </main>
 
-<div id="footer"></div> <script>   fetch("footer.html")     .then(response => response.text())     .then(data => {       document.getElementById("footer").innerHTML = data;     }); </script>
-
+<div id="footer"></div>
 <script>
-    function toggleMenu() {
-        document.querySelector('.nav-links').classList.toggle('show');
-    }
-
     const button = document.getElementById('sortToggle');
     const container = document.getElementById('episodes');
     let ascending = true;
@@ -157,5 +137,6 @@ window.addEventListener('load', () => {
 </script>
 
 
+<script src="kll-includes.js"></script>
 </body>
 </html>

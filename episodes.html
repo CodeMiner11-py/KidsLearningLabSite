@@ -467,12 +467,6 @@
   </style>
 </head>
 
-<script>
-  fetch("footer.html")
-    .then(r => r.text())
-    .then(d => { document.getElementById("footer").innerHTML = d; });
-</script>
-
 <body>
 
 <div class="floating-shapes">
@@ -480,33 +474,8 @@
   <div class="shape"></div><div class="shape"></div>
 </div>
 
-<header>
-  <nav class="container">
-    <div class="logo">
-      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" width="40">
-      <span>Kids Learning Lab™</span>
-    </div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="episodes.html">Episodes</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="python.html">Python Learning Lab</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="availability.html">Where to Listen</a></li>
-    </ul>
-    <div class="hamburger" onclick="toggleMenu()"><span>☰</span></div>
-    <div class="mobile-nav-container" id="mobileNav">
-      <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="episodes.html">Episodes</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="python.html">Python Learning Lab</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="availability.html">Where to Listen</a></li>
-      </ul>
-    </div>
-  </nav>
-</header>
+<div id="header"></div>
+
 
 <main>
   <div class="ep-page">
@@ -547,13 +516,6 @@
 </div>
 
 <div id="footer"></div>
-
-<script>
-  function toggleMenu() {
-    document.getElementById('mobileNav').classList.toggle('show');
-    document.querySelector('.hamburger').classList.toggle('open');
-  }
-</script>
 
 <script>
 (function () {
@@ -857,5 +819,6 @@
 })();
 </script>
 
+<script src="kll-includes.js"></script>
 </body>
 </html>
