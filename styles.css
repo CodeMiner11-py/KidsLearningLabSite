@@ -14,6 +14,22 @@ body {
 	overflow-x: hidden;
 }
 
+.login-btn {
+    background-color: #1a6fc4;
+    color: white !important;
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background 0.18s;
+    white-space: nowrap;
+}
+
+.login-btn:hover {
+    background-color: #1558a0;
+}
+
 .beehiiv-embed-div
 {
   display: block; /* Ensures the iframe behaves as a block-level element */
