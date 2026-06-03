@@ -757,7 +757,7 @@
     measurementId: "G-67F06KZQVR"
   };
 
-  const ADMIN_UID = "KPhXgjMlYJd8rfZxZxFyIAIqxwq2";
+
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -771,7 +771,7 @@
 
   /* ── Auth ── */
   onAuthStateChanged(auth, user => {
-    if (user && user.uid === ADMIN_UID) {
+    if (user && user.email === "kidslearninglab099@gmail.com") {
       currentUser = user;
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('signedInAs').textContent = user.email;
