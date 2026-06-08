@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Group Spinner</title>
+<title>Wheel of Fate</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -11,14 +11,10 @@
     --surface2: #efefef;
     --border: #d8d8dd;
     --accent: #c0392b;
-    --accent2: #e67e22;
     --text: #1a1a1e;
     --muted: #888896;
-    --success: #1a7a3c;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -29,16 +25,13 @@
     align-items: center;
     padding: 40px 20px 80px;
   }
-
   h1 {
-    font-family: 'Times New Roman', Times, serif;
     font-size: clamp(2.2rem, 6vw, 3.6rem);
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: #1a1a1e;
+    color: var(--text);
     margin-bottom: 4px;
   }
-
   .subtitle {
     color: var(--muted);
     font-size: 0.85rem;
@@ -46,7 +39,6 @@
     letter-spacing: 0.06em;
     margin-bottom: 40px;
   }
-
   .layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -54,87 +46,64 @@
     width: 100%;
     max-width: 960px;
   }
-
-  @media (max-width: 700px) {
-    .layout { grid-template-columns: 1fr; }
-  }
-
+  @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
   .panel {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 22px;
   }
-
   .panel-title {
-    font-family: 'Times New Roman', Times, serif;
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #1a1a1e;
+    color: var(--text);
     border-bottom: 2px solid var(--border);
     padding-bottom: 10px;
     margin-bottom: 16px;
   }
 
-  /* --- Step 1: Categories --- */
+  /* Category input */
   .category-input-wrapper {
     display: flex;
     gap: 8px;
     margin-bottom: 12px;
     align-items: center;
   }
-
   .category-input-wrapper input[type="text"] {
     flex: 1;
-    background: #ffffff;
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text);
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.95rem;
     padding: 9px 13px;
     outline: none;
     transition: border-color 0.2s;
   }
-
   .category-input-wrapper input[type="text"]:focus { border-color: #555; }
-
-  /* Color picker swatch in category row */
-  .color-swatch {
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    padding: 2px;
-    background: #fff;
-    flex-shrink: 0;
-  }
-
   input[type="color"] {
     -webkit-appearance: none;
     appearance: none;
-    width: 30px;
-    height: 30px;
-    border: none;
-    border-radius: 4px;
+    width: 38px; height: 38px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    padding: 2px;
     cursor: pointer;
-    padding: 0;
-    background: none;
+    flex-shrink: 0;
+    background: #fff;
   }
-
   input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 4px; }
   input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
-
   .btn-add {
-    background: #1a1a1e;
+    background: var(--text);
     border: none;
     border-radius: 6px;
-    color: #ffffff;
+    color: #fff;
     cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -142,16 +111,11 @@
     transition: background 0.15s;
     white-space: nowrap;
   }
-
   .btn-add:hover { background: #333; }
+  .hint { color: var(--muted); font-size: 0.78rem; margin-top: 10px; font-style: italic; }
 
-  .category-tags {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-height: 10px;
-  }
-
+  /* Category tags */
+  .category-tags { display: flex; flex-direction: column; gap: 6px; }
   .tag {
     align-items: center;
     border-radius: 6px;
@@ -160,55 +124,73 @@
     gap: 8px;
     padding: 6px 10px;
     border: 1px solid;
+    flex-wrap: wrap;
   }
-
   .tag .tag-swatch {
-    width: 14px;
-    height: 14px;
+    width: 14px; height: 14px;
     border-radius: 3px;
     flex-shrink: 0;
     border: 1px solid rgba(0,0,0,0.12);
   }
-
-  .tag .tag-label { flex: 1; }
-
-  .tag .tag-hex {
-    font-size: 0.72rem;
-    font-family: 'Courier New', monospace;
-    opacity: 0.6;
-    letter-spacing: 0.04em;
+  .tag .tag-label { flex: 1; font-weight: 600; min-width: 60px; }
+  .tag .tag-hex { font-size: 0.72rem; font-family: 'Courier New', monospace; opacity: 0.6; letter-spacing: 0.04em; }
+  .tag button.tag-del {
+    background: none; border: none; color: inherit;
+    cursor: pointer; font-size: 0.9rem; line-height: 1;
+    opacity: 0.5; padding: 0;
   }
+  .tag button.tag-del:hover { opacity: 1; }
+  .tag input[type="color"] { width: 20px; height: 20px; border-radius: 3px; padding: 1px; }
 
-  .tag button {
-    background: none;
-    border: none;
+  /* Audio upload area in tag */
+  .audio-upload-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .audio-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.08);
+    border: 1px dashed rgba(0,0,0,0.22);
+    border-radius: 5px;
     color: inherit;
     cursor: pointer;
-    font-size: 0.9rem;
-    line-height: 1;
-    opacity: 0.5;
-    padding: 0;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    transition: background 0.15s;
+    opacity: 0.75;
   }
-
-  .tag button:hover { opacity: 1; }
-
-  /* inline color picker in tag */
-  .tag input[type="color"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+  .audio-upload-label:hover { opacity: 1; background: rgba(0,0,0,0.13); }
+  .audio-upload-label input[type="file"] { display: none; }
+  .audio-filename {
+    font-size: 0.72rem;
+    font-style: italic;
+    opacity: 0.65;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
   }
+  .btn-clear-audio {
+    background: none; border: none; cursor: pointer;
+    opacity: 0.45; font-size: 0.8rem; padding: 0 2px;
+    color: inherit;
+  }
+  .btn-clear-audio:hover { opacity: 1; }
 
-  .hint { color: var(--muted); font-size: 0.78rem; margin-top: 10px; font-style: italic; }
-
-  /* --- Step 2: Participants Table --- */
+  /* Participants table */
   .table-wrapper { overflow-x: auto; }
-
   table { border-collapse: collapse; width: 100%; }
-
   th {
     color: var(--muted);
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -216,54 +198,42 @@
     text-align: left;
     text-transform: uppercase;
   }
-
   td { padding: 4px 3px; }
-
   td input, td select {
-    background: #ffffff;
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 5px;
     color: var(--text);
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.9rem;
     outline: none;
     padding: 8px 10px;
     transition: border-color 0.2s;
     width: 100%;
   }
-
   td input:focus, td select:focus { border-color: #555; }
-  td select option { background: #ffffff; }
-
   .btn-row-del {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 4px 6px;
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1rem; padding: 4px 6px;
     transition: color 0.15s;
   }
-
   .btn-row-del:hover { color: #c0392b; }
-
   .btn-add-row {
     background: none;
     border: 1px dashed var(--border);
     border-radius: 6px;
     color: var(--muted);
     cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.88rem;
     margin-top: 10px;
     padding: 9px;
     transition: all 0.2s;
     width: 100%;
   }
-
   .btn-add-row:hover { border-color: #555; color: #333; }
 
-  /* --- Step 3: Generate --- */
+  /* Generate panel */
   .generate-panel {
     grid-column: 1 / -1;
     display: flex;
@@ -271,31 +241,23 @@
     align-items: center;
     gap: 16px;
   }
-
   .btn-generate {
-    background: #1a1a1e;
+    background: var(--text);
     border: none;
     border-radius: 8px;
-    color: #ffffff;
+    color: #fff;
     cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     padding: 16px 52px;
     transition: transform 0.15s, background 0.15s;
   }
-
   .btn-generate:hover { transform: translateY(-2px); background: #333; }
   .btn-generate:active { transform: translateY(0); }
   .btn-generate:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-
-  .status-bar {
-    color: var(--muted);
-    font-size: 0.82rem;
-    font-style: italic;
-    margin-top: 6px;
-  }
+  .status-bar { color: var(--muted); font-size: 0.82rem; font-style: italic; margin-top: 6px; }
 
   /* Preview list */
   #preview-list {
@@ -308,10 +270,9 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
-
   .preview-item {
     align-items: center;
-    background: #ffffff;
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 6px;
     display: flex;
@@ -322,11 +283,8 @@
     cursor: pointer;
     transition: background 0.15s;
   }
-
   .preview-item:hover { background: #f0f0f4; }
-
   .preview-item .pi-name { font-weight: 700; }
-
   .preview-item .pi-group {
     border-radius: 4px;
     font-size: 0.76rem;
@@ -336,67 +294,112 @@
     white-space: nowrap;
   }
 
-  .pi-hex {
-    font-family: 'Courier New', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-left: 4px;
+  /* Name lookup */
+  .lookup-row { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 420px; }
+  .lookup-wrap { position: relative; flex: 1; }
+  .lookup-row input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
   }
+  .lookup-row input:focus { border-color: #555; }
+  .lookup-suggestions {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    left: 0; right: 0;
+    margin-top: 4px;
+    overflow: hidden;
+    position: absolute;
+    top: 100%;
+    z-index: 50;
+  }
+  .lookup-suggestions div {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 9px 14px;
+    transition: background 0.1s;
+  }
+  .lookup-suggestions div:hover { background: var(--surface); }
 
-  /* --- Fullscreen Spin Overlay --- */
+  /* Spin overlay */
   #spinOverlay {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 200;
-    background: #ffffff;
+    background: #fff;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0;
   }
-
   #spinOverlay.open { display: flex; }
-
-  /* Name banner at top */
   #spinName {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: clamp(1.8rem, 5vw, 3rem);
     font-weight: 700;
     font-style: italic;
-    color: #888896;
+    color: var(--muted);
     letter-spacing: 0.03em;
     margin-bottom: 28px;
     text-align: center;
     padding: 0 20px;
   }
-
-  /* Wheel sits centered */
-  #spinCanvasWrap {
-    position: relative;
-    display: inline-block;
-  }
-
-  #spinCanvas {
-    border-radius: 50%;
-    display: block;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.13);
-  }
-
+  #spinCanvasWrap { position: relative; display: inline-block; }
+  #spinCanvas { border-radius: 50%; display: block; box-shadow: 0 8px 40px rgba(0,0,0,0.13); }
   #spinCenter {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 28px;
-    height: 28px;
-    background: #ffffff;
-    border: 4px solid #1a1a1e;
+    width: 28px; height: 28px;
+    background: #fff;
+    border: 4px solid var(--text);
     border-radius: 50%;
     z-index: 2;
   }
+  #spinNav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 20px;
+  }
+  .btn-spin-action {
+    background: var(--text);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 12px 30px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-spin-action:hover { background: #333; transform: translateY(-1px); }
+  .btn-spin-action:active { transform: translateY(0); }
+  .btn-spin-action:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-spin-action.ghost {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-spin-action.ghost:hover { border-color: #555; background: var(--surface); }
 
-  /* Result reveal — covers everything */
+  /* Result reveal */
   #resultReveal {
     display: none;
     position: fixed;
@@ -405,21 +408,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0;
     cursor: pointer;
   }
-
   #resultReveal.show { display: flex; }
-
   #resultReveal .reveal-bg {
     position: absolute;
     inset: 0;
     opacity: 0;
     transition: opacity 0.5s ease;
   }
-
   #resultReveal.show .reveal-bg { opacity: 1; }
-
   #resultReveal .reveal-content {
     position: relative;
     z-index: 1;
@@ -433,41 +431,32 @@
     opacity: 0;
     transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
   }
-
-  #resultReveal.show .reveal-content {
-    transform: scale(1);
-    opacity: 1;
-    transition-delay: 0.15s;
-  }
-
+  #resultReveal.show .reveal-content { transform: scale(1); opacity: 1; transition-delay: 0.15s; }
   .reveal-person {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: clamp(1.6rem, 4vw, 2.6rem);
     font-weight: 400;
     font-style: italic;
     color: rgba(255,255,255,0.85);
     letter-spacing: 0.02em;
   }
-
   .reveal-label {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: clamp(3.5rem, 12vw, 8rem);
     font-weight: 700;
-    color: #ffffff;
+    color: #fff;
     letter-spacing: 0.02em;
     line-height: 1;
     text-shadow: 0 4px 32px rgba(0,0,0,0.25);
   }
-
   .reveal-hex {
     font-family: 'Courier New', monospace;
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     color: rgba(255,255,255,0.55);
     letter-spacing: 0.12em;
   }
-
   .reveal-tap {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: inherit;
     font-size: 0.9rem;
     font-style: italic;
     color: rgba(255,255,255,0.45);
@@ -475,90 +464,36 @@
     letter-spacing: 0.06em;
   }
 
-  /* Nav row at bottom of spin overlay */
-  #spinNav {
+  /* Audio indicator on reveal */
+  .reveal-audio-indicator {
     display: flex;
-    gap: 12px;
     align-items: center;
-    margin-top: 32px;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0 20px;
-  }
-
-  .btn-spin-action {
-    background: #1a1a1e;
-    border: none;
-    border-radius: 8px;
-    color: #ffffff;
-    cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 12px 30px;
-    transition: background 0.15s, transform 0.1s;
-  }
-
-  .btn-spin-action:hover { background: #333; transform: translateY(-1px); }
-  .btn-spin-action:active { transform: translateY(0); }
-  .btn-spin-action:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-  .btn-spin-action.ghost {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
-  .btn-spin-action.ghost:hover { border-color: #555; background: var(--surface); }
-
-  /* Name lookup row in generate panel */
-  .lookup-row {
-    display: flex;
     gap: 8px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-top: -8px;
+  }
+  .audio-wave {
+    display: flex;
     align-items: center;
-    width: 100%;
-    max-width: 420px;
+    gap: 2px;
+    height: 16px;
   }
-
-  .lookup-row input {
-    flex: 1;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 0.95rem;
-    padding: 10px 14px;
-    outline: none;
-    transition: border-color 0.2s;
+  .audio-wave span {
+    display: inline-block;
+    width: 3px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 2px;
+    animation: wave 0.9s ease-in-out infinite;
   }
-
-  .lookup-row input:focus { border-color: #555; }
-
-  .lookup-suggestions {
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-    left: 0; right: 0;
-    margin-top: 4px;
-    overflow: hidden;
-    position: absolute;
-    top: 100%;
-    z-index: 50;
+  .audio-wave span:nth-child(2) { animation-delay: 0.15s; }
+  .audio-wave span:nth-child(3) { animation-delay: 0.3s; }
+  .audio-wave span:nth-child(4) { animation-delay: 0.45s; }
+  @keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
   }
-
-  .lookup-suggestions div {
-    cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 0.9rem;
-    padding: 9px 14px;
-    transition: background 0.1s;
-  }
-
-  .lookup-suggestions div:hover { background: var(--surface); }
-  .lookup-suggestions div strong { font-weight: 700; }
-
-  .lookup-wrap { position: relative; flex: 1; }
 </style>
 </head>
 <body>
@@ -572,12 +507,12 @@
   <div class="panel">
     <div class="panel-title">① Categories / Groups</div>
     <div class="category-input-wrapper">
-      <input type="color" id="catColor" value="#e63946" title="Choose color" style="width:38px;height:38px;border-radius:6px;border:1px solid #d8d8dd;padding:2px;cursor:pointer;flex-shrink:0" />
-      <input type="text" id="catInput" placeholder="e.g. Group 1" maxlength="30" />
+      <input type="color" id="catColor" value="#e63946" title="Choose color">
+      <input type="text" id="catInput" placeholder="e.g. Group 1" maxlength="30">
       <button class="btn-add" onclick="addCategory()">Add</button>
     </div>
     <div class="category-tags" id="catTags"></div>
-    <p class="hint">Up to 20 categories. They'll appear as wheel segments.</p>
+    <p class="hint">Up to 20 categories. Upload audio to play when a group is landed on.</p>
   </div>
 
   <!-- Step 2 -->
@@ -598,36 +533,30 @@
     <button class="btn-add-row" onclick="addRow()">+ Add Participant</button>
   </div>
 
-  <!-- Step 3 panel: lookup + preview + launch -->
+  <!-- Step 3 -->
   <div class="panel generate-panel">
     <div class="panel-title" style="text-align:center">③ Spin for Someone</div>
-
-    <!-- Name lookup -->
     <div class="lookup-row">
       <div class="lookup-wrap">
         <input type="text" id="lookupInput" placeholder="Type a name to spin for…" autocomplete="off"
-          oninput="onLookup()" onkeydown="onLookupKey(event)" />
+          oninput="onLookup()" onkeydown="onLookupKey(event)">
         <div class="lookup-suggestions" id="lookupSuggestions" style="display:none"></div>
       </div>
-      <button class="btn-generate" id="lookupSpinBtn" onclick="spinForLookup()" style="padding:10px 24px;font-size:1rem" disabled>
-        Spin!
-      </button>
+      <button class="btn-generate" id="lookupSpinBtn" onclick="spinForLookup()"
+        style="padding:10px 24px;font-size:1rem" disabled>Spin!</button>
     </div>
-
     <div id="preview-list"></div>
-    <button class="btn-generate" id="genBtn" onclick="spinAll()" disabled>
-      🎰 Spin All in Order
-    </button>
-    <p class="status-bar" id="statusBar">Add categories and participants to begin.</p>
+    <button class="btn-generate" id="genBtn" onclick="spinAll()" disabled>🎰 Spin All in Order</button>
+    <p class="status-bar" id="statusBar">Add at least 2 categories.</p>
   </div>
 
-</div><!-- end .layout -->
+</div>
 
-<!-- ── Fullscreen Spin Overlay ── -->
+<!-- Spin overlay -->
 <div id="spinOverlay">
   <div id="spinName">–</div>
   <div id="spinCanvasWrap">
-    <canvas id="spinCanvas"></canvas>
+    <canvas id="spinCanvas" width="549" height="549"></canvas>
     <div id="spinCenter"></div>
   </div>
   <div id="spinNav">
@@ -637,13 +566,19 @@
   </div>
 </div>
 
-<!-- ── Full-screen Result Reveal ── -->
+<!-- Result reveal -->
 <div id="resultReveal" onclick="dismissReveal()">
   <div class="reveal-bg" id="revealBg"></div>
   <div class="reveal-content">
     <div class="reveal-person" id="revealPerson"></div>
     <div class="reveal-label" id="revealLabel"></div>
     <div class="reveal-hex" id="revealHex"></div>
+    <div class="reveal-audio-indicator" id="revealAudioIndicator" style="display:none">
+      <div class="audio-wave">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <span>Playing audio…</span>
+    </div>
     <div class="reveal-tap">tap anywhere to continue</div>
   </div>
 </div>
@@ -656,48 +591,92 @@ const PALETTE = [
   '#bc6c25','#52b788','#d62828','#023e8a','#b5838d'
 ];
 
-let categories  = [];
+// Each category: { label, color, audio: null | { name, url, buffer } }
+let categories = [];
 let participants = [];
+let spinQueue = [], spinQueueIdx = 0;
+let isSpinning = false, spinAF = null, currentAngle = 0;
+let currentAudio = null; // currently playing AudioBufferSourceNode
 
-let spinQueue    = [];
-let spinQueueIdx = 0;
-let isSpinning   = false;
-let spinAF       = null;
-let currentAngle = 0;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// ── Canvas sizing ────────────────────────────────────────────────────────────
+// ── Audio helpers ─────────────────────────────────────────────────────────────
 
-function wheelSize() {
-  const vmin = Math.min(window.innerWidth, window.innerHeight);
-  return Math.floor(vmin * 0.60);
+function stopCurrentAudio() {
+  if (currentAudio) {
+    try { currentAudio.stop(); } catch(e) {}
+    currentAudio = null;
+  }
+  document.getElementById('revealAudioIndicator').style.display = 'none';
 }
 
+function playCategoryAudio(catIdx) {
+  stopCurrentAudio();
+  const cat = categories[catIdx];
+  if (!cat || !cat.audio) return;
+  // Resume context if suspended (autoplay policy)
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const src = audioCtx.createBufferSource();
+  src.buffer = cat.audio.buffer;
+  src.connect(audioCtx.destination);
+  src.start(0);
+  currentAudio = src;
+  src.onended = () => {
+    if (currentAudio === src) {
+      currentAudio = null;
+      document.getElementById('revealAudioIndicator').style.display = 'none';
+    }
+  };
+  document.getElementById('revealAudioIndicator').style.display = 'flex';
+}
+
+function loadAudioFile(file, catIdx) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    audioCtx.decodeAudioData(e.target.result.slice(0))
+      .then(buffer => {
+        categories[catIdx].audio = { name: file.name, buffer };
+        renderCategories();
+      })
+      .catch(() => alert('Could not decode audio file: ' + file.name));
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function clearCategoryAudio(catIdx) {
+  categories[catIdx].audio = null;
+  renderCategories();
+}
+
+// ── Canvas sizing ─────────────────────────────────────────────────────────────
+
+function wheelSize() {
+  return Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.60);
+}
 function resizeCanvas() {
   const canvas = document.getElementById('spinCanvas');
   const s = wheelSize();
-  canvas.width  = s;
-  canvas.height = s;
+  canvas.width = s; canvas.height = s;
   drawWheel(currentAngle);
 }
-
 window.addEventListener('resize', resizeCanvas);
 
-// ── Categories ───────────────────────────────────────────────────────────────
+// ── Categories ────────────────────────────────────────────────────────────────
 
 document.getElementById('catInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addCategory();
 });
 
 function addCategory() {
-  const input  = document.getElementById('catInput');
+  const input = document.getElementById('catInput');
   const picker = document.getElementById('catColor');
-  const val    = input.value.trim();
+  const val = input.value.trim();
   if (!val) return;
   if (categories.length >= 20) return alert('Max 20 categories.');
   if (categories.find(c => c.label.toLowerCase() === val.toLowerCase()))
     return alert('Category already exists.');
-  categories.push({ label: val, color: picker.value });
-  input.value  = '';
+  categories.push({ label: val, color: picker.value, audio: null });
+  input.value = '';
   picker.value = PALETTE[categories.length % PALETTE.length];
   renderCategories(); syncSelects(); updatePreview(); validate();
 }
@@ -709,38 +688,52 @@ function removeCategory(idx) {
 }
 
 function renderCategories() {
-  document.getElementById('catTags').innerHTML = categories.map((c, i) => `
-    <span class="tag" style="background:${c.color}18;color:${c.color};border:1px solid ${c.color}55">
-      <span class="tag-swatch" style="background:${c.color}"></span>
-      <span class="tag-label">${escH(c.label)}</span>
-      <span class="tag-hex">${c.color.toUpperCase()}</span>
-      <input type="color" value="${c.color}" title="Pick color"
-        oninput="categories[${i}].color=this.value;renderCategories();updatePreview();drawWheel(currentAngle)"
-        style="width:18px;height:18px;cursor:pointer;border:none;background:none;padding:0" />
-      <button onclick="removeCategory(${i})">×</button>
-    </span>`).join('');
+  document.getElementById('catTags').innerHTML = categories.map((c, i) => {
+    const audioName = c.audio ? c.audio.name : '';
+    const audioShort = audioName.length > 22 ? audioName.slice(0,20)+'…' : audioName;
+    return `
+    <span class="tag" style="background:${c.color}18;color:${c.color};border-color:${c.color}55;flex-direction:column;align-items:flex-start;gap:5px">
+      <span style="display:flex;align-items:center;gap:8px;width:100%">
+        <span class="tag-swatch" style="background:${c.color}"></span>
+        <span class="tag-label">${escH(c.label)}</span>
+        <span class="tag-hex">${c.color.toUpperCase()}</span>
+        <input type="color" value="${c.color}" title="Pick color"
+          oninput="categories[${i}].color=this.value;renderCategories();updatePreview();drawWheel(currentAngle)"
+          style="width:18px;height:18px;cursor:pointer;border:none;background:none;padding:0;flex-shrink:0" />
+        <button class="tag-del" onclick="removeCategory(${i})">×</button>
+      </span>
+      <span class="audio-upload-wrap">
+        <label class="audio-upload-label">
+          🎵 ${audioName ? 'Replace audio' : 'Upload audio'}
+          <input type="file" accept="audio/*" onchange="loadAudioFile(this.files[0],${i})">
+        </label>
+        ${audioName ? `
+          <span class="audio-filename" title="${escH(audioName)}">${escH(audioShort)}</span>
+          <button class="btn-clear-audio" title="Remove audio" onclick="clearCategoryAudio(${i})">✕</button>
+        ` : ''}
+      </span>
+    </span>`;
+  }).join('');
 }
 
-// ── Participants ─────────────────────────────────────────────────────────────
+// ── Participants ──────────────────────────────────────────────────────────────
 
 function addRow() {
   participants.push({ name: '', targetIndex: 0 });
   renderTable(); validate();
 }
-
 function removeRow(idx) {
   participants.splice(idx, 1);
   renderTable(); updatePreview(); validate();
 }
-
 function renderTable() {
   document.getElementById('participantBody').innerHTML = participants.map((p, i) => `
     <tr>
       <td><input type="text" placeholder="Name" value="${escH(p.name)}"
-        oninput="participants[${i}].name=this.value;updatePreview();updateLookupBtn();validate()" /></td>
+        oninput="participants[${i}].name=this.value;updatePreview();updateLookupBtn();validate()"></td>
       <td>
         <select onchange="participants[${i}].targetIndex=+this.value;updatePreview()">
-          ${categories.map((c, ci) =>
+          ${categories.map((c,ci) =>
             `<option value="${ci}" ${p.targetIndex===ci?'selected':''}>${escH(c.label)}</option>`
           ).join('')}
         </select>
@@ -748,13 +741,12 @@ function renderTable() {
       <td><button class="btn-row-del" onclick="removeRow(${i})">🗑</button></td>
     </tr>`).join('');
 }
-
 function syncSelects() { renderTable(); }
 
-// ── Preview list ─────────────────────────────────────────────────────────────
+// ── Preview list ──────────────────────────────────────────────────────────────
 
 function updatePreview() {
-  const el    = document.getElementById('preview-list');
+  const el = document.getElementById('preview-list');
   const valid = participants.filter(p => p.name.trim() && categories.length > 0);
   if (!valid.length) {
     el.innerHTML = '<p style="color:var(--muted);font-size:.85rem;text-align:center;padding:16px;font-style:italic">No participants yet.</p>';
@@ -763,29 +755,28 @@ function updatePreview() {
   el.innerHTML = valid.map(p => {
     const cat = categories[p.targetIndex] || {};
     const idx = participants.indexOf(p);
+    const hasAudio = cat.audio ? ' 🎵' : '';
     return `
       <div class="preview-item" onclick="spinForIdx(${idx})" title="Spin for ${escH(p.name)}">
         <span class="pi-name">${escH(p.name)}</span>
         <span class="pi-group" style="background:${cat.color};color:#ffffff">
-          ${escH(cat.label||'?')}
-          <span style="color:rgba(255,255,255,0.65);font-family:'Courier New',monospace;font-size:.7rem;margin-left:4px">${(cat.color||'').toUpperCase()}</span>
+          ${escH(cat.label||'?')}${hasAudio}
         </span>
       </div>`;
   }).join('');
 }
 
-// ── Name lookup ──────────────────────────────────────────────────────────────
+// ── Name lookup ───────────────────────────────────────────────────────────────
 
 let lookupTarget = null;
 
 function onLookup() {
-  const q   = document.getElementById('lookupInput').value.trim().toLowerCase();
+  const q = document.getElementById('lookupInput').value.trim().toLowerCase();
   const box = document.getElementById('lookupSuggestions');
-  lookupTarget = null;
-  updateLookupBtn();
-  if (!q) { box.style.display = 'none'; return; }
+  lookupTarget = null; updateLookupBtn();
+  if (!q) { box.style.display='none'; return; }
   const matches = participants.filter(p => p.name.trim() && p.name.toLowerCase().includes(q));
-  if (!matches.length) { box.style.display = 'none'; return; }
+  if (!matches.length) { box.style.display='none'; return; }
   const exact = matches.find(p => p.name.toLowerCase() === q);
   if (exact) { lookupTarget = exact; updateLookupBtn(); }
   box.style.display = 'block';
@@ -793,42 +784,26 @@ function onLookup() {
     `<div onclick="selectLookup(${participants.indexOf(p)})">${escH(p.name)}</div>`
   ).join('');
 }
-
-function onLookupKey(e) {
-  if (e.key === 'Enter' && lookupTarget) spinForLookup();
-}
-
+function onLookupKey(e) { if (e.key==='Enter' && lookupTarget) spinForLookup(); }
 function selectLookup(idx) {
   lookupTarget = participants[idx];
   document.getElementById('lookupInput').value = lookupTarget.name;
   document.getElementById('lookupSuggestions').style.display = 'none';
   updateLookupBtn();
 }
-
 function updateLookupBtn() {
   document.getElementById('lookupSpinBtn').disabled = !lookupTarget;
 }
-
 document.addEventListener('click', e => {
   if (!e.target.closest('#lookupInput') && !e.target.closest('#lookupSuggestions'))
     document.getElementById('lookupSuggestions').style.display = 'none';
 });
 
-function spinForLookup() {
-  if (!lookupTarget) return;
-  spinQueue = [lookupTarget]; spinQueueIdx = 0; openOverlay();
-}
+function spinForLookup() { if (!lookupTarget) return; spinQueue=[lookupTarget]; spinQueueIdx=0; openOverlay(); }
+function spinForIdx(idx) { spinQueue=[participants[idx]]; spinQueueIdx=0; openOverlay(); }
+function spinAll() { spinQueue=participants.filter(p=>p.name.trim()); spinQueueIdx=0; openOverlay(); }
 
-function spinForIdx(idx) {
-  spinQueue = [participants[idx]]; spinQueueIdx = 0; openOverlay();
-}
-
-function spinAll() {
-  spinQueue = participants.filter(p => p.name.trim());
-  spinQueueIdx = 0; openOverlay();
-}
-
-// ── Validation ───────────────────────────────────────────────────────────────
+// ── Validation ────────────────────────────────────────────────────────────────
 
 function validate() {
   const ok = categories.length >= 2 && participants.some(p => p.name.trim());
@@ -842,29 +817,27 @@ function validate() {
 // ── Overlay ───────────────────────────────────────────────────────────────────
 
 function openOverlay() {
-  resizeCanvas();
-  currentAngle = 0;
+  resizeCanvas(); currentAngle = 0;
   document.getElementById('spinOverlay').classList.add('open');
   loadCurrentSpin();
 }
-
 function closeOverlay() {
   if (isSpinning) return;
   cancelAnimationFrame(spinAF);
+  stopCurrentAudio();
   document.getElementById('spinOverlay').classList.remove('open');
   document.getElementById('resultReveal').classList.remove('show');
 }
-
 function loadCurrentSpin() {
   const p = spinQueue[spinQueueIdx];
   currentAngle = 0;
+  stopCurrentAudio();
   document.getElementById('spinName').textContent = p ? p.name : '–';
   document.getElementById('btnSpin').disabled = false;
   document.getElementById('btnNext').style.display = 'none';
   document.getElementById('resultReveal').classList.remove('show');
   drawWheel(0);
 }
-
 function spinNext() {
   spinQueueIdx++;
   if (spinQueueIdx >= spinQueue.length) { closeOverlay(); return; }
@@ -877,26 +850,24 @@ const SPIN_DURATION = 4200;
 
 function spin() {
   if (isSpinning) return;
+  // Resume AudioContext on user gesture
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
   const p = spinQueue[spinQueueIdx];
   if (!p) return;
-
   isSpinning = true;
-  document.getElementById('btnSpin').disabled  = true;
+  stopCurrentAudio();
+  document.getElementById('btnSpin').disabled = true;
   document.getElementById('btnClose').disabled = true;
   document.getElementById('btnNext').style.display = 'none';
   document.getElementById('resultReveal').classList.remove('show');
 
-  const n        = categories.length;
+  const n = categories.length;
   const segAngle = (2 * Math.PI) / n;
-  // Tick is at 12 o'clock (−π/2). We want target segment centre there.
-  // Segment i centre angle from rotation=0: i*seg + seg/2 (measured from 3 o'clock)
-  // We need: rotation + i*seg + seg/2 ≡ −π/2 (mod 2π)
-  // => rotation = −π/2 − (i*seg + seg/2) mod 2π
   const landAngle = -Math.PI/2 - (p.targetIndex * segAngle + segAngle/2);
   const finalAngle = currentAngle + 2*Math.PI*5 + ((landAngle - currentAngle) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
-
   const startAngle = currentAngle;
-  const startTime  = performance.now();
+  const startTime = performance.now();
 
   function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
 
@@ -911,7 +882,6 @@ function spin() {
     document.getElementById('btnClose').disabled = false;
     showReveal(p);
   }
-
   spinAF = requestAnimationFrame(frame);
 }
 
@@ -919,21 +889,24 @@ function spin() {
 
 function showReveal(p) {
   const cat = categories[p.targetIndex];
-  document.getElementById('revealBg').style.background    = cat.color;
-  document.getElementById('revealPerson').textContent     = p.name;
-  document.getElementById('revealLabel').textContent      = cat.label;
-  document.getElementById('revealHex').textContent        = cat.color.toUpperCase();
+  document.getElementById('revealBg').style.background = cat.color;
+  document.getElementById('revealPerson').textContent = p.name;
+  document.getElementById('revealLabel').textContent = cat.label;
+  document.getElementById('revealHex').textContent = cat.color.toUpperCase();
   document.getElementById('resultReveal').classList.add('show');
+  // Play audio after brief delay so reveal animation starts first
+  setTimeout(() => playCategoryAudio(p.targetIndex), 300);
 }
 
 function dismissReveal() {
+  stopCurrentAudio();
   document.getElementById('resultReveal').classList.remove('show');
   document.getElementById('btnSpin').disabled = false;
   const hasMore = spinQueueIdx < spinQueue.length - 1;
   const nb = document.getElementById('btnNext');
   if (hasMore) {
     nb.style.display = 'inline-block';
-    nb.textContent   = `Next: ${spinQueue[spinQueueIdx + 1].name} →`;
+    nb.textContent = `Next: ${spinQueue[spinQueueIdx + 1].name} →`;
   } else {
     nb.style.display = 'none';
   }
@@ -946,81 +919,50 @@ function drawWheel(rotation) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  const cx = W/2, cy = H/2;
-  const r  = cx - 6;
-  const n  = categories.length;
+  const cx = W/2, cy = H/2, r = cx - 6;
+  const n = categories.length;
   ctx.clearRect(0, 0, W, H);
   if (!n) return;
-
   const seg = (2 * Math.PI) / n;
-
   for (let i = 0; i < n; i++) {
-    const start = rotation + i * seg;
-    const end   = start + seg;
-    const cat   = categories[i];
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, end);
-    ctx.closePath();
-    ctx.fillStyle = cat.color;
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
+    const start = rotation + i * seg, end = start + seg;
+    const cat = categories[i];
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end); ctx.closePath();
+    ctx.fillStyle = cat.color; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
     const mid = start + seg/2;
-    const lx  = cx + r * 0.63 * Math.cos(mid);
-    const ly  = cy + r * 0.63 * Math.sin(mid);
-    ctx.save();
-    ctx.translate(lx, ly);
-    ctx.rotate(mid + Math.PI/2);
-    const label    = cat.label.length > 13 ? cat.label.slice(0, 12) + '\u2026' : cat.label;
+    const lx = cx + r * 0.63 * Math.cos(mid);
+    const ly = cy + r * 0.63 * Math.sin(mid);
+    ctx.save(); ctx.translate(lx, ly); ctx.rotate(mid + Math.PI/2);
+    const label = cat.label.length > 13 ? cat.label.slice(0,12) + '…' : cat.label;
+    const hasAudio = cat.audio ? ' ♪' : '';
     const fontSize = Math.max(10, Math.min(16, Math.floor(r * seg * 0.38)));
-    ctx.font         = `bold ${fontSize}px 'Times New Roman', Times, serif`;
-    ctx.fillStyle    = '#ffffff';
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor  = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur   = 4;
-    ctx.fillText(label, 0, 0);
-    ctx.shadowBlur = 0;
-    ctx.restore();
+    ctx.font = `bold ${fontSize}px 'Times New Roman', Times, serif`;
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
+    ctx.fillText(label + hasAudio, 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
   }
-
   // Outer ring
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, 2*Math.PI);
-  ctx.strokeStyle = '#dddddd';
-  ctx.lineWidth   = 4;
-  ctx.stroke();
-
-  // Top tick at 12 o'clock (no arrow)
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 4; ctx.stroke();
+  // Top tick
   const tAngle = -Math.PI/2;
   ctx.beginPath();
-  ctx.moveTo(cx + (r + 2)*Math.cos(tAngle), cy + (r + 2)*Math.sin(tAngle));
-  ctx.lineTo(cx + (r - 24)*Math.cos(tAngle), cy + (r - 24)*Math.sin(tAngle));
-  ctx.strokeStyle = '#1a1a1e';
-  ctx.lineWidth   = 7;
-  ctx.lineCap     = 'round';
-  ctx.stroke();
-
+  ctx.moveTo(cx + (r+2)*Math.cos(tAngle), cy + (r+2)*Math.sin(tAngle));
+  ctx.lineTo(cx + (r-24)*Math.cos(tAngle), cy + (r-24)*Math.sin(tAngle));
+  ctx.strokeStyle = '#1a1a1e'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.stroke();
   // Centre dot
-  ctx.beginPath();
-  ctx.arc(cx, cy, 11, 0, 2*Math.PI);
-  ctx.fillStyle   = '#ffffff';
-  ctx.fill();
-  ctx.strokeStyle = '#1a1a1e';
-  ctx.lineWidth   = 3;
-  ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 11, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.strokeStyle = '#1a1a1e'; ctx.lineWidth = 3; ctx.stroke();
 }
 
 // ── Util ──────────────────────────────────────────────────────────────────────
 
 function escH(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // Init
