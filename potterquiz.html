@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Harry Potter House Quiz Night</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+  h1 { text-align: center; }
+  .houses { display: flex; gap: 16px; margin: 24px 0; flex-wrap: wrap; }
+  .house { flex: 1; min-width: 120px; border: 2px solid #ccc; padding: 12px; text-align: center; }
+  .house .score { font-size: 2em; font-weight: bold; }
+  .house button { margin: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9em; }
+  .question { margin: 16px 0; padding: 12px; border-left: 3px solid #999; }
+  .question summary { cursor: pointer; font-weight: bold; }
+  .answer { margin-top: 8px; color: #444; font-style: italic; }
+  #winner { font-size: 1.4em; font-weight: bold; text-align: center; margin: 24px 0; padding: 16px; border: 2px solid #000; display: none; }
+  #tally-btn { display: block; margin: 24px auto; padding: 10px 24px; font-size: 1em; cursor: pointer; }
+  #reset-btn { display: block; margin: 8px auto; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Harry Potter Quiz Night</h1>
+<p style="text-align:center">Read each question aloud. Award points to the house that answers correctly.</p>
+
+<div class="houses">
+  <div class="house" style="border-color:#740001;color:#740001">
+    <div>🦁 Gryffindor</div>
+    <div class="score" id="score-g">0</div>
+    <div>
+      <button onclick="addPoint('g',1)">+1</button>
+      <button onclick="addPoint('g',2)">+2</button>
+      <button onclick="addPoint('g',-1)">−1</button>
+    </div>
+  </div>
+  <div class="house" style="border-color:#0e1a40;color:#0e1a40">
+    <div>🦅 Ravenclaw</div>
+    <div class="score" id="score-r">0</div>
+    <div>
+      <button onclick="addPoint('r',1)">+1</button>
+      <button onclick="addPoint('r',2)">+2</button>
+      <button onclick="addPoint('r',-1)">−1</button>
+    </div>
+  </div>
+  <div class="house" style="border-color:#1a472a;color:#1a472a">
+    <div>🐍 Slytherin</div>
+    <div class="score" id="score-s">0</div>
+    <div>
+      <button onclick="addPoint('s',1)">+1</button>
+      <button onclick="addPoint('s',2)">+2</button>
+      <button onclick="addPoint('s',-1)">−1</button>
+    </div>
+  </div>
+  <div class="house" style="border-color:#f0c75e;color:#8b6914">
+    <div>🦡 Hufflepuff</div>
+    <div class="score" id="score-h">0</div>
+    <div>
+      <button onclick="addPoint('h',1)">+1</button>
+      <button onclick="addPoint('h',2)">+2</button>
+      <button onclick="addPoint('h',-1)">−1</button>
+    </div>
+  </div>
+</div>
+
+<hr>
+<h2>Questions</h2>
+
+<div class="question">
+  <details>
+    <summary>1. What is the name of Harry Potter's owl?</summary>
+    <div class="answer">Hedwig</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>2. What house does Harry Potter belong to at Hogwarts?</summary>
+    <div class="answer">Gryffindor</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>3. What core is inside Harry's wand?</summary>
+    <div class="answer">Phoenix feather</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>4. Who is the Half-Blood Prince?</summary>
+    <div class="answer">Severus Snape</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>5. What position does Harry play in Quidditch?</summary>
+    <div class="answer">Seeker</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>6. What is the name of the magical bank in Diagon Alley?</summary>
+    <div class="answer">Gringotts</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>7. What spell is used to disarm an opponent?</summary>
+    <div class="answer">Expelliarmus</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>8. What is the name of Hagrid's three-headed dog?</summary>
+    <div class="answer">Fluffy</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>9. In what year does Harry first arrive at Hogwarts?</summary>
+    <div class="answer">1991</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>10. What form does Hermione's Patronus take?</summary>
+    <div class="answer">An otter</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>11. What is the name of the wizarding newspaper?</summary>
+    <div class="answer">The Daily Prophet</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>12. Which Defence Against the Dark Arts teacher turns out to be possessed by Voldemort?</summary>
+    <div class="answer">Professor Quirrell</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>13. What does "Dumbledore" mean in Old English?</summary>
+    <div class="answer">Bumblebee</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>14. What are the three Unforgivable Curses?</summary>
+    <div class="answer">Avada Kedavra (killing), Crucio (torture), and Imperio (control)</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>15. Who gives Harry his first broomstick, and what model is it?</summary>
+    <div class="answer">Professor McGonagall — a Nimbus 2000</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>16. What magical object is hidden in the Mirror of Erised in Book 1?</summary>
+    <div class="answer">The Philosopher's Stone (Sorcerer's Stone)</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>17. What is the name of Voldemort's snake?</summary>
+    <div class="answer">Nagini</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>18. What creature is Aragog?</summary>
+    <div class="answer">An Acromantula (giant spider)</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>19. What is the incantation for the Patronus Charm?</summary>
+    <div class="answer">Expecto Patronum</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>20. Where do the Dursleys live?</summary>
+    <div class="answer">4 Privet Drive, Little Whinging, Surrey</div>
+  </details>
+</div>
+
+<div class="question">
+  <details>
+    <summary>21. What does Harry see when he looks into the Mirror of Erised?</summary>
+    <div class="answer">Himself surrounded by his family (his parents and relatives)</div>
+  </details>
+</div>
+
+<hr>
+
+<button id="tally-btn" onclick="tally()">🏆 Announce Winner</button>
+<button id="reset-btn" onclick="resetScores()">Reset Scores</button>
+
+<div id="winner"></div>
+
+<script>
+  const scores = { g: 0, r: 0, s: 0, h: 0 };
+  const names = { g: "🦁 Gryffindor", r: "🦅 Ravenclaw", s: "🐍 Slytherin", h: "🦡 Hufflepuff" };
+
+  function addPoint(house, val) {
+    scores[house] = Math.max(0, scores[house] + val);
+    document.getElementById("score-" + house).textContent = scores[house];
+    document.getElementById("winner").style.display = "none";
+  }
+
+  function tally() {
+    const max = Math.max(...Object.values(scores));
+    const winners = Object.keys(scores).filter(h => scores[h] === max);
+    const el = document.getElementById("winner");
+    if (winners.length === 4) {
+      el.textContent = "It's a four-way tie! Every house wins! 🎉";
+    } else if (winners.length > 1) {
+      el.textContent = "Tie! " + winners.map(h => names[h]).join(" & ") + " win with " + max + " points! 🎉";
+    } else {
+      el.textContent = names[winners[0]] + " wins with " + max + " points! 🏆";
+    }
+    el.style.display = "block";
+  }
+
+  function resetScores() {
+    for (const h of Object.keys(scores)) {
+      scores[h] = 0;
+      document.getElementById("score-" + h).textContent = 0;
+    }
+    document.getElementById("winner").style.display = "none";
+  }
+</script>
+
+</body>
+</html>
