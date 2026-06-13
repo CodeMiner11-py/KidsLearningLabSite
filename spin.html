@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wheel of Fate</title>
@@ -494,6 +492,87 @@
     0%, 100% { height: 4px; }
     50% { height: 14px; }
   }
+
+  /* Export / Import */
+  .io-panel {
+    margin-top: 32px;
+    width: 100%;
+    max-width: 960px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .io-section { display: flex; flex-direction: column; gap: 8px; }
+  .io-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .io-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .io-textarea {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    padding: 10px 14px;
+    resize: vertical;
+    min-height: 58px;
+    max-height: 120px;
+    outline: none;
+    transition: border-color 0.2s;
+    word-break: break-all;
+  }
+  .io-textarea:focus { border-color: #555; }
+  .btn-io {
+    background: var(--text);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 10px 20px;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .btn-io:hover { background: #333; transform: translateY(-1px); }
+  .btn-io:active { transform: translateY(0); }
+  .btn-io.ghost {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-io.ghost:hover { border-color: #555; background: var(--surface2); transform: translateY(-1px); }
+  .io-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+  .io-status {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--muted);
+    min-height: 1.2em;
+  }
+  .io-status.ok { color: #43aa8b; }
+  .io-status.err { color: #c0392b; }
 </style>
 </head>
 <body>
@@ -527,7 +606,16 @@
             <th></th>
           </tr>
         </thead>
-        <tbody id="participantBody"></tbody>
+        <tbody id="participantBody">
+    <tr>
+      <td><input type="text" placeholder="Name" value="" oninput="participants[0].name=this.value;updatePreview();updateLookupBtn();validate()"></td>
+      <td>
+        <select onchange="participants[0].targetIndex=+this.value;updatePreview()">
+          
+        </select>
+      </td>
+      <td><button class="btn-row-del" onclick="removeRow(0)">🗑</button></td>
+    </tr></tbody>
       </table>
     </div>
     <button class="btn-add-row" onclick="addRow()">+ Add Participant</button>
@@ -538,18 +626,43 @@
     <div class="panel-title" style="text-align:center">③ Spin for Someone</div>
     <div class="lookup-row">
       <div class="lookup-wrap">
-        <input type="text" id="lookupInput" placeholder="Type a name to spin for…" autocomplete="off"
-          oninput="onLookup()" onkeydown="onLookupKey(event)">
+        <input type="text" id="lookupInput" placeholder="Type a name to spin for…" autocomplete="off" oninput="onLookup()" onkeydown="onLookupKey(event)">
         <div class="lookup-suggestions" id="lookupSuggestions" style="display:none"></div>
       </div>
-      <button class="btn-generate" id="lookupSpinBtn" onclick="spinForLookup()"
-        style="padding:10px 24px;font-size:1rem" disabled>Spin!</button>
+      <button class="btn-generate" id="lookupSpinBtn" onclick="spinForLookup()" style="padding:10px 24px;font-size:1rem" disabled="">Spin!</button>
     </div>
     <div id="preview-list"></div>
-    <button class="btn-generate" id="genBtn" onclick="spinAll()" disabled>🎰 Spin All in Order</button>
+    <button class="btn-generate" id="genBtn" onclick="spinAll()" disabled="">🎰 Spin All in Order</button>
     <p class="status-bar" id="statusBar">Add at least 2 categories.</p>
   </div>
 
+</div>
+
+<!-- Export / Import panel -->
+<div class="io-panel">
+  <div class="panel-title" style="border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:2px">④ Export &amp; Import</div>
+
+  <div class="io-section">
+    <div class="io-label">Export — generate a string with all categories, participants &amp; audio</div>
+    <div class="io-row">
+      <textarea class="io-textarea" id="exportField" readonly placeholder="Click 'Export as Text' to generate…"></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn-io" onclick="doExport()">Export as Text</button>
+        <button class="btn-io ghost" id="btnCopy" onclick="doCopy()" style="display:none">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="io-divider">
+
+  <div class="io-section">
+    <div class="io-label">Import — paste an export string to restore everything</div>
+    <div class="io-row">
+      <textarea class="io-textarea" id="importField" placeholder="Paste export string here…"></textarea>
+      <button class="btn-io" onclick="doImport()">Import</button>
+    </div>
+    <div class="io-status" id="importStatus"></div>
+  </div>
 </div>
 
 <!-- Spin overlay -->
@@ -614,7 +727,6 @@ function playCategoryAudio(catIdx) {
   stopCurrentAudio();
   const cat = categories[catIdx];
   if (!cat || !cat.audio) return;
-  // Resume context if suspended (autoplay policy)
   if (audioCtx.state === 'suspended') audioCtx.resume();
   const src = audioCtx.createBufferSource();
   src.buffer = cat.audio.buffer;
@@ -850,7 +962,6 @@ const SPIN_DURATION = 4200;
 
 function spin() {
   if (isSpinning) return;
-  // Resume AudioContext on user gesture
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
   const p = spinQueue[spinQueueIdx];
@@ -894,7 +1005,6 @@ function showReveal(p) {
   document.getElementById('revealLabel').textContent = cat.label;
   document.getElementById('revealHex').textContent = cat.color.toUpperCase();
   document.getElementById('resultReveal').classList.add('show');
-  // Play audio after brief delay so reveal animation starts first
   setTimeout(() => playCategoryAudio(p.targetIndex), 300);
 }
 
@@ -959,6 +1069,153 @@ function drawWheel(rotation) {
   ctx.strokeStyle = '#1a1a1e'; ctx.lineWidth = 3; ctx.stroke();
 }
 
+// ── Export / Import ───────────────────────────────────────────────────────────
+
+// Convert AudioBuffer → base64 PCM (WAV-wrapped for reliable re-decode)
+function audioBufferToWavBase64(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const numFrames = buffer.length;
+  const bytesPerSample = 2; // 16-bit PCM
+  const dataLen = numFrames * numChannels * bytesPerSample;
+  const wavLen = 44 + dataLen;
+  const ab = new ArrayBuffer(wavLen);
+  const view = new DataView(ab);
+  function writeStr(off, str) { for (let i=0;i<str.length;i++) view.setUint8(off+i, str.charCodeAt(i)); }
+  writeStr(0, 'RIFF');
+  view.setUint32(4, wavLen - 8, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * bytesPerSample, true);
+  view.setUint16(32, numChannels * bytesPerSample, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataLen, true);
+  let off = 44;
+  for (let i = 0; i < numFrames; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const s = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+      view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      off += 2;
+    }
+  }
+  // Convert ArrayBuffer to base64
+  const bytes = new Uint8Array(ab);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+async function doExport() {
+  const btn = document.querySelector('[onclick="doExport()"]');
+  btn.textContent = 'Exporting…';
+  btn.disabled = true;
+
+  try {
+    const catData = await Promise.all(categories.map(async (c) => {
+      const entry = { label: c.label, color: c.color, audioName: null, audioB64: null };
+      if (c.audio && c.audio.buffer) {
+        entry.audioName = c.audio.name;
+        entry.audioB64 = audioBufferToWavBase64(c.audio.buffer);
+      }
+      return entry;
+    }));
+
+    const pData = participants.map(p => ({ name: p.name, targetIndex: p.targetIndex }));
+
+    const payload = JSON.stringify({ v: 1, categories: catData, participants: pData });
+    const encoded = btoa(unescape(encodeURIComponent(payload)));
+
+    const field = document.getElementById('exportField');
+    field.value = encoded;
+    document.getElementById('btnCopy').style.display = 'inline-block';
+  } catch(e) {
+    alert('Export failed: ' + e.message);
+  }
+
+  btn.textContent = 'Export as Text';
+  btn.disabled = false;
+}
+
+function doCopy() {
+  const field = document.getElementById('exportField');
+  field.select();
+  navigator.clipboard.writeText(field.value).catch(() => {
+    document.execCommand('copy');
+  });
+  const btn = document.getElementById('btnCopy');
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+}
+
+async function doImport() {
+  const raw = document.getElementById('importField').value.trim();
+  const status = document.getElementById('importStatus');
+  status.className = 'io-status';
+  if (!raw) { status.textContent = 'Paste an export string first.'; status.className = 'io-status err'; return; }
+
+  let payload;
+  try {
+    const decoded = decodeURIComponent(escape(atob(raw)));
+    payload = JSON.parse(decoded);
+  } catch(e) {
+    status.textContent = 'Invalid import string — could not decode.';
+    status.className = 'io-status err';
+    return;
+  }
+
+  if (!payload.categories || !payload.participants) {
+    status.textContent = 'Import string is missing required data.';
+    status.className = 'io-status err';
+    return;
+  }
+
+  status.textContent = 'Importing…';
+
+  // Rebuild categories with audio buffers
+  const newCats = [];
+  for (const c of payload.categories) {
+    const entry = { label: c.label, color: c.color, audio: null };
+    if (c.audioB64 && c.audioName) {
+      try {
+        const bin = atob(c.audioB64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const buffer = await audioCtx.decodeAudioData(bytes.buffer);
+        entry.audio = { name: c.audioName, buffer };
+      } catch(e) {
+        console.warn('Could not restore audio for category:', c.label, e);
+      }
+    }
+    newCats.push(entry);
+  }
+
+  categories = newCats;
+  participants = payload.participants.map(p => ({
+    name: p.name,
+    targetIndex: Math.min(p.targetIndex, categories.length - 1)
+  }));
+
+  renderCategories();
+  syncSelects();
+  updatePreview();
+  updateLookupBtn();
+  validate();
+
+  // Reset export field
+  document.getElementById('exportField').value = '';
+  document.getElementById('btnCopy').style.display = 'none';
+  document.getElementById('importField').value = '';
+
+  const audioCount = categories.filter(c => c.audio).length;
+  status.textContent = `Imported ${categories.length} categories, ${participants.length} participants${audioCount ? `, ${audioCount} audio clip(s)` : ''}.`;
+  status.className = 'io-status ok';
+}
+
 // ── Util ──────────────────────────────────────────────────────────────────────
 
 function escH(str) {
@@ -969,5 +1226,5 @@ function escH(str) {
 addRow();
 validate();
 </script>
-</body>
-</html>
+
+</body></html>
