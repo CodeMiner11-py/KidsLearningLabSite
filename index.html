@@ -285,14 +285,24 @@
 </head>
 
 <body>
+  <div id="pear-ai-overlay">
+    <div class="pear-ai-modal">
+      <button class="pear-ai-close" onclick="document.getElementById('pear-ai-overlay').classList.remove('active')">✕</button>
+      <img src="https://kidslearninglab.com/pear%201.png" class="pear-ai-logo" alt="Pear AI logo">
+      <div class="pear-ai-title">Cook Faster & Easier</div>
+      <p class="pear-ai-desc">Pear AI is a recipe creator created by the host of Kids Learning Lab, Eshaan (me). It can create a recipe in seconds from a description or ingredients, and has useful cooking and organizing tools. Download Pear AI today for free on the iOS App Store.</p>
+      <a href="https://kidslearninglab.com/pear-ai-ios/" class="pear-ai-btn" target="_blank" rel="noopener">Download For Free</a>
+    </div>
+  </div>
+
     <div id="top-banner" style="background-color: #add8e6;">
       <div class="desktop-banner">
-        Click here to learn about
-        <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">our new video episodes!</a>
+        Click to learn about the 
+        <a href="https://kidslearninglab.com/episodes?ep=the-fifa-world-cup-what-is-it" style="text-decoration: underline;">FIFA World Cup 2026!</a>
       </div>
       <div class="mobile-banner">
-        <a href="https://news.kidslearninglab.com/p/new-episodes-on-kids-learning-lab" style="text-decoration: underline;">
-          New Video Episodes!
+        <a href="https://kidslearninglab.com/episodes?ep=the-fifa-world-cup-what-is-it" style="text-decoration: underline;">
+          FIFA World Cup 2026!
         </a>
       </div>
     </div>
@@ -487,6 +497,92 @@
                             margin: auto !important;
                             width: 100% !important;
                         }
+
+                        #pear-ai-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  font-family: "DM Sans", sans-serif !important;
+}
+
+#pear-ai-overlay.active {
+  display: flex;
+}
+
+.pear-ai-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 32px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.pear-ai-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f1f1;
+  color: #333;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pear-ai-close:hover {
+  background: #e0e0e0;
+}
+
+.pear-ai-logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 20px;
+  object-fit: cover;
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.pear-ai-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.pear-ai-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.pear-ai-btn {
+  display: inline-block;
+  background: #1a6fc4;
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.pear-ai-btn:hover {
+  background: #155a9e;
+}
                     </style>
                 </div>
             </div>
@@ -662,5 +758,17 @@
     </script>
 
 <script src="kll-includes.js"></script>
+<script>
+  (function () {
+    const KEY = 'pearAiVisitCount';
+    let count = parseInt(localStorage.getItem(KEY) || '0', 10) + 1;
+    localStorage.setItem(KEY, count);
+  
+    // Show on visit 1, 6, 11, 16, ...
+    if ((count - 1) % 5 === 0) {
+      document.getElementById('pear-ai-overlay').classList.add('active');
+    }
+  })();
+  </script>
 </body>
 </html>
