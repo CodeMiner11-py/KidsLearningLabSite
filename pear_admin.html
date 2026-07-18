@@ -8,15 +8,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --black: #0a0a0a;
-      --white: #fafaf8;
-      --gray-1: #f0ede8;
-      --gray-2: #d8d4cc;
-      --gray-3: #a09890;
-      --gray-4: #5a5450;
-      --red: #8b1a1a;
-      --green: #1a4a1a;
-      --serif: 'Times New Roman', Georgia, serif;
+      --black: #000000;
+      --white: #ffffff;
+      --gray-1: #f0f0f0;
+      --gray-2: #c0c0c0;
+      --gray-3: #a0a0a0;
+      --gray-4: #808080;
+      --red: #ff0000;
+      --green: #0000ff;
+      --serif: Arial, Helvetica, sans-serif;
     }
 
     body {
@@ -24,34 +24,33 @@
       background: var(--white);
       color: var(--black);
       min-height: 100vh;
+      font-size: 13px;
     }
 
     /* ── Auth Screen ── */
     #authScreen {
       position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
+      display: block;
       background: var(--white);
       z-index: 9999;
-      flex-direction: column;
-      gap: 24px;
+      padding: 20px;
     }
     #authScreen.hidden { display: none; }
 
     .auth-box {
       border: 1px solid var(--black);
-      padding: 48px 56px;
-      text-align: center;
+      padding: 20px;
+      text-align: left;
       max-width: 400px;
-      width: 100%;
     }
     .auth-box h1 {
       font-size: 1.8rem;
       font-weight: normal;
       margin-bottom: 6px;
-      letter-spacing: .04em;
+      
     }
     .auth-box .subtitle {
-      font-style: italic;
+      
       color: var(--gray-4);
       font-size: .95rem;
       margin-bottom: 32px;
@@ -60,7 +59,7 @@
     }
     .auth-error {
       color: var(--red);
-      font-style: italic;
+      
       font-size: .88rem;
       margin-top: 12px;
       display: none;
@@ -89,7 +88,7 @@
       color: var(--white);
       padding: 10px 22px;
       cursor: pointer;
-      letter-spacing: .04em;
+      
       transition: background .15s, color .15s;
     }
     .btn:hover { background: var(--gray-4); }
@@ -98,11 +97,11 @@
     .btn.danger { background: var(--red); border-color: var(--red); }
     .btn.danger:hover { background: #6b1010; }
     .btn.success { background: var(--green); border-color: var(--green); }
-    .btn.success:hover { background: #0f2e0f; }
-    .btn.accent { background: #2a3a6a; border-color: #2a3a6a; }
-    .btn.accent:hover { background: #1a2850; }
-    .btn.gold { background: #7a5c1e; border-color: #7a5c1e; }
-    .btn.gold:hover { background: #5e4416; }
+    .btn.success:hover { background: #0000cc; }
+    .btn.accent { background: var(--green); border-color: var(--green); }
+    .btn.accent:hover { background: #0000cc; }
+    .btn.gold { background: var(--green); border-color: var(--green); }
+    .btn.gold:hover { background: #0000cc; }
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
     .btn-google {
@@ -123,19 +122,19 @@
     /* ── Header ── */
     header {
       border-bottom: 2px solid var(--black);
-      padding: 18px 40px;
+      padding: 10px;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 20px;
     }
-    header h1 { font-size: 1.5rem; font-weight: normal; letter-spacing: .06em; }
-    header h1 span { font-style: italic; }
+    header h1 { font-size: 1.5rem; font-weight: normal;  }
+    header h1 span {  }
     .header-right { display: flex; align-items: center; gap: 16px; font-size: .82rem; color: var(--gray-4); }
-    #signedInAs { font-style: italic; }
+    #signedInAs {  }
 
     /* ── Layout ── */
-    .container { max-width: 1100px; margin: 0 auto; padding: 36px 40px 80px; }
+    .container { max-width: 1100px; margin: 0; padding: 10px; }
 
     /* ── Toolbar ── */
     .toolbar {
@@ -154,19 +153,19 @@
     th {
       font-family: var(--serif);
       font-weight: normal;
-      font-style: italic;
+      
       text-align: left;
       padding: 10px 14px;
-      letter-spacing: .03em;
+      
       white-space: nowrap;
     }
     td { padding: 10px 14px; border-bottom: 1px solid var(--gray-2); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--gray-1); }
     .td-title { font-weight: normal; max-width: 200px; }
-    .td-author { color: var(--gray-4); font-style: italic; font-size: .82rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .td-author { color: var(--gray-4);  font-size: .82rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .td-img { width: 56px; height: 40px; object-fit: cover; border: 1px solid var(--gray-2); display: block; }
-    .td-img-placeholder { width: 56px; height: 40px; border: 1px solid var(--gray-2); background: var(--gray-1); display: flex; align-items: center; justify-content: center; color: var(--gray-3); font-size: .7rem; font-style: italic; }
+    .td-img-placeholder { width: 56px; height: 40px; border: 1px solid var(--gray-2); background: var(--gray-1); display: flex; align-items: center; justify-content: center; color: var(--gray-3); font-size: .7rem;  }
     .td-actions { display: flex; gap: 8px; white-space: nowrap; }
     .curated-badge {
       display: inline-block;
@@ -174,16 +173,16 @@
       border: 1px solid var(--green);
       color: var(--green);
       padding: 2px 7px;
-      font-style: italic;
-      letter-spacing: .03em;
+      
+      
     }
 
     /* ── Modal ── */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 5000;
-      background: rgba(10,10,10,.6);
-      display: flex; align-items: flex-start; justify-content: center;
-      padding: 40px 24px;
+      background: rgba(0,0,0,.5);
+      display: block;
+      padding: 20px;
       overflow-y: auto;
     }
     .modal-overlay.hidden { display: none; }
@@ -195,8 +194,8 @@
       position: relative;
     }
     .modal h2 {
-      font-size: 1.4rem; font-weight: normal; font-style: italic;
-      margin-bottom: 6px; letter-spacing: .03em;
+      font-size: 1.4rem; font-weight: normal; 
+      margin-bottom: 6px; 
     }
     .modal-subtitle {
       font-size: .82rem; color: var(--gray-4); margin-bottom: 28px;
@@ -212,8 +211,8 @@
 
     .form-row { margin-bottom: 18px; }
     .form-row label {
-      display: block; font-size: .78rem; letter-spacing: .07em;
-      text-transform: uppercase; margin-bottom: 6px; color: var(--gray-4);
+      display: block; font-size: .78rem; 
+       margin-bottom: 6px; color: var(--gray-4);
     }
     .form-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
@@ -228,7 +227,7 @@
     }
     .list-item-row button:hover { background: var(--gray-1); }
     .add-item-btn {
-      font-family: var(--serif); font-size: .82rem; font-style: italic;
+      font-family: var(--serif); font-size: .82rem; 
       color: var(--gray-4); background: none; border: 1px dashed var(--gray-2);
       padding: 7px 14px; cursor: pointer; text-align: left; width: 100%;
     }
@@ -245,7 +244,7 @@
     }
 
     .status-bar {
-      margin-top: 12px; font-size: .85rem; font-style: italic;
+      margin-top: 12px; font-size: .85rem; 
       min-height: 1.2em;
     }
     .status-bar.ok { color: var(--green); }
@@ -254,21 +253,21 @@
     /* Confirm overlay */
     .confirm-overlay {
       position: fixed; inset: 0; z-index: 6000;
-      background: rgba(10,10,10,.65);
-      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.5);
+      display: block; padding: 20px;
     }
     .confirm-overlay.hidden { display: none; }
     .confirm-box {
       background: var(--white); border: 1px solid var(--black);
-      padding: 32px 36px; max-width: 380px; width: 100%; text-align: center;
+      padding: 20px; max-width: 380px; text-align: left;
     }
     .confirm-box p { font-size: .95rem; line-height: 1.6; margin-bottom: 24px; }
-    .confirm-box .confirm-title { font-style: italic; font-size: 1.15rem; margin-bottom: 10px; }
+    .confirm-box .confirm-title {  font-size: 1.15rem; margin-bottom: 10px; }
     .confirm-box .btn-row { display: flex; gap: 10px; justify-content: center; }
 
     /* Loading */
-    .loading-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-4); }
-    .empty-row { text-align: center; padding: 40px; font-style: italic; color: var(--gray-3); border: 1px solid var(--gray-2); }
+    .loading-row { text-align: center; padding: 40px;  color: var(--gray-4); }
+    .empty-row { text-align: center; padding: 40px;  color: var(--gray-3); border: 1px solid var(--gray-2); }
 
     /* ── JSON Import Modal ── */
     #jsonImportOverlay .modal { max-width: 720px; }
@@ -299,7 +298,7 @@
     .json-example-toggle {
       font-family: var(--serif);
       font-size: .8rem;
-      font-style: italic;
+      
       color: var(--gray-4);
       background: none;
       border: none;
@@ -314,7 +313,7 @@
     #jsonExampleBlock.visible { display: block; }
 
     .import-parse-status {
-      font-size: .82rem; font-style: italic; margin-top: 10px; min-height: 1.2em;
+      font-size: .82rem;  margin-top: 10px; min-height: 1.2em;
     }
     .import-parse-status.ok { color: var(--green); }
     .import-parse-status.err { color: var(--red); }
@@ -350,7 +349,7 @@
     .gen-queue:empty::after {
       content: 'No recipes generated yet.';
       display: block;
-      font-style: italic;
+      
       color: var(--gray-3);
       padding: 24px 0;
       text-align: center;
@@ -385,12 +384,12 @@
       width: 80px; height: 80px;
       border: 1px dashed var(--gray-3);
       display: flex; align-items: center; justify-content: center;
-      font-size: .68rem; color: var(--gray-3); font-style: italic;
+      font-size: .68rem; color: var(--gray-3); 
       text-align: center; line-height: 1.4;
     }
     .gen-img-actions { display: flex; flex-direction: column; gap: 5px; width: 100%; }
     .gen-img-btn {
-      font-family: var(--serif); font-size: .7rem; font-style: italic;
+      font-family: var(--serif); font-size: .7rem; 
       border: 1px solid var(--gray-2); background: var(--white);
       color: var(--gray-4); cursor: pointer; padding: 4px 6px;
       text-align: center; width: 100%;
@@ -414,7 +413,7 @@
     .gen-card-desc textarea {
       border: none; border-bottom: 1px dashed var(--gray-2);
       background: transparent; font-family: var(--serif); font-size: .85rem;
-      color: var(--gray-4); font-style: italic; width: 100%;
+      color: var(--gray-4);  width: 100%;
       resize: none; min-height: 40px; padding: 2px 4px;
       line-height: 1.5;
     }
@@ -432,7 +431,7 @@
       display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
     }
     .gen-card-nutrition .n-cell { display: flex; flex-direction: column; gap: 2px; }
-    .gen-card-nutrition .n-label { font-size: .65rem; color: var(--gray-3); text-transform: uppercase; letter-spacing: .05em; }
+    .gen-card-nutrition .n-label { font-size: .65rem; color: var(--gray-3);   }
     .gen-card-nutrition input {
       font-size: .78rem; padding: 4px 6px; border-color: var(--gray-2);
     }
@@ -441,14 +440,14 @@
       display: flex; gap: 8px; margin-top: 4px; align-items: center; flex-wrap: wrap;
     }
     .gen-card-status {
-      font-size: .78rem; font-style: italic; margin-left: auto;
+      font-size: .78rem;  margin-left: auto;
     }
     .gen-card-status.ok  { color: var(--green); }
     .gen-card-status.err { color: var(--red); }
     .gen-card-status.pending { color: var(--gray-4); }
 
     .gen-card-toggle {
-      font-family: var(--serif); font-size: .72rem; font-style: italic;
+      font-family: var(--serif); font-size: .72rem; 
       color: var(--gray-4); background: none; border: none; cursor: pointer;
       padding: 0; text-decoration: underline; text-underline-offset: 2px;
     }
@@ -459,12 +458,12 @@
 
     .gen-list-section { margin-bottom: 10px; }
     .gen-list-section label {
-      display: block; font-size: .72rem; letter-spacing: .06em;
-      text-transform: uppercase; color: var(--gray-4); margin-bottom: 5px;
+      display: block; font-size: .72rem; 
+       color: var(--gray-4); margin-bottom: 5px;
     }
 
     .gen-progress {
-      font-style: italic; color: var(--gray-4); font-size: .82rem;
+       color: var(--gray-4); font-size: .82rem;
       padding: 8px 0; text-align: center;
       border: 1px dashed var(--gray-2);
       margin-bottom: 14px;
@@ -475,7 +474,7 @@
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
       padding: 16px 0; border-bottom: 1px solid var(--gray-2); margin-bottom: 18px;
     }
-    .ai-count-label { font-size: .82rem; color: var(--gray-4); font-style: italic; }
+    .ai-count-label { font-size: .82rem; color: var(--gray-4);  }
     .ai-count-select { width: auto; padding: 7px 10px; }
 
     /* Spinner */
@@ -593,7 +592,7 @@
     </div>
 
     <div class="form-row">
-      <label>Nutrition Facts <span style="font-style:italic;font-size:.8em;color:var(--gray-3)">(optional)</span></label>
+      <label>Nutrition Facts <span style="font-size:.8em;color:var(--gray-3)">(optional)</span></label>
       <div class="nutrition-grid">
         <div><label>Calories</label><input type="text" id="nCalories" placeholder="e.g. 320kcal"></div>
         <div><label>Protein</label><input type="text" id="nProtein" placeholder="e.g. 12g"></div>
@@ -661,7 +660,7 @@
 
     <!-- Worker URL + Secret -->
     <div style="background:var(--gray-1);border:1px solid var(--gray-2);padding:16px 18px;margin-bottom:20px;">
-      <div style="font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-4);margin-bottom:10px;">Worker Settings</div>
+      <div style="font-size:.72rem;color:var(--gray-4);margin-bottom:10px;">Worker Settings</div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
         <div>
           <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:4px;">Worker URL</label>
@@ -677,7 +676,7 @@
     <!-- Generation Controls -->
     <div class="ai-gen-controls">
       <div>
-        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Meal Type</label>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:5px;">Meal Type</label>
         <select id="aiMealType" style="width:auto;padding:7px 10px;">
           <option value="">— any —</option>
           <option>Breakfast</option>
@@ -688,19 +687,19 @@
         </select>
       </div>
       <div>
-        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Cuisine</label>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:5px;">Cuisine</label>
         <input type="text" id="aiCuisine" placeholder="e.g. Italian" style="width:140px;">
       </div>
       <div>
-        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Dietary</label>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:5px;">Dietary</label>
         <input type="text" id="aiDietary" placeholder="e.g. vegetarian" style="width:140px;">
       </div>
       <div>
-        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Prompt hint</label>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:5px;">Prompt hint</label>
         <input type="text" id="aiPrompt" placeholder="e.g. something comforting…" style="width:200px;">
       </div>
       <div>
-        <label style="display:block;font-size:.72rem;color:var(--gray-4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">Count</label>
+        <label style="display:block;font-size:.72rem;color:var(--gray-4);margin-bottom:5px;">Count</label>
         <select id="aiCount" style="width:auto;padding:7px 10px;">
           <option value="1">1</option>
           <option value="3" selected>3</option>
@@ -719,7 +718,7 @@
         <button class="btn success" id="approveAllBtn" onclick="approveAll()" disabled>✓ Approve All Pending</button>
         <button class="btn outline" onclick="closeAiGenModal()">Close</button>
       </div>
-      <span id="aiGenSummary" style="font-size:.82rem;font-style:italic;color:var(--gray-4);"></span>
+      <span id="aiGenSummary" style="font-size:.82rem;color:var(--gray-4);"></span>
     </div>
   </div>
 </div>
@@ -1287,7 +1286,7 @@
     container.innerHTML = genQueue.map(entry => {
       if (entry.status === 'error') {
         return `<div class="gen-card" style="padding:14px 16px;">
-          <div style="color:var(--red);font-style:italic;font-size:.88rem;">✗ Generation failed: ${esc(entry.error)}</div>
+          <div style="color:var(--red);font-size:.88rem;">✗ Generation failed: ${esc(entry.error)}</div>
         </div>`;
       }
 
@@ -1345,10 +1344,10 @@
               <button class="btn danger"  style="padding:6px 14px;font-size:.82rem;" onclick="denyCard(${entry.id})">✗ Deny</button>
               <button class="btn outline" style="padding:6px 14px;font-size:.82rem;" onclick="regenerateCard(${entry.id})">↻ Regenerate</button>
             ` : isApproved ? `
-              <span style="color:var(--green);font-style:italic;font-size:.82rem;">✓ Approved & saved</span>
+              <span style="color:var(--green);font-size:.82rem;">✓ Approved & saved</span>
               <button class="btn outline" style="padding:4px 10px;font-size:.78rem;" onclick="undenyCard(${entry.id})">Undo</button>
             ` : `
-              <span style="color:var(--red);font-style:italic;font-size:.82rem;">✗ Denied</span>
+              <span style="color:var(--red);font-size:.82rem;">✗ Denied</span>
               <button class="btn outline" style="padding:4px 10px;font-size:.78rem;" onclick="undenyCard(${entry.id})">Restore</button>
             `}
             <button class="gen-card-toggle" onclick="toggleCardExpand(${entry.id})">view details ↓</button>
