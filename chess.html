@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BENCH-BOARD CHESS SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<style>
+  body{font-family:Arial, Helvetica, sans-serif; font-size:13px; color:#000; background:#fff; margin:10px;}
+  table{border-collapse:collapse;}
+  h1{font-size:15px; margin:0 0 2px 0;}
+  h2{font-size:13px; margin:10px 0 4px 0; text-decoration:underline;}
+  p{margin:4px 0;}
+  hr{border:none; border-top:1px solid #000; margin:8px 0;}
+  #boardTable td.sq{
+    width:32px; height:32px; min-width:32px;
+    text-align:center; vertical-align:middle;
+    border:1px solid #000; font-size:20px; cursor:pointer;
+    padding:0; position:relative;
+  }
+  #boardTable td.light{background:#fff; color:#000;}
+  #boardTable td.dark{background:#000; color:#fff;}
+  #boardTable td.label{border:none; text-align:center; font-size:10px; color:#000; background:#fff; width:32px;}
+  #boardTable td.rlabel{border:none; text-align:right; padding-right:3px; font-size:10px; color:#000; background:#fff;}
+  .sel{outline:3px solid #000; outline-offset:-3px;}
+  .fromto{outline:2px dashed #000; outline-offset:-2px;}
+  .chk{outline:4px solid #000; outline-offset:-4px;}
+  .mk{position:absolute; bottom:1px; right:2px; font-size:9px; color:inherit;}
+  button{font-family:Arial, Helvetica, sans-serif; font-size:12px; padding:2px 6px;}
+  button.primary{background:#000080; color:#fff;}
+  button.danger{background:#800000; color:#fff;}
+  select, input[type=number]{font-family:Arial, Helvetica, sans-serif; font-size:12px;}
+  td.ctrl{vertical-align:top; padding-left:24px;}
+  .lbl{display:inline-block; min-width:150px;}
+  .fw{font-weight:bold;}
+</style>
+</head>
+<body>
+
+<h1>BENCH-BOARD CHESS SYSTEM</h1>
+<p>v1.0 &mdash; custom setup + rated bot opponent</p>
+<hr>
+
+<table>
+<tr>
+<td valign="top">
+  <table id="boardTable"></table>
+  <p>STATUS: <span id="statusText" class="fw">Arrange the board, then start the game.</span></p>
+  <p>CAPTURED BY WHITE: <span id="capturedWhite">(none)</span></p>
+  <p>CAPTURED BY BLACK: <span id="capturedBlack">(none)</span></p>
+</td>
+
+<td class="ctrl" valign="top">
+
+  <div id="setupPanel">
+    <h2>SETUP</h2>
+
+    <p>
+      <button id="btnStandard">STANDARD START</button>
+      <button id="btnClear" class="danger">CLEAR BOARD</button>
+    </p>
+
+    <p>TOOL SELECTED: <span id="toolLabel" class="fw">(none)</span></p>
+
+    <p>
+      <span class="lbl">WHITE PIECES:</span>
+      <span id="paletteWhite"></span>
+    </p>
+    <p>
+      <span class="lbl">BLACK PIECES:</span>
+      <span id="paletteBlack"></span>
+    </p>
+    <p>
+      <span class="lbl">TOOL:</span>
+      <button id="btnErase">ERASE</button>
+    </p>
+
+    <hr>
+
+    <p>
+      <span class="lbl">SIDE TO MOVE FIRST:</span>
+      <select id="selFirstMove">
+        <option value="w">WHITE</option>
+        <option value="b">BLACK</option>
+      </select>
+    </p>
+    <p>
+      <span class="lbl">YOU PLAY AS:</span>
+      <select id="selSide">
+        <option value="w">WHITE</option>
+        <option value="b">BLACK</option>
+      </select>
+    </p>
+    <p>
+      <span class="lbl">BOT ELO (400-2800):</span>
+      <input type="number" id="eloInput" min="400" max="2800" step="50" value="1200" style="width:60px;">
+      <span id="eloTier">CLUB PLAYER</span>
+    </p>
+
+    <hr>
+    <p id="setupHint">NEEDS EXACTLY ONE WHITE KING AND ONE BLACK KING ON THE BOARD.</p>
+    <p><button id="btnStart" class="primary">START GAME</button></p>
+  </div>
+
+  <div id="gamePanel" style="display:none;">
+    <h2>IN PLAY</h2>
+    <p id="opponentLine">-</p>
+    <p id="thinkingField" style="display:none;">BOT IS THINKING...</p>
+    <p>
+      <span class="lbl">PROMOTION PIECE:</span>
+      <select id="selPromo">
+        <option value="q">QUEEN</option>
+        <option value="r">ROOK</option>
+        <option value="b">BISHOP</option>
+        <option value="n">KNIGHT</option>
+      </select>
+    </p>
+    <p>
+      <button id="btnUndo">UNDO MOVE</button>
+      <button id="btnNewSetup" class="danger">NEW SETUP</button>
+    </p>
+  </div>
+
+</td>
+</tr>
+</table>
+
+<hr>
+<p style="font-size:10px;">ENGINE: chess.js (legal move generation). BOT STRENGTH IS SIMULATED VIA SEARCH DEPTH, EVALUATION NOISE, AND BLUNDER RATE.</p>
+
+<script>
+(function(){
+  const PIECE_GLYPH = {
+    'wK':'\u2654','wQ':'\u2655','wR':'\u2656','wB':'\u2657','wN':'\u2658','wP':'\u2659',
+    'bK':'\u265A','bQ':'\u265B','bR':'\u265C','bB':'\u265D','bN':'\u265E','bP':'\u265F'
+  };
+  const FILES = ['a','b','c','d','e','f','g','h'];
+
+  let game = new Chess();
+  game.clear();
+  let mode = 'setup';
+  let humanSide = 'w';
+  let firstMove = 'w';
+  let elo = 1200;
+  let selectedTool = null;
+  let selectedSquare = null;
+  let legalTargets = [];
+  let promoChoice = 'q';
+  let thinking = false;
+
+  // ---------- Board table build ----------
+  const boardTable = document.getElementById('boardTable');
+
+  function squareId(fileIdx, rank){ return FILES[fileIdx] + rank; }
+
+  function buildBoardTable(){
+    boardTable.innerHTML = '';
+    const headRow = document.createElement('tr');
+    const corner = document.createElement('td');
+    corner.className = 'label';
+    headRow.appendChild(corner);
+    FILES.forEach(f=>{
+      const td = document.createElement('td');
+      td.className = 'label';
+      td.textContent = f.toUpperCase();
+      headRow.appendChild(td);
+    });
+    boardTable.appendChild(headRow);
+
+    for(let rank=8; rank>=1; rank--){
+      const row = document.createElement('tr');
+      const rlab = document.createElement('td');
+      rlab.className = 'rlabel';
+      rlab.textContent = rank;
+      row.appendChild(rlab);
+      for(let file=0; file<8; file++){
+        const id = squareId(file, rank);
+        const td = document.createElement('td');
+        const isLight = (file + rank) % 2 === 1;
+        td.className = 'sq ' + (isLight ? 'light':'dark');
+        td.dataset.square = id;
+        td.addEventListener('click', onSquareClick);
+        row.appendChild(td);
+      }
+      boardTable.appendChild(row);
+    }
+  }
+  buildBoardTable();
+
+  function render(){
+    const boardArr = game.board();
+    document.querySelectorAll('#boardTable td.sq').forEach(el=>{
+      const id = el.dataset.square;
+      const file = FILES.indexOf(id[0]);
+      const rank = parseInt(id[1],10);
+      const rowIdx = 8 - rank;
+      const piece = boardArr[rowIdx][file];
+      el.innerHTML = '';
+      el.classList.remove('sel','fromto','chk');
+      if(piece){
+        el.appendChild(document.createTextNode(PIECE_GLYPH[piece.color + piece.type.toUpperCase()]));
+      }
+    });
+
+    if(selectedSquare){
+      const sel = boardTable.querySelector('[data-square="'+selectedSquare+'"]');
+      if(sel) sel.classList.add('sel');
+    }
+    legalTargets.forEach(mv=>{
+      const t = boardTable.querySelector('[data-square="'+mv.to+'"]');
+      if(!t) return;
+      const mk = document.createElement('span');
+      mk.className = 'mk';
+      mk.textContent = mv.captured ? 'X' : '*';
+      t.appendChild(mk);
+    });
+
+    if(mode === 'play'){
+      const hist = game.history({verbose:true});
+      if(hist.length){
+        const last = hist[hist.length-1];
+        const fromEl = boardTable.querySelector('[data-square="'+last.from+'"]');
+        const toEl = boardTable.querySelector('[data-square="'+last.to+'"]');
+        if(fromEl) fromEl.classList.add('fromto');
+        if(toEl) toEl.classList.add('fromto');
+      }
+      if(game.in_check()){
+        const turn = game.turn();
+        const b2 = game.board();
+        for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+          const p = b2[r][c];
+          if(p && p.type==='k' && p.color===turn){
+            const id = squareId(c, 8-r);
+            const kEl = boardTable.querySelector('[data-square="'+id+'"]');
+            if(kEl) kEl.classList.add('chk');
+          }
+        }
+      }
+    }
+    renderCaptured();
+    renderStatus();
+  }
+
+  function renderCaptured(){
+    const hist = game.history({verbose:true});
+    const byWhite = [];
+    const byBlack = [];
+    hist.forEach(m=>{
+      if(m.captured){
+        const glyph = PIECE_GLYPH[(m.color==='w'?'b':'w') + m.captured.toUpperCase()];
+        if(m.color==='w') byWhite.push(glyph); else byBlack.push(glyph);
+      }
+    });
+    document.getElementById('capturedWhite').textContent = byWhite.length ? byWhite.join(' ') : '(none)';
+    document.getElementById('capturedBlack').textContent = byBlack.length ? byBlack.join(' ') : '(none)';
+  }
+
+  function renderStatus(){
+    const statusEl = document.getElementById('statusText');
+    if(mode === 'setup'){
+      statusEl.textContent = 'Arrange the board, then start the game.';
+      return;
+    }
+    if(game.in_checkmate()){
+      const winner = game.turn()==='w' ? 'BLACK' : 'WHITE';
+      statusEl.textContent = 'CHECKMATE - ' + winner + ' WINS.';
+    } else if(game.in_stalemate()){
+      statusEl.textContent = 'STALEMATE - DRAW.';
+    } else if(game.in_threefold_repetition()){
+      statusEl.textContent = 'DRAW BY REPETITION.';
+    } else if(game.insufficient_material()){
+      statusEl.textContent = 'DRAW - INSUFFICIENT MATERIAL.';
+    } else if(game.in_draw()){
+      statusEl.textContent = 'DRAW.';
+    } else if(game.in_check()){
+      statusEl.textContent = (game.turn()==='w'?'WHITE':'BLACK') + ' IS IN CHECK.';
+    } else {
+      statusEl.textContent = (game.turn()==='w'?'WHITE':'BLACK') + ' TO MOVE.';
+    }
+  }
+
+  // ---------- Palettes ----------
+  const paletteWhiteEl = document.getElementById('paletteWhite');
+  const paletteBlackEl = document.getElementById('paletteBlack');
+
+  function makePaletteButtons(container, codes, colorPrefix){
+    codes.forEach(code=>{
+      const btn = document.createElement('button');
+      const full = colorPrefix + code.toUpperCase();
+      btn.textContent = PIECE_GLYPH[full];
+      btn.title = full;
+      btn.addEventListener('click', ()=>{
+        selectedTool = {type:'piece', code: full};
+        document.getElementById('toolLabel').textContent = full;
+      });
+      container.appendChild(btn);
+    });
+  }
+  makePaletteButtons(paletteWhiteEl, ['K','Q','R','B','N','P'], 'w');
+  makePaletteButtons(paletteBlackEl, ['K','Q','R','B','N','P'], 'b');
+
+  document.getElementById('btnErase').addEventListener('click', ()=>{
+    selectedTool = {type:'erase'};
+    document.getElementById('toolLabel').textContent = 'ERASE';
+  });
+
+  function pieceCodeToChessJs(code){
+    return { color: code[0], type: code[1].toLowerCase() };
+  }
+
+  function onSquareClick(e){
+    const sq = e.currentTarget.dataset.square;
+    if(mode === 'setup'){
+      if(!selectedTool) return;
+      if(selectedTool.type === 'erase'){
+        game.remove(sq);
+      } else {
+        game.remove(sq);
+        game.put(pieceCodeToChessJs(selectedTool.code), sq);
+      }
+      render();
+      validateSetup();
+      return;
+    }
+    handlePlayClick(sq);
+  }
+
+  function countKings(){
+    const b = game.board();
+    let wk=0, bk=0;
+    b.forEach(row=>row.forEach(p=>{
+      if(p && p.type==='k'){ if(p.color==='w') wk++; else bk++; }
+    }));
+    return {wk,bk};
+  }
+
+  function validateSetup(){
+    const {wk,bk} = countKings();
+    const hint = document.getElementById('setupHint');
+    const startBtn = document.getElementById('btnStart');
+    if(wk!==1 || bk!==1){
+      hint.textContent = 'NEEDS EXACTLY ONE WHITE KING AND ONE BLACK KING. (WHITE KINGS: '+wk+', BLACK KINGS: '+bk+')';
+      startBtn.disabled = true;
+      return false;
+    }
+    hint.textContent = 'POSITION OK. READY TO START.';
+    startBtn.disabled = false;
+    return true;
+  }
+
+  document.getElementById('btnStandard').addEventListener('click', ()=>{
+    game = new Chess();
+    render();
+    validateSetup();
+  });
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    game.clear();
+    render();
+    validateSetup();
+  });
+
+  document.getElementById('selFirstMove').addEventListener('change', (e)=>{ firstMove = e.target.value; });
+  document.getElementById('selSide').addEventListener('change', (e)=>{ humanSide = e.target.value; });
+  document.getElementById('selPromo').addEventListener('change', (e)=>{ promoChoice = e.target.value; });
+
+  const eloInput = document.getElementById('eloInput');
+  const eloTierEl = document.getElementById('eloTier');
+  function tierName(e){
+    if(e < 600) return 'TOTAL BEGINNER';
+    if(e < 900) return 'CASUAL PLAYER';
+    if(e < 1200) return 'IMPROVING AMATEUR';
+    if(e < 1500) return 'CLUB PLAYER';
+    if(e < 1800) return 'STRONG CLUB PLAYER';
+    if(e < 2100) return 'EXPERT';
+    if(e < 2400) return 'NATIONAL MASTER';
+    return 'GRANDMASTER-LEVEL';
+  }
+  function updateElo(){
+    let v = parseInt(eloInput.value,10);
+    if(isNaN(v)) v = 1200;
+    v = Math.max(400, Math.min(2800, v));
+    elo = v;
+    eloTierEl.textContent = tierName(elo);
+  }
+  eloInput.addEventListener('change', updateElo);
+  eloInput.addEventListener('input', updateElo);
+  updateElo();
+
+  // ---------- Start / reset ----------
+  document.getElementById('btnStart').addEventListener('click', ()=>{
+    if(!validateSetup()) return;
+    const fenParts = game.fen().split(' ');
+    fenParts[1] = firstMove;
+    fenParts[2] = '-';
+    fenParts[3] = '-';
+    fenParts[4] = '0';
+    fenParts[5] = '1';
+    const fen = fenParts.join(' ');
+    const ok = game.load(fen);
+    if(!ok){
+      document.getElementById('setupHint').textContent = 'THAT POSITION IS NOT LEGAL (CHECK KING SAFETY).';
+      return;
+    }
+    mode = 'play';
+    selectedSquare = null; legalTargets = [];
+    document.getElementById('setupPanel').style.display = 'none';
+    document.getElementById('gamePanel').style.display = 'block';
+    document.getElementById('opponentLine').textContent =
+      'OPPONENT: BOT RATED ' + elo + ' ELO (' + tierName(elo) + '), PLAYING ' + (humanSide==='w'?'BLACK':'WHITE') + '.';
+    render();
+    maybeBotMove();
+  });
+
+  document.getElementById('btnNewSetup').addEventListener('click', ()=>{
+    mode = 'setup';
+    document.getElementById('gamePanel').style.display = 'none';
+    document.getElementById('setupPanel').style.display = 'block';
+    selectedTool = null; selectedSquare = null; legalTargets = [];
+    document.getElementById('toolLabel').textContent = '(none)';
+    validateSetup();
+    render();
+  });
+
+  document.getElementById('btnUndo').addEventListener('click', ()=>{
+    if(thinking) return;
+    game.undo();
+    if(game.turn() !== humanSide){
+      game.undo();
+    }
+    selectedSquare = null; legalTargets = [];
+    render();
+  });
+
+  // ---------- Play mode ----------
+  function handlePlayClick(sq){
+    if(thinking) return;
+    if(game.turn() !== humanSide) return;
+    const piece = game.get(sq);
+
+    if(selectedSquare){
+      const move = legalTargets.find(m=>m.to===sq);
+      if(move){
+        doHumanMove(selectedSquare, sq);
+        selectedSquare = null; legalTargets = [];
+        render();
+        maybeBotMove();
+        return;
+      }
+      if(piece && piece.color === humanSide){
+        selectSquare(sq);
+      } else {
+        selectedSquare = null; legalTargets = [];
+      }
+      render();
+      return;
+    }
+    if(piece && piece.color === humanSide){
+      selectSquare(sq);
+      render();
+    }
+  }
+
+  function selectSquare(sq){
+    selectedSquare = sq;
+    const moves = game.moves({square: sq, verbose:true});
+    legalTargets = moves.map(m=>({to:m.to, captured: !!m.captured}));
+  }
+
+  function doHumanMove(from, to){
+    const piece = game.get(from);
+    let promotion = undefined;
+    if(piece && piece.type === 'p' && (to[1]==='8' || to[1]==='1')){
+      promotion = promoChoice;
+    }
+    game.move({from, to, promotion});
+  }
+
+  // ---------- Bot (search + elo simulation) ----------
+  const PIECE_VALUE = {p:100, n:320, b:330, r:500, q:900, k:0};
+  const PST_PAWN = [
+    0,0,0,0,0,0,0,0,
+    50,50,50,50,50,50,50,50,
+    10,10,20,30,30,20,10,10,
+    5,5,10,25,25,10,5,5,
+    0,0,0,20,20,0,0,0,
+    5,-5,-10,0,0,-10,-5,5,
+    5,10,10,-20,-20,10,10,5,
+    0,0,0,0,0,0,0,0
+  ];
+  const PST_KNIGHT = [
+    -50,-40,-30,-30,-30,-30,-40,-50,
+    -40,-20,0,0,0,0,-20,-40,
+    -30,0,10,15,15,10,0,-30,
+    -30,5,15,20,20,15,5,-30,
+    -30,0,15,20,20,15,0,-30,
+    -30,5,10,15,15,10,5,-30,
+    -40,-20,0,5,5,0,-20,-40,
+    -50,-40,-30,-30,-30,-30,-40,-50
+  ];
+  const PST_BISHOP = [
+    -20,-10,-10,-10,-10,-10,-10,-20,
+    -10,0,0,0,0,0,0,-10,
+    -10,0,5,10,10,5,0,-10,
+    -10,5,5,10,10,5,5,-10,
+    -10,0,10,10,10,10,0,-10,
+    -10,10,10,10,10,10,10,-10,
+    -10,5,0,0,0,0,5,-10,
+    -20,-10,-10,-10,-10,-10,-10,-20
+  ];
+  const PST_ROOK = [
+    0,0,0,0,0,0,0,0,
+    5,10,10,10,10,10,10,5,
+    -5,0,0,0,0,0,0,-5,
+    -5,0,0,0,0,0,0,-5,
+    -5,0,0,0,0,0,0,-5,
+    -5,0,0,0,0,0,0,-5,
+    -5,0,0,0,0,0,0,-5,
+    0,0,0,5,5,0,0,0
+  ];
+  const PST_QUEEN = [
+    -20,-10,-10,-5,-5,-10,-10,-20,
+    -10,0,0,0,0,0,0,-10,
+    -10,0,5,5,5,5,0,-10,
+    -5,0,5,5,5,5,0,-5,
+    0,0,5,5,5,5,0,-5,
+    -10,5,5,5,5,5,0,-10,
+    -10,0,5,0,0,0,0,-10,
+    -20,-10,-10,-5,-5,-10,-10,-20
+  ];
+  const PST_KING = [
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -20,-30,-30,-40,-40,-30,-30,-20,
+    -10,-20,-20,-20,-20,-20,-20,-10,
+    20,20,0,0,0,0,20,20,
+    20,30,10,0,0,10,30,20
+  ];
+  const PST = {p:PST_PAWN, n:PST_KNIGHT, b:PST_BISHOP, r:PST_ROOK, q:PST_QUEEN, k:PST_KING};
+
+  function pstIndex(square, color){
+    const file = FILES.indexOf(square[0]);
+    const rank = parseInt(square[1],10);
+    const row = color==='w' ? (8-rank) : (rank-1);
+    const col = color==='w' ? file : (7-file);
+    return row*8+col;
+  }
+
+  function evaluateBoard(g){
+    const board = g.board();
+    let score = 0;
+    for(let r=0;r<8;r++){
+      for(let c=0;c<8;c++){
+        const p = board[r][c];
+        if(!p) continue;
+        const sq = FILES[c] + (8-r);
+        const val = PIECE_VALUE[p.type] + PST[p.type][pstIndex(sq, p.color)];
+        score += (p.color==='w') ? val : -val;
+      }
+    }
+    return score;
+  }
+
+  function elo_to_params(e){
+    const depth = Math.max(1, Math.min(4, 1 + Math.floor((e-400)/600)));
+    const blunder = Math.max(0, Math.min(0.55, 0.55 - (e-400)/3200));
+    const noise = Math.max(0, 60 - e/40);
+    return {depth, blunder, noise};
+  }
+
+  function orderMoves(moves){
+    return moves.slice().sort((a,b)=>{
+      const av = a.captured ? 1:0, bv = b.captured?1:0;
+      return bv-av;
+    });
+  }
+
+  function minimax(g, depth, alpha, beta, maximizing, noise){
+    if(depth===0 || g.game_over()){
+      let ev = evaluateBoard(g);
+      if(noise>0) ev += (Math.random()*2-1)*noise;
+      return ev;
+    }
+    const moves = orderMoves(g.moves({verbose:true}));
+    if(moves.length===0){
+      return evaluateBoard(g);
+    }
+    if(maximizing){
+      let best = -Infinity;
+      for(const m of moves){
+        g.move(m.san);
+        const val = minimax(g, depth-1, alpha, beta, false, noise);
+        g.undo();
+        if(val>best) best = val;
+        alpha = Math.max(alpha, val);
+        if(beta<=alpha) break;
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for(const m of moves){
+        g.move(m.san);
+        const val = minimax(g, depth-1, alpha, beta, true, noise);
+        g.undo();
+        if(val<best) best = val;
+        beta = Math.min(beta, val);
+        if(beta<=alpha) break;
+      }
+      return best;
+    }
+  }
+
+  function chooseBotMove(){
+    const {depth, blunder, noise} = elo_to_params(elo);
+    const moves = game.moves({verbose:true});
+    if(moves.length===0) return null;
+
+    if(Math.random() < blunder){
+      return moves[Math.floor(Math.random()*moves.length)];
+    }
+
+    const botIsWhite = game.turn()==='w';
+    let bestMove = null;
+    let bestScore = botIsWhite ? -Infinity : Infinity;
+    const ordered = orderMoves(moves);
+    for(const m of ordered){
+      game.move(m.san);
+      const val = minimax(game, depth-1, -Infinity, Infinity, !botIsWhite, noise);
+      game.undo();
+      if(botIsWhite ? (val>bestScore) : (val<bestScore)){
+        bestScore = val; bestMove = m;
+      }
+    }
+    return bestMove || ordered[0];
+  }
+
+  function maybeBotMove(){
+    if(mode !== 'play') return;
+    if(game.game_over()) { renderStatus(); return; }
+    if(game.turn() === humanSide) return;
+    thinking = true;
+    document.getElementById('thinkingField').style.display = 'block';
+    document.getElementById('btnUndo').disabled = true;
+    setTimeout(()=>{
+      const mv = chooseBotMove();
+      if(mv){
+        game.move({from:mv.from, to:mv.to, promotion: mv.promotion || undefined});
+      }
+      thinking = false;
+      document.getElementById('thinkingField').style.display = 'none';
+      document.getElementById('btnUndo').disabled = false;
+      render();
+    }, 150);
+  }
+
+  // init
+  game = new Chess();
+  render();
+  validateSetup();
+})();
+</script>
+</body>
+</html>
