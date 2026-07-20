@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids Learning Lab · The Science of Roller Coasters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0..200" />
+<style>
+  :root{
+    --navy:#0B1D3A;
+    --blue:#2E6BFF;
+    --blue-deep:#1746C4;
+    --sky:#EAF3FF;
+    --sky-2:#F5FAFF;
+    --yellow:#FFC93C;
+    --coral:#FF5C72;
+    --green:#2FBE8F;
+    --white:#FFFFFF;
+    --ink:#12213F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'DM Sans', sans-serif;
+    color:var(--ink);
+    background:var(--sky-2);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block;}
+  .wrap{max-width:720px;margin:0 auto;}
+  .material-symbols-outlined{
+    font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;
+    vertical-align:middle;
+    line-height:1;
+  }
+  .eyebrow{
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--blue-deep);
+  }
+  .eyebrow.on-dark{color:var(--yellow);}
+  h1,h2,h3{font-family:'DM Sans', sans-serif;margin:0;}
+  p{line-height:1.55;margin:0;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg,#EAF3FF 0%, #DCEBFF 60%, #cfe3ff 100%);
+    padding:36px 20px 0;
+    position:relative;
+  }
+  .hero-inner{
+    max-width:680px;margin:0 auto;
+    text-align:center;
+  }
+  .logo{
+    width:84px;height:84px;border-radius:22px;
+    margin:0 auto 14px;
+    box-shadow:0 10px 24px rgba(23,70,196,.25);
+  }
+  .hero h1{
+    font-size:clamp(28px,7vw,42px);
+    font-weight:900;
+    color:var(--navy);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-top:10px;
+  }
+  .hero h1 span{color:var(--blue-deep);}
+  .hero p.sub{
+    max-width:480px;margin:14px auto 0;
+    font-size:16px;color:#33456e;font-weight:500;
+  }
+  .badge-row{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    margin:20px 0 0;
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--white);
+    border:2px solid #d5e5ff;
+    color:var(--blue-deep);
+    font-weight:700;font-size:13px;
+    padding:6px 14px;border-radius:999px;
+  }
+  .pill .material-symbols-outlined{font-size:16px;}
+
+  /* hill/track illustration under hero */
+  .coaster-scene{margin-top:26px;position:relative;}
+  .coaster-scene svg{display:block;width:100%;height:auto;}
+  .coaster-badge{
+    position:absolute;top:6%;left:12%;
+    width:44px;height:44px;border-radius:50%;
+    background:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 18px rgba(23,70,196,.35);
+  }
+  .coaster-badge .material-symbols-outlined{color:var(--white);font-size:24px;}
+
+  /* ---------- DIVIDER (hill silhouette) ---------- */
+  .hill-divider{display:block;width:100%;line-height:0;}
+  .hill-divider svg{display:block;width:100%;height:60px;}
+
+  /* ---------- SECTION SHELLS ---------- */
+  section{padding:44px 20px;}
+  .section-inner{max-width:640px;margin:0 auto;}
+  .light{background:var(--sky-2);}
+  .navy-section{background:var(--navy);color:var(--white);}
+  .navy-section .eyebrow{color:var(--yellow);}
+  .navy-section h2{color:var(--white);}
+  .navy-section p{color:#c9d7f5;}
+
+  h2.section-title{
+    font-size:clamp(22px,5.5vw,30px);
+    font-weight:900;
+    letter-spacing:-.01em;
+    margin:6px 0 12px;
+  }
+
+  /* ---------- DID YOU KNOW STRIP ---------- */
+  .dyk-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .dyk-card{
+    background:var(--white);
+    border-radius:16px;
+    padding:16px 14px;
+    border:2px solid #E1EDFF;
+    position:relative;
+  }
+  .dyk-card .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--sky);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+  }
+  .dyk-card .icon-badge .material-symbols-outlined{color:var(--blue-deep);font-size:20px;}
+  .dyk-card p{font-size:14px;font-weight:600;color:var(--navy);}
+  @media(max-width:480px){
+    .dyk-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- ENERGY GAME ---------- */
+  .game-card{
+    background:var(--white);
+    border-radius:22px;
+    padding:24px 20px 26px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .game-track-wrap{
+    background:linear-gradient(180deg,#EAF3FF,#F8FBFF);
+    border-radius:16px;
+    padding:18px 16px 12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .track-svg{width:100%;height:130px;display:block;}
+  .car-dot{
+    position:absolute;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--coral);
+    border:3px solid var(--white);
+    box-shadow:0 3px 6px rgba(0,0,0,.3);
+    transform:translate(-50%,-50%);
+  }
+  .slider-row{margin-top:18px;}
+  .slider-row label{
+    display:flex;justify-content:space-between;
+    font-weight:800;font-size:13px;color:var(--blue-deep);
+    margin-bottom:6px;
+  }
+  input[type=range]{
+    width:100%;-webkit-appearance:none;appearance:none;
+    height:10px;border-radius:999px;
+    background:linear-gradient(90deg,var(--yellow),var(--coral));
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:26px;height:26px;border-radius:50%;
+    background:var(--blue-deep);
+    border:4px solid var(--white);
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--blue-deep);border:4px solid var(--white);
+    box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer;
+  }
+  .meters{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    margin-top:18px;
+  }
+  .meter{
+    background:var(--sky);
+    border-radius:12px;padding:10px 12px;
+  }
+  .meter .label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5a6f9c;}
+  .meter .bar-bg{
+    background:#dbe7fb;border-radius:999px;height:10px;margin-top:6px;overflow:hidden;
+  }
+  .meter .bar-fill{height:100%;border-radius:999px;transition:width .1s linear;}
+  .meter.potential .bar-fill{background:var(--yellow);}
+  .meter.kinetic .bar-fill{background:var(--coral);}
+  .speed-readout{
+    text-align:center;margin-top:16px;
+    font-weight:900;color:var(--navy);
+  }
+  .speed-readout .num{font-size:34px;letter-spacing:-.01em;}
+  .speed-readout .unit{font-size:13px;font-weight:700;color:#5a6f9c;}
+  .game-note{font-size:13px;color:#5a6f9c;margin-top:14px;text-align:center;}
+
+  /* ---------- G-FORCE ---------- */
+  .gforce-row{
+    display:flex;gap:14px;margin-top:18px;overflow-x:auto;
+    padding-bottom:6px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gforce-card{
+    flex:0 0 auto;width:130px;
+    background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.18);
+    border-radius:16px;padding:14px;text-align:center;
+  }
+  .gforce-card .g{font-size:26px;font-weight:900;color:var(--yellow);}
+  .gforce-card .desc{font-size:12.5px;color:#c9d7f5;margin-top:6px;line-height:1.4;}
+
+  /* ---------- RECORDS ---------- */
+  .records-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .record-card{
+    background:var(--white);border-radius:16px;padding:16px;
+    border:2px solid #E1EDFF;
+  }
+  .record-card .tag{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.06em;
+    background:var(--sky);color:var(--blue-deep);
+    padding:3px 8px;border-radius:999px;margin-bottom:8px;
+  }
+  .record-card .tag .material-symbols-outlined{font-size:14px;}
+  .record-card h3{font-size:16px;font-weight:800;color:var(--navy);}
+  .record-card .stat{font-size:22px;font-weight:900;color:var(--coral);margin-top:4px;}
+  .record-card .loc{font-size:12.5px;color:#5a6f9c;margin-top:4px;font-weight:600;}
+  @media(max-width:480px){
+    .records-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card{
+    background:var(--white);border-radius:22px;
+    padding:22px 18px 24px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .quiz-progress{
+    display:flex;gap:6px;margin-bottom:16px;
+  }
+  .quiz-progress .dot{
+    flex:1;height:6px;border-radius:999px;background:#E1EDFF;
+  }
+  .quiz-progress .dot.done{background:var(--blue);}
+  .quiz-progress .dot.current{background:var(--yellow);}
+  .quiz-question{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:14px;}
+  .quiz-options{display:flex;flex-direction:column;gap:10px;}
+  .quiz-opt{
+    text-align:left;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:12px;padding:12px 14px;
+    font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+    color:var(--navy);cursor:pointer;
+    transition:all .12s ease;
+  }
+  .quiz-opt:hover{border-color:var(--blue);}
+  .quiz-opt.correct{background:#e6faf3;border-color:var(--green);color:#146c4e;}
+  .quiz-opt.incorrect{background:#ffeff1;border-color:var(--coral);color:#a3172c;}
+  .quiz-opt[disabled]{cursor:default;}
+  .quiz-feedback{
+    margin-top:12px;font-size:14px;font-weight:700;min-height:20px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .quiz-feedback .material-symbols-outlined{font-size:18px;}
+  .quiz-feedback.correct{color:var(--green);}
+  .quiz-feedback.incorrect{color:var(--coral);}
+  .quiz-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+  .btn{
+    font-family:'DM Sans',sans-serif;
+    background:var(--blue-deep);color:var(--white);
+    border:none;padding:10px 20px;border-radius:999px;
+    font-weight:800;font-size:14px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn .material-symbols-outlined{font-size:18px;}
+  .btn:disabled{background:#c7d6f5;cursor:default;}
+  .quiz-result{text-align:center;display:none;}
+  .quiz-result .score{
+    font-size:40px;font-weight:900;color:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .quiz-result .score .material-symbols-outlined{font-size:34px;color:var(--yellow);}
+  .quiz-result p{margin-top:8px;color:#5a6f9c;font-weight:600;font-size:14px;}
+  .quiz-result .btn{margin-top:16px;justify-content:center;}
+
+  /* ---------- SPONSOR ---------- */
+  .sponsor{
+    background:var(--sky);
+    border-radius:18px;padding:18px 18px;
+    display:flex;gap:14px;align-items:center;
+    margin-top:8px;
+    border:2px dashed #b9d3ff;
+  }
+  .sponsor img{width:44px;height:44px;border-radius:10px;flex-shrink:0;}
+  .sponsor h4{font-size:14px;font-weight:800;color:var(--blue-deep);margin:0 0 4px;}
+  .sponsor p{font-size:13px;color:#4a5d85;font-weight:500;}
+  .sponsor a{color:var(--blue-deep);font-weight:800;text-decoration:underline;}
+
+  /* ---------- SIGN-OFF ---------- */
+  .signoff{
+    background:var(--navy);color:var(--white);
+    padding:44px 20px 52px;text-align:center;
+  }
+  .signoff .material-symbols-outlined{font-size:36px;color:var(--yellow);margin-bottom:12px;}
+  .signoff h3{font-size:clamp(20px,5vw,26px);font-weight:900;}
+  .signoff .btn{
+    margin-top:20px;background:var(--yellow);color:var(--navy);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <img class="logo" src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab logo">
+    <div class="eyebrow">Kids Learning Lab · New Episode</div>
+    <h1>The Science of <span>Roller Coasters</span></h1>
+    <p class="sub">Gravity, g-forces, teardrop loops, and the wildest record-breaking rides on Earth. No engine required — just physics.</p>
+    <div class="badge-row">
+      <span class="pill"><span class="material-symbols-outlined">bolt</span>Energy</span>
+      <span class="pill"><span class="material-symbols-outlined">sync</span>Loops</span>
+      <span class="pill"><span class="material-symbols-outlined">emoji_events</span>Records</span>
+      <span class="pill"><span class="material-symbols-outlined">quiz</span>Quiz</span>
+    </div>
+  </div>
+
+  <div class="coaster-scene">
+    <div class="coaster-badge"><span class="material-symbols-outlined">attractions</span></div>
+    <svg viewBox="0 0 680 170" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,150 C 90,10 170,10 260,90 C 330,150 380,150 440,70 C 500,-10 560,20 620,90 C 650,125 665,140 680,150 L680,170 L0,170 Z" fill="#B9D6FF" opacity="0.7"/>
+      <path d="M0,160 C 80,60 150,60 230,120 C 300,170 360,160 430,100 C 490,50 550,70 610,120 C 640,145 660,155 680,160" fill="none" stroke="#1746C4" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<!-- hill divider into light section -->
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,10 L600,40 L600,60 L0,60 Z" fill="#F5FAFF"/></svg>
+</div>
+
+<!-- DID YOU KNOW -->
+<section class="light">
+  <div class="section-inner">
+    <div class="eyebrow">Did you know?</div>
+    <h2 class="section-title">Four things that might surprise you</h2>
+    <div class="dyk-grid">
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">ac_unit</span></div>
+        <p>The very first roller coasters were giant ice slides built in Russia in the 1600s.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">terrain</span></div>
+        <p>One of America's first coasters wasn't built for fun — it moved coal down a Pennsylvania mountain.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">rocket_launch</span></div>
+        <p>Astronauts train for weightlessness in a plane nicknamed the "Vomit Comet."</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">water_drop</span></div>
+        <p>Modern loops are shaped like teardrops, not circles — that's what keeps your neck happy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENERGY / GAME -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Try it yourself</div>
+    <h2 class="section-title">Build your own hill</h2>
+    <p style="color:#3d517c;font-size:15px;">Every coaster runs on one thing: energy conversion. Drag the slider to change the height — and slope — of the lift hill and watch <b>potential energy</b> turn into <b>kinetic energy</b> and speed on the way down.</p>
+
+    <div class="game-card">
+      <div class="game-track-wrap">
+        <svg class="track-svg" id="trackSvg" viewBox="0 0 300 130" preserveAspectRatio="none">
+          <path id="trackPath" d="" fill="none" stroke="#1746C4" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="car-dot" id="carDot"></div>
+      </div>
+
+      <div class="slider-row">
+        <label><span>Hill height</span><span id="heightLabel">70%</span></label>
+        <input type="range" min="20" max="100" value="70" id="hillSlider">
+      </div>
+
+      <div class="meters">
+        <div class="meter potential">
+          <div class="label">Potential energy</div>
+          <div class="bar-bg"><div class="bar-fill" id="peBar" style="width:70%"></div></div>
+        </div>
+        <div class="meter kinetic">
+          <div class="label">Kinetic energy</div>
+          <div class="bar-bg"><div class="bar-fill" id="keBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="speed-readout">
+        <span class="num" id="speedNum">0</span> <span class="unit">mph at the bottom</span>
+      </div>
+      <p class="game-note" id="gameNote">Tap "Send it down" to release the coaster.</p>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn" id="runBtn"><span class="material-symbols-outlined">play_arrow</span>Send it down</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,60 L300,5 L600,50 L600,60 L0,60 Z" fill="#0B1D3A"/></svg>
+</div>
+
+<!-- G-FORCES -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">Feel the force</div>
+    <h2 class="section-title">What's a g-force, anyway?</h2>
+    <p>Standing still, you feel 1 g. On a coaster, that number swings wildly — here's what different moments actually feel like on your body.</p>
+    <div class="gforce-row">
+      <div class="gforce-card"><div class="g">1g</div><div class="desc">Just standing around. Totally normal.</div></div>
+      <div class="gforce-card"><div class="g">4g</div><div class="desc">Bottom of a big hill — you'd feel 4x heavier.</div></div>
+      <div class="gforce-card"><div class="g">−1g</div><div class="desc">A big drop — the floaty, stomach-drop feeling.</div></div>
+      <div class="gforce-card"><div class="g">−2g</div><div class="desc">You'd float right out of your seat without a harness.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,5 L300,55 L600,15 L600,60 L0,60 Z" fill="#F5FAFF"/></svg>
+</div>
+
+<!-- RECORDS -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Hall of fame</div>
+    <h2 class="section-title">Wild world records</h2>
+    <div class="records-grid">
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">speed</span>Fastest</span>
+        <h3>Formula Rossa</h3>
+        <div class="stat">149 mph</div>
+        <div class="loc">Abu Dhabi · 0–149 mph in 4.9 sec</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">vertical_align_top</span>Tallest</span>
+        <h3>Kingda Ka</h3>
+        <div class="stat">456 ft</div>
+        <div class="loc">New Jersey, USA</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">straighten</span>Longest</span>
+        <h3>Steel Dragon 2000</h3>
+        <div class="stat">8,133 ft</div>
+        <div class="loc">Japan · ~4 minute ride</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">sync</span>Most inversions</span>
+        <h3>Verrückt</h3>
+        <div class="stat">14 flips</div>
+        <div class="loc">Germany · upside-down 14 times</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,50 L300,10 L600,45 L600,60 L0,60 Z" fill="#0B1D3A"/></svg>
+</div>
+
+<!-- QUIZ -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">Quiz time</div>
+    <h2 class="section-title">Were you paying attention?</h2>
+    <p>Five questions. See if you can ride to a perfect score.</p>
+
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-progress" id="quizProgress"></div>
+
+      <div id="quizBody">
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-nav">
+          <button class="btn" id="nextBtn" disabled>Next question<span class="material-symbols-outlined">arrow_forward</span></button>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="score"><span class="material-symbols-outlined">emoji_events</span><span id="quizScore">0/5</span></div>
+        <p id="quizResultMsg">Nice work!</p>
+        <button class="btn" id="retryBtn"><span class="material-symbols-outlined">replay</span>Ride again</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSOR -->
+<section class="light">
+  <div class="section-inner">
+    <div class="sponsor">
+      <img src="https://pearai.kidslearninglab.com/pear.png" alt="Pear AI logo">
+      <div>
+        <h4>Pear AI</h4>
+        <p>Snap a photo of any food and Pear AI whips up a recipe with nutrition facts. Get it free at <a href="#">kidslearninglab.com/pear</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGN-OFF -->
+<div class="signoff">
+  <span class="material-symbols-outlined">celebration</span>
+  <h3>Thanks for signing up for the newsletter!</h3>
+  <a href="https://news.kidslearninglab.com" class="btn">Access your account<span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+
+<script>
+// ---------- ENERGY GAME ----------
+(function(){
+  const slider = document.getElementById('hillSlider');
+  const heightLabel = document.getElementById('heightLabel');
+  const peBar = document.getElementById('peBar');
+  const keBar = document.getElementById('keBar');
+  const speedNum = document.getElementById('speedNum');
+  const gameNote = document.getElementById('gameNote');
+  const runBtn = document.getElementById('runBtn');
+  const car = document.getElementById('carDot');
+  const path = document.getElementById('trackPath');
+
+  // Track geometry in viewBox units (0 0 300 130)
+  const startX = 20, troughX = 150, troughY = 115, endX = 280, endY = 95;
+
+  function buildPathD(h){
+    // h in [20,100] -> topY in [115 .. 26], steeper as h increases
+    const topY = 115 - (h - 20) * 1.11;
+    const dropC1x = startX + (troughX - startX) * 0.35;
+    const dropC1y = topY;
+    const dropC2x = startX + (troughX - startX) * 0.72;
+    const dropC2y = troughY;
+    const riseC1x = troughX + (endX - troughX) * 0.3;
+    const riseC1y = troughY;
+    const riseC2x = troughX + (endX - troughX) * 0.62;
+    const riseC2y = endY;
+    return `M ${startX} ${topY} C ${dropC1x} ${dropC1y} ${dropC2x} ${dropC2y} ${troughX} ${troughY} C ${riseC1x} ${riseC1y} ${riseC2x} ${riseC2y} ${endX} ${endY}`;
+  }
+
+  function maxSpeedFor(height){
+    return Math.round(Math.sqrt(height/100) * 90);
+  }
+
+  function placeCarAt(t){
+    const pathLen = path.getTotalLength();
+    const pt = path.getPointAtLength(t * pathLen);
+    const svgBox = path.ownerSVGElement.getBoundingClientRect();
+    const scaleX = svgBox.width / 300;
+    const scaleY = svgBox.height / 130;
+    car.style.left = (pt.x*scaleX) + 'px';
+    car.style.top = (pt.y*scaleY) + 'px';
+  }
+
+  function updateStatic(){
+    const h = parseInt(slider.value,10);
+    heightLabel.textContent = h + '%';
+    path.setAttribute('d', buildPathD(h));
+    peBar.style.width = h + '%';
+    keBar.style.width = '0%';
+    speedNum.textContent = '0';
+    gameNote.textContent = 'Tap "Send it down" to release the coaster.';
+    placeCarAt(0);
+  }
+
+  let animating = false;
+  function runRide(){
+    if(animating) return;
+    animating = true;
+    runBtn.disabled = true;
+    const h = parseInt(slider.value,10);
+    const topSpeed = maxSpeedFor(h);
+    const duration = 1700;
+    const start = performance.now();
+
+    function frame(now){
+      const t = Math.min(1, (now-start)/duration);
+      placeCarAt(t);
+      const pe = Math.max(0, (1-t)) * h;
+      const ke = Math.min(h, t*2*h);
+      peBar.style.width = Math.min(100,pe) + '%';
+      keBar.style.width = Math.min(100,ke) + '%';
+      speedNum.textContent = Math.round(topSpeed * Math.sin(Math.min(1,t*1.3)*Math.PI/1.3));
+
+      if(t < 1){
+        requestAnimationFrame(frame);
+      } else {
+        animating = false;
+        runBtn.disabled = false;
+        gameNote.textContent = 'Top speed reached: ' + topSpeed + ' mph. Try a taller hill for more speed.';
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  slider.addEventListener('input', updateStatic);
+  runBtn.addEventListener('click', runRide);
+  window.addEventListener('resize', ()=>placeCarAt(0));
+  updateStatic();
+})();
+
+// ---------- QUIZ ----------
+(function(){
+  const questions = [
+    {
+      q: "What powers most of a roller coaster's ride?",
+      options: ["An engine", "Gravity", "Wind"],
+      answer: 1
+    },
+    {
+      q: "What do we call the energy stored at the top of a hill, before the coaster moves?",
+      options: ["Kinetic energy", "Sound energy", "Potential energy"],
+      answer: 2
+    },
+    {
+      q: "What shape are modern roller coaster loops, instead of perfect circles?",
+      options: ["Teardrop-shaped", "Square-shaped", "Star-shaped"],
+      answer: 0
+    },
+    {
+      q: "True or false: the first roller coasters were ice slides built in Russia.",
+      options: ["True", "False"],
+      answer: 0
+    },
+    {
+      q: "What do we call the measurement of force pushing on your body during a ride?",
+      options: ["Wind speed", "G-forces", "Track pressure"],
+      answer: 1
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  const progressEl = document.getElementById('quizProgress');
+  const qEl = document.getElementById('quizQuestion');
+  const optsEl = document.getElementById('quizOptions');
+  const feedbackEl = document.getElementById('quizFeedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const quizBody = document.getElementById('quizBody');
+  const quizResult = document.getElementById('quizResult');
+  const quizScore = document.getElementById('quizScore');
+  const quizResultMsg = document.getElementById('quizResultMsg');
+  const retryBtn = document.getElementById('retryBtn');
+
+  function renderProgress(){
+    progressEl.innerHTML = '';
+    questions.forEach((_,i)=>{
+      const d = document.createElement('div');
+      d.className = 'dot' + (i<current?' done':'') + (i===current?' current':'');
+      progressEl.appendChild(d);
+    });
+  }
+
+  function renderQuestion(){
+    answered = false;
+    nextBtn.disabled = true;
+    feedbackEl.innerHTML = '';
+    feedbackEl.className = 'quiz-feedback';
+    renderProgress();
+    const item = questions[current];
+    qEl.textContent = (current+1) + '. ' + item.q;
+    optsEl.innerHTML = '';
+    item.options.forEach((opt, i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>selectOption(i, btn));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function selectOption(i, btn){
+    if(answered) return;
+    answered = true;
+    const item = questions[current];
+    const allBtns = optsEl.querySelectorAll('.quiz-opt');
+    allBtns.forEach(b=>b.setAttribute('disabled','true'));
+
+    if(i === item.answer){
+      btn.classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Correct!';
+      feedbackEl.className = 'quiz-feedback correct';
+      score++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns[item.answer].classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">info</span>Not quite — the right answer is highlighted above.';
+      feedbackEl.className = 'quiz-feedback incorrect';
+    }
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion(){
+    current++;
+    if(current >= questions.length){
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showResult(){
+    quizBody.style.display = 'none';
+    quizResult.style.display = 'block';
+    quizScore.textContent = score + '/' + questions.length;
+    let msg = 'Nice ride!';
+    if(score === questions.length) msg = 'Perfect score — future roller coaster engineer!';
+    else if(score >= questions.length - 1) msg = 'So close to a perfect ride!';
+    else if(score <= 2) msg = "Give it another spin — you've got this!";
+    quizResultMsg.textContent = msg;
+  }
+
+  function restart(){
+    current = 0;
+    score = 0;
+    quizBody.style.display = 'block';
+    quizResult.style.display = 'none';
+    renderQuestion();
+  }
+
+  nextBtn.addEventListener('click', nextQuestion);
+  retryBtn.addEventListener('click', restart);
+  renderQuestion();
+})();
+</script>
+
+</body>
+</html>
