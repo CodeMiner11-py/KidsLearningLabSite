@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hello.html</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #2a2f3a;
+    --text: #e6e8eb;
+    --muted: #8b93a1;
+    --accent: #5b8cff;
+    --accent-hover: #4574e6;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  .wrap { width: 100%; max-width: 780px; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 260px;
+    background: #0d0f13;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  button:hover { background: var(--accent-hover); }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    margin-left: 8px;
+  }
+  button.secondary:hover { border-color: var(--accent); }
+  .result {
+    margin-top: 16px;
+    display: none;
+  }
+  .result.show { display: block; }
+  .link-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #0d0f13;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    word-break: break-all;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--accent);
+  }
+  .link-box a { color: var(--accent); text-decoration: none; flex: 1; }
+  .link-box a:hover { text-decoration: underline; }
+  .frame-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+  }
+  iframe {
+    width: 100%;
+    min-height: 500px;
+    border: none;
+    display: block;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: #1e222c;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  code {
+    background: #1e222c;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  .note {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  body.blackout {
+    background: #000;
+    justify-content: center;
+    padding: 0;
+  }
+  .blackout-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+  }
+  .blackout-screen img {
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+    opacity: 0.95;
+  }
+  .blackout-screen p {
+    color: #6b7280;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function () {
+  const app = document.getElementById('app');
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  // --- encoding helpers: base64url of UTF-8 text (obfuscated, not encrypted) ---
+  function encode(str) {
+    const utf8 = new TextEncoder().encode(str);
+    let bin = '';
+    utf8.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decode(b64url) {
+    let b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const bin = atob(b64);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  function showBlackout(message) {
+    document.body.classList.add('blackout');
+    app.innerHTML = `
+      <div class="blackout-screen">
+        <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="logo">
+        <p>${message}</p>
+      </div>
+    `;
+  }
+
+  function buildUrl(encoded) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('code', encoded);
+    return url.toString();
+  }
+
+  // --- ADMIN VIEW ---
+  if (code === 'ADMIN') {
+    app.innerHTML = `
+      <span class="badge">Admin</span>
+      <h1>Create a page</h1>
+      <p class="sub">Enter HTML below. It'll be encoded into a shareable link — no server, no database, the content lives entirely in the URL.</p>
+      <div class="panel">
+        <textarea id="htmlInput" placeholder="<h1>Hello world</h1>
+<p>Type any HTML here...</p>"></textarea>
+        <div>
+          <button id="genBtn">Generate link</button>
+        </div>
+        <div class="result" id="result">
+          <div class="link-box">
+            <a id="genLink" href="#" target="_blank"></a>
+          </div>
+          <button class="secondary" id="copyBtn" style="margin-top:10px;">Copy link</button>
+          <button class="secondary" id="previewBtn" style="margin-top:10px;">Preview</button>
+        </div>
+      </div>
+      <div class="frame-wrap" id="previewWrap" style="display:none;">
+        <iframe id="previewFrame" sandbox="allow-same-origin"></iframe>
+      </div>
+    `;
+
+    const genBtn = document.getElementById('genBtn');
+    const result = document.getElementById('result');
+    const genLink = document.getElementById('genLink');
+    const copyBtn = document.getElementById('copyBtn');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewWrap = document.getElementById('previewWrap');
+    const previewFrame = document.getElementById('previewFrame');
+
+    genBtn.addEventListener('click', () => {
+      const raw = document.getElementById('htmlInput').value;
+      if (!raw.trim()) return;
+      const encoded = encode(raw);
+      const url = buildUrl(encoded);
+      genLink.textContent = url;
+      genLink.href = url;
+      result.classList.add('show');
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(genLink.href).then(() => {
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => copyBtn.textContent = 'Copy link', 1200);
+      });
+    });
+
+    previewBtn.addEventListener('click', () => {
+      const raw = document.getElementById('htmlInput').value;
+      previewFrame.srcdoc = raw;
+      previewWrap.style.display = 'block';
+    });
+
+  // --- VIEW GENERATED PAGE ---
+  } else if (code) {
+    let html = '';
+    let error = false;
+    try {
+      html = decode(code);
+    } catch (e) {
+      error = true;
+    }
+
+    if (error) {
+      showBlackout('404 Not Found');
+    } else {
+      app.innerHTML = `<div class="frame-wrap"><iframe id="renderFrame" sandbox="allow-same-origin allow-scripts"></iframe></div>`;
+      document.getElementById('renderFrame').srcdoc = html;
+    }
+
+  // --- HOME / NO CODE ---
+  } else {
+    showBlackout('Request timed out');
+  }
+})();
+</script>
+</body>
+</html>
