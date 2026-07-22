@@ -155,6 +155,21 @@
     letter-spacing: 0.02em;
     margin: 0;
   }
+  body.render-mode {
+    padding: 0;
+    background: none;
+    display: block;
+  }
+  body.render-mode .wrap {
+    max-width: none;
+  }
+  body.render-mode iframe {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    display: block;
+    border: none;
+  }
 </style>
 </head>
 <body>
@@ -266,7 +281,8 @@
     if (error) {
       showBlackout('404 Not Found');
     } else {
-      app.innerHTML = `<div class="frame-wrap"><iframe id="renderFrame" sandbox="allow-same-origin allow-scripts"></iframe></div>`;
+      document.body.classList.add('render-mode');
+      app.innerHTML = `<iframe id="renderFrame" sandbox="allow-same-origin allow-scripts"></iframe>`;
       document.getElementById('renderFrame').srcdoc = html;
     }
 
