@@ -770,5 +770,40 @@
     }
   })();
   </script>
+
+  <!-- SURVEY MODAL START -->
+<div id="surveyModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; font-family:Arial, sans-serif;">
+  <div style="background:#fff; max-width:400px; width:90%; padding:28px; border-radius:10px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.25); font-family:Arial, sans-serif;">
+    <h2 style="margin:0 0 14px 0; font-family:Arial, sans-serif; font-size:20px; color:#111;">Fill out our survey!</h2>
+    <p style="margin:0 0 22px 0; font-family:Arial, sans-serif; font-size:15px; color:#333; line-height:1.5;">
+      This is not required but it would help if you filled out feedback so we can make the show better!
+    </p>
+    <a href="https://go.kidslearninglab.com/survey" target="_blank" rel="noopener"
+       style="display:inline-block; background:#1a73e8; color:#fff; text-decoration:none; font-family:Arial, sans-serif; font-size:15px; font-weight:bold; padding:10px 24px; border-radius:6px;">
+      Take the survey
+    </a>
+    <div style="margin-top:14px;">
+      <button onclick="document.getElementById('surveyModalOverlay').style.display='none';"
+              style="background:none; border:none; color:#888; font-family:Arial, sans-serif; font-size:13px; cursor:pointer; text-decoration:underline;">
+        No thanks
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var STORAGE_KEY = 'siteVisitCount';
+  var INTERVAL = 11;
+
+  var count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10) + 1;
+  localStorage.setItem(STORAGE_KEY, count);
+
+  if (count % INTERVAL === 0) {
+    document.getElementById('surveyModalOverlay').style.display = 'flex';
+  }
+})();
+</script>
+<!-- SURVEY MODAL END -->
 </body>
 </html>
