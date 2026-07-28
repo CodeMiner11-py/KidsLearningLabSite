@@ -1,31 +1,930 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="/url_fixing_worker.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redirecting...</title>
+<title>Kids Learning Lab · How Movies Are Made</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0..200">
 <style>
-    body {
-        font-family: Georgia, serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background: linear-gradient(135deg, #f0f0f0, #d0d0d0);
-        color: #333;
-        text-align: center;
-        font-size: 2em;
-    }
+  :root{
+    --navy:#0B1D3A;
+    --blue:#2E6BFF;
+    --blue-deep:#1746C4;
+    --sky:#EAF3FF;
+    --sky-2:#F5FAFF;
+    --yellow:#FFC93C;
+    --coral:#FF5C72;
+    --green:#2FBE8F;
+    --white:#FFFFFF;
+    --ink:#12213F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'DM Sans', sans-serif;
+    color:var(--ink);
+    background:var(--sky-2);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block;}
+  .wrap{max-width:720px;margin:0 auto;}
+  .material-symbols-outlined{
+    font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;
+    vertical-align:middle;
+    line-height:1;
+  }
+  .eyebrow{
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--blue-deep);
+  }
+  .eyebrow.on-dark{color:var(--yellow);}
+  h1,h2,h3{font-family:'DM Sans', sans-serif;margin:0;}
+  p{line-height:1.55;margin:0;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg,#EAF3FF 0%, #DCEBFF 60%, #cfe3ff 100%);
+    padding:36px 20px 0;
+    position:relative;
+  }
+  .hero-inner{
+    max-width:680px;margin:0 auto;
+    text-align:center;
+  }
+  .logo{
+    width:84px;height:84px;border-radius:22px;
+    margin:0 auto 14px;
+    box-shadow:0 10px 24px rgba(23,70,196,.25);
+  }
+  .hero h1{
+    font-size:clamp(28px,7vw,42px);
+    font-weight:900;
+    color:var(--navy);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-top:10px;
+  }
+  .hero h1 span{color:var(--blue-deep);}
+  .hero p.sub{
+    max-width:480px;margin:14px auto 0;
+    font-size:16px;color:#33456e;font-weight:500;
+  }
+  .badge-row{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    margin:20px 0 0;
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--white);
+    border:2px solid #d5e5ff;
+    color:var(--blue-deep);
+    font-weight:700;font-size:13px;
+    padding:6px 14px;border-radius:999px;
+  }
+  .pill .material-symbols-outlined{font-size:16px;}
+
+  .clapper-scene{margin-top:26px;position:relative;}
+  .clapper-scene svg{display:block;width:100%;height:auto;}
+  .coaster-badge{
+    position:absolute;top:6%;left:12%;
+    width:44px;height:44px;border-radius:50%;
+    background:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 18px rgba(23,70,196,.35);
+  }
+  .coaster-badge .material-symbols-outlined{color:var(--white);font-size:24px;}
+
+  /* ---------- DIVIDER (hill silhouette) ---------- */
+  .hill-divider{display:block;width:100%;line-height:0;}
+  .hill-divider svg{display:block;width:100%;height:60px;}
+
+  /* ---------- SECTION SHELLS ---------- */
+  section{padding:44px 20px;}
+  .section-inner{max-width:640px;margin:0 auto;}
+  .light{background:var(--sky-2);}
+  .navy-section{background:var(--navy);color:var(--white);}
+  .navy-section .eyebrow{color:var(--yellow);}
+  .navy-section h2{color:var(--white);}
+  .navy-section p{color:#c9d7f5;}
+
+  h2.section-title{
+    font-size:clamp(22px,5.5vw,30px);
+    font-weight:900;
+    letter-spacing:-.01em;
+    margin:6px 0 12px;
+  }
+
+  /* ---------- DID YOU KNOW STRIP ---------- */
+  .dyk-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .dyk-card{
+    background:var(--white);
+    border-radius:16px;
+    padding:16px 14px;
+    border:2px solid #E1EDFF;
+    position:relative;
+  }
+  .dyk-card .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--sky);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+  }
+  .dyk-card .icon-badge .material-symbols-outlined{color:var(--blue-deep);font-size:20px;}
+  .dyk-card p{font-size:14px;font-weight:600;color:var(--navy);}
+  @media(max-width:480px){
+    .dyk-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- GREEN SCREEN GAME ---------- */
+  .game-card{
+    background:var(--white);
+    border-radius:22px;
+    padding:24px 20px 26px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .stage-wrap{
+    border-radius:16px;
+    overflow:hidden;
+    position:relative;
+    height:200px;
+    transition:background 0.4s ease;
+  }
+  .stage-wrap svg{width:100%;height:100%;display:block;}
+  .scene-buttons{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;
+  }
+  .scene-btn{
+    font-family:'DM Sans',sans-serif;
+    display:flex;align-items:center;gap:8px;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:12px;padding:10px 12px;
+    font-weight:700;font-size:13.5px;color:var(--navy);
+    cursor:pointer;transition:all .12s ease;
+  }
+  .scene-btn .material-symbols-outlined{font-size:18px;color:var(--blue-deep);}
+  .scene-btn.active{background:var(--blue-deep);border-color:var(--blue-deep);color:var(--white);}
+  .scene-btn.active .material-symbols-outlined{color:var(--yellow);}
+  .game-note{font-size:13px;color:#5a6f9c;margin-top:14px;text-align:center;}
+
+  /* ---------- GHOST CHAT ---------- */
+  .ghost-card{
+    background:var(--white);
+    border-radius:22px;
+    padding:20px 18px 22px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .ghost-header{
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  }
+  .ghost-avatar{
+    width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(160deg,#2E6BFF,#1746C4);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 6px 14px rgba(23,70,196,.3);
+  }
+  .ghost-avatar .material-symbols-outlined{color:var(--white);font-size:24px;}
+  .ghost-header h3{font-size:15.5px;font-weight:800;color:var(--navy);}
+  .ghost-header p{font-size:12.5px;color:#5a6f9c;font-weight:600;margin-top:1px;}
+  .ghost-log{
+    background:var(--sky-2);
+    border-radius:14px;
+    padding:14px;
+    height:230px;
+    overflow-y:auto;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .ghost-msg{
+    max-width:82%;
+    padding:9px 13px;
+    border-radius:14px;
+    font-size:14px;
+    line-height:1.45;
+    font-weight:600;
+  }
+  .ghost-msg.bot{
+    background:var(--white);
+    border:2px solid #E1EDFF;
+    color:var(--navy);
+    align-self:flex-start;
+    border-bottom-left-radius:4px;
+  }
+  .ghost-msg.user{
+    background:var(--blue-deep);
+    color:var(--white);
+    align-self:flex-end;
+    border-bottom-right-radius:4px;
+  }
+  .ghost-msg.typing{
+    display:flex;gap:4px;align-items:center;
+    padding:12px 14px;
+  }
+  .ghost-msg.typing span{
+    width:6px;height:6px;border-radius:50%;
+    background:#9db3e0;
+    animation:ghostBlink 1.1s infinite ease-in-out;
+  }
+  .ghost-msg.typing span:nth-child(2){animation-delay:.15s;}
+  .ghost-msg.typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes ghostBlink{
+    0%,80%,100%{opacity:.25;transform:translateY(0);}
+    40%{opacity:1;transform:translateY(-2px);}
+  }
+  .ghost-chips{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;
+  }
+  .ghost-chip{
+    font-family:'DM Sans',sans-serif;
+    background:var(--sky);border:2px solid #d5e5ff;color:var(--blue-deep);
+    font-weight:700;font-size:12.5px;
+    padding:6px 12px;border-radius:999px;cursor:pointer;
+  }
+  .ghost-chip:hover{border-color:var(--blue);}
+  .ghost-input-row{
+    display:flex;gap:8px;margin-top:14px;
+  }
+  .ghost-input-row input{
+    flex:1;
+    font-family:'DM Sans',sans-serif;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:999px;padding:11px 16px;
+    font-size:14px;font-weight:600;color:var(--navy);
+    outline:none;
+  }
+  .ghost-input-row input:focus{border-color:var(--blue);}
+  .ghost-send{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--blue-deep);border:none;color:var(--white);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .ghost-send:disabled{background:#c7d6f5;cursor:default;}
+  .ghost-note{font-size:12px;color:#8496bd;margin-top:10px;text-align:center;}
+
+  /* ---------- ERAS (was G-FORCE) ---------- */
+  .gforce-row{
+    display:flex;gap:14px;margin-top:18px;overflow-x:auto;
+    padding-bottom:6px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gforce-card{
+    flex:0 0 auto;width:150px;
+    background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.18);
+    border-radius:16px;padding:14px;text-align:center;
+  }
+  .gforce-card .g{font-size:20px;font-weight:900;color:var(--yellow);}
+  .gforce-card .desc{font-size:12.5px;color:#c9d7f5;margin-top:6px;line-height:1.4;}
+
+  /* ---------- MOVIE MAGIC (was RECORDS) ---------- */
+  .records-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .record-card{
+    background:var(--white);border-radius:16px;padding:16px;
+    border:2px solid #E1EDFF;
+  }
+  .record-card .tag{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.06em;
+    background:var(--sky);color:var(--blue-deep);
+    padding:3px 8px;border-radius:999px;margin-bottom:8px;
+  }
+  .record-card .tag .material-symbols-outlined{font-size:14px;}
+  .record-card h3{font-size:16px;font-weight:800;color:var(--navy);}
+  .record-card .stat{font-size:18px;font-weight:900;color:var(--coral);margin-top:4px;}
+  .record-card .loc{font-size:12.5px;color:#5a6f9c;margin-top:4px;font-weight:600;}
+  @media(max-width:480px){
+    .records-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card{
+    background:var(--white);border-radius:22px;
+    padding:22px 18px 24px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .quiz-progress{
+    display:flex;gap:6px;margin-bottom:16px;
+  }
+  .quiz-progress .dot{
+    flex:1;height:6px;border-radius:999px;background:#E1EDFF;
+  }
+  .quiz-progress .dot.done{background:var(--blue);}
+  .quiz-progress .dot.current{background:var(--yellow);}
+  .quiz-question{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:14px;}
+  .quiz-options{display:flex;flex-direction:column;gap:10px;}
+  .quiz-opt{
+    text-align:left;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:12px;padding:12px 14px;
+    font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+    color:var(--navy);cursor:pointer;
+    transition:all .12s ease;
+  }
+  .quiz-opt:hover{border-color:var(--blue);}
+  .quiz-opt.correct{background:#e6faf3;border-color:var(--green);color:#146c4e;}
+  .quiz-opt.incorrect{background:#ffeff1;border-color:var(--coral);color:#a3172c;}
+  .quiz-opt[disabled]{cursor:default;}
+  .quiz-feedback{
+    margin-top:12px;font-size:14px;font-weight:700;min-height:20px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .quiz-feedback .material-symbols-outlined{font-size:18px;}
+  .quiz-feedback.correct{color:var(--green);}
+  .quiz-feedback.incorrect{color:var(--coral);}
+  .quiz-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+  .btn{
+    font-family:'DM Sans',sans-serif;
+    background:var(--blue-deep);color:var(--white);
+    border:none;padding:10px 20px;border-radius:999px;
+    font-weight:800;font-size:14px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn .material-symbols-outlined{font-size:18px;}
+  .btn:disabled{background:#c7d6f5;cursor:default;}
+  .quiz-result{text-align:center;display:none;}
+  .quiz-result .score{
+    font-size:40px;font-weight:900;color:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .quiz-result .score .material-symbols-outlined{font-size:34px;color:var(--yellow);}
+  .quiz-result p{margin-top:8px;color:#5a6f9c;font-weight:600;font-size:14px;}
+  .quiz-result .btn{margin-top:16px;justify-content:center;}
+
+  /* ---------- SPONSOR ---------- */
+  .sponsor{
+    background:var(--sky);
+    border-radius:18px;padding:18px 18px;
+    display:flex;gap:14px;align-items:center;
+    margin-top:8px;
+    border:2px dashed #b9d3ff;
+  }
+  .sponsor img{width:44px;height:44px;border-radius:10px;flex-shrink:0;}
+  .sponsor h4{font-size:14px;font-weight:800;color:var(--blue-deep);margin:0 0 4px;}
+  .sponsor p{font-size:13px;color:#4a5d85;font-weight:500;}
+  .sponsor a{color:var(--blue-deep);font-weight:800;text-decoration:underline;}
+
+  /* ---------- UP NEXT ---------- */
+  .upnext{
+    display:flex;align-items:center;gap:14px;
+    background:var(--white);border:2px solid #E1EDFF;
+    border-radius:18px;padding:16px 18px;margin-top:22px;
+  }
+  .upnext .icon-badge{
+    width:44px;height:44px;border-radius:12px;background:var(--sky);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .upnext .icon-badge .material-symbols-outlined{color:var(--blue-deep);font-size:22px;}
+  .upnext .eyebrow{margin-bottom:2px;}
+  .upnext h4{font-size:15px;font-weight:800;color:var(--navy);}
+
+  /* ---------- SIGN-OFF ---------- */
+  .signoff{
+    background:var(--navy);color:var(--white);
+    padding:44px 20px 52px;text-align:center;
+  }
+  .signoff .material-symbols-outlined{font-size:36px;color:var(--yellow);margin-bottom:12px;}
+  .signoff h3{font-size:clamp(20px,5vw,26px);font-weight:900;}
+  .signoff .btn{
+    margin-top:20px;background:var(--yellow);color:var(--navy);
+  }
 </style>
-<script>
-    setTimeout(function() {
-        window.location.href = "https://minecraft-merryhill-milpitas-edition.fandom.com/wiki/";
-    }, 5000);
-</script>
 </head>
 <body>
-    Redirecting to MMME wiki. The wiki is loading...
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <img class="logo" src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab logo">
+    <div class="eyebrow">Kids Learning Lab · New Episode</div>
+    <h1>How <span>Movies</span> Are Made</h1>
+    <p class="sub">Green screens, motion capture, and the surprising stuff Foley artists use to fake a snowy footstep. Take a backstage tour of a real movie studio with us.</p>
+    <div class="badge-row">
+      <span class="pill"><span class="material-symbols-outlined">videocam</span>Cameras</span>
+      <span class="pill"><span class="material-symbols-outlined">theater_comedy</span>CGI</span>
+      <span class="pill"><span class="material-symbols-outlined">graphic_eq</span>Foley</span>
+      <span class="pill"><span class="material-symbols-outlined">quiz</span>Quiz</span>
+    </div>
+  </div>
+
+  <div class="clapper-scene">
+    <div class="coaster-badge"><span class="material-symbols-outlined">movie</span></div>
+    <svg viewBox="0 0 680 170" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,150 C 90,10 170,10 260,90 C 330,150 380,150 440,70 C 500,-10 560,20 620,90 C 650,125 665,140 680,150 L680,170 L0,170 Z" fill="#B9D6FF" opacity="0.7"></path>
+      <g transform="translate(230,55)">
+        <rect x="0" y="24" width="180" height="70" rx="6" fill="#1746C4"></rect>
+        <rect x="0" y="0" width="180" height="24" rx="4" fill="#0B1D3A"></rect>
+        <rect x="0" y="0" width="30" height="24" fill="#FFC93C" transform="skewX(-20)"></rect>
+        <rect x="55" y="0" width="30" height="24" fill="#FFC93C" transform="skewX(-20)"></rect>
+        <rect x="110" y="0" width="30" height="24" fill="#FFC93C" transform="skewX(-20)"></rect>
+        <rect x="10" y="45" width="160" height="8" rx="4" fill="#EAF3FF" opacity="0.5"></rect>
+        <rect x="10" y="62" width="110" height="8" rx="4" fill="#EAF3FF" opacity="0.5"></rect>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- hill divider into light section -->
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,10 L600,40 L600,60 L0,60 Z" fill="#F5FAFF"></path></svg>
+</div>
+
+<!-- DID YOU KNOW -->
+<section class="light">
+  <div class="section-inner">
+    <div class="eyebrow">Did you know?</div>
+    <h2 class="section-title">Four things that might surprise you</h2>
+    <div class="dyk-grid">
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">videocam</span></div>
+        <p>The very first movie cameras had to be hand-cranked the whole time — and they had no sound at all.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">chat_bubble</span></div>
+        <p>Since silent films had no sound, actors used big, exaggerated faces — and "title cards" popped up for important lines.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">grain</span></div>
+        <p>Foley artists make movie sound effects from everyday stuff. Walking on snow? That's just a box of corn starch.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">pets</span></div>
+        <p>Even in "real" movies, plenty is fake — the dinosaurs in Jurassic Park were never actually there.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GREEN SCREEN GAME -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Try it yourself</div>
+    <h2 class="section-title">Step onto the green screen</h2>
+    <p style="color:#3d517c;font-size:15px;">Movie studios film actors in front of a plain green wall, then swap it out for anywhere they want — a pizza restaurant, an alien planet, even the ocean floor. Tap a background below and watch it happen.</p>
+
+    <div class="game-card">
+      <div class="stage-wrap" id="stageWrap">
+        <svg viewBox="0 0 300 200" preserveAspectRatio="none" id="stageSvg">
+          <rect id="bgRect" x="0" y="0" width="300" height="200" fill="#2FBE8F"></rect>
+          <g id="sceneExtras"></g>
+          <!-- simple alien character, stays constant across scenes -->
+          <g transform="translate(150,150)">
+            <ellipse cx="0" cy="34" rx="26" ry="7" fill="rgba(11,29,58,0.18)"></ellipse>
+            <ellipse cx="0" cy="0" rx="20" ry="26" fill="#8CE28B"></ellipse>
+            <circle cx="-8" cy="-6" r="7" fill="#0B1D3A"></circle>
+            <circle cx="8" cy="-6" r="7" fill="#0B1D3A"></circle>
+            <circle cx="-6" cy="-8" r="2.4" fill="#fff"></circle>
+            <circle cx="10" cy="-8" r="2.4" fill="#fff"></circle>
+            <path d="M-14,-30 C-14,-40 -6,-42 -6,-32" stroke="#8CE28B" stroke-width="5" fill="none" stroke-linecap="round"></path>
+            <path d="M14,-30 C14,-40 6,-42 6,-32" stroke="#8CE28B" stroke-width="5" fill="none" stroke-linecap="round"></path>
+          </g>
+        </svg>
+      </div>
+
+      <div class="scene-buttons" id="sceneButtons">
+        <button class="scene-btn active" data-scene="green"><span class="material-symbols-outlined">check_box_outline_blank</span>Green screen</button>
+        <button class="scene-btn" data-scene="pizza"><span class="material-symbols-outlined">local_pizza</span>Pizza restaurant</button>
+        <button class="scene-btn" data-scene="space"><span class="material-symbols-outlined">public</span>Alien planet</button>
+        <button class="scene-btn" data-scene="ocean"><span class="material-symbols-outlined">water</span>Ocean floor</button>
+      </div>
+      <p class="game-note" id="stageNote">Right now the alien is just standing in front of a green wall — nothing else has changed.</p>
+    </div>
+
+    <div class="eyebrow" style="margin-top:32px;">Try it yourself</div>
+    <h2 class="section-title">Talk to the Museum Ghost</h2>
+    <p style="color:#3d517c;font-size:15px;">Remember the museum ghost from the episode? Ask them anything about how movies are made — cameras, CGI, motion capture, Foley sound, or movie history.</p>
+
+    <div class="ghost-card">
+      <div class="ghost-header">
+        <div class="ghost-avatar"><span class="material-symbols-outlined">theater_comedy</span></div>
+        <div>
+          <h3>The Museum Ghost</h3>
+          <p>Ask away — I've narrated movies since the 1900s.</p>
+        </div>
+      </div>
+
+      <div class="ghost-log" id="ghostLog">
+        <div class="ghost-msg bot">Boo! Well, a friendly boo. Ask me anything about how movies get made, and I'll do my best to explain it.</div>
+      </div>
+
+      <div class="ghost-chips" id="ghostChips">
+        <button class="ghost-chip" data-q="What does a Foley artist do?">What does a Foley artist do?</button>
+        <button class="ghost-chip" data-q="Why do movies use green screens?">Why green screens?</button>
+        <button class="ghost-chip" data-q="What was the first movie camera like?">First movie camera?</button>
+      </div>
+
+      <div class="ghost-input-row">
+        <input type="text" id="ghostInput" placeholder="Ask the ghost a question…" maxlength="140">
+        <button class="ghost-send" id="ghostSend"><span class="material-symbols-outlined">arrow_upward</span></button>
+      </div>
+      <p class="ghost-note">The ghost is an AI and can make mistakes — always double check with a grown-up.</p>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,60 L300,5 L600,50 L600,60 L0,60 Z" fill="#0B1D3A"></path></svg>
+</div>
+
+<!-- MOVIE ERAS -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">A quick trip through time</div>
+    <h2 class="section-title">How movies have changed</h2>
+    <p>The museum ghost walked us through it — here's the timeline, era by era.</p>
+    <div class="gforce-row">
+      <div class="gforce-card"><div class="g">Silent</div><div class="desc">No sound at all. Actors acted big, and title cards showed key words.</div></div>
+      <div class="gforce-card"><div class="g">Talkies</div><div class="desc">Sound arrives! Audiences were stunned to hear actors actually speak.</div></div>
+      <div class="gforce-card"><div class="g">Color</div><div class="desc">Black-and-white gives way to full color on screen.</div></div>
+      <div class="gforce-card"><div class="g">Digital 4K</div><div class="desc">Today's movies are razor-sharp, built with CGI and motion capture.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,5 L300,55 L600,15 L600,60 L0,60 Z" fill="#F5FAFF"></path></svg>
+</div>
+
+<!-- MOVIE MAGIC HALL OF FAME -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Movie magic</div>
+    <h2 class="section-title">Famous tricks of the trade</h2>
+    <div class="records-grid">
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">pets</span>All CGI</span>
+        <h3>Jurassic Park</h3>
+        <div class="stat">Not real</div>
+        <div class="loc">Every dinosaur was computer-generated</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">accessibility_new</span>Motion capture</span>
+        <h3>Avatar</h3>
+        <div class="stat">Dot suits</div>
+        <div class="loc">Actors' movements became on-screen characters</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">grain</span>Foley trick</span>
+        <h3>Walking on snow</h3>
+        <div class="stat">Corn starch</div>
+        <div class="loc">Stepping on a box of it nails the sound</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">local_pizza</span>Prop table</span>
+        <h3>Pizza Aliens Two</h3>
+        <div class="stat">Foam + paint</div>
+        <div class="loc">That "pizza" on set isn't real food</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,50 L300,10 L600,45 L600,60 L0,60 Z" fill="#0B1D3A"></path></svg>
+</div>
+
+<!-- QUIZ -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">Quiz time</div>
+    <h2 class="section-title">Were you paying attention?</h2>
+    <p>Five questions. See if you can direct your way to a perfect score.</p>
+
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-progress" id="quizProgress"><div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+      <div id="quizBody">
+        <div class="quiz-question" id="quizQuestion">1. What do actors wear on their bodies for motion capture?</div>
+        <div class="quiz-options" id="quizOptions"><button class="quiz-opt">Tracking dots</button><button class="quiz-opt">Capes</button><button class="quiz-opt">Headphones</button></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-nav">
+          <button class="btn" id="nextBtn" disabled="">Next question<span class="material-symbols-outlined">arrow_forward</span></button>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="score"><span class="material-symbols-outlined">emoji_events</span><span id="quizScore">0/5</span></div>
+        <p id="quizResultMsg">Nice work!</p>
+        <button class="btn" id="retryBtn"><span class="material-symbols-outlined">replay</span>Watch it again</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSOR -->
+<section class="light">
+  <div class="section-inner">
+    <div class="sponsor">
+      <img src="https://pearai.kidslearninglab.com/pear.png" alt="Pear AI logo">
+      <div>
+        <h4>Pear AI</h4>
+        <p>Snap a photo of any food and Pear AI whips up a recipe with nutrition facts. Get it free at <a href="#">kidslearninglab.com/pear</a>.</p>
+      </div>
+    </div>
+
+    <div class="upnext">
+      <div class="icon-badge"><span class="material-symbols-outlined">directions_car</span></div>
+      <div>
+        <div class="eyebrow">Up next episode</div>
+        <h4>How Waymo and Other Self-Driving Cars Work</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGN-OFF -->
+<div class="signoff">
+  <span class="material-symbols-outlined">celebration</span>
+  <h3>Thanks for signing up for the newsletter!</h3>
+  <a href="https://news.kidslearninglab.com" class="btn">Access your account<span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+
+<script>
+// ---------- GREEN SCREEN GAME ----------
+(function(){
+  const bgRect = document.getElementById('bgRect');
+  const extras = document.getElementById('sceneExtras');
+  const note = document.getElementById('stageNote');
+  const buttons = document.querySelectorAll('.scene-btn');
+
+  const scenes = {
+    green: {
+      fill: '#2FBE8F',
+      extras: '',
+      note: "Right now the alien is just standing in front of a green wall — nothing else has changed."
+    },
+    pizza: {
+      fill: '#FFE0B2',
+      extras: `
+        <rect x="0" y="140" width="300" height="60" fill="#C98B4A"></rect>
+        <rect x="20" y="60" width="70" height="80" fill="#8C5A2B"></rect>
+        <circle cx="230" cy="90" r="26" fill="#FFC93C"></circle>
+        <circle cx="230" cy="90" r="18" fill="#FF5C72" opacity="0.5"></circle>
+      `,
+      note: "Swap complete — same alien, same lighting, brand new pizza restaurant behind it."
+    },
+    space: {
+      fill: '#12123A',
+      extras: `
+        <circle cx="40" cy="40" r="2" fill="#fff"></circle>
+        <circle cx="90" cy="20" r="1.5" fill="#fff"></circle>
+        <circle cx="250" cy="30" r="2" fill="#fff"></circle>
+        <circle cx="270" cy="70" r="1.5" fill="#fff"></circle>
+        <circle cx="60" cy="100" r="1.5" fill="#fff"></circle>
+        <circle cx="230" cy="140" r="40" fill="#FF5C72" opacity="0.6"></circle>
+        <ellipse cx="230" cy="140" rx="60" ry="10" fill="#FFC93C" opacity="0.5"></ellipse>
+      `,
+      note: "Now it looks like the alien is home — but this planet never existed, it's all pixels."
+    },
+    ocean: {
+      fill: '#1746C4',
+      extras: `
+        <rect x="0" y="150" width="300" height="50" fill="#0B1D3A" opacity="0.4"></rect>
+        <path d="M0,60 Q20,50 40,60 T80,60 T120,60" stroke="#EAF3FF" stroke-width="3" fill="none" opacity="0.4"></path>
+        <path d="M180,110 Q200,100 220,110 T260,110 T300,110" stroke="#EAF3FF" stroke-width="3" fill="none" opacity="0.4"></path>
+        <circle cx="250" cy="50" r="10" fill="#FFC93C"></circle>
+      `,
+      note: "Deep-sea alien, coming right up — no fish tank required."
+    }
+  };
+
+  function applyScene(key){
+    const s = scenes[key];
+    bgRect.setAttribute('fill', s.fill);
+    extras.innerHTML = s.extras;
+    note.textContent = s.note;
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.scene === key));
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => applyScene(btn.dataset.scene));
+  });
+})();
+
+// ---------- MUSEUM GHOST CHAT ----------
+(function(){
+  const WORKER_URL = 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/';
+  const log = document.getElementById('ghostLog');
+  const input = document.getElementById('ghostInput');
+  const sendBtn = document.getElementById('ghostSend');
+  const chips = document.getElementById('ghostChips');
+
+  const PERSONA = "You are the friendly Museum Ghost character from the Kids Learning Lab podcast episode 'How Movies Are Made'. You are warm, a little goofy, and love teaching kids ages 6-12 about how movies are made: old hand-crank cameras, silent films, title cards, talkies, color film, CGI, motion capture, green screens, props, and Foley sound effects. Rules: keep every reply to 2-3 short sentences in simple, friendly language a child would understand. Stay in character as a kind ghost but never say anything scary or spooky. Only talk about movies and movie-making history. If the question is unrelated, off-topic, or inappropriate, gently and briefly redirect back to movie-making topics without lecturing. Never mention that you are an AI language model unless asked directly.";
+
+  let history = [];
+  let waiting = false;
+
+  function addMessage(text, who){
+    const div = document.createElement('div');
+    div.className = 'ghost-msg ' + who;
+    div.textContent = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  function addTyping(){
+    const div = document.createElement('div');
+    div.className = 'ghost-msg bot typing';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  function buildPrompt(question){
+    let convo = '';
+    history.slice(-6).forEach(turn => {
+      convo += (turn.who === 'user' ? 'Kid' : 'Ghost') + ': ' + turn.text + '\n';
+    });
+    return PERSONA + '\n\nHere is the conversation so far:\n' + convo + 'Kid: ' + question + '\nGhost:';
+  }
+
+  async function ask(question){
+    if(waiting || !question.trim()) return;
+    waiting = true;
+    sendBtn.disabled = true;
+    input.disabled = true;
+
+    addMessage(question, 'user');
+    history.push({who:'user', text:question});
+    input.value = '';
+
+    const typingEl = addTyping();
+
+    try{
+      const prompt = buildPrompt(question);
+      const url = WORKER_URL + '?prompt=' + encodeURIComponent(prompt);
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('bad response');
+      const data = await res.json();
+      const reply = (data.response || "Boo... I lost my train of thought. Ask me again?").trim();
+      typingEl.remove();
+      addMessage(reply, 'bot');
+      history.push({who:'bot', text:reply});
+    } catch(err){
+      typingEl.remove();
+      addMessage("Ooo, my ghostly connection is fuzzy right now. Try asking again in a moment!", 'bot');
+    } finally {
+      waiting = false;
+      sendBtn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }
+  }
+
+  sendBtn.addEventListener('click', () => ask(input.value));
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') ask(input.value);
+  });
+  chips.addEventListener('click', (e) => {
+    const btn = e.target.closest('.ghost-chip');
+    if(btn) ask(btn.dataset.q);
+  });
+})();
+
+// ---------- QUIZ ----------
+(function(){
+  const questions = [
+    {
+      q: "What do actors wear on their bodies for motion capture?",
+      options: ["Tracking dots", "Capes", "Headphones"],
+      answer: 0
+    },
+    {
+      q: "Before movies had sound, what popped up on screen to show important dialogue?",
+      options: ["Subtitles app", "Title cards", "A narrator's photo"],
+      answer: 1
+    },
+    {
+      q: "What do Foley artists step on to create the sound of walking on snow?",
+      options: ["Ice from Alaska", "A box of corn starch", "Smashed ice cream cones"],
+      answer: 1
+    },
+    {
+      q: "True or false: the alien planet in Pizza Aliens Two is a real place.",
+      options: ["True", "False"],
+      answer: 1
+    },
+    {
+      q: "What's the name for computer-generated imagery, like a fake dragon or dinosaur?",
+      options: ["CGI", "HDTV", "3D-Print"],
+      answer: 0
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  const progressEl = document.getElementById('quizProgress');
+  const qEl = document.getElementById('quizQuestion');
+  const optsEl = document.getElementById('quizOptions');
+  const feedbackEl = document.getElementById('quizFeedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const quizBody = document.getElementById('quizBody');
+  const quizResult = document.getElementById('quizResult');
+  const quizScore = document.getElementById('quizScore');
+  const quizResultMsg = document.getElementById('quizResultMsg');
+  const retryBtn = document.getElementById('retryBtn');
+
+  function renderProgress(){
+    progressEl.innerHTML = '';
+    questions.forEach((_,i)=>{
+      const d = document.createElement('div');
+      d.className = 'dot' + (i<current?' done':'') + (i===current?' current':'');
+      progressEl.appendChild(d);
+    });
+  }
+
+  function renderQuestion(){
+    answered = false;
+    nextBtn.disabled = true;
+    feedbackEl.innerHTML = '';
+    feedbackEl.className = 'quiz-feedback';
+    renderProgress();
+    const item = questions[current];
+    qEl.textContent = (current+1) + '. ' + item.q;
+    optsEl.innerHTML = '';
+    item.options.forEach((opt, i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>selectOption(i, btn));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function selectOption(i, btn){
+    if(answered) return;
+    answered = true;
+    const item = questions[current];
+    const allBtns = optsEl.querySelectorAll('.quiz-opt');
+    allBtns.forEach(b=>b.setAttribute('disabled','true'));
+
+    if(i === item.answer){
+      btn.classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Correct!';
+      feedbackEl.className = 'quiz-feedback correct';
+      score++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns[item.answer].classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">info</span>Not quite — the right answer is highlighted above.';
+      feedbackEl.className = 'quiz-feedback incorrect';
+    }
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion(){
+    current++;
+    if(current >= questions.length){
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showResult(){
+    quizBody.style.display = 'none';
+    quizResult.style.display = 'block';
+    quizScore.textContent = score + '/' + questions.length;
+    let msg = 'Nice work!';
+    if(score === questions.length) msg = 'Perfect score — future movie director!';
+    else if(score >= questions.length - 1) msg = 'So close to a perfect take!';
+    else if(score <= 2) msg = "Give it another take — you've got this!";
+    quizResultMsg.textContent = msg;
+  }
+
+  function restart(){
+    current = 0;
+    score = 0;
+    quizBody.style.display = 'block';
+    quizResult.style.display = 'none';
+    renderQuestion();
+  }
+
+  nextBtn.addEventListener('click', nextQuestion);
+  retryBtn.addEventListener('click', restart);
+  renderQuestion();
+})();
+</script>
+
 </body>
 </html>
