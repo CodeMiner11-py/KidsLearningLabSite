@@ -222,7 +222,10 @@
   function freshImage(){
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = "https://cataas.com/cat";
+    fetch("https://cataas.com/cat", { cache: "no-store" })
+      .then(res => res.blob())
+      .then(blob => { img.src = URL.createObjectURL(blob); })
+      .catch(() => { img.src = "https://cataas.com/cat"; });
     return img;
   }
 
