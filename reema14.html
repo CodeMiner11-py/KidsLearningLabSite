@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE CAT GAME — Reema's 14th Birthday</title>
+<style>
+  :root{
+    --pink: #ff5fb0;
+    --pink-deep: #ff2f97;
+    --cream: #fff2f8;
+    --ink: #1a1a1a;
+    --gold: #d4af37;
+  }
+  html,body{
+    margin:0; padding:0; height:100%; overflow:hidden;
+    background: var(--cream);
+    font-family: Arial, sans-serif;
+    color: var(--ink);
+    -webkit-user-select:none; user-select:none;
+  }
+  #app{ position:relative; width:100vw; height:100vh; }
+
+  /* ---------- INTRO SCREEN ---------- */
+  #intro{
+    position:absolute; inset:0; z-index:50;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: var(--cream);
+    text-align:center; gap:14px; padding:20px; box-sizing:border-box;
+  }
+  #intro h1{ font-size: clamp(28px,6vw,56px); margin:0 0 10px 0; letter-spacing:1px; }
+  #intro .catwrap{ display:flex; align-items:center; gap:18px; }
+  #intro img{
+    width:min(46vw,300px); height:min(46vw,300px); object-fit:cover;
+    border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.25);
+    cursor:pointer;
+  }
+  #intro .hint{ font-size:18px; max-width:180px; text-align:left; font-weight:bold; }
+  #intro .footer{ position:absolute; bottom:16px; left:0; right:0; display:flex; justify-content:space-between; padding:0 24px; font-size:14px; opacity:0.75; box-sizing:border-box;}
+
+  /* ---------- GAME SCREEN ---------- */
+  #game{ position:absolute; inset:0; display:none; }
+  #game.active{ display:block; }
+
+  #topbar{
+    position:absolute; top:0; left:0; right:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; box-sizing:border-box;
+    background: var(--pink);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+  #counter{ font-size:22px; font-weight:bold; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.2); }
+  #shopBtns{ display:flex; gap:8px; }
+  #shopBtns button, #saveLoadBar button{
+    background:#ffe3f2; border:2px solid #fff; border-radius:8px;
+    padding:8px 14px; font-weight:bold; font-size:13px; cursor:pointer;
+    color:#a80058;
+  }
+  #shopBtns button:hover, #saveLoadBar button:hover{ background:#fff; }
+  #saveLoadBar{
+    position:absolute; bottom:16px; right:16px; z-index:20;
+    display:flex; gap:8px;
+  }
+
+  #stage-frame{
+    position:absolute; top:52px; left:0; right:0; bottom:0;
+    box-sizing:border-box;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+  canvas{ display:block; width:100%; height:100%; }
+
+  #toast{
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.75); color:#fff; padding:10px 18px; border-radius:20px;
+    font-size:14px; opacity:0; transition:opacity 0.3s ease; pointer-events:none; z-index:30;
+  }
+  #toast.show{ opacity:1; }
+
+  /* ---------- SHOP MODAL ---------- */
+  #shopOverlay{
+    position:absolute; inset:0; z-index:40; display:none;
+    background:rgba(0,0,0,0.45);
+    align-items:center; justify-content:center;
+  }
+  #shopOverlay.active{ display:flex; }
+  #shopModal{
+    background:var(--pink); width:min(92vw,640px); max-height:82vh; overflow-y:auto;
+    border-radius:16px; padding:20px; box-sizing:border-box;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  }
+  #shopModal h2{ color:#fff; margin:0 0 14px 0; text-align:center; text-shadow:0 1px 3px rgba(0,0,0,0.25); }
+  .tierRow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#ffeef7; border-radius:10px; padding:10px 14px; margin-bottom:8px;
+  }
+  .tierLeft{ display:flex; align-items:center; gap:12px; }
+  .tierPreview{
+    width:60px; height:44px; display:flex; align-items:center; justify-content:center;
+    background:#fff; border-radius:6px; font-size:20px; overflow:hidden;
+  }
+  .tierName{ font-weight:bold; font-size:14px; color:#333; }
+  .tierCost{ font-size:12px; color:#a80058; }
+  .tierBtn{
+    border:none; border-radius:8px; padding:8px 12px; font-weight:bold; cursor:pointer; font-size:13px;
+    min-width:78px;
+  }
+  .tierBtn.buy{ background:#a80058; color:#fff; }
+  .tierBtn.buy:disabled{ background:#c99; cursor:not-allowed; opacity:0.6; }
+  .tierBtn.equip{ background:#4caf50; color:#fff; }
+  .tierBtn.equipped{ background:#333; color:#fff; cursor:default; }
+  #closeShop{
+    display:block; margin:14px auto 0 auto; background:#fff; color:#a80058;
+    border:none; border-radius:20px; padding:8px 20px; font-weight:bold; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- INTRO -->
+  <div id="intro">
+    <h1>WELCOME TO CAT GAME</h1>
+    <p style="font-size:18px;">This is cat:</p>
+    <div class="catwrap">
+      <img id="introCat" src="https://cataas.com/cat?intro" alt="cat">
+      <div class="hint">⬅ Click on cat to duplicate new cat.</div>
+    </div>
+    <div class="footer">
+      <span>Reema's 14th Birthday</span>
+      <span>THE CAT GAME</span>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game">
+    <div id="topbar">
+      <div id="counter">1 CAT</div>
+      <div id="shopBtns">
+        <button data-shop="font">UPGRADE FONT</button>
+        <button data-shop="cursor">UPGRADE CURSOR</button>
+        <button data-shop="frame">UPGRADE FRAME</button>
+      </div>
+    </div>
+    <div id="stage-frame">
+      <canvas id="stage"></canvas>
+    </div>
+    <div id="toast"></div>
+    <div id="saveLoadBar">
+      <button id="saveBtn">💾 Save Game</button>
+      <button id="loadBtn">📂 Load Game</button>
+    </div>
+  </div>
+
+  <!-- SHOP MODAL -->
+  <div id="shopOverlay">
+    <div id="shopModal">
+      <h2 id="shopTitle">UPGRADE</h2>
+      <div id="tierList"></div>
+      <button id="closeShop">CLOSE</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ CONFIG ============ */
+  const MAX_CATS = 2500;
+  const BASE_SPEED = 2.2;
+
+  const TIERS = [5, 15, 50, 150, 500, 1500];
+
+  const FONTS = [
+    { name:"Comic Neue",     cost:5,    family:"'Comic Neue', cursive",  google:"Comic+Neue:wght@700" },
+    { name:"Caveat",         cost:15,   family:"'Caveat', cursive",      google:"Caveat:wght@700" },
+    { name:"Bungee",         cost:50,   family:"'Bungee', cursive",      google:"Bungee" },
+    { name:"Pacifico",       cost:150,  family:"'Pacifico', cursive",    google:"Pacifico" },
+    { name:"Press Start 2P", cost:500,  family:"'Press Start 2P', cursive", google:"Press+Start+2P" },
+    { name:"Monoton",        cost:1500, family:"'Monoton', cursive",     google:"Monoton" },
+  ];
+
+  const CURSORS = [
+    { name:"Classic Arrow", cost:5,    css:"default",  emoji:"➡️", trail:"line",    color:"#000000" },
+    { name:"Witch Hat",     cost:15,   css:null,       emoji:"🧙", trail:"sparkle", color:"#ffd54a" },
+    { name:"Teal Point",    cost:50,   css:null,       emoji:"👆", trail:"dot",     color:"#00b8b8" },
+    { name:"Orange Point",  cost:150,  css:null,       emoji:"👉", trail:"dot",     color:"#ff8c00" },
+    { name:"Crayon",        cost:500,  css:null,       emoji:"🖍️", trail:"crayon",  color:null },
+    { name:"Emoji Face",    cost:1500, css:null,       emoji:"😆", trail:"emoji",   color:null },
+  ];
+
+  const FRAMES = [
+    { name:"Thin Black",    cost:5,    color:"#222222", width:2 },
+    { name:"Polaroid",      cost:15,   color:"#f4ecd8", width:4 },
+    { name:"Lavender Wave", cost:50,   color:"#c9c2e8", width:3 },
+    { name:"Thin Gold",     cost:150,  color:"#d4af37", width:3 },
+    { name:"Gold Ornate",   cost:500,  color:"#f5e08c", width:4 },
+    { name:"Grand Baroque", cost:1500, color:"#8a6a1f", width:5 },
+  ];
+
+  /* ============ STATE ============ */
+  let cats = [];
+  let owned = { font:new Set(), cursor:new Set(), frame:new Set() };
+  let equipped = { font:-1, cursor:0, frame:-1 }; // index into arrays, -1 = none/default
+  owned.cursor.add(0); // classic arrow free
+
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d');
+  const stageFrame = document.getElementById('stage-frame');
+
+  function resizeCanvas(){
+    canvas.width = stageFrame.clientWidth;
+    canvas.height = stageFrame.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  /* ============ IMAGE POOL ============ */
+  // Each cat image can be reused at most twice. Keep a small ready buffer.
+  let pool = []; // {img, usesLeft}
+  const READY_AHEAD = 2;
+
+  function freshImage(){
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "https://cataas.com/cat";
+    return img;
+  }
+
+  function topUpPool(){
+    const readyCount = pool.filter(p => p.usesLeft > 0).length;
+    for (let i = readyCount; i < READY_AHEAD; i++){
+      pool.push({ img: freshImage(), usesLeft: 2 });
+    }
+  }
+
+  function getCatImage(){
+    let entry = pool.find(p => p.usesLeft > 0);
+    if (!entry){
+      entry = { img: freshImage(), usesLeft: 2 };
+      pool.push(entry);
+    }
+    entry.usesLeft--;
+    topUpPool();
+    return entry.img;
+  }
+
+  topUpPool();
+
+  /* ============ CURSOR TRAIL ============ */
+  let trail = [];
+  let lastTrailPoint = null;
+
+  function addTrailParticle(x, y){
+    const cur = CURSORS[equipped.cursor];
+    if (!cur) return;
+    if (lastTrailPoint){
+      const dx = x - lastTrailPoint.x, dy = y - lastTrailPoint.y;
+      if (dx*dx + dy*dy < 16) return; // throttle by distance
+    }
+    const lifeFrames = cur.trail === "line" ? 14 : 26;
+    trail.push({
+      x, y,
+      px: lastTrailPoint ? lastTrailPoint.x : x,
+      py: lastTrailPoint ? lastTrailPoint.y : y,
+      life: lifeFrames,
+      maxLife: lifeFrames,
+      type: cur.trail,
+      color: cur.color,
+      emoji: cur.emoji,
+      angle: Math.random() * Math.PI * 2,
+      size: 5 + Math.random() * 5,
+      hue: Math.random() * 360
+    });
+    lastTrailPoint = { x, y };
+    if (trail.length > 200) trail.shift();
+  }
+
+  function drawStar(x, y, size, color, rotation){
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++){
+      ctx.lineTo(0, -size);
+      ctx.rotate(Math.PI / 4);
+      ctx.lineTo(0, -size / 3);
+      ctx.rotate(Math.PI / 4);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function updateAndDrawTrail(){
+    for (let i = trail.length - 1; i >= 0; i--){
+      const p = trail[i];
+      p.life--;
+      if (p.life <= 0){ trail.splice(i, 1); continue; }
+      const alpha = Math.max(0, p.life / p.maxLife);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      switch (p.type){
+        case "line":
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(p.px, p.py);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          break;
+        case "sparkle":
+          drawStar(p.x, p.y, p.size, p.color, p.angle);
+          break;
+        case "dot":
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        case "crayon":
+          ctx.fillStyle = "hsl(" + p.hue + ",80%,60%)";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        case "emoji":
+          ctx.font = (p.size * 3) + "px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(p.emoji, p.x, p.y);
+          break;
+      }
+      ctx.restore();
+    }
+  }
+
+  stageFrame.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    addTrailParticle(e.clientX - rect.left, e.clientY - rect.top);
+  });
+
+  /* ============ CAT HELPERS ============ */
+  function catSize(count){
+    return 60;
+  }
+
+  function speedFactor(count){
+    return Math.max(0.12, 1 - count / 2600);
+  }
+
+  function addCat(nearX, nearY){
+    if (cats.length >= MAX_CATS) return false;
+    const w = canvas.width || 400, h = canvas.height || 400;
+    const x = nearX !== undefined ? nearX : Math.random()*w;
+    const y = nearY !== undefined ? nearY : Math.random()*h;
+    const angle = Math.random() * Math.PI * 2;
+    const sf = speedFactor(cats.length+1);
+    cats.push({
+      x, y,
+      vx: Math.cos(angle) * BASE_SPEED * sf,
+      vy: Math.sin(angle) * BASE_SPEED * sf,
+      img: getCatImage()
+    });
+    return true;
+  }
+
+  function removeCats(n){
+    for (let i=0;i<n && cats.length>0;i++) cats.pop();
+  }
+
+  /* ============ PHYSICS + RENDER LOOP ============ */
+  let frameSkip = 0;
+  function tick(){
+    requestAnimationFrame(tick);
+
+    // performance scaling: skip physics update frames as count grows
+    const count = cats.length;
+    const skipEvery = count > 1500 ? 2 : count > 600 ? 1 : 0;
+    frameSkip++;
+    const doPhysics = skipEvery === 0 || (frameSkip % (skipEvery+1) === 0);
+
+    const size = catSize(Math.max(count,1));
+    const sf = speedFactor(count);
+    const w = canvas.width, h = canvas.height;
+
+    if (doPhysics){
+      for (const c of cats){
+        c.x += c.vx * sf;
+        c.y += c.vy * sf;
+        if (c.x < size/2){ c.x = size/2; c.vx *= -1; }
+        if (c.x > w - size/2){ c.x = w - size/2; c.vx *= -1; }
+        if (c.y < size/2){ c.y = size/2; c.vy *= -1; }
+        if (c.y > h - size/2){ c.y = h - size/2; c.vy *= -1; }
+      }
+    }
+
+    ctx.clearRect(0,0,w,h);
+    ctx.imageSmoothingEnabled = count < 800; // lower quality when heavy
+    const frame = equipped.frame >= 0 ? FRAMES[equipped.frame] : null;
+    for (const c of cats){
+      if (c.img.complete && c.img.naturalWidth > 0){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, size/2, 0, Math.PI*2);
+        ctx.clip();
+        ctx.drawImage(c.img, c.x-size/2, c.y-size/2, size, size);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = "#ddd";
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, size/2, 0, Math.PI*2);
+        ctx.fill();
+      }
+      if (frame){
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, size/2, 0, Math.PI*2);
+        ctx.lineWidth = frame.width;
+        ctx.strokeStyle = frame.color;
+        ctx.stroke();
+      }
+    }
+
+    updateAndDrawTrail();
+
+    updateCounter();
+  }
+
+  function updateCounter(){
+    const el = document.getElementById('counter');
+    el.textContent = cats.length + (cats.length===1 ? " CAT" : " CATS");
+  }
+
+  /* ============ CLICK TO DUPLICATE ============ */
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const size = catSize(Math.max(cats.length,1));
+    for (let i = cats.length-1; i>=0; i--){
+      const c = cats[i];
+      const dx = mx - c.x, dy = my - c.y;
+      if (dx*dx + dy*dy <= (size/2)*(size/2)){
+        if (cats.length >= MAX_CATS){
+          showToast("Max 2500 cats reached!");
+        } else {
+          addCat(c.x + (Math.random()*20-10), c.y + (Math.random()*20-10));
+        }
+        break;
+      }
+    }
+  });
+
+  /* ============ TOAST ============ */
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 1800);
+  }
+
+  /* ============ FONT LOADING ============ */
+  const loadedFonts = new Set();
+  function ensureFontLoaded(font){
+    if (loadedFonts.has(font.google)) return;
+    const link = document.createElement('link');
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=" + font.google + "&display=swap";
+    document.head.appendChild(link);
+    loadedFonts.add(font.google);
+  }
+
+  /* ============ CURSOR RENDERING ============ */
+  function emojiCursorCSS(emoji){
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='24' font-size='28'>${emoji}</text></svg>`;
+    return "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\") 4 4, auto";
+  }
+
+  function applyCursor(idx){
+    const c = CURSORS[idx];
+    if (c.css === "default"){
+      stageFrame.style.cursor = "default";
+    } else {
+      stageFrame.style.cursor = emojiCursorCSS(c.emoji);
+    }
+  }
+
+  function applyFont(idx){
+    if (idx < 0){
+      document.body.style.fontFamily = "Arial, sans-serif";
+      return;
+    }
+    const f = FONTS[idx];
+    ensureFontLoaded(f);
+    document.body.style.fontFamily = f.family;
+  }
+
+  function applyFrame(idx){
+    // Frame is drawn per-cat in the render loop (see tick()) — nothing to do to the page.
+  }
+
+  /* ============ SHOP UI ============ */
+  const shopOverlay = document.getElementById('shopOverlay');
+  const shopTitle = document.getElementById('shopTitle');
+  const tierList = document.getElementById('tierList');
+  let currentShop = null;
+
+  function shopData(type){
+    if (type==="font") return FONTS;
+    if (type==="cursor") return CURSORS;
+    return FRAMES;
+  }
+
+  function openShop(type){
+    currentShop = type;
+    shopTitle.textContent = "UPGRADE " + type.toUpperCase();
+    renderTiers();
+    shopOverlay.classList.add('active');
+  }
+
+  function renderTiers(){
+    const data = shopData(currentShop);
+    tierList.innerHTML = "";
+    data.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = "tierRow";
+
+      const left = document.createElement('div');
+      left.className = "tierLeft";
+
+      const preview = document.createElement('div');
+      preview.className = "tierPreview";
+      if (currentShop === "font"){
+        preview.textContent = "Aa";
+        ensureFontLoaded(item); // preview needs font too
+        preview.style.fontFamily = item.family;
+      } else if (currentShop === "cursor"){
+        preview.textContent = item.emoji;
+      } else {
+        preview.style.border = item.width + "px solid " + item.color;
+      }
+      left.appendChild(preview);
+
+      const info = document.createElement('div');
+      const nm = document.createElement('div');
+      nm.className = "tierName"; nm.textContent = item.name;
+      const cs = document.createElement('div');
+      cs.className = "tierCost"; cs.textContent = item.cost + " cats";
+      info.appendChild(nm); info.appendChild(cs);
+      left.appendChild(info);
+
+      const btn = document.createElement('button');
+      const isOwned = owned[currentShop].has(idx);
+      const isEquipped = equipped[currentShop] === idx;
+
+      if (isEquipped){
+        btn.textContent = "EQUIPPED";
+        btn.className = "tierBtn equipped";
+        btn.disabled = true;
+      } else if (isOwned){
+        btn.textContent = "EQUIP";
+        btn.className = "tierBtn equip";
+        btn.onclick = () => { equip(currentShop, idx); renderTiers(); };
+      } else {
+        btn.textContent = "BUY";
+        btn.className = "tierBtn buy";
+        btn.disabled = cats.length < item.cost;
+        btn.onclick = () => { buy(currentShop, idx); };
+      }
+
+      row.appendChild(left);
+      row.appendChild(btn);
+      tierList.appendChild(row);
+    });
+  }
+
+  function buy(type, idx){
+    const item = shopData(type)[idx];
+    if (cats.length < item.cost) return;
+    removeCats(item.cost);
+    if (cats.length === 0) addCat();
+    owned[type].add(idx);
+    equip(type, idx);
+    renderTiers();
+    showToast("Bought " + item.name + "! -" + item.cost + " cats");
+  }
+
+  function equip(type, idx){
+    equipped[type] = idx;
+    if (type==="font") applyFont(idx);
+    if (type==="cursor") applyCursor(idx);
+    if (type==="frame") applyFrame(idx);
+  }
+
+  document.querySelectorAll('#shopBtns button').forEach(btn=>{
+    btn.addEventListener('click', ()=> openShop(btn.dataset.shop));
+  });
+  document.getElementById('closeShop').addEventListener('click', ()=>{
+    shopOverlay.classList.remove('active');
+  });
+  shopOverlay.addEventListener('click', (e)=>{
+    if (e.target === shopOverlay) shopOverlay.classList.remove('active');
+  });
+
+  /* ============ SAVE / LOAD ============ */
+  function serializeState(){
+    return btoa(JSON.stringify({
+      n: cats.length,
+      ownedFont: Array.from(owned.font),
+      ownedCursor: Array.from(owned.cursor),
+      ownedFrame: Array.from(owned.frame),
+      eqFont: equipped.font,
+      eqCursor: equipped.cursor,
+      eqFrame: equipped.frame
+    }));
+  }
+
+  function saveGame(){
+    window.prompt("Copy this save code (Ctrl/Cmd+C, then OK):", serializeState());
+  }
+
+  function loadGame(){
+    const str = window.prompt("Paste your save code:");
+    if (!str) return;
+    try {
+      const data = JSON.parse(atob(str.trim()));
+      if (!document.getElementById('game').classList.contains('active')){
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('game').classList.add('active');
+        resizeCanvas();
+        requestAnimationFrame(tick);
+      }
+      cats = [];
+      pool = [];
+      topUpPool();
+      const n = Math.max(1, Math.min(MAX_CATS, data.n|0));
+      for (let i=0; i<n; i++) addCat();
+      owned.font = new Set(data.ownedFont || []);
+      owned.cursor = new Set(data.ownedCursor || [0]);
+      owned.frame = new Set(data.ownedFrame || []);
+      equip('font', typeof data.eqFont === "number" ? data.eqFont : -1);
+      equip('cursor', typeof data.eqCursor === "number" ? data.eqCursor : 0);
+      equip('frame', typeof data.eqFrame === "number" ? data.eqFrame : -1);
+      showToast("Game loaded!");
+    } catch(e){
+      showToast("Invalid save code");
+    }
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', saveGame);
+  document.getElementById('loadBtn').addEventListener('click', loadGame);
+
+  /* ============ INTRO -> GAME ============ */
+  document.getElementById('introCat').addEventListener('click', startGame);
+  function startGame(){
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('game').classList.add('active');
+    resizeCanvas();
+    addCat(); // the original cat
+    applyCursor(0);
+    requestAnimationFrame(tick);
+  }
+
+})();
+</script>
+</body>
+</html>
