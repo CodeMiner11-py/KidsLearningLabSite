@@ -1,0 +1,3081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<title>Kids Learning Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #123B7A;
+    --blue-main: #1E6FE0;
+    --blue-bright: #4FA6FF;
+    --blue-pale: #EAF3FF;
+    --blue-mist: #F5FAFF;
+    --ink: #14213D;
+    --ink-soft: #5B6B85;
+    --error: #D6435A;
+    --white: #FFFFFF;
+    --streak-orange: #FF8A2B;
+  }
+
+  #deleteAccountConfirmBtn:hover { background: #B8324A; }
+
+  .settings-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1.5px solid #DCE7F5;
+    color: var(--blue-main);
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 5px 14px 5px 8px;
+    margin-bottom: 16px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .settings-badge .material-symbols-outlined {
+    font-size: 15px;
+    color: var(--blue-bright);
+  }
+
+  * { box-sizing: border-box; }
+  * { -webkit-tap-highlight-color: transparent; }
+  
+
+  button, .tab, .nav-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button:focus, input:focus {
+    outline: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Google Sans', sans-serif;
+    background: var(--blue-mist);
+    color: var(--ink);
+  }
+
+  body { font-family: "Google Sans" !important }
+
+  body {
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- AUTH SCREEN ---------- */
+  #auth-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+    z-index: 0;
+  }
+  .blob-1 {
+    width: 340px; height: 340px;
+    background: radial-gradient(circle at 30% 30%, var(--blue-bright), var(--blue-main));
+    top: -120px; left: -120px;
+    opacity: 0.35;
+  }
+  .blob-2 {
+    width: 260px; height: 260px;
+    background: radial-gradient(circle at 70% 70%, var(--blue-main), var(--blue-deep));
+    bottom: -100px; right: -80px;
+    opacity: 0.3;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 380px;
+    background: var(--white);
+    border-radius: 28px;
+    padding: 40px 32px 32px;
+    box-shadow: 0 20px 60px rgba(18, 59, 122, 0.14);
+  }
+
+  .mark {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(18, 59, 122, 0.18);
+  }
+
+  .mark img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    color: var(--blue-deep);
+  }
+
+  .subhead {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    line-height: 1.4;
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--blue-pale);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+    user-select: none;
+  }
+
+  .tab.active {
+    background: var(--white);
+    color: var(--blue-main);
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.1);
+  }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #DCE7F5;
+    background: var(--blue-mist);
+    font-family: 'Google Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  input[type="email"]:focus, input[type="password"]:focus {
+    border-color: var(--blue-main);
+    background: var(--white);
+  }
+
+  .forgot { text-align: right; margin-top: -6px; }
+
+  .forgot button {
+    background: none;
+    border: none;
+    color: var(--blue-main);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    font-family: 'Google Sans', sans-serif;
+  }
+
+  .submit {
+    margin-top: 10px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--blue-main);
+    color: var(--white);
+    font-family: 'Google Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .submit:hover { background: var(--blue-deep); }
+  .submit:active { transform: scale(0.98); }
+  .submit:disabled { background: #A9C6EE; cursor: not-allowed; }
+
+  .message { font-size: 13px; text-align: center; min-height: 18px; margin-top: 4px; }
+  .message.error { color: var(--error); }
+  .message.success { color: var(--blue-main); }
+
+  /* ---------- APP SHELL ---------- */
+  #app-shell {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+
+  *, button, input, select, textarea {
+    font-family: 'Google Sans', sans-serif !important;
+  }
+
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+  }
+
+  * { -webkit-tap-highlight-color: transparent; }
+
+
+
+  #app-shell #page-settings {
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  text-align: left;
+}
+
+
+
+.settings-wrap,
+.settings-heading,
+.settings-badge {
+  text-align: left;
+}
+
+#app-shell #page-settings.active,
+#app-shell .page#page-settings[style*="flex"] {
+  display: flex;
+}
+
+  .page {
+    display: none;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    font-size: 15px;
+    padding: 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  #page-home {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    text-align: left;
+    padding: calc(20px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  /* ---- Home page: greeting + randomized, colorful widget grid ---- */
+  .home-greeting {
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -.01em;
+    margin: 0 0 18px;
+    text-align: center;
+  }
+
+  .home-widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: var(--hw-row, 84px);
+    gap: 14px;
+    grid-auto-flow: row dense;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .home-widget {
+    border: none;
+    cursor: pointer;
+    border-radius: 26px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    color: var(--white);
+    font-family: 'Google Sans', sans-serif;
+    box-shadow: 0 6px 16px rgba(18, 59, 122, 0.14);
+    transition: transform 0.12s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-widget:active { transform: scale(0.96); }
+
+  /* Sizes — xs = 1 column at single-row height (fits the gap a small
+     widget leaves next to a tall one), small ≈ square, wide = 2 columns
+     at small's height, tall = 1 column at double height, banner = full
+     width single row, large = 2×2 hero. Mirrors iOS's widget system. */
+  .hw-xs    { grid-column: span 1; grid-row: span 1; }
+  .hw-sm    { grid-column: span 1; grid-row: span 2; }
+  .hw-wide  { grid-column: span 2; grid-row: span 2; }
+  .hw-tall  { grid-column: span 1; grid-row: span 3; }
+  .hw-large { grid-column: span 2; grid-row: span 3; }
+  .hw-banner{ grid-column: span 2; grid-row: span 1; }
+
+  /* ---- "stat" template: big centered number/emoji (streak) ---- */
+  .home-widget.type-stat {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .hw-stat-num {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+  }
+  .hw-stat-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .hw-stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.92;
+    margin-top: 6px;
+  }
+
+  /* ---- "info" template: label / big headline / sub, stacked ---- */
+  .home-widget.type-info {
+    justify-content: center;
+    gap: 4px;
+  }
+  .hw-label {
+    font-size: 13px;
+    font-weight: 700;
+    opacity: 0.85;
+    text-transform: none;
+  }
+  .hw-big {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.12;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .hw-tall .hw-big, .hw-large .hw-big { font-size: 30px; }
+  .hw-sub {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+
+  /* ---- "banner" template: one bold centered line, full width ---- */
+  .home-widget.type-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    gap: 10px;
+  }
+  .home-widget.type-banner .hw-big {
+    font-size: 21px;
+    -webkit-line-clamp: 1;
+  }
+  .hw-banner-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  /* ---- "icon" template: tiny single-row icon + label (Edit Profile) ---- */
+  .home-widget.type-icon {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 8px;
+  }
+  .hw-icon-symbol {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .hw-icon-label {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .home-widgets-loading {
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  .bottom-nav {
+    display: flex;
+    background: var(--white);
+    border-top: 1px solid #E4EDF9;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(18, 59, 122, 0.06);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: 'Google Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .nav-btn .material-symbols-outlined {
+    font-size: 24px;
+    color: var(--ink-soft);
+    transition: color 0.15s ease, font-variation-settings 0.15s ease;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .nav-btn.active .material-symbols-outlined {
+    color: var(--blue-main);
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .nav-btn.active { color: var(--blue-main); background: var(--blue-pale); }
+  .nav-btn.active svg { stroke: var(--blue-main); }
+  .nav-btn.active svg.fill-icon { fill: var(--blue-main); }
+
+  #signout-btn {
+    margin-top: 16px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1.5px solid #DCE7F5;
+    background: var(--white);
+    color: var(--blue-main);
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #page-listen {
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 16px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.listen-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.listen-header img {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1.5px solid #DCE7F5;
+}
+.listen-show-title { font-size: 19px; font-weight: 800; color: var(--ink); }
+.listen-show-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+
+.listen-status {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  padding: 24px 0;
+}
+
+.episode-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--white);
+  border: 1.5px solid #DCE7F5;
+  border-radius: 16px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.episode-card.playing { border-color: var(--blue-main); background: var(--blue-pale); }
+.episode-card img {
+  width: 56px; height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.episode-card-info { min-width: 0; flex: 1; }
+.episode-card-title {
+  font-size: 14px; font-weight: 700; color: var(--ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.episode-card-meta { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+.episode-card-play {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--blue-pale);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--blue-main);
+}
+.episode-card.playing .episode-card-play { background: var(--blue-main); color: var(--white); }
+
+/* ---------- MINI PLAYER ---------- */
+.mini-player {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border-top: 1px solid #E4EDF9;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.mini-player.show { display: flex; }
+.mini-player img {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.mini-player-info { min-width: 0; flex: 1; }
+.mini-player-title {
+  font-size: 12.5px; font-weight: 700; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mini-player-sub { font-size: 10.5px; color: var(--ink-soft); }
+.mini-player-btn {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--blue-main);
+  cursor: pointer;
+}
+.mini-player-btn .material-symbols-outlined { font-size: 22px; }
+
+/* ---------- SPLASH SCREEN ---------- */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-mist);
+}
+
+#splash-screen .splash-logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(18, 59, 122, 0.18);
+  margin-bottom: 22px;
+}
+#splash-screen .splash-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#splash-screen .splash-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+
+#splash-screen .splash-bar-track {
+  width: 160px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--blue-pale);
+  overflow: hidden;
+}
+#splash-screen .splash-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue-main), var(--blue-bright));
+  animation: splashLoad 3s ease-in-out forwards;
+}
+@keyframes splashLoad {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* ---------- EPISODE DETAIL MODAL ---------- */
+.episode-modal-overlay .kll-modal,
+.episode-modal {
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+  text-align: left;
+}
+.episode-modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--blue-pale);
+  color: var(--blue-main);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.episode-modal img {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  margin: 0 auto 16px;
+}
+.episode-modal-title { font-size: 18px; font-weight: 800; color: var(--ink); text-align: center; margin-bottom: 6px; }
+.episode-modal-meta { font-size: 12px; color: var(--ink-soft); text-align: center; margin-bottom: 18px; }
+.episode-modal-description { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; margin-top: 18px; }
+.episode-modal-description p { margin: 0 0 12px; }
+.episode-modal-description a { color: var(--blue-main); }
+.player-controls { margin-top: 4px; }
+
+.player-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.player-time {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+}
+#playerCurrentTime { text-align: right; }
+
+.player-seek-bar {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: #DCE7F5;
+  outline: none;
+}
+.player-seek-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--blue-main);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(18,59,122,0.3);
+}
+.player-seek-bar::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: var(--blue-main);
+  cursor: pointer;
+}
+
+.player-buttons-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 14px 0 6px;
+}
+.player-ctrl-btn {
+  border: none;
+  background: none;
+  color: var(--blue-main);
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.player-ctrl-btn .material-symbols-outlined { font-size: 26px; }
+.player-ctrl-btn:disabled { color: #B9CFEF; cursor: not-allowed; }
+.player-ctrl-btn-main {
+  width: 54px; height: 54px;
+  background: var(--blue-main);
+  color: var(--white);
+}
+.player-ctrl-btn-main .material-symbols-outlined { font-size: 30px; }
+.player-ctrl-btn-main:hover { background: var(--blue-deep); }
+  /* ---------- SETTINGS PAGE ---------- */
+  #page-settings {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 32px 20px calc(24px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .settings-wrap { max-width: 480px; margin: 0 auto; width: 100%; }
+
+  .settings-heading {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--blue-deep);
+    margin: 0 0 24px;
+    letter-spacing: -.01em;
+  }
+
+  .settings-card {
+    background: var(--white);
+    border: 1.5px solid #DCE7F5;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .settings-card-label {
+    padding: 12px 18px;
+    background: var(--blue-pale);
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--blue-main);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .settings-profile-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border-bottom: 1.5px solid #EEF4FC;
+  }
+
+  .settings-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--blue-pale);
+    background: var(--blue-pale);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--blue-main);
+    font-size: 24px;
+  }
+
+  .settings-name { font-weight: 800; font-size: 15px; color: var(--ink); }
+  .settings-email { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+  .settings-row-btn {
+    width: 100%;
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px;
+    background: none; border: none;
+    border-top: 1.5px solid #EEF4FC;
+    cursor: pointer;
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 700; font-size: 14px;
+    color: var(--ink);
+    text-align: left;
+  }
+  .settings-row-btn:first-child { border-top: none; }
+  .settings-row-btn .material-symbols-outlined { font-size: 19px; color: var(--ink-soft); }
+  .settings-row-btn.danger { color: var(--error); }
+  .settings-row-btn.danger .material-symbols-outlined { color: var(--error); }
+
+  .settings-about-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px;
+  }
+  .settings-about-row img { width: 44px; height: 44px; border-radius: 12px; }
+  .settings-about-title { font-weight: 800; font-size: 14px; color: var(--ink); }
+  .settings-about-sub { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  .settings-status {
+    font-size: 12.5px;
+    padding: 0 18px 0;
+    margin: 0;
+    min-height: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .15s ease, padding .15s ease;
+  }
+  .settings-status:not(:empty) {
+    max-height: 40px;
+    padding: 0 18px 14px;
+  }
+
+  .kll-modal-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(18, 59, 122, 0.45);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .kll-modal-overlay.show { display: flex; }
+  /* These modals can be opened from within a full-page overlay (e.g. Account
+     Settings) and must render above it, even though they share the same
+     base z-index and appear earlier in the DOM. */
+  #deleteAccountModalOverlay,
+  #cpModal1,
+  #cpModal2,
+  #cpModal3 {
+    z-index: 9500;
+  }
+  .kll-modal {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    max-width: 400px; width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 70px rgba(18, 59, 122, 0.2);
+  }
+  .kll-modal img {
+    width: 52px; height: 52px; border-radius: 16px;
+    margin-bottom: 18px; box-shadow: 0 6px 18px rgba(18, 59, 122, 0.18);
+  }
+  .kll-modal h2 {
+    font-size: 20px; font-weight: 800; color: var(--blue-deep);
+    margin: 0 0 8px;
+  }
+  .kll-modal p {
+    font-size: 13px; color: var(--ink-soft); line-height: 1.5;
+    margin: 0 0 24px;
+  }
+  .kll-code-input {
+    width: 100%;
+    font-size: 28px; font-weight: 800; letter-spacing: 0.3em;
+    text-align: center;
+    padding: 14px; border-radius: 12px;
+    border: 1.5px solid #DCE7F5; background: var(--blue-mist);
+    color: var(--ink); outline: none; margin-bottom: 10px;
+    transition: border-color 0.15s ease;
+  }
+  .kll-code-input:focus { border-color: var(--blue-main); background: var(--white); }
+  .kll-text-input {
+    width: 100%; font-size: 15px;
+    padding: 13px 14px; border-radius: 12px;
+    border: 1.5px solid #DCE7F5; background: var(--blue-mist);
+    color: var(--ink); outline: none; margin-bottom: 8px;
+    transition: border-color 0.15s ease;
+  }
+  .kll-text-input:focus { border-color: var(--blue-main); background: var(--white); }
+  .kll-modal-error {
+    font-size: 12.5px; color: var(--error); min-height: 16px; margin-bottom: 10px;
+  }
+  .kll-modal-timer {
+    font-size: 12px; color: var(--ink-soft); margin-bottom: 16px;
+  }
+  .kll-modal-btn {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    background: var(--blue-main); color: var(--white);
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    margin-bottom: 10px; transition: background 0.15s ease;
+  }
+  .kll-modal-btn:hover { background: var(--blue-deep); }
+  .kll-modal-btn:disabled { background: #A9C6EE; cursor: not-allowed; }
+  #lessonStartBtn { position: relative; overflow: hidden; }
+  #lessonStartBtn .lesson-start-btn-fill {
+    position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
+    background: var(--blue-deep); z-index: 0; pointer-events: none;
+  }
+  #lessonStartBtn .lesson-start-btn-label {
+    position: relative; z-index: 1;
+  }
+  .kll-modal-btn-secondary {
+    width: 100%; padding: 12px; border-radius: 12px;
+    border: 1.5px solid #DCE7F5; background: var(--white);
+    color: var(--blue-main); font-weight: 600; font-size: 13.5px; cursor: pointer;
+  }
+
+  .settings-status.error { color: var(--error); }
+  .settings-status.success { color: var(--blue-main); }
+
+  /* ---- Profile page ---- */
+  .profile-subheading { font-size: 13px; color: var(--ink-soft); margin: -16px 0 20px; }
+  .profile-header-row { display: flex; align-items: center; gap: 14px; padding: 18px; }
+  .profile-avatar-btn { position: relative; border: none; background: none; padding: 0; cursor: pointer; flex-shrink: 0; }
+  .profile-avatar-lg { width: 64px; height: 64px; font-size: 30px; overflow: hidden; }
+  .profile-avatar-lg img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .profile-avatar-edit-badge {
+    position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--blue-main); color: var(--white); display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--white);
+  }
+  .profile-avatar-edit-badge .material-symbols-outlined { font-size: 13px; }
+  .profile-header-info { flex: 1; min-width: 0; }
+  .profile-change-name-btn {
+    margin-top: 6px; border: none; background: var(--blue-pale); color: var(--blue-main);
+    font-family: inherit; font-weight: 700; font-size: 12px; border-radius: 999px; padding: 5px 12px; cursor: pointer;
+  }
+  .profile-xp-row {
+    display: flex; align-items: center; gap: 12px; padding: 16px 18px;
+    border-top: 1.5px solid #EEF4FC; background: #FFF8EF;
+  }
+  .profile-xp-icon {
+    width: 40px; height: 40px; border-radius: 50%; background: #FFF1E0; color: var(--streak-orange);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .profile-xp-count { font-size: 20px; font-weight: 800; color: var(--streak-orange); line-height: 1.1; }
+  .profile-xp-label { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .settings-row-btn { position: relative; }
+  .profile-row-chevron { position: absolute; right: 16px; color: var(--ink-soft) !important; }
+  .danger-card-icon { background: #FDEBE8; color: var(--error); }
+
+  /* ---- Change Avatar: emoji + color picker modal ---- */
+  .avatar-modal { max-width: 380px; }
+  .avatar-preview-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+  .avatar-preview { width: 84px; height: 84px; font-size: 38px; border-width: 3px; }
+  .avatar-section-label {
+    font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase;
+    letter-spacing: .04em; text-align: left; margin: 4px 0 8px;
+  }
+  .avatar-emoji-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 20px;
+  }
+  .avatar-emoji-btn {
+    aspect-ratio: 1; border-radius: 12px; border: 2px solid #DCE7F5; background: var(--blue-mist);
+    font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease; padding: 0;
+  }
+  .avatar-emoji-btn.selected { border-color: var(--blue-main); background: var(--blue-pale); }
+  .avatar-color-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 8px;
+  }
+  .avatar-color-swatch {
+    aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; cursor: pointer;
+    box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.08); padding: 0;
+  }
+  .avatar-color-swatch.selected { border-color: var(--ink); }
+  .avatar-emoji { line-height: 1; }
+
+  /* ---- Friends page ---- */
+  .friend-profile-card {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 24px 18px 18px; margin-bottom: 18px;
+  }
+  .friend-profile-name { font-weight: 800; font-size: 16px; color: var(--ink); margin-top: 10px; }
+  .friend-profile-email { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .friend-profile-stats-row { display: flex; gap: 28px; margin-top: 16px; }
+  .friend-profile-stat-count { font-size: 22px; font-weight: 800; color: var(--blue-deep); line-height: 1.1; }
+  .friend-profile-stat-label { font-size: 11.5px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+
+  .friend-action-row { display: flex; gap: 10px; margin: 4px 0 22px; }
+  .friend-action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px 10px; border-radius: 14px; border: none;
+    background: var(--blue-pale); color: var(--blue-main); font-family: inherit; font-weight: 800; font-size: 13.5px;
+    cursor: pointer;
+  }
+  .friend-action-btn .material-symbols-outlined { font-size: 18px; }
+  .friend-action-btn-danger { background: #FDEBE8; color: var(--error); }
+
+  .friend-section-label { border-radius: 10px; margin-bottom: 10px; display: inline-block; }
+  .friends-empty { font-size: 13px; color: var(--ink-soft); text-align: center; padding: 18px 0; }
+  .friends-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+  .friend-row {
+    display: flex; align-items: center; gap: 12px; background: var(--white); border: 1.5px solid #DCE7F5;
+    border-radius: 16px; padding: 12px 14px; flex-wrap: wrap;
+  }
+  .friend-row-avatar { width: 42px; height: 42px; font-size: 20px; flex-shrink: 0; overflow: hidden; }
+  .friend-row-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .friend-row-tap { flex: 1; min-width: 120px; display: flex; flex-direction: column; align-items: flex-start; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; text-align: left; }
+  .friend-row-name { font-weight: 800; font-size: 14px; color: var(--ink); }
+  .friend-row-sub { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+  .friend-row-btns { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; margin-left: auto; }
+  .friend-row-btn {
+    flex-shrink: 0; border: none; background: #FDEBE8; color: var(--error); font-family: inherit;
+    font-weight: 700; font-size: 12px; border-radius: 999px; padding: 8px 12px; cursor: pointer;
+    white-space: normal; text-align: center; line-height: 1.25; max-width: 110px;
+  }
+  .friend-row-btn.accept { background: #E7F8EE; color: #2FAE60; }
+  .friend-row-btn.pending { background: #EEF2F8; color: var(--ink-soft); cursor: default; }
+  .friend-row-btn + .friend-row-btn { margin-left: 6px; }
+  .friend-row-btns .friend-row-btn + .friend-row-btn { margin-left: 0; }
+
+  /* ============ LEARN PAGE ============ */
+  #page-learn {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: calc(20px + env(safe-area-inset-top)) 0 calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .learn-top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px 10px;
+  }
+  .learn-topbar-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--blue-pale); border: none; border-radius: 999px;
+    padding: 8px 14px; font-weight: 700; font-size: 14px; color: var(--blue-deep); cursor: pointer;
+  }
+  .learn-topbar-btn .material-symbols-outlined { font-size: 18px; }
+  .learn-streak-icon { width: 20px; height: 20px; }
+
+  /* ---- Empty state ---- */
+  .learn-empty-state {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 60px 30px;
+  }
+  .learn-empty-icon {
+    font-size: 52px; color: var(--blue-main); background: var(--blue-pale);
+    width: 92px; height: 92px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  }
+  .learn-empty-state h2 { font-size: 19px; color: var(--blue-deep); margin: 0 0 8px; }
+  .learn-empty-state p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.5; }
+  .learn-primary-btn {
+    background: var(--blue-main); color: var(--white); border: none; border-radius: 12px;
+    padding: 14px 24px; font-weight: 700; font-size: 15px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .learn-primary-btn:hover { background: var(--blue-deep); }
+  .learn-primary-btn:disabled { background: #A9C6EE; cursor: not-allowed; }
+
+  /* ---- Course home (dynamically themed to --cc) ---- */
+  .learn-course-home {
+    --cc: var(--blue-main); --cc-pale: var(--blue-pale);
+    padding: 8px 20px 40px;
+  }
+  .learn-course-header { text-align: center; margin-bottom: 26px; }
+  .learn-course-header h2 { color: var(--cc); font-size: 20px; margin: 0 0 4px; }
+  .learn-course-status { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+  .review-wrong-btn {
+    margin: 12px auto 0; display: inline-flex; align-items: center; gap: 6px;
+    background: var(--cc-pale); color: var(--cc); border: none; border-radius: 999px;
+    padding: 8px 16px; font-family: inherit; font-size: 12.5px; font-weight: 700;
+    cursor: pointer;
+  }
+  .review-wrong-btn .material-symbols-outlined { font-size: 16px; }
+  .review-wrong-btn:hover { filter: brightness(0.96); }
+
+  .share-course-header-btn {
+    margin: 12px auto 0; display: inline-flex; align-items: center; gap: 6px;
+    background: var(--cc-pale); color: var(--cc); border: none; border-radius: 999px;
+    padding: 8px 16px; font-family: inherit; font-size: 12.5px; font-weight: 700;
+    cursor: pointer;
+  }
+  .share-course-header-btn .material-symbols-outlined { font-size: 16px; }
+  .share-course-header-btn:hover { filter: brightness(0.96); }
+
+  /* ---- Incoming shared-course banner (top of Learn page) ---- */
+  .learn-shared-banner { padding: 16px 20px 0; }
+  .learn-shared-banner-label {
+    font-size: 12px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 10px;
+  }
+  .shared-course-card {
+    --item-color: var(--blue-main);
+    position: relative; background: var(--white); border: 1.5px solid #DCE7F5;
+    border-left: 4px solid var(--item-color); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .shared-course-from {
+    font-size: 11.5px; font-weight: 700; color: var(--item-color);
+    text-transform: uppercase; letter-spacing: .03em;
+  }
+  .shared-course-title { font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 3px; }
+  .shared-course-desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+  .shared-course-btns { display: flex; gap: 8px; margin-top: 12px; }
+  .shared-course-btn {
+    flex: 1; border: none; border-radius: 10px; padding: 10px; font-family: inherit;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  .shared-course-btn.accept { background: var(--item-color); color: var(--white); }
+  .shared-course-btn.decline { background: var(--blue-pale); color: var(--ink-soft); }
+  .shared-course-btn:disabled { opacity: .6; cursor: not-allowed; }
+  .shared-course-error { font-size: 11.5px; color: var(--error); margin-top: 8px; }
+
+  /* ---- Share Course modal (pick a friend to send a course to) ---- */
+  .share-course-friends-list {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;
+    max-height: 320px; overflow-y: auto;
+  }
+  .share-course-friend-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--blue-mist); border: 1.5px solid #DCE7F5; border-radius: 14px; padding: 12px 14px;
+  }
+  .share-course-friend-name { font-weight: 800; font-size: 13.5px; color: var(--ink); }
+  .share-course-friend-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 1px; }
+  .share-course-send-btn {
+    flex-shrink: 0; border: none; background: var(--blue-main); color: var(--white); font-family: inherit;
+    font-weight: 700; font-size: 12.5px; border-radius: 999px; padding: 8px 14px; cursor: pointer;
+  }
+  .share-course-send-btn:disabled { background: #A9C6EE; cursor: not-allowed; }
+  .share-course-empty { font-size: 13px; color: var(--ink-soft); text-align: center; padding: 18px 0; }
+
+  /* ---- Units overview (pick any unlocked unit) ---- */
+  .learn-units-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .unit-card {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    border: none; border-radius: 14px; padding: 14px 16px; cursor: pointer;
+    background: var(--blue-mist); font-family: inherit;
+  }
+  .unit-card.current { background: var(--cc-pale); box-shadow: inset 0 0 0 1.5px var(--cc); }
+  .unit-card.locked { cursor: not-allowed; opacity: 0.55; }
+  .unit-card-icon {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--cc); color: var(--white);
+  }
+  .unit-card.locked .unit-card-icon { background: #DCE7F5; color: #A9BBD4; }
+  .unit-card-icon .material-symbols-outlined { font-size: 20px; }
+  .unit-card-num { font-size: 11.5px; font-weight: 700; color: var(--cc); text-transform: uppercase; letter-spacing: 0.03em; }
+  .unit-card.locked .unit-card-num { color: var(--ink-soft); }
+  .unit-card-title { font-size: 14.5px; font-weight: 700; color: var(--ink); margin-top: 1px; }
+
+  /* ---- Single unit's lesson path ---- */
+  .unit-back-btn {
+    display: flex; align-items: center; gap: 4px; background: none; border: none;
+    color: var(--cc); font-weight: 700; font-size: 13.5px; cursor: pointer; padding: 0 0 18px;
+    font-family: inherit;
+  }
+  .unit-back-btn .material-symbols-outlined { font-size: 18px; }
+  .unit-path-title { text-align: center; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 22px; }
+
+  .learn-lesson-path { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .lesson-node {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; padding: 0;
+    transition: transform 0.15s ease;
+  }
+  .lesson-node .material-symbols-outlined { font-size: 28px; color: var(--white); }
+  .lesson-node.completed { background: var(--cc); }
+  .lesson-node.available { background: var(--cc); box-shadow: 0 0 0 6px var(--cc-pale); }
+  .lesson-node.locked, .lesson-node.pending { background: #DCE7F5; }
+  .lesson-node.locked .material-symbols-outlined,
+  .lesson-node.pending .material-symbols-outlined { color: #A9BBD4; }
+  .lesson-node.review { border: 3px solid var(--cc); }
+
+  /* ---- Course review card (shown once all 10 units are done) ---- */
+  .learn-course-review-card {
+    display: none; flex-direction: column; align-items: center; text-align: center;
+    padding: 40px 20px;
+  }
+  .learn-course-review-icon {
+    font-size: 46px; color: var(--cc); background: var(--cc-pale);
+    width: 88px; height: 88px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  }
+  .learn-course-review-title { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .learn-course-review-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 20px; line-height: 1.5; }
+
+  /* ---- Streak modal ---- */
+  .streak-modal-icon { width: 52px; height: 52px; margin: 0 auto 10px; display: block; box-shadow: none; }
+  .streak-modal-count { font-size: 42px; font-weight: 800; color: var(--blue-deep); text-align: center; line-height: 1.1; }
+
+  /* ---- Lesson summary: full page ---- */
+  .lesson-summary-overlay { background: var(--blue-mist); backdrop-filter: none; padding: 0; }
+  .lesson-summary-container {
+    --cc: var(--blue-main);
+    height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    display: flex; flex-direction: column; box-sizing: border-box;
+  }
+  .lesson-summary-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 32px; text-align: center; overflow-y: auto;
+  }
+  .lesson-summary-icon {
+    font-size: 44px; color: var(--cc); background: var(--blue-pale);
+    width: 88px; height: 88px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 22px;
+  }
+  .lesson-summary-body h2 { font-size: 22px; font-weight: 800; color: var(--blue-deep); margin: 0 0 20px; }
+  .lesson-summary-score { font-size: 48px; font-weight: 800; color: var(--blue-deep); text-align: center; line-height: 1.1; margin-bottom: 4px; }
+  .lesson-summary-score-label { font-size: 13px; color: var(--ink-soft); text-align: center; margin-bottom: 24px; }
+  .lesson-summary-xp {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-size: 13px; font-weight: 700; color: var(--streak-orange); margin: -14px 0 20px;
+  }
+  .lesson-summary-xp .material-symbols-outlined { font-size: 17px; }
+  .game-xp-earned {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-size: 14px; font-weight: 700; color: var(--streak-orange); margin: 8px 0 4px;
+  }
+  .game-xp-earned .material-symbols-outlined { font-size: 18px; }
+  .lesson-summary-streak {
+    width: 100%; border-radius: 16px; background: #FFF4E9; border: 1.5px solid #FBDDBB;
+    padding: 16px; margin-bottom: 8px;
+  }
+  .lesson-summary-streak-icon { width: 44px; height: 44px; margin: 0 auto 8px; display: block; box-shadow: none; }
+  .lesson-summary-streak-label { font-size: 13px; font-weight: 700; color: var(--streak-orange); text-align: center; margin-bottom: 4px; }
+  .lesson-summary-streak-count { font-size: 30px; font-weight: 800; color: var(--streak-orange); text-align: center; line-height: 1.1; }
+  .lesson-summary-footer { padding: 14px 24px calc(28px + env(safe-area-inset-bottom)); }
+
+  /* ---- Streak modal ---- */
+  .streak-modal-icon { width: 52px; height: 52px; margin: 0 auto 10px; display: block; box-shadow: none; }
+  .streak-modal-count { font-size: 42px; font-weight: 800; color: var(--blue-deep); text-align: center; line-height: 1.1; }
+
+  .streak-modal-label { font-size: 13px; color: var(--ink-soft); text-align: center; margin-bottom: 16px; }
+  .streak-modal-missed { font-size: 12.5px; color: var(--ink-soft); text-align: center; margin-bottom: 18px; }
+
+  .streak-cal { margin-bottom: 20px; }
+  .streak-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .streak-cal-nav-btn {
+    background: var(--blue-pale); border: none; border-radius: 50%; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--blue-deep);
+  }
+  .streak-cal-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .streak-cal-nav-btn .material-symbols-outlined { font-size: 20px; }
+  .streak-cal-month-label { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .streak-cal-weekdays, .streak-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .streak-cal-weekdays span { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--ink-soft); padding-bottom: 4px; }
+  .streak-cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--ink); border-radius: 50%; margin: 2px auto; width: 28px; height: 28px;
+  }
+  .streak-cal-day.today { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--ink-soft); }
+  .streak-cal-day.done { border: 2px solid var(--streak-orange); color: var(--streak-orange); font-weight: 700; }
+
+  /* ---- Courses modal ---- */
+  .courses-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; max-height: 320px; overflow-y: auto; text-align: left; }
+  .course-list-item {
+    display: flex; align-items: stretch; gap: 4px; border-radius: 14px;
+    border-left: 5px solid var(--item-color, var(--blue-main));
+    background: var(--blue-mist); width: 100%; overflow: hidden;
+  }
+  .course-list-item.active-course { outline: 2px solid var(--item-color, var(--blue-main)); }
+  .course-item-main {
+    flex: 1; display: flex; flex-direction: column; gap: 3px; border: none; background: none;
+    padding: 14px; cursor: pointer; text-align: left; font-family: inherit; min-width: 0;
+  }
+  .course-item-title { font-weight: 700; color: var(--ink); font-size: 14.5px; }
+  .course-item-desc { font-size: 12px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .course-item-delete-btn {
+    flex-shrink: 0; width: 44px; border: none; background: none; cursor: pointer;
+    color: var(--ink-soft); display: flex; align-items: center; justify-content: center;
+  }
+  .course-item-delete-btn:hover { color: var(--error); }
+  .course-item-delete-btn .material-symbols-outlined { font-size: 20px; }
+  .course-item-delete-btn.confirming { color: var(--error); }
+
+  /* ---- Lesson start modal ---- */
+  .lesson-start-title { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .lesson-start-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 20px; }
+
+  /* ---- Full-screen lesson view ---- */
+  .lesson-view-overlay { background: var(--white); backdrop-filter: none; padding: 0; }
+  .lesson-view-overlay .lesson-view-container { max-width: 480px; margin: 0 auto; }
+  .lesson-view-container {
+    --cc: var(--blue-main);
+    height: 100%; width: 100%; display: flex; flex-direction: column;
+    position: relative;
+  }
+  .lesson-view-topbar { display: flex; align-items: center; gap: 14px; padding: calc(18px + env(safe-area-inset-top)) 18px 6px; }
+  .lesson-exit-btn { background: none; border: none; font-size: 24px; color: var(--ink-soft); cursor: pointer; padding: 0; }
+  .lesson-progress-track { flex: 1; height: 10px; border-radius: 999px; background: #E7EEF8; position: relative; overflow: hidden; }
+  .lesson-progress-fill { height: 100%; background: var(--cc); border-radius: 999px; transition: width .25s ease; }
+  .lesson-xp-tracker-row { display: flex; justify-content: flex-end; padding: 6px 18px 0; }
+  .lesson-xp-tracker {
+    display: flex; align-items: center; gap: 3px;
+    background: #FFF1E0; color: var(--streak-orange); font-weight: 800; font-size: 12.5px;
+    border-radius: 999px; padding: 4px 10px 4px 8px;
+  }
+  .lesson-xp-tracker .material-symbols-outlined { font-size: 15px; }
+  .lesson-view-title { text-align: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); padding: 8px 18px 0; }
+  .lesson-part-content { flex: 1; overflow-y: auto; padding: 20px 26px; display: flex; flex-direction: column; justify-content: center; }
+  .lesson-text-part { font-size: 17px; line-height: 1.65; color: var(--ink); text-align: center; }
+  .lesson-question-text { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 22px; text-align: center; }
+  .lesson-choice {
+    display: block; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px;
+    border: 2px solid #DCE7F5; border-radius: 12px; background: var(--white);
+    font-size: 14.5px; color: var(--ink); cursor: pointer; font-family: inherit;
+  }
+  .lesson-choice.selected { border-color: var(--cc); }
+  .lesson-choice.correct { border-color: #2FAE60; background: #E7F8EE; }
+  .lesson-choice.wrong { border-color: #E0503A; background: #FDEBE8; }
+  .lesson-view-footer { padding: 14px 24px calc(28px + env(safe-area-inset-bottom)); }
+  .lesson-feedback { text-align: center; font-weight: 700; font-size: 14.5px; margin-bottom: 10px; min-height: 18px; }
+  .lesson-feedback.correct { color: #2FAE60; }
+  .lesson-feedback.wrong { color: #E0503A; }
+  .lesson-action-btn {
+    width: 100%; padding: 15px; border: none; border-radius: 12px;
+    background: var(--cc); color: var(--white); font-weight: 700; font-size: 15px; cursor: pointer;
+  }
+  .lesson-action-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .lesson-why-btn {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    width: 100%; padding: 11px; margin-bottom: 10px;
+    border: 2px solid var(--cc); border-radius: 12px; background: var(--white);
+    color: var(--cc); font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .lesson-why-btn .material-symbols-outlined { font-size: 18px; }
+
+  /* ---- "Why?" explanation modal ---- */
+  .why-modal-icon { display: block; margin: 0 auto 8px; font-size: 34px; color: var(--blue-main); }
+  .why-modal-body { font-size: 14px; line-height: 1.6; color: var(--ink); text-align: left; margin: 0 0 20px; }
+
+  /* ---- AI Assistant: floating button + popup chat, anchored to the lesson view ---- */
+  .ai-assistant-fab {
+    position: absolute; right: 18px; bottom: calc(96px + env(safe-area-inset-bottom));
+    width: 50px; height: 50px; border-radius: 50%; border: none;
+    background: var(--cc); color: var(--white); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 16px rgba(20,33,61,0.25); z-index: 5;
+  }
+  .ai-assistant-fab .material-symbols-outlined { font-size: 26px; }
+
+  .ai-assistant-panel {
+    display: none; flex-direction: column;
+    position: absolute; right: 18px; left: 18px; bottom: calc(96px + env(safe-area-inset-bottom));
+    max-width: 380px; margin: 0 auto; height: min(420px, 60vh);
+    background: var(--white); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(20,33,61,0.3); border: 1.5px solid #DCE7F5;
+    z-index: 6;
+  }
+  .ai-assistant-panel.show { display: flex; }
+
+  .ai-assistant-header {
+    display: flex; align-items: center; gap: 8px; padding: 12px 14px;
+    background: var(--cc); color: var(--white);
+  }
+  .ai-assistant-header-icon { font-size: 20px; }
+  .ai-assistant-header-title { font-weight: 700; font-size: 14px; flex: 1; }
+  .ai-assistant-close-btn {
+    background: none; border: none; color: var(--white); cursor: pointer; padding: 0;
+    display: flex; align-items: center;
+  }
+  .ai-assistant-close-btn .material-symbols-outlined { font-size: 20px; }
+
+  .ai-assistant-messages {
+    flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+    background: var(--blue-mist);
+  }
+  .ai-assistant-msg {
+    max-width: 85%; padding: 9px 12px; border-radius: 14px; font-size: 13.5px; line-height: 1.45;
+  }
+  .ai-assistant-msg.assistant {
+    align-self: flex-start; background: var(--white); color: var(--ink); border: 1.5px solid #DCE7F5;
+    border-bottom-left-radius: 4px;
+  }
+  .ai-assistant-msg.user {
+    align-self: flex-end; background: var(--cc); color: var(--white);
+    border-bottom-right-radius: 4px;
+  }
+
+  .ai-assistant-input-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1.5px solid #DCE7F5;
+  }
+  .ai-assistant-input {
+    flex: 1; border: 1.5px solid #DCE7F5; border-radius: 999px; padding: 9px 14px;
+    font-size: 13.5px; font-family: inherit; color: var(--ink); outline: none;
+  }
+  .ai-assistant-input:focus { border-color: var(--cc); }
+  .ai-assistant-send-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none; flex-shrink: 0;
+    background: var(--cc); color: var(--white); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ai-assistant-send-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .ai-assistant-send-btn .material-symbols-outlined { font-size: 18px; }
+
+  /* ---- Maze: difficulty picker (choose modal) ---- */
+  .maze-difficulty-label { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; text-align: left; }
+  .maze-difficulty-row { display: flex; gap: 8px; margin-bottom: 18px; }
+  .maze-difficulty-btn {
+    flex: 1; padding: 11px 6px; border: 2px solid #DCE7F5; border-radius: 12px;
+    background: var(--blue-mist); color: var(--ink); font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .maze-difficulty-btn.selected { border-color: var(--blue-main); background: var(--blue-pale); color: var(--blue-main); }
+
+  /* ---- Maze: full-screen view ---- */
+  .maze-view-overlay { background: var(--blue-mist); backdrop-filter: none; padding: 0; }
+  .maze-view-container {
+    height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    display: flex; flex-direction: column; box-sizing: border-box;
+  }
+  .maze-view-topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: calc(18px + env(safe-area-inset-top)) 18px 6px;
+  }
+  .maze-view-title { flex: 1; text-align: center; font-size: 14px; font-weight: 800; color: var(--blue-deep); }
+  .maze-timer {
+    min-width: 42px; text-align: center; font-size: 15px; font-weight: 800; color: var(--blue-main);
+    background: var(--white); border-radius: 999px; padding: 6px 12px;
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.1);
+  }
+  .maze-timer.urgent { color: var(--error); }
+
+  .maze-grid-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 24px; }
+  .maze-grid {
+    display: grid; width: 100%; max-width: 340px; aspect-ratio: 1;
+    background: var(--white); border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(18, 59, 122, 0.12); box-sizing: border-box;
+  }
+  .maze-cell { position: relative; box-sizing: border-box; }
+  .maze-cell-dot {
+    position: absolute; inset: 24%; border-radius: 50%; background: var(--blue-main);
+    box-shadow: 0 2px 6px rgba(30, 111, 224, 0.5);
+  }
+  .maze-cell-flag {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #2FAE60; font-size: 16px;
+  }
+
+  .maze-controls { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 calc(24px + env(safe-area-inset-bottom)); }
+  .maze-dpad-mid { display: flex; align-items: center; gap: 6px; }
+  .maze-dpad-btn {
+    width: 52px; height: 52px; border-radius: 14px; border: none; background: var(--white);
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.12); color: var(--blue-main);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .maze-dpad-btn:active { background: var(--blue-pale); }
+  .maze-dpad-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .maze-dpad-btn .material-symbols-outlined { font-size: 28px; }
+  .maze-dpad-spacer { width: 52px; height: 52px; }
+
+  /* ---- Maze: blocking question modal (reuses .lesson-choice / .lesson-feedback) ---- */
+  .maze-question-modal { --cc: var(--blue-main); }
+  .maze-question-tag { font-size: 12.5px; font-weight: 700; color: var(--streak-orange); margin-bottom: 10px; text-align: center; }
+
+  /* ---- Seesaw: duration picker (choose modal) ---- */
+  .seesaw-duration-btn {
+    flex: 1; padding: 11px 4px; border: 2px solid #DCE7F5; border-radius: 12px;
+    background: var(--blue-mist); color: var(--ink); font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .seesaw-duration-btn.selected { border-color: var(--blue-main); background: var(--blue-pale); color: var(--blue-main); }
+
+  /* ---- Seesaw: full-screen pass-and-play view ---- */
+  .seesaw-view-overlay { background: var(--blue-mist); backdrop-filter: none; padding: 0; }
+  .seesaw-container {
+    --cc: var(--blue-main);
+    position: relative; height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    overflow: hidden; background: var(--blue-mist); box-sizing: border-box;
+  }
+  .seesaw-exit-btn {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; z-index: 20;
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.85); color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.15);
+  }
+  .seesaw-exit-btn .material-symbols-outlined { font-size: 20px; }
+  .seesaw-rotator { position: absolute; inset: 0; transition: transform 0.5s ease; }
+  .seesaw-rotator.flipped { transform: rotate(180deg); }
+  .seesaw-fill {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 100%;
+    background: var(--cc); transition: background 0.2s ease;
+  }
+  .seesaw-timer-mid {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 92px; height: 92px; border-radius: 50%;
+    background: rgba(255,255,255,0.94); color: var(--cc);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 900; letter-spacing: -0.02em;
+    box-shadow: 0 6px 20px rgba(18, 59, 122, 0.22); z-index: 2;
+  }
+  .seesaw-timer-mid.low { color: var(--error); }
+  .seesaw-player-tag {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 0; right: 0;
+    text-align: center; font-size: 12.5px; font-weight: 800; color: var(--cc);
+    letter-spacing: 0.04em; text-transform: uppercase; z-index: 2;
+  }
+  .seesaw-bottom-area {
+    position: absolute; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-radius: 22px;
+    padding: 22px 22px 20px;
+    box-shadow: 0 10px 30px rgba(18, 59, 122, 0.2);
+    box-sizing: border-box;
+  }
+  .seesaw-bottom-area .lesson-choice {
+    background: rgba(255, 255, 255, 0.7);
+  }
+  .seesaw-bottom-area .lesson-choice.correct { background: rgba(231, 248, 238, 0.9); }
+  .seesaw-bottom-area .lesson-choice.wrong { background: rgba(253, 235, 232, 0.9); }
+
+  /* ---- Duel ("Who Can Answer First?"): round-timer picker (choose modal) ---- */
+  .duel-timer-btn {
+    flex: 1; padding: 11px 4px; border: 2px solid #DCE7F5; border-radius: 12px;
+    background: var(--blue-mist); color: var(--ink); font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .duel-timer-btn.selected { border-color: var(--blue-main); background: var(--blue-pale); color: var(--blue-main); }
+  .duel-card-icon { background: #FFF1E0; color: var(--streak-orange); }
+
+  /* ---- Duel: full-screen split-view (2 players, same device, facing each other) ---- */
+  .duel-view-overlay { background: var(--ink); backdrop-filter: none; padding: 0; }
+  .duel-container {
+    --cc: var(--blue-main);
+    position: relative; height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    display: flex; flex-direction: column; box-sizing: border-box; background: var(--blue-mist);
+  }
+  .duel-exit-btn {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; z-index: 20;
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.9); color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.15);
+  }
+  .duel-exit-btn .material-symbols-outlined { font-size: 20px; }
+
+  .duel-zone {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 18px 20px; box-sizing: border-box; transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .duel-zone-top { transform: rotate(180deg); padding-top: calc(18px + env(safe-area-inset-top)); }
+  .duel-zone-bottom { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .duel-zone.locked { opacity: 0.4; }
+  .duel-zone.zone-won { background: rgba(47, 174, 96, 0.12); }
+  .duel-zone-tag {
+    font-size: 12px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .duel-question-text { font-size: 16px; font-weight: 700; color: var(--ink); text-align: center; max-width: 380px; }
+  .duel-zone .lesson-choice { min-width: 260px; }
+
+  .duel-mid-bar {
+    position: relative; display: flex; align-items: center; justify-content: center; gap: 18px;
+    padding: 4px 0; background: var(--white); box-shadow: 0 0 0 1px rgba(18,59,122,0.06);
+    z-index: 2;
+  }
+  .duel-score {
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800; color: var(--white);
+  }
+  .duel-score-1 { background: var(--blue-main); }
+  .duel-score-2 { background: var(--streak-orange); }
+  .duel-timer-mid {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue-pale); color: var(--blue-main);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; font-weight: 900; letter-spacing: -0.02em;
+  }
+  .duel-timer-mid.low { background: rgba(214, 67, 90, 0.14); color: var(--error); }
+  .duel-round-label {
+    text-align: center; font-size: 11.5px; font-weight: 700; color: var(--ink-soft);
+    background: var(--white); padding-bottom: 8px; z-index: 2;
+  }
+
+  /* ---- Meltdown: lava theme ---- */
+  .meltdown-card-icon { background: #FFF0E5; color: #FF6A1F; }
+  .meltdown-difficulty-btn {
+    flex: 1; padding: 11px 6px; border: 2px solid #DCE7F5; border-radius: 12px;
+    background: var(--blue-mist); color: var(--ink); font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .meltdown-difficulty-btn.selected { border-color: #FF6A1F; background: #FFF0E5; color: #FF6A1F; }
+  .meltdown-modal-btn { background: #FF6A1F; }
+  .meltdown-modal-btn:hover { background: #E0500D; }
+
+  .meltdown-view-overlay { background: #1C1410; backdrop-filter: none; padding: 0; }
+  .meltdown-container {
+    --cc: #FF6A1F;
+    height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    display: flex; flex-direction: column; box-sizing: border-box;
+    background: radial-gradient(circle at 50% 0%, #2A1B14, #1C1410 65%);
+  }
+  .meltdown-topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: calc(18px + env(safe-area-inset-top)) 18px 6px;
+  }
+  .meltdown-topbar .lesson-exit-btn { color: #FFF3E8; opacity: 0.85; }
+  .meltdown-streak-badge {
+    flex: 1; display: flex; align-items: center; gap: 4px;
+    font-size: 14px; font-weight: 800; color: #FFC97A;
+  }
+  .meltdown-streak-badge .material-symbols-outlined { font-size: 18px; color: #FFC97A; }
+  .meltdown-timer-badge {
+    min-width: 56px; text-align: center; font-size: 15px; font-weight: 800; color: #FF6A1F;
+    background: rgba(255,255,255,0.06); border-radius: 999px; padding: 6px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .meltdown-timer-badge.urgent { color: #FF3B30; }
+
+  .meltdown-body { flex: 1; display: flex; align-items: stretch; gap: 8px; padding: 10px 16px calc(24px + env(safe-area-inset-bottom)); min-height: 0; }
+  .meltdown-question-col { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+  .meltdown-question-col .lesson-question-text { color: #FFF3E8; text-align: left; }
+  .meltdown-question-col .lesson-choice {
+    background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); color: #FFF3E8;
+  }
+  .meltdown-question-col .lesson-choice.correct { border-color: #2FAE60; background: rgba(47, 174, 96, 0.22); }
+  .meltdown-question-col .lesson-choice.wrong { border-color: #FF3B30; background: rgba(255, 59, 48, 0.22); }
+
+  .meltdown-thermo-col {
+    flex-shrink: 0; width: 56px; display: flex; flex-direction: column; align-items: center;
+    justify-content: flex-end; padding-bottom: 4px;
+  }
+  .meltdown-thermo {
+    position: relative; width: 22px; flex: 1; border-radius: 999px;
+    background: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.12);
+    overflow: hidden; margin-bottom: -14px;
+  }
+  .meltdown-thermo-fill {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 0%;
+    background: #FFD166;
+    transition: height 0.35s ease, background 0.35s ease;
+    border-radius: 999px;
+  }
+  .meltdown-thermo-bulb {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(180deg, #FF8A2B, #FF3B30);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.08), 0 4px 14px rgba(255, 59, 48, 0.5);
+    z-index: 1;
+  }
+  .meltdown-thermo-bulb .material-symbols-outlined { font-size: 18px; color: #FFF3E8; }
+
+  /* ---- Learning Games: full-page list ---- */
+  .games-page-overlay { background: var(--blue-mist); backdrop-filter: none; padding: 0; }
+  .games-page-container {
+    height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+    display: flex; flex-direction: column; box-sizing: border-box;
+  }
+  .games-page-topbar {
+    display: flex; align-items: center; gap: 14px;
+    padding: calc(18px + env(safe-area-inset-top)) 18px 6px;
+  }
+  .games-exit-btn { background: none; border: none; font-size: 24px; color: var(--ink-soft); cursor: pointer; padding: 0; }
+  .games-page-title { font-size: 16px; font-weight: 800; color: var(--blue-deep); }
+  .games-page-body { flex: 1; overflow-y: auto; padding: 18px 20px 40px; }
+  .games-page-sub { font-size: 13px; color: var(--ink-soft); margin: 0 0 18px; }
+  .games-list { display: flex; flex-direction: column; gap: 12px; }
+  .game-card {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    border: none; border-radius: 16px; padding: 16px; cursor: pointer;
+    background: var(--white); font-family: inherit;
+    box-shadow: 0 2px 10px rgba(18, 59, 122, 0.08);
+  }
+  .game-card-icon {
+    flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--blue-pale); color: var(--blue-main);
+  }
+  .game-card-icon .material-symbols-outlined { font-size: 24px; }
+  .game-card-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .game-card-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .game-card .material-symbols-outlined.game-card-chevron { margin-left: auto; color: var(--ink-soft); font-size: 20px; }
+
+  /* ---- Notification bell (fixed, visible on every page) ---- */
+  .notif-bell-btn {
+    position: fixed;
+    top: calc(14px + env(safe-area-inset-top));
+    right: 14px;
+    z-index: 500;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--white);
+    box-shadow: 0 4px 14px rgba(18, 59, 122, 0.16);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue-deep);
+    cursor: pointer;
+  }
+  .notif-bell-btn .material-symbols-outlined { font-size: 22px; }
+  .notif-bell-badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    min-width: 18px; height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #F0435A;
+    color: var(--white);
+    font-size: 10.5px;
+    font-weight: 800;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px var(--white);
+  }
+
+  /* ---- Notification panel list ---- */
+  .notif-list { display: flex; flex-direction: column; gap: 10px; }
+  .notif-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    width: 100%; text-align: left;
+    border: none; border-radius: 16px; padding: 14px 16px;
+    background: var(--white); font-family: inherit; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(18, 59, 122, 0.08);
+  }
+  .notif-row.unread { background: var(--blue-pale); }
+  .notif-row-icon {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--blue-mist); color: var(--blue-main);
+  }
+  .notif-row-icon .material-symbols-outlined { font-size: 20px; }
+  .notif-row-title { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .notif-row-body { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+  .notif-row-time { font-size: 11px; color: var(--ink-soft); margin-top: 4px; }
+
+  /* ---- Foreground push toast ---- */
+  .notif-toast {
+    position: fixed;
+    top: calc(60px + env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    z-index: 9600;
+    max-width: 340px; width: calc(100% - 32px);
+    background: var(--white);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 30px rgba(18, 59, 122, 0.22);
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+  .notif-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .notif-toast-icon {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--blue-mist); color: var(--blue-main);
+  }
+  .notif-toast-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .notif-toast-body { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+
+  /* ---- Trivia: choose modal ---- */
+  .trivia-option-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; text-align: left; }
+  .trivia-option-card {
+    border: 2px solid #DCE7F5; border-radius: 14px; background: var(--blue-mist);
+    padding: 14px 16px; cursor: pointer; font-family: inherit; text-align: left;
+    width: 100%; display: block;
+  }
+  .trivia-option-card.selected { border-color: var(--blue-main); background: var(--blue-pale); }
+  .trivia-option-card.disabled { opacity: 0.5; cursor: not-allowed; }
+  .trivia-option-title {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 14.5px; color: var(--ink); margin-bottom: 2px;
+  }
+  .trivia-option-title .material-symbols-outlined { font-size: 18px; color: var(--blue-main); }
+  .trivia-option-sub { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; }
+  .trivia-option-card .kll-text-input { margin-top: 10px; margin-bottom: 0; }
+
+  /* ---- Trivia: full-screen player ---- */
+  .trivia-view-overlay { background: var(--white); backdrop-filter: none; padding: 0; }
+  .trivia-view-container {
+    --cc: var(--blue-main);
+    height: 100%; width: 100%; position: relative; background: var(--cc);
+    max-width: 480px; margin: 0 auto; overflow: hidden;
+  }
+  .trivia-exit-btn {
+    position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 18px; z-index: 5;
+    width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: rgba(255, 255, 255, 0.2); color: var(--white);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .trivia-scroller {
+    height: 100%; width: 100%; overflow-y: auto;
+    scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch;
+  }
+  .trivia-slide {
+    min-height: 100%; width: 100%; box-sizing: border-box;
+    scroll-snap-align: start; scroll-snap-stop: always;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 110px 30px 70px; text-align: center;
+  }
+  .trivia-question {
+    font-size: clamp(26px, 8vw, 42px); font-weight: 800; line-height: 1.25;
+    color: var(--white); margin-bottom: 30px;
+  }
+  .trivia-answer-btn {
+    background: rgba(255, 255, 255, 0.22); color: var(--white); border: none;
+    border-radius: 14px; padding: 14px 26px; font-weight: 700; font-size: 15px;
+    cursor: pointer; font-family: inherit;
+  }
+  .trivia-answer-text {
+    font-size: clamp(18px, 5.5vw, 26px); font-weight: 700; color: var(--white);
+    margin-top: 24px; line-height: 1.4;
+  }
+  .trivia-scroll-hint {
+    position: absolute; bottom: calc(22px + env(safe-area-inset-bottom)); left: 0; right: 0;
+    text-align: center; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.7);
+    display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none;
+  }
+  .trivia-scroll-hint .material-symbols-outlined { font-size: 18px; }
+  .trivia-finished-title { font-size: 28px; font-weight: 800; color: var(--white); margin-bottom: 22px; }
+  .trivia-finished-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; }
+  .trivia-finished-btn-primary {
+    background: var(--white); color: var(--cc); border: none; border-radius: 12px;
+    padding: 14px; font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit;
+  }
+  .trivia-finished-btn-secondary {
+    background: rgba(255, 255, 255, 0.15); color: var(--white);
+    border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 12px;
+    padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .trivia-finished-btn-primary:disabled, .trivia-finished-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .trivia-finished-error { color: rgba(255, 255, 255, 0.9); font-size: 12.5px; margin-top: 12px; min-height: 16px; }
+
+  /* ---- Voice Trivia ---- */
+  .voice-trivia-view-overlay { background: var(--white); backdrop-filter: none; padding: 0; }
+  .voice-trivia-container {
+    --cc: var(--blue-main);
+    height: 100%; width: 100%; position: relative; background: var(--cc);
+    max-width: 480px; margin: 0 auto; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 110px 30px 60px; box-sizing: border-box; text-align: center;
+  }
+  .voice-trivia-progress {
+    position: absolute; top: calc(20px + env(safe-area-inset-top)); left: 74px; right: 18px;
+    font-size: 12.5px; font-weight: 700; color: rgba(255, 255, 255, 0.75); text-align: right;
+  }
+  .voice-trivia-question {
+    font-size: clamp(24px, 7.5vw, 38px); font-weight: 800; line-height: 1.25;
+    color: var(--white); margin-bottom: 28px; transition: background-color 0.25s ease, border-radius 0.25s ease;
+  }
+  .voice-trivia-question.flash-correct { background: rgba(60, 200, 120, 0.35); border-radius: 14px; padding: 8px 12px; }
+  .voice-trivia-question.flash-giveup { background: rgba(255, 255, 255, 0.18); border-radius: 14px; padding: 8px 12px; }
+  .voice-trivia-mic-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .voice-trivia-mic {
+    width: 74px; height: 74px; border-radius: 50%; background: rgba(255, 255, 255, 0.18);
+    display: flex; align-items: center; justify-content: center; color: var(--white);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  .voice-trivia-mic .material-symbols-outlined { font-size: 32px; }
+  .voice-trivia-mic.listening { animation: voiceTriviaPulse 1.6s ease-out infinite; background: rgba(255, 255, 255, 0.28); }
+  @keyframes voiceTriviaPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45); }
+    70% { box-shadow: 0 0 0 22px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  }
+  .voice-trivia-status { font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, 0.85); text-transform: uppercase; letter-spacing: 0.04em; }
+  .voice-trivia-transcript {
+    min-height: 22px; font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.9);
+    font-style: italic; margin-bottom: 10px; max-width: 340px;
+  }
+  .voice-trivia-feedback {
+    min-height: 26px; font-size: 17px; font-weight: 800; color: var(--white); margin-bottom: 18px;
+  }
+  .voice-trivia-giveup-btn {
+    background: rgba(255, 255, 255, 0.15); color: var(--white);
+    border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 12px;
+    padding: 10px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer; font-family: inherit;
+  }
+  .voice-trivia-finished { display: flex; flex-direction: column; align-items: center; }
+
+</style>
+</head>
+<body>
+
+  <!-- ============ AUTH SCREEN ============ -->
+  <div id="auth-screen">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="card">
+      <div class="mark"><img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab" /></div>
+      <h1>Sign in to Kids Learning Lab</h1>
+      <p class="subhead">This is its own account, different from your newsletter account.</p>
+
+      <div class="tabs">
+        <div class="tab active" id="tab-signin">Sign In</div>
+        <div class="tab" id="tab-signup">Create Account</div>
+      </div>
+
+      <form id="auth-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" minlength="6" />
+        </div>
+        <div class="forgot" id="forgot-wrap">
+          <button type="button" id="forgot-btn">Forgot password?</button>
+        </div>
+        <button type="submit" class="submit" id="submit-btn">Sign In</button>
+        <p class="message" id="message"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ APP SHELL ============ -->
+  <div id="app-shell">
+    <button id="notifBellBtn" class="notif-bell-btn" aria-label="Notifications">
+      <span class="material-symbols-outlined">notifications</span>
+      <span id="notifBellBadge" class="notif-bell-badge" style="display:none;">0</span>
+    </button>
+    <div class="page" id="page-listen">
+      <div class="listen-header">
+        <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+        <div>
+          <div class="listen-show-title">Kids Learning Lab</div>
+          <div class="listen-show-sub">Science, History & Technology for Kids</div>
+        </div>
+      </div>
+      <div class="listen-status" id="listenStatus">Loading episodes…</div>
+      <div id="listenEpisodeList"></div>
+    </div>
+    <div class="page" id="page-learn">
+      <div class="learn-top-bar">
+        <button id="learnStreakBtn" class="learn-topbar-btn">
+          <img src="streak.png" alt="" class="learn-streak-icon">
+          <span id="learnStreakCount">0</span>
+        </button>
+        <button id="learnGamesBtn" class="learn-topbar-btn">
+          <span class="material-symbols-outlined">sports_esports</span>
+          <span>Games</span>
+        </button>
+        <button id="learnCoursesBtn" class="learn-topbar-btn">
+          <span class="material-symbols-outlined">school</span>
+          <span>Courses</span>
+        </button>
+      </div>
+
+      <div id="learnSharedCoursesBanner" class="learn-shared-banner" style="display:none;">
+        <div class="learn-shared-banner-label">Shared With You</div>
+        <div id="learnSharedCoursesList"></div>
+      </div>
+
+      <div id="learnEmptyState" class="learn-empty-state">
+        <div class="learn-empty-icon material-symbols-outlined">school</div>
+        <h2>Start Learning Something New</h2>
+        <p>Type anything you want to learn, and we'll build you a course.</p>
+        <button id="learnCreateFirstBtn" class="learn-primary-btn">Create a Course</button>
+      </div>
+
+      <div id="learnCourseHome" class="learn-course-home" style="display:none;">
+        <div class="learn-course-header">
+          <h2 id="learnCourseTitle"></h2>
+          <div id="learnCourseStatus" class="learn-course-status"></div>
+          <button id="reviewWrongAnswersBtn" class="review-wrong-btn" style="display:none;">
+            <span class="material-symbols-outlined">history_edu</span>
+            <span id="reviewWrongAnswersLabel">Review Wrong Answers</span>
+          </button>
+          <button id="shareCourseHeaderBtn" class="share-course-header-btn">
+            <span class="material-symbols-outlined">ios_share</span>
+            <span>Share Course</span>
+          </button>
+        </div>
+
+        <div id="learnUnitsList" class="learn-units-list"></div>
+
+        <div id="learnUnitPathView" class="learn-unit-path-view" style="display:none;">
+          <button id="unitPathBackBtn" class="unit-back-btn">
+            <span class="material-symbols-outlined">arrow_back</span> All Units
+          </button>
+          <div id="unitPathTitle" class="unit-path-title"></div>
+          <div id="learnLessonPath" class="learn-lesson-path"></div>
+        </div>
+
+        <div id="learnCourseReviewCard" class="learn-course-review-card">
+          <div class="learn-course-review-icon material-symbols-outlined">emoji_events</div>
+          <div id="learnCourseReviewTitle" class="learn-course-review-title"></div>
+          <div id="learnCourseReviewSub" class="learn-course-review-sub"></div>
+          <button id="learnCourseReviewBtn" class="learn-primary-btn" style="display:none;"></button>
+        </div>
+      </div>
+    </div>
+    <div class="page" id="page-home">
+      <h1 class="home-greeting" id="homeGreeting">Welcome!</h1>
+      <div class="home-widgets-grid" id="homeWidgets">
+        <div class="home-widgets-loading">Loading…</div>
+      </div>
+    </div>
+    <div class="page" id="page-settings">
+      <div class="settings-wrap">
+        <div class="settings-badge">
+          <span class="material-symbols-outlined">person</span>Profile
+        </div>
+        <h1 class="settings-heading">Your Profile</h1>
+        <p class="profile-subheading">Your progress, XP, and friends — all in one place.</p>
+
+        <div class="settings-card">
+          <div class="profile-header-row">
+            <button type="button" class="profile-avatar-btn" id="profileAvatarBtn">
+              <div class="settings-avatar profile-avatar-lg" id="settingsAvatar">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <div class="profile-avatar-edit-badge">
+                <span class="material-symbols-outlined">mood</span>
+              </div>
+            </button>
+            <div class="profile-header-info">
+              <div class="settings-name" id="settingsName">—</div>
+              <div class="settings-email" id="settingsEmail">—</div>
+              <button type="button" class="profile-change-name-btn" id="profileChangeNameBtn">Change Name</button>
+            </div>
+          </div>
+          <div class="profile-xp-row">
+            <div class="profile-xp-icon material-symbols-outlined">bolt</div>
+            <div>
+              <div class="profile-xp-count" id="profileXpCount">0</div>
+              <div class="profile-xp-label">Total XP</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <button class="settings-row-btn" id="profileFriendsBtn">
+            <span class="material-symbols-outlined">emoji_people</span>
+            Friends
+            <span class="profile-row-chevron material-symbols-outlined">chevron_right</span>
+          </button>
+          <button class="settings-row-btn" id="profileAccountSettingsBtn">
+            <span class="material-symbols-outlined">manage_accounts</span>
+            Account Settings
+            <span class="profile-row-chevron material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <button type="button" class="badge-shelf-btn" id="profileBadgesBtn">
+            <div class="settings-card-label">Badges</div>
+            <div class="badge-shelf-row" id="profileBadgesShelf">
+              <div class="badge-shelf-empty">Complete lessons, games, and more to start earning badges!</div>
+            </div>
+            <div class="badge-shelf-footer">
+              <span id="profileBadgesCountLabel">0 badges earned</span>
+              <span class="material-symbols-outlined">chevron_right</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-label">About</div>
+          <div class="settings-about-row">
+            <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+            <div>
+              <div class="settings-about-title">Kids Learning Lab</div>
+              <div class="settings-about-sub">For more information about Kids Learning Lab and Eshaan Buddhisagar (creator), visit kidslearninglab.com/about in a browser.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-player" id="miniPlayer">
+      <img id="miniPlayerArt" src="" alt="">
+      <div class="mini-player-info">
+        <div class="mini-player-title" id="miniPlayerTitle">—</div>
+        <div class="mini-player-sub">Kids Learning Lab</div>
+      </div>
+      <button class="mini-player-btn" id="miniPlayerPlayPause" aria-label="Play or pause">
+        <span class="material-symbols-outlined" id="miniPlayerPlayPauseIcon">pause</span>
+      </button>
+      <button class="mini-player-btn" id="miniPlayerClose" aria-label="Stop">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-page="listen">
+        <span class="material-symbols-outlined">headphones</span>
+        Listen
+      </button>
+      <button class="nav-btn" data-page="learn">
+        <span class="material-symbols-outlined">menu_book</span>
+        Learn
+      </button>
+      <button class="nav-btn active" data-page="home">
+        <span class="material-symbols-outlined">home</span>
+        Home
+      </button>
+      <button class="nav-btn" data-page="settings">
+        <span class="material-symbols-outlined">person</span>
+        Profile
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============ VERIFY EMAIL MODAL ============ -->
+  <div class="kll-modal-overlay" id="verifyModalOverlay">
+    <div class="kll-modal">
+      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+      <h2>Check your email</h2>
+      <p id="verifyModalSubtitle">We sent a 6-digit code to your email. It expires in 10 minutes.</p>
+      <input id="verifyCodeInput" class="kll-code-input" type="text" maxlength="6" placeholder="000000" inputmode="numeric">
+      <div class="kll-modal-error" id="verifyError"></div>
+      <div class="kll-modal-timer" id="verifyTimer"></div>
+      <button class="kll-modal-btn" id="verifySubmitBtn">Verify Code</button>
+      <button class="kll-modal-btn-secondary" id="verifyResendBtn">Resend Code</button>
+    </div>
+  </div>
+
+  <!-- ============ USERNAME MODAL ============ -->
+  <div class="kll-modal-overlay" id="usernameModalOverlay">
+    <div class="kll-modal">
+      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+      <h2 id="usernameModalTitle">Choose your username</h2>
+      <p>This is how you'll appear in Kids Learning Lab. Letters, numbers, and spaces only.</p>
+      <input id="usernameInput" class="kll-text-input" type="text" maxlength="30" placeholder="e.g. Alex Johnson">
+      <div class="kll-modal-error" id="usernameError"></div>
+      <button class="kll-modal-btn" id="usernameSubmitBtn">Set Username</button>
+    </div>
+  </div>
+
+  <!-- ============ DELETE ACCOUNT CONFIRM MODAL ============ -->
+  <div class="kll-modal-overlay" id="deleteAccountModalOverlay">
+    <div class="kll-modal">
+      <div style="width:56px;height:56px;border-radius:50%;background:#FDEDEF;border:2px solid #F5C6CC;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+        <span class="material-symbols-outlined" style="font-size:26px;color:var(--error)">delete_forever</span>
+      </div>
+      <h2>Delete your account?</h2>
+      <p>This permanently deletes your account and cannot be undone. You may be asked to sign in again to confirm.</p>
+      <div class="kll-modal-error" id="deleteAccountError"></div>
+      <button class="kll-modal-btn" id="deleteAccountConfirmBtn" style="background:var(--error)">Delete Account</button>
+      <button class="kll-modal-btn-secondary" id="deleteAccountCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ CHANGE PASSWORD: STEP 1 (confirm current password) ============ -->
+<div class="kll-modal-overlay" id="cpModal1">
+  <div class="kll-modal">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+    <h2>Confirm your password</h2>
+    <p>Enter your current password to continue.</p>
+    <input id="cpOldPassword" class="kll-text-input" type="password" placeholder="Current password">
+    <div class="kll-modal-error" id="cpError1"></div>
+    <button class="kll-modal-btn" id="cpBtn1">Confirm Password</button>
+    <button class="kll-modal-btn-secondary" id="cpCancel1">Cancel</button>
+  </div>
+</div>
+<!-- ============ CHANGE PASSWORD: STEP 2 (email code) ============ -->
+<div class="kll-modal-overlay" id="cpModal2">
+  <div class="kll-modal">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+    <h2>Verify it's you</h2>
+    <p>We'll send a 6-digit code to <strong id="cpEmailDisplay">your email</strong>.</p>
+    <input id="cpVerifyCode" class="kll-code-input" type="text" maxlength="6" placeholder="000000" inputmode="numeric" style="display:none">
+    <div class="kll-modal-error" id="cpError2"></div>
+    <button class="kll-modal-btn" id="cpSendCodeBtn">Send Code to Email</button>
+    <button class="kll-modal-btn" id="cpVerifyCodeBtn" style="display:none">Verify Code</button>
+    <button class="kll-modal-btn-secondary" id="cpCancel2">Cancel</button>
+  </div>
+</div>
+<!-- ============ CHANGE PASSWORD: STEP 3 (set new password) ============ -->
+<div class="kll-modal-overlay" id="cpModal3">
+  <div class="kll-modal">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab">
+    <h2>Choose your new password</h2>
+    <p>Must be at least 6 characters.</p>
+    <input id="cpNewPassword" class="kll-text-input" type="password" placeholder="New password" minlength="6">
+    <input id="cpConfirmPassword" class="kll-text-input" type="password" placeholder="Confirm new password" minlength="6">
+    <div class="kll-modal-error" id="cpError3"></div>
+    <button class="kll-modal-btn" id="cpBtn3">Set New Password</button>
+    <button class="kll-modal-btn-secondary" id="cpCancel3">Cancel</button>
+  </div>
+</div>
+<!-- ============ EPISODE DETAIL ============ -->
+<div class="kll-modal-overlay episode-modal-overlay" id="episodeModalOverlay">
+  <div class="kll-modal episode-modal">
+    <button class="episode-modal-close" id="episodeModalCloseBtn">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <img id="episodeModalArt" src="" alt="">
+    <div class="episode-modal-title" id="episodeModalTitle"></div>
+    <div class="episode-modal-meta" id="episodeModalMeta"></div>
+
+    <div class="player-controls">
+      <div class="player-progress-row">
+        <span class="player-time" id="playerCurrentTime">0:00</span>
+        <input type="range" id="playerSeekBar" class="player-seek-bar" min="0" max="100" value="0" step="0.5">
+        <span class="player-time" id="playerDuration">0:00</span>
+      </div>
+      <div class="player-buttons-row">
+        <button class="player-ctrl-btn" id="playerPrevEpisodeBtn" aria-label="Previous episode">
+          <span class="material-symbols-outlined">skip_previous</span>
+        </button>
+        <button class="player-ctrl-btn" id="playerRewindBtn" aria-label="Rewind 10 seconds">
+          <span class="material-symbols-outlined">replay_10</span>
+        </button>
+        <button class="player-ctrl-btn player-ctrl-btn-main" id="episodeModalPlayBtn" aria-label="Play or pause">
+          <span class="material-symbols-outlined" id="episodeModalPlayIcon">play_arrow</span>
+        </button>
+        <button class="player-ctrl-btn" id="playerForwardBtn" aria-label="Forward 10 seconds">
+          <span class="material-symbols-outlined">forward_10</span>
+        </button>
+        <button class="player-ctrl-btn" id="playerNextEpisodeBtn" aria-label="Next episode">
+          <span class="material-symbols-outlined">skip_next</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="episode-modal-description" id="episodeModalDescription"></div>
+  </div>
+</div>
+
+<div id="splash-screen">
+  <div class="splash-logo">
+    <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab" />
+  </div>
+  <div class="splash-text">Loading app…</div>
+  <div class="splash-bar-track">
+    <div class="splash-bar-fill"></div>
+  </div>
+</div>
+
+  <!-- end of body place new modals here -->
+
+  <script type="module" src="./main.js"></script>
+  <!-- ============ LEARN: STREAK MODAL ============ -->
+  <div class="kll-modal-overlay" id="streakModalOverlay">
+    <div class="kll-modal">
+      <img src="streak.png" class="streak-modal-icon" alt="">
+      <div class="streak-modal-count" id="streakModalCount">0</div>
+      <div class="streak-modal-label">day streak</div>
+      <div class="streak-modal-missed" id="streakModalMissed"></div>
+      <div class="streak-cal">
+        <div class="streak-cal-header">
+          <button id="streakCalPrevBtn" class="streak-cal-nav-btn" aria-label="Previous month" type="button">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <div id="streakCalMonthLabel" class="streak-cal-month-label"></div>
+          <button id="streakCalNextBtn" class="streak-cal-nav-btn" aria-label="Next month" type="button">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+        <div class="streak-cal-weekdays">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+        <div id="streakCalGrid" class="streak-cal-grid"></div>
+      </div>
+      <button class="kll-modal-btn-secondary" id="streakModalCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: COURSES MODAL ============ -->
+  <div class="kll-modal-overlay" id="coursesModalOverlay">
+    <div class="kll-modal">
+      <h2>Your Courses</h2>
+      <div id="coursesList" class="courses-list"></div>
+      <button id="addCourseBtn" class="learn-primary-btn" style="width:100%;margin-bottom:10px;">
+        <span class="material-symbols-outlined">add</span> New Course
+      </button>
+      <button class="kll-modal-btn-secondary" id="coursesModalCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: SHARE COURSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="shareCourseModalOverlay">
+    <div class="kll-modal">
+      <h2>Share Course</h2>
+      <p class="why-modal-body" id="shareCourseModalSub">Send this course to a friend.</p>
+      <div id="shareCourseFriendsList" class="share-course-friends-list"></div>
+      <div id="shareCourseEmpty" class="share-course-empty" style="display:none;">Add a friend first to share courses with them.</div>
+      <div class="kll-modal-error" id="shareCourseError"></div>
+      <button class="kll-modal-btn-secondary" id="shareCourseCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: COURSE REVIEW ERROR MODAL ============ -->
+  <div class="kll-modal-overlay" id="courseReviewErrorModalOverlay">
+    <div class="kll-modal">
+      <div style="width:56px;height:56px;border-radius:50%;background:#FDEDEF;border:2px solid #F5C6CC;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+        <span class="material-symbols-outlined" style="font-size:26px;color:var(--error)">error_outline</span>
+      </div>
+      <h2>Couldn't prepare your review</h2>
+      <p>Something went wrong while creating your course review. Please try again.</p>
+      <button class="kll-modal-btn" id="courseReviewErrorCloseBtn">Okay</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: CREATE COURSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="createCourseModalOverlay">
+    <div class="kll-modal">
+      <h2>What do you want to learn?</h2>
+      <p>Type any topic and we'll build you a 10-unit course.</p>
+      <input type="text" id="createCourseInput" class="kll-text-input" maxlength="80" placeholder="e.g. Ancient Rome, guitar chords, chess openings...">
+      <div class="kll-modal-error" id="createCourseError"></div>
+      <button class="kll-modal-btn" id="createCourseSubmitBtn">Create Course</button>
+      <button class="kll-modal-btn-secondary" id="createCourseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: LESSON START MODAL ============ -->
+  <div class="kll-modal-overlay" id="lessonStartModalOverlay">
+    <div class="kll-modal">
+      <div class="lesson-start-title" id="lessonStartTitle"></div>
+      <div class="lesson-start-sub" id="lessonStartSub"></div>
+      <button class="kll-modal-btn" id="lessonStartBtn">
+        <span class="lesson-start-btn-fill"></span>
+        <span class="lesson-start-btn-label">Start</span>
+      </button>
+      <button class="kll-modal-btn-secondary" id="lessonStartCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN LESSON VIEW ============ -->
+  <div class="kll-modal-overlay lesson-view-overlay" id="lessonViewOverlay">
+    <div class="lesson-view-container">
+      <div class="lesson-view-topbar">
+        <button id="lessonExitBtn" class="lesson-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="lesson-progress-track">
+          <div id="lessonProgressFill" class="lesson-progress-fill"></div>
+        </div>
+      </div>
+      <div class="lesson-xp-tracker-row">
+        <div class="lesson-xp-tracker" id="lessonXpTracker" style="display:none;">
+          <span class="material-symbols-outlined">bolt</span>
+          <span id="lessonXpTrackerCount">10</span> XP
+        </div>
+      </div>
+      <div id="lessonViewTitle" class="lesson-view-title"></div>
+      <div id="lessonPartContent" class="lesson-part-content"></div>
+      <div class="lesson-view-footer">
+        <div id="lessonFeedback" class="lesson-feedback"></div>
+        <button id="lessonWhyBtn" class="lesson-why-btn" type="button" style="display:none">
+          <span class="material-symbols-outlined">help</span> Why?
+        </button>
+        <button id="lessonActionBtn" class="lesson-action-btn">Next</button>
+      </div>
+
+      <!-- ---- AI Assistant: floating button + popup chat ---- -->
+      <button id="aiAssistantFab" class="ai-assistant-fab" type="button" aria-label="Open AI Assistant">
+        <span class="material-symbols-outlined">robot_2</span>
+      </button>
+      <div id="aiAssistantPanel" class="ai-assistant-panel">
+        <div class="ai-assistant-header">
+          <span class="material-symbols-outlined ai-assistant-header-icon">robot_2</span>
+          <span class="ai-assistant-header-title">AI Assistant</span>
+          <button id="aiAssistantCloseBtn" class="ai-assistant-close-btn" type="button" aria-label="Close AI Assistant">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div id="aiAssistantMessages" class="ai-assistant-messages">
+          <div class="ai-assistant-msg assistant">Hi, I'm your AI Assistant! Ask me anything about this lesson.</div>
+        </div>
+        <form id="aiAssistantForm" class="ai-assistant-input-row">
+          <input id="aiAssistantInput" class="ai-assistant-input" type="text" placeholder="Ask a question…" autocomplete="off" />
+          <button id="aiAssistantSendBtn" class="ai-assistant-send-btn" type="submit" aria-label="Send">
+            <span class="material-symbols-outlined">send</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: "WHY?" EXPLANATION MODAL ============ -->
+  <div class="kll-modal-overlay" id="whyModalOverlay">
+    <div class="kll-modal">
+      <span class="material-symbols-outlined why-modal-icon">robot_2</span>
+      <h2>Why?</h2>
+      <p class="why-modal-body" id="whyModalBody">Thinking…</p>
+      <button class="kll-modal-btn" id="whyModalCloseBtn">Got it</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: LESSON SUMMARY FULL PAGE ============ -->
+  <div class="kll-modal-overlay lesson-summary-overlay" id="lessonSummaryModalOverlay">
+    <div class="lesson-summary-container" id="lessonSummaryContainer">
+      <div class="lesson-summary-body">
+        <div class="lesson-summary-icon material-symbols-outlined">celebration</div>
+        <h2>Lesson complete!</h2>
+        <div class="lesson-summary-score" id="lessonSummaryScore">0/0</div>
+        <div class="lesson-summary-score-label">correct</div>
+        <div id="lessonSummaryXp" class="lesson-summary-xp" style="display:none;">
+          <span class="material-symbols-outlined">bolt</span> <span id="lessonSummaryXpCount">0</span> XP earned
+        </div>
+        <div id="lessonSummaryStreak" class="lesson-summary-streak" style="display:none">
+          <img src="streak.png" class="lesson-summary-streak-icon" alt="">
+          <div class="lesson-summary-streak-label">Streak extended!</div>
+          <div class="lesson-summary-streak-count" id="lessonSummaryStreakCount">0</div>
+        </div>
+      </div>
+      <div class="lesson-summary-footer">
+        <button class="lesson-action-btn" id="lessonSummaryCompleteBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: LEARNING GAMES FULL PAGE ============ -->
+  <div class="kll-modal-overlay games-page-overlay" id="gamesPageOverlay">
+    <div class="games-page-container">
+      <div class="games-page-topbar">
+        <button id="gamesExitBtn" class="games-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="games-page-title">Learning Games</div>
+      </div>
+      <div class="games-page-body">
+        <p class="games-page-sub">Pick a game to play.</p>
+        <div class="games-list">
+          <button type="button" class="game-card" id="gameCardTrivia">
+            <div class="game-card-icon"><span class="material-symbols-outlined">auto_awesome</span></div>
+            <div>
+              <div class="game-card-title">Trivia</div>
+              <div class="game-card-sub">Quick-fire questions about anything</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="gameCardVoiceTrivia">
+            <div class="game-card-icon voice-trivia-card-icon"><span class="material-symbols-outlined">mic</span></div>
+            <div>
+              <div class="game-card-title">Voice Trivia</div>
+              <div class="game-card-sub">Say your answer out loud — the app listens</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="gameCardMaze">
+            <div class="game-card-icon"><span class="material-symbols-outlined">explore</span></div>
+            <div>
+              <div class="game-card-title">Maze</div>
+              <div class="game-card-sub">Navigate a maze, answer questions to keep moving</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="gameCardSeesaw">
+            <div class="game-card-icon"><span class="material-symbols-outlined">balance</span></div>
+            <div>
+              <div class="game-card-title">Seesaw</div>
+              <div class="game-card-sub">2 players, pass the phone — answer before time runs out</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="gameCardMeltdown">
+            <div class="game-card-icon meltdown-card-icon"><span class="material-symbols-outlined">local_fire_department</span></div>
+            <div>
+              <div class="game-card-title">Meltdown</div>
+              <div class="game-card-sub">Solo speed round — answer fast before you melt</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="gameCardDuel">
+            <div class="game-card-icon duel-card-icon"><span class="material-symbols-outlined">bolt</span></div>
+            <div>
+              <div class="game-card-title">Who Can Answer First?</div>
+              <div class="game-card-sub">2 players, same question, same time — fastest correct tap wins the round</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: TRIVIA CHOOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="triviaChooseModalOverlay">
+    <div class="kll-modal">
+      <h2 id="triviaChooseTitle">Choose Your Trivia</h2>
+      <div class="trivia-option-list">
+        <button type="button" class="trivia-option-card" id="triviaCourseOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">school</span> Trivia About This Course
+          </div>
+          <div class="trivia-option-sub" id="triviaCourseOptionDesc"></div>
+        </button>
+        <button type="button" class="trivia-option-card" id="triviaCustomOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">edit</span> Custom Trivia
+          </div>
+          <input type="text" id="triviaCustomInput" class="kll-text-input" maxlength="80" placeholder="e.g. dinosaurs, outer space, world capitals...">
+        </button>
+      </div>
+      <div class="kll-modal-error" id="triviaChooseError"></div>
+      <button class="kll-modal-btn" id="triviaGenerateBtn">Generate</button>
+      <button class="kll-modal-btn-secondary" id="triviaChooseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN TRIVIA VIEW ============ -->
+  <div class="kll-modal-overlay trivia-view-overlay" id="triviaViewOverlay">
+    <div class="trivia-view-container" id="triviaViewContainer">
+      <button id="triviaExitBtn" class="trivia-exit-btn" aria-label="Exit trivia">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div id="triviaScroller" class="trivia-scroller"></div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN VOICE TRIVIA VIEW ============ -->
+  <div class="kll-modal-overlay voice-trivia-view-overlay" id="voiceTriviaViewOverlay">
+    <div class="voice-trivia-container" id="voiceTriviaContainer">
+      <button id="voiceTriviaExitBtn" class="trivia-exit-btn" aria-label="Exit voice trivia">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="voice-trivia-progress" id="voiceTriviaProgress"></div>
+
+      <div id="voiceTriviaPlayArea">
+        <div class="voice-trivia-question" id="voiceTriviaQuestion"></div>
+        <div class="voice-trivia-mic-wrap">
+          <div class="voice-trivia-mic" id="voiceTriviaMic"><span class="material-symbols-outlined">mic</span></div>
+          <div class="voice-trivia-status" id="voiceTriviaStatus">Get ready…</div>
+        </div>
+        <div class="voice-trivia-transcript" id="voiceTriviaTranscript"></div>
+        <div class="voice-trivia-feedback" id="voiceTriviaFeedback"></div>
+        <button class="voice-trivia-giveup-btn" id="voiceTriviaGiveUpBtn">Or tap here to give up</button>
+      </div>
+
+      <div class="voice-trivia-finished" id="voiceTriviaFinished" style="display:none">
+        <div class="trivia-finished-title">You Finished! 🎉</div>
+        <div class="trivia-finished-actions">
+          <button class="trivia-finished-btn-primary" id="voiceTriviaPlayAgainBtn">Play Again</button>
+          <button class="trivia-finished-btn-secondary" id="voiceTriviaExitFinishedBtn">Exit</button>
+        </div>
+        <div class="voice-trivia-status" style="margin-top:14px;">You can also just say "play again" or "exit"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: MAZE CHOOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="mazeChooseModalOverlay">
+    <div class="kll-modal">
+      <h2>Choose Your Maze</h2>
+      <div class="trivia-option-list">
+        <button type="button" class="trivia-option-card" id="mazeCourseOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">school</span> Maze About This Course
+          </div>
+          <div class="trivia-option-sub" id="mazeCourseOptionDesc"></div>
+        </button>
+        <button type="button" class="trivia-option-card" id="mazeCustomOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">edit</span> Custom Topic
+          </div>
+          <input type="text" id="mazeCustomInput" class="kll-text-input" maxlength="80" placeholder="e.g. dinosaurs, outer space, world capitals...">
+        </button>
+      </div>
+      <div class="maze-difficulty-label">Difficulty</div>
+      <div class="maze-difficulty-row">
+        <button type="button" class="maze-difficulty-btn" data-difficulty="easy">Easy</button>
+        <button type="button" class="maze-difficulty-btn" data-difficulty="medium">Medium</button>
+        <button type="button" class="maze-difficulty-btn" data-difficulty="hard">Hard</button>
+      </div>
+      <div class="kll-modal-error" id="mazeChooseError"></div>
+      <button class="kll-modal-btn" id="mazeGenerateBtn">Generate</button>
+      <button class="kll-modal-btn-secondary" id="mazeChooseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN MAZE VIEW ============ -->
+  <div class="kll-modal-overlay maze-view-overlay" id="mazeViewOverlay">
+    <div class="maze-view-container">
+      <div class="maze-view-topbar">
+        <button id="mazeExitBtn" class="lesson-exit-btn" aria-label="Exit maze">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="maze-view-title" id="mazeViewTitle">Maze</div>
+        <div class="maze-timer" id="mazeTimer">--</div>
+      </div>
+      <div class="maze-grid-wrap">
+        <div id="mazeGrid" class="maze-grid"></div>
+      </div>
+      <div class="maze-controls">
+        <button type="button" class="maze-dpad-btn" id="mazeUpBtn" aria-label="Move up">
+          <span class="material-symbols-outlined">keyboard_arrow_up</span>
+        </button>
+        <div class="maze-dpad-mid">
+          <button type="button" class="maze-dpad-btn" id="mazeLeftBtn" aria-label="Move left">
+            <span class="material-symbols-outlined">keyboard_arrow_left</span>
+          </button>
+          <div class="maze-dpad-spacer"></div>
+          <button type="button" class="maze-dpad-btn" id="mazeRightBtn" aria-label="Move right">
+            <span class="material-symbols-outlined">keyboard_arrow_right</span>
+          </button>
+        </div>
+        <button type="button" class="maze-dpad-btn" id="mazeDownBtn" aria-label="Move down">
+          <span class="material-symbols-outlined">keyboard_arrow_down</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: MAZE BLOCKING QUESTION MODAL ============ -->
+  <div class="kll-modal-overlay" id="mazeQuestionModalOverlay">
+    <div class="kll-modal maze-question-modal">
+      <div class="maze-question-tag">Answer to keep moving!</div>
+      <div class="lesson-question-text" id="mazeQuestionText"></div>
+      <div id="mazeQuestionChoices"></div>
+      <div class="lesson-feedback" id="mazeQuestionFeedback"></div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: MAZE COMPLETE FULL PAGE ============ -->
+  <div class="kll-modal-overlay lesson-summary-overlay" id="mazeFinishedModalOverlay">
+    <div class="lesson-summary-container" id="mazeFinishedContainer">
+      <div class="lesson-summary-body">
+        <div class="lesson-summary-icon material-symbols-outlined">flag_circle</div>
+        <h2>Maze complete!</h2>
+        <div class="game-xp-earned">
+          <span class="material-symbols-outlined">bolt</span> <span id="mazeFinishedXpCount">0</span> XP earned
+        </div>
+        <div class="friend-profile-stats-row" style="margin-top:10px;">
+          <div class="friend-profile-stat">
+            <div class="friend-profile-stat-count" id="mazeFinishedMoves">0</div>
+            <div class="friend-profile-stat-label">Moves</div>
+          </div>
+          <div class="friend-profile-stat">
+            <div class="friend-profile-stat-count" id="mazeFinishedTime">0s</div>
+            <div class="friend-profile-stat-label">Time</div>
+          </div>
+        </div>
+      </div>
+      <div class="lesson-summary-footer">
+        <button class="lesson-action-btn" id="mazeFinishedDoneBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: SEESAW CHOOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="seesawChooseModalOverlay">
+    <div class="kll-modal">
+      <h2>Choose Your Seesaw</h2>
+      <div class="trivia-option-list">
+        <button type="button" class="trivia-option-card" id="seesawCourseOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">school</span> Questions About This Course
+          </div>
+          <div class="trivia-option-sub" id="seesawCourseOptionDesc"></div>
+        </button>
+        <button type="button" class="trivia-option-card" id="seesawCustomOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">edit</span> Custom Topic
+          </div>
+          <input type="text" id="seesawCustomInput" class="kll-text-input" maxlength="80" placeholder="e.g. dinosaurs, outer space, world capitals...">
+        </button>
+      </div>
+      <div class="maze-difficulty-label">Turn Timer</div>
+      <div class="maze-difficulty-row">
+        <button type="button" class="seesaw-duration-btn" data-duration="10">10s</button>
+        <button type="button" class="seesaw-duration-btn" data-duration="20">20s</button>
+        <button type="button" class="seesaw-duration-btn" data-duration="30">30s</button>
+        <button type="button" class="seesaw-duration-btn" data-duration="infinite">&#8734;</button>
+      </div>
+      <div class="kll-modal-error" id="seesawChooseError"></div>
+      <button class="kll-modal-btn" id="seesawGenerateBtn">Generate</button>
+      <button class="kll-modal-btn-secondary" id="seesawChooseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN SEESAW VIEW (2-player pass-and-play) ============ -->
+  <div class="kll-modal-overlay seesaw-view-overlay" id="seesawViewOverlay">
+    <div class="seesaw-container" id="seesawContainer">
+      <button id="seesawExitBtn" class="seesaw-exit-btn" aria-label="Exit seesaw">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="seesaw-rotator" id="seesawRotator">
+        <div class="seesaw-fill" id="seesawFill"></div>
+        <div class="seesaw-player-tag" id="seesawPlayerTag">Player 1</div>
+        <div class="seesaw-timer-mid" id="seesawTimerMid">10</div>
+        <div class="seesaw-bottom-area">
+          <div class="lesson-question-text" id="seesawQuestionText"></div>
+          <div id="seesawChoices"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: SEESAW LOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="seesawLoseModalOverlay">
+    <div class="kll-modal">
+      <div class="material-symbols-outlined why-modal-icon" style="color:#E0503A">timer_off</div>
+      <h2>Time's up!</h2>
+      <p class="why-modal-body" id="seesawLoseStats"></p>
+      <div class="game-xp-earned" id="seesawLoseXp"></div>
+      <button class="kll-modal-btn" id="seesawLoseDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: MELTDOWN CHOOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="meltdownChooseModalOverlay">
+    <div class="kll-modal">
+      <h2>Choose Your Meltdown</h2>
+      <div class="trivia-option-list">
+        <button type="button" class="trivia-option-card" id="meltdownCourseOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">school</span> Questions About This Course
+          </div>
+          <div class="trivia-option-sub" id="meltdownCourseOptionDesc"></div>
+        </button>
+        <button type="button" class="trivia-option-card" id="meltdownCustomOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">edit</span> Custom Topic
+          </div>
+          <input type="text" id="meltdownCustomInput" class="kll-text-input" maxlength="80" placeholder="e.g. dinosaurs, outer space, world capitals...">
+        </button>
+      </div>
+      <div class="maze-difficulty-label">Starting Heat</div>
+      <div class="maze-difficulty-row">
+        <button type="button" class="meltdown-difficulty-btn" data-difficulty="easy">Easy</button>
+        <button type="button" class="meltdown-difficulty-btn" data-difficulty="medium">Medium</button>
+        <button type="button" class="meltdown-difficulty-btn" data-difficulty="hard">Hard</button>
+      </div>
+      <div class="kll-modal-error" id="meltdownChooseError"></div>
+      <button class="kll-modal-btn meltdown-modal-btn" id="meltdownGenerateBtn">Generate</button>
+      <button class="kll-modal-btn-secondary" id="meltdownChooseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN MELTDOWN VIEW (solo speed round) ============ -->
+  <div class="kll-modal-overlay meltdown-view-overlay" id="meltdownViewOverlay">
+    <div class="meltdown-container">
+      <div class="meltdown-topbar">
+        <button id="meltdownExitBtn" class="lesson-exit-btn" aria-label="Exit meltdown">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="meltdown-streak-badge">
+          <span class="material-symbols-outlined">bolt</span> <span id="meltdownStreak">0</span>
+        </div>
+        <div class="meltdown-timer-badge" id="meltdownTimer">10.0</div>
+      </div>
+      <div class="meltdown-body">
+        <div class="meltdown-question-col">
+          <div class="lesson-question-text" id="meltdownQuestionText"></div>
+          <div id="meltdownChoices"></div>
+        </div>
+        <div class="meltdown-thermo-col">
+          <div class="meltdown-thermo">
+            <div class="meltdown-thermo-fill" id="meltdownThermoFill"></div>
+          </div>
+          <div class="meltdown-thermo-bulb">
+            <span class="material-symbols-outlined">local_fire_department</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: MELTDOWN LOSE (MELTED) MODAL ============ -->
+  <div class="kll-modal-overlay" id="meltdownLoseModalOverlay">
+    <div class="kll-modal">
+      <div class="material-symbols-outlined why-modal-icon" style="color:#FF4B1F">local_fire_department</div>
+      <h2>You melted!</h2>
+      <p class="why-modal-body" id="meltdownLoseStats"></p>
+      <p class="why-modal-body" id="meltdownLoseBest" style="margin-top:-14px;"></p>
+      <div class="game-xp-earned" id="meltdownLoseXp"></div>
+      <button class="kll-modal-btn meltdown-modal-btn" id="meltdownLoseDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: DUEL ("WHO CAN ANSWER FIRST?") CHOOSE MODAL ============ -->
+  <div class="kll-modal-overlay" id="duelChooseModalOverlay">
+    <div class="kll-modal">
+      <h2>Choose Your Duel</h2>
+      <div class="trivia-option-list">
+        <button type="button" class="trivia-option-card" id="duelCourseOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">school</span> Questions About This Course
+          </div>
+          <div class="trivia-option-sub" id="duelCourseOptionDesc"></div>
+        </button>
+        <button type="button" class="trivia-option-card" id="duelCustomOption">
+          <div class="trivia-option-title">
+            <span class="material-symbols-outlined">edit</span> Custom Topic
+          </div>
+          <input type="text" id="duelCustomInput" class="kll-text-input" maxlength="80" placeholder="e.g. dinosaurs, outer space, world capitals...">
+        </button>
+      </div>
+      <div class="maze-difficulty-label">Round Timer</div>
+      <div class="maze-difficulty-row">
+        <button type="button" class="duel-timer-btn" data-timer="5">5s</button>
+        <button type="button" class="duel-timer-btn" data-timer="8">8s</button>
+        <button type="button" class="duel-timer-btn" data-timer="12">12s</button>
+      </div>
+      <div class="kll-modal-error" id="duelChooseError"></div>
+      <button class="kll-modal-btn" id="duelGenerateBtn">Generate</button>
+      <button class="kll-modal-btn-secondary" id="duelChooseCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: FULL-SCREEN DUEL VIEW (2-player, simultaneous, same device) ============ -->
+  <div class="kll-modal-overlay duel-view-overlay" id="duelViewOverlay">
+    <div class="duel-container" id="duelContainer">
+      <button id="duelExitBtn" class="duel-exit-btn" aria-label="Exit duel">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div class="duel-zone duel-zone-top" id="duelZoneTop">
+        <div class="duel-zone-tag">Player 1</div>
+        <div class="duel-question-text" id="duelQuestionTextTop"></div>
+        <div id="duelChoicesTop"></div>
+      </div>
+
+      <div class="duel-mid-bar">
+        <div class="duel-score duel-score-1" id="duelScore1">0</div>
+        <div class="duel-timer-mid" id="duelTimerMid">8</div>
+        <div class="duel-score duel-score-2" id="duelScore2">0</div>
+      </div>
+      <div class="duel-round-label" id="duelRoundLabel">Round 1 of 10</div>
+
+      <div class="duel-zone duel-zone-bottom" id="duelZoneBottom">
+        <div class="duel-zone-tag">Player 2</div>
+        <div class="duel-question-text" id="duelQuestionTextBottom"></div>
+        <div id="duelChoicesBottom"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: DUEL MATCH OVER MODAL ============ -->
+  <div class="kll-modal-overlay" id="duelEndModalOverlay">
+    <div class="kll-modal">
+      <div class="material-symbols-outlined why-modal-icon" id="duelEndIcon" style="color:#FF8A2B">emoji_events</div>
+      <h2 id="duelEndTitle">Match Over!</h2>
+      <p class="why-modal-body" id="duelEndStats"></p>
+      <div class="game-xp-earned" id="duelEndXp"></div>
+      <button class="kll-modal-btn" id="duelEndDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: ACCOUNT SETTINGS FULL PAGE ============ -->
+  <div class="kll-modal-overlay games-page-overlay" id="accountSettingsPageOverlay">
+    <div class="games-page-container">
+      <div class="games-page-topbar">
+        <button id="accountSettingsExitBtn" class="games-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="games-page-title">Account Settings</div>
+      </div>
+      <div class="games-page-body">
+        <p class="games-page-sub">Manage your account.</p>
+        <div class="games-list">
+          <button type="button" class="game-card" id="settingsResetPwBtn">
+            <div class="game-card-icon"><span class="material-symbols-outlined">lock_reset</span></div>
+            <div>
+              <div class="game-card-title">Change Password</div>
+              <div class="game-card-sub">Update the password you sign in with</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="settingsDeleteBtn">
+            <div class="game-card-icon danger-card-icon"><span class="material-symbols-outlined">delete_forever</span></div>
+            <div>
+              <div class="game-card-title">Delete Account</div>
+              <div class="game-card-sub">Permanently remove your account and all its data</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+          <button type="button" class="game-card" id="settingsSignOutBtn">
+            <div class="game-card-icon"><span class="material-symbols-outlined">logout</span></div>
+            <div>
+              <div class="game-card-title">Sign Out</div>
+              <div class="game-card-sub">Sign out of Kids Learning Lab on this device</div>
+            </div>
+            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
+          </button>
+        </div>
+        <p class="settings-status" id="settingsStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: CHANGE AVATAR MODAL (emoji + color) ============ -->
+  <div class="kll-modal-overlay" id="avatarModalOverlay">
+    <div class="kll-modal avatar-modal">
+      <h2>Choose Your Avatar</h2>
+      <p class="why-modal-body">Pick 1 or 2 emoji and a background color.</p>
+
+      <div class="avatar-preview-wrap">
+        <div class="settings-avatar profile-avatar-lg avatar-preview" id="avatarPreview">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+      </div>
+
+      <div class="avatar-section-label">Emoji (pick up to 2)</div>
+      <div class="avatar-emoji-grid" id="avatarEmojiGrid"></div>
+
+      <div class="avatar-section-label">Background Color</div>
+      <div class="avatar-color-grid" id="avatarColorGrid"></div>
+
+      <div class="kll-modal-error" id="avatarError"></div>
+      <button class="kll-modal-btn" id="avatarSaveBtn">Save Avatar</button>
+      <button class="kll-modal-btn-secondary" id="avatarCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: FRIENDS FULL PAGE ============ -->
+  <div class="kll-modal-overlay games-page-overlay" id="notifPanelOverlay">
+    <div class="games-page-container">
+      <div class="games-page-topbar">
+        <button id="notifPanelExitBtn" class="games-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="games-page-title">Notifications</div>
+      </div>
+      <div class="games-page-body">
+        <div id="notifPanelEmpty" class="friends-empty" style="display:none;">You're all caught up — nothing new.</div>
+        <div id="notifPanelList" class="notif-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kll-modal-overlay games-page-overlay" id="friendsPageOverlay">
+    <div class="games-page-container">
+      <div class="games-page-topbar">
+        <button id="friendsExitBtn" class="games-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="games-page-title">Friends</div>
+      </div>
+      <div class="games-page-body">
+        <div class="friend-profile-card">
+          <div class="settings-avatar profile-avatar-lg" id="friendsMyAvatar">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="friend-profile-name" id="friendsMyName">—</div>
+          <div class="friend-profile-email" id="friendsMyEmail">—</div>
+          <div class="friend-profile-stats-row">
+            <div class="friend-profile-stat">
+              <div class="friend-profile-stat-count" id="friendsMyXp">0</div>
+              <div class="friend-profile-stat-label">XP</div>
+            </div>
+            <div class="friend-profile-stat">
+              <div class="friend-profile-stat-count" id="friendsMyStreak">0</div>
+              <div class="friend-profile-stat-label">Streak</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="games-page-sub">Share your email address with friends, or add someone by entering theirs below.</p>
+        <div class="friend-action-row">
+          <button type="button" class="friend-action-btn" id="addFriendOpenBtn">
+            <span class="material-symbols-outlined">person_add</span> Add Friend
+          </button>
+          <button type="button" class="friend-action-btn friend-action-btn-danger" id="blockOpenBtn">
+            <span class="material-symbols-outlined">block</span> Block
+          </button>
+        </div>
+
+        <div id="friendRequestsSection" style="display:none;">
+          <div class="settings-card-label friend-section-label">Friend Requests</div>
+          <div id="friendRequestsList" class="friends-list"></div>
+        </div>
+
+        <div id="sentRequestsSection" style="display:none;">
+          <div class="settings-card-label friend-section-label">Sent Requests</div>
+          <div id="sentRequestsList" class="friends-list"></div>
+        </div>
+
+        <div class="settings-card-label friend-section-label">Friends</div>
+        <div id="friendsListEmpty" class="friends-empty" style="display:none;">No friends yet — add one above!</div>
+        <div id="friendsList" class="friends-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: ADD FRIEND MODAL ============ -->
+  <div class="kll-modal-overlay" id="addFriendModalOverlay">
+    <div class="kll-modal">
+      <h2>Add Friend</h2>
+      <p class="why-modal-body">Enter your friend's email address. They'll need to accept before you can see each other's profiles.</p>
+      <input type="email" id="addFriendEmailInput" class="kll-text-input" placeholder="friend@email.com">
+      <div class="kll-modal-error" id="addFriendError"></div>
+      <button class="kll-modal-btn" id="addFriendSendBtn">Send Request</button>
+      <button class="kll-modal-btn-secondary" id="addFriendCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: BLOCK MODAL ============ -->
+  <div class="kll-modal-overlay" id="blockModalOverlay">
+    <div class="kll-modal">
+      <h2>Block Someone</h2>
+      <p class="why-modal-body">Enter the email address of the person you want to block. This removes any existing friendship or pending request with them.</p>
+      <input type="email" id="blockEmailInput" class="kll-text-input" placeholder="email@email.com">
+      <div class="kll-modal-error" id="blockError"></div>
+      <button class="kll-modal-btn meltdown-modal-btn" id="blockConfirmBtn">Block</button>
+      <button class="kll-modal-btn-secondary" id="blockCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE: FRIEND'S PROFILE FULL PAGE ============ -->
+  <div class="kll-modal-overlay games-page-overlay" id="friendProfilePageOverlay">
+    <div class="games-page-container">
+      <div class="games-page-topbar">
+        <button id="friendProfileExitBtn" class="games-exit-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="games-page-title" id="friendProfileTitle">Friend</div>
+      </div>
+      <div class="games-page-body">
+        <div class="friend-profile-card">
+          <div class="settings-avatar profile-avatar-lg" id="friendProfileAvatar">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="friend-profile-name" id="friendProfileName">—</div>
+          <div class="friend-profile-email" id="friendProfileEmail">—</div>
+          <div class="friend-profile-stats-row">
+            <div class="friend-profile-stat">
+              <div class="friend-profile-stat-count" id="friendProfileXp">0</div>
+              <div class="friend-profile-stat-label">XP</div>
+            </div>
+            <div class="friend-profile-stat">
+              <div class="friend-profile-stat-count" id="friendProfileStreak">0</div>
+              <div class="friend-profile-stat-label">Streak</div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="friend-action-btn friend-action-btn-danger" id="friendProfileRemoveBtn" style="width:100%; justify-content:center;">
+          <span class="material-symbols-outlined">person_remove</span> Remove Friend
+        </button>
+
+        <div class="settings-card-label friend-section-label" style="margin-top:22px;">Friends</div>
+        <div id="friendProfileFriendsEmpty" class="friends-empty" style="display:none;">No friends yet.</div>
+        <div id="friendProfileFriendsList" class="friends-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LESSON: QUIT CONFIRMATION MODAL ============ -->
+  <div class="kll-modal-overlay" id="quitLessonModalOverlay">
+    <div class="kll-modal">
+      <div class="material-symbols-outlined why-modal-icon" style="color:#E0503A">warning</div>
+      <h2>Do you want to quit?</h2>
+      <p class="why-modal-body">You will lose progress &amp; XP.</p>
+      <button class="kll-modal-btn meltdown-modal-btn" id="quitLessonConfirmBtn">Quit Lesson</button>
+      <button class="kll-modal-btn-secondary" id="quitLessonCancelBtn">Keep Going</button>
+    </div>
+  </div>
+
+  <script type="module" src="./player.js"></script>
+  <script type="module" src="./learn.js"></script>
+  <script>
+    if (!navigator.onLine) {
+      window.location.href = "./404.html";
+    }
+    </script>
+
+</body>
+</html>

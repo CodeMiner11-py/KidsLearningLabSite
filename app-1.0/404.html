@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<title>Kids Learning Lab — Offline</title>
+<style>
+  :root {
+    --blue-deep: #123B7A;
+    --blue-main: #1E6FE0;
+    --blue-bright: #4FA6FF;
+    --blue-pale: #EAF3FF;
+    --blue-mist: #F5FAFF;
+    --ink: #14213D;
+    --ink-soft: #5B6B85;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    background: var(--blue-mist);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .blob-1 {
+    width: 340px; height: 340px;
+    background: radial-gradient(circle at 30% 30%, var(--blue-bright), var(--blue-main));
+    top: -120px; left: -120px;
+    opacity: 0.35;
+  }
+  .blob-2 {
+    width: 260px; height: 260px;
+    background: radial-gradient(circle at 70% 70%, var(--blue-main), var(--blue-deep));
+    bottom: -100px; right: -80px;
+    opacity: 0.3;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 380px;
+    background: var(--white);
+    border-radius: 28px;
+    padding: 44px 32px 36px;
+    box-shadow: 0 20px 60px rgba(18, 59, 122, 0.14);
+    text-align: center;
+  }
+
+  .icon-wrap {
+    width: 72px; height: 72px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: var(--blue-pale);
+    border: 2px solid #DCE7F5;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .icon-wrap svg { width: 32px; height: 32px; }
+
+  h1 {
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--blue-deep);
+  }
+
+  p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin: 0 0 28px;
+  }
+
+  .retry-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--blue-main);
+    color: var(--white);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .retry-btn:hover { background: var(--blue-deep); }
+  .retry-btn:active { transform: scale(0.98); }
+  .retry-btn svg { width: 16px; height: 16px; }
+
+  .mark {
+    width: 8px; height: 8px;
+    margin: 26px auto 0;
+    border-radius: 50%;
+    background: var(--blue-bright);
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <!-- Custom no-wifi SVG -->
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 8.5C6 5 10 3.5 12 3.5C14 3.5 18 5 22 8.5" stroke="#B9CFEF" stroke-width="2" stroke-linecap="round"/>
+        <path d="M5 12.5C7.2 10.7 9.5 9.8 12 9.8C14.5 9.8 16.8 10.7 19 12.5" stroke="#B9CFEF" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8.3 16.3C9.4 15.5 10.6 15.1 12 15.1C13.4 15.1 14.6 15.5 15.7 16.3" stroke="#B9CFEF" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="20" r="1.4" fill="#1E6FE0"/>
+        <line x1="3" y1="3" x2="21" y2="21" stroke="#1E6FE0" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>You're offline</h1>
+    <p>Kids Learning Lab needs an internet connection to load. Check your Wi-Fi or cellular data, then try again.</p>
+    <button class="retry-btn" onclick="location.reload()">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20 4v6h-6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Try Again
+    </button>
+    <div class="mark"></div>
+  </div>
+
+  <script>
+    window.addEventListener('online', () => {
+      location.href = './index.html';
+    });
+  </script>
+</body>
+</html>

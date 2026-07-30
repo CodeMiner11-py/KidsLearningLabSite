@@ -56,6 +56,10 @@
     color:#a80058;
   }
   #shopBtns button:hover, #saveLoadBar button:hover{ background:#fff; }
+  #footer{
+    position:absolute; bottom:16px; left:16px; z-index:20;
+    font-size:13px; opacity:0.8; color:#a80058; font-weight:bold;
+  }
   #saveLoadBar{
     position:absolute; bottom:16px; right:16px; z-index:20;
     display:flex; gap:8px;
@@ -144,6 +148,7 @@
       <canvas id="stage"></canvas>
     </div>
     <div id="toast"></div>
+    <div id="footer">Reema's 14th Birthday &nbsp;·&nbsp; THE CAT GAME</div>
     <div id="saveLoadBar">
       <button id="saveBtn">💾 Save Game</button>
       <button id="loadBtn">📂 Load Game</button>
