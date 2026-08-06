@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code MCP — Claude Code, but really free!</title>
+<style>
+  :root{
+    --cream:#F4F1EA;
+    --ink:#1F1B16;
+    --clay:#D97757;
+    --clay-dark:#BD5D3F;
+    --line: rgba(31,27,22,0.12);
+    --sub: rgba(31,27,22,0.62);
+    --sys: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+    --sys-mono: "SF Mono", "SFMono-Regular", Menlo, Monaco, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--sys);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:88px 24px 64px;
+  }
+
+  .brand{
+    font-family:var(--sys);
+    font-weight:700;
+    font-size:38px;
+    letter-spacing:-0.02em;
+    margin-bottom:48px;
+  }
+
+  .brand span{ color:var(--clay); }
+
+  @media (max-width:520px){
+    .brand{ font-size:30px; }
+  }
+
+  .eyebrow{
+    font-family:var(--sys-mono);
+    font-size:13px;
+    letter-spacing:0.06em;
+    color:var(--clay-dark);
+    text-transform:uppercase;
+    margin-bottom:18px;
+  }
+
+  h1{
+    font-family:var(--sys);
+    font-weight:700;
+    font-size:44px;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+
+  h1 span{ color:var(--clay); }
+
+  .lede{
+    font-size:18px;
+    line-height:1.6;
+    color:var(--sub);
+    max-width:520px;
+    margin:0 0 40px;
+  }
+
+  .cta{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:var(--clay);
+    color:#fff;
+    font-family:var(--sys);
+    font-weight:600;
+    font-size:16px;
+    padding:15px 28px;
+    border-radius:10px;
+    text-decoration:none;
+    box-shadow:0 1px 2px rgba(31,27,22,0.08);
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+
+  .cta:hover{ background:var(--clay-dark); }
+  .cta:active{ transform:translateY(1px); }
+  .cta:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+
+  .cta svg{ width:16px; height:16px; }
+
+  .filenote{
+    font-family:var(--sys-mono);
+    font-size:13px;
+    color:var(--sub);
+    margin:12px 0 0;
+  }
+
+  hr{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:64px 0 40px;
+  }
+
+  h2{
+    font-family:var(--sys);
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--sub);
+    margin:0 0 24px;
+  }
+
+  .step{
+    display:flex;
+    gap:16px;
+    padding:18px 0;
+    border-top:1px solid var(--line);
+  }
+
+  .step:last-child{ border-bottom:1px solid var(--line); }
+
+  .step-num{
+    font-family:var(--sys-mono);
+    font-size:13px;
+    color:var(--clay);
+    padding-top:2px;
+    flex-shrink:0;
+    width:20px;
+  }
+
+  .step-body p{
+    margin:0;
+    font-size:15.5px;
+    line-height:1.6;
+    color:var(--ink);
+  }
+
+  .step-body b{ font-weight:600; }
+
+  footer{
+    margin-top:56px;
+    font-size:13px;
+    color:var(--sub);
+  }
+
+  @media (max-width:520px){
+    h1{ font-size:34px; }
+    .wrap{ padding:56px 20px 48px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">Code<span>MCP</span></div>
+    <div class="eyebrow">Local MCP server for Claude</div>
+    <h1>Claude Code, but <span>really</span> free.</h1>
+    <p class="lede">
+      Instead of buying Claude Code, download this local MCP server so Claude
+      can read your files, edit them, and run commands — right on your machine.
+    </p>
+
+    <a class="cta" href="Code MCP 1.0.zip" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12"/>
+        <path d="M7 10l5 5 5-5"/>
+        <path d="M5 21h14"/>
+      </svg>
+      Download for Mac
+    </a>
+    <p class="filenote">Code MCP 1.0.zip · macOS only</p>
+
+    <hr>
+
+    <h2>How it works</h2>
+
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <p><b>Download and open the installer.</b> It sets up a small server that runs locally on your computer.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <p><b>Connect it to Claude.</b> Claude talks to the server over MCP — nothing leaves your machine except what you ask it to touch.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <p><b>Ask Claude to work on your project.</b> It can read files, make edits, and run commands, just like Claude Code.</p>
+      </div>
+    </div>
+
+    <footer>Not affiliated with Anthropic. Just a local MCP server.</footer>
+  </div>
+</body>
+</html>
