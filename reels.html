@@ -507,9 +507,9 @@
 
     <div class="field">
       <label>Pexels API key <span class="badge-req">required for stock visuals</span></label>
-      <input type="text" id="cfgPexelsKey" placeholder="MY_PEXELS_KEY">
+      <input type="text" id="cfgPexelsKey" placeholder="a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj">
       <div class="key-hint">
-        // PEXELS KEY PLACEHOLDER — "MY_PEXELS_KEY"<br>
+        // PEXELS KEY PLACEHOLDER — "a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj"<br>
         // Wire up your own key-provisioning service here:<br>
         // replace loadKeys()/saveKeys() below to fetch the<br>
         // real key from your backend instead of localStorage,<br>
@@ -565,7 +565,7 @@ const state = {
 function loadKeys(){
   return {
     workerUrl: localStorage.getItem('erg_worker_url') || 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/',
-    pexelsKey: localStorage.getItem('erg_pexels_key') || 'MY_PEXELS_KEY' // <-- placeholder, see config modal
+    pexelsKey: localStorage.getItem('erg_pexels_key') || 'a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj' // <-- placeholder, see config modal
   };
 }
 function saveKeys(workerUrl, pexelsKey){
@@ -575,13 +575,13 @@ function saveKeys(workerUrl, pexelsKey){
 function openConfig(){
   const k = loadKeys();
   document.getElementById('cfgWorkerUrl').value = k.workerUrl;
-  document.getElementById('cfgPexelsKey').value = (k.pexelsKey === 'MY_PEXELS_KEY' ? '' : k.pexelsKey);
+  document.getElementById('cfgPexelsKey').value = (k.pexelsKey === 'a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj' ? '' : k.pexelsKey);
   document.getElementById('configModal').classList.add('open');
 }
 function closeConfig(){ document.getElementById('configModal').classList.remove('open'); }
 function saveConfig(){
   const w = document.getElementById('cfgWorkerUrl').value.trim() || 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/';
-  const p = document.getElementById('cfgPexelsKey').value.trim() || 'MY_PEXELS_KEY';
+  const p = document.getElementById('cfgPexelsKey').value.trim() || 'a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj';
   saveKeys(w, p);
   closeConfig();
   showToast('Settings saved');
@@ -894,7 +894,7 @@ async function searchStockFor(query, aiPicked){
   const grid = document.getElementById('stockGrid');
   grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Searching Pexels…</div>';
 
-  if(!pexelsKey || pexelsKey === 'MY_PEXELS_KEY'){
+  if(!pexelsKey || pexelsKey === 'a2QpzrLRDpBkb7kymGA3PpEhnFNWxPOzlbBtu7GJNIRg8Rm8hsG86maj'){
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Add a Pexels key in Setup keys to load real stock photos.</div>';
     return;
   }
