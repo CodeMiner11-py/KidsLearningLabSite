@@ -249,6 +249,60 @@
   }
   .done-icon .material-symbols-rounded{ color:var(--white); font-size:36px; }
 
+  /* mode badge */
+  .mode-badge{
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--gray-600);
+    padding:5px 6px 5px 12px; border-radius:999px; border:1px solid var(--line);
+  }
+  .mode-badge button{
+    all:unset; cursor:pointer; font-size:11.5px; font-weight:600;
+    color:var(--white); background:var(--black);
+    padding:5px 10px; border-radius:999px;
+  }
+  .mode-badge button:hover{ opacity:.82; }
+
+  /* modal */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; animation:fadeIn .2s ease; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+  .modal{
+    background:var(--white); border-radius:20px;
+    width:100%; max-width:520px;
+    padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.25);
+    animation:pop .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop{ from{opacity:0; transform:scale(.95) translateY(6px);} to{opacity:1; transform:scale(1) translateY(0);} }
+  .modal-title{ font-size:20px; font-weight:700; letter-spacing:-0.01em; margin-bottom:6px; }
+  .modal-sub{ font-size:14px; color:var(--gray-600); margin-bottom:24px; }
+  .modal-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-option{
+    all:unset; cursor:pointer;
+    border:1.5px solid var(--line); border-radius:16px;
+    padding:20px 16px; text-align:left;
+    display:flex; flex-direction:column; gap:10px;
+    transition:border-color .15s, background .15s;
+  }
+  .modal-option:hover{ border-color:var(--black); background:var(--gray-050); }
+  .modal-option .material-symbols-rounded{ font-size:26px; }
+  .modal-option h3{ font-size:15px; font-weight:600; }
+  .modal-option p{ font-size:12.5px; color:var(--gray-400); line-height:1.45; }
+  .modal-option .tag{
+    align-self:flex-start; font-size:10.5px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.05em;
+    color:var(--gray-400); border:1px solid var(--gray-200);
+    border-radius:999px; padding:2px 8px; margin-top:2px;
+  }
+
+  [data-mode-block]{ display:none; }
+  [data-mode-block].mode-visible{ display:block; }
+
   @media (max-width:820px){
     .shell{ grid-template-columns:1fr; padding:24px 18px 100px; }
     .sidebar{ position:static; }
@@ -271,6 +325,32 @@
     </div>
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <div class="progress-label" id="progressLabel">Step 1 of 6</div>
+    <div class="mode-badge" id="modeBadge" style="display:none;">
+      <span id="modeBadgeText">Two boards</span>
+      <button onclick="openModal()">Switch</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">One board or two?</div>
+    <div class="modal-sub">This changes what you'll flash and how the signal reaches your computer.</div>
+    <div class="modal-options">
+      <button class="modal-option" onclick="chooseMode('one')">
+        <span class="material-symbols-rounded">usb</span>
+        <h3>One board</h3>
+        <p>Plug it straight into your computer. Tethered by cable, no radio needed.</p>
+        <span class="tag">Simpler</span>
+      </button>
+      <button class="modal-option" onclick="chooseMode('two')">
+        <span class="material-symbols-rounded">sensors</span>
+        <h3>Two boards</h3>
+        <p>One stays in your hand, one stays plugged in. Talks wirelessly over radio.</p>
+        <span class="tag">Wireless</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -299,8 +379,8 @@
       <div class="hero-cards">
         <div class="hero-card">
           <span class="material-symbols-rounded">memory</span>
-          <h3>2× micro:bit</h3>
-          <p>One transmitter, one receiver. Any version with a radio module.</p>
+          <h3 id="heroBoardCount">2× micro:bit</h3>
+          <p id="heroBoardDesc">One transmitter, one receiver. Any version with a radio module.</p>
         </div>
         <div class="hero-card">
           <span class="material-symbols-rounded">usb</span>
@@ -337,7 +417,7 @@
 
       <div class="step-nav">
         <button class="nav-btn ghost" disabled><span class="material-symbols-rounded">arrow_back</span> Back</button>
-        <button class="nav-btn primary" onclick="goTo(1)">Start setup <span class="material-symbols-rounded">arrow_forward</span></button>
+        <button class="nav-btn primary" onclick="openModal()">Start setup <span class="material-symbols-rounded">arrow_forward</span></button>
       </div>
     </section>
 
@@ -391,9 +471,42 @@
 
     <!-- STEP 2: Flash -->
     <section class="panel" data-panel="2">
-      <div class="panel-head"><span class="panel-num">03</span><h2>Flash both boards</h2></div>
-      <p class="panel-sub">Plug in one micro:bit at a time. In Mu Editor, paste the matching code below, then click <strong>Flash</strong>. Label the boards — it's easy to mix them up later.</p>
+      <div class="panel-head"><span class="panel-num">03</span><h2 id="step2Title">Flash both boards</h2></div>
+      <p class="panel-sub" id="step2Sub">Plug in one micro:bit at a time. In Mu Editor, paste the matching code below, then click <strong>Flash</strong>. Label the boards — it's easy to mix them up later.</p>
 
+      <div data-mode-block="one">
+        <div class="section-block">
+          <h4><span class="material-symbols-rounded" style="font-size:16px;">usb</span> Your board — tethered</h4>
+          <div class="codeblock">
+            <div class="codeblock-head">
+              <div class="codeblock-name"><span class="material-symbols-rounded">description</span> single_board.py</div>
+              <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+            </div>
+            <pre><code><span class="tok-kw">from</span> microbit <span class="tok-kw">import</span> *
+
+<span class="tok-kw">while</span> True:
+    x = accelerometer.get_x()
+    y = accelerometer.get_y()
+    z = accelerometer.get_z()
+
+    print(<span class="tok-str">"{},{},{}"</span>.format(x, y, z))
+
+    <span class="tok-kw">if</span> button_a.was_pressed():
+        print(<span class="tok-str">"CLICK_L"</span>)
+    <span class="tok-kw">if</span> button_b.was_pressed():
+        print(<span class="tok-str">"CLICK_R"</span>)
+
+    display.show(Image.ARROW_N <span class="tok-kw">if</span> y &lt; -<span class="tok-str">300</span> <span class="tok-kw">else</span> Image.ARROW_S <span class="tok-kw">if</span> y &gt; <span class="tok-str">300</span> <span class="tok-kw">else</span> Image.SQUARE_SMALL)
+    sleep(<span class="tok-str">50</span>)  <span class="tok-com"># ~20Hz update rate</span></code></pre>
+          </div>
+        </div>
+        <div class="note">
+          <span class="material-symbols-rounded">info</span>
+          <div>No radio needed — this board prints straight over the same USB cable that's powering it. Clicks are already built in, so you can skip step 6.</div>
+        </div>
+      </div>
+
+      <div data-mode-block="two">
       <div class="section-block">
         <h4><span class="material-symbols-rounded" style="font-size:16px;">pan_tool</span> Board 1 — Transmitter (handheld)</h4>
         <div class="codeblock">
@@ -448,6 +561,7 @@ radio.config(channel=<span class="tok-str">7</span>, power=<span class="tok-str"
         <span class="material-symbols-rounded">priority_high</span>
         <div>Both boards must use the same <code>channel</code> number. If you have neighbors also playing with micro:bits, pick a channel other than the default (0–83 are valid) so you don't cross signals.</div>
       </div>
+      </div>
 
       <div class="step-nav">
         <button class="nav-btn ghost" onclick="goTo(1)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
@@ -458,10 +572,10 @@ radio.config(channel=<span class="tok-str">7</span>, power=<span class="tok-str"
     <!-- STEP 3: Connect & run -->
     <section class="panel" data-panel="3">
       <div class="panel-head"><span class="panel-num">04</span><h2>Find the port &amp; run the script</h2></div>
-      <p class="panel-sub">Leave the transmitter running on battery power. Keep the receiver plugged into your computer via USB.</p>
+      <p class="panel-sub" id="step3Sub">Leave the transmitter running on battery power. Keep the receiver plugged into your computer via USB.</p>
 
       <div class="section-block">
-        <h4>Find the receiver's serial port</h4>
+        <h4 id="step3PortLabel">Find the receiver's serial port</h4>
         <div class="platform-tabs">
           <button class="ptab active" onclick="setPlatform(this,'mac')">macOS</button>
           <button class="ptab" onclick="setPlatform(this,'win')">Windows</button>
@@ -637,6 +751,68 @@ print(<span class="tok-str">"Tilt the transmitter to move the mouse. Ctrl+C to s
 <script>
   const steps = [0,1,2,3,4,5];
   let current = 0;
+  let boardMode = null; // 'one' | 'two'
+
+  function openModal(){
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'modalOverlay') closeModal();
+  });
+
+  function chooseMode(mode){
+    boardMode = mode;
+    applyMode();
+    closeModal();
+    goTo(1);
+  }
+
+  function applyMode(){
+    const isOne = boardMode === 'one';
+
+    document.querySelectorAll('[data-mode-block]').forEach(el => {
+      el.classList.toggle('mode-visible', el.dataset.modeBlock === boardMode);
+    });
+
+    // topbar badge
+    const badge = document.getElementById('modeBadge');
+    badge.style.display = 'flex';
+    document.getElementById('modeBadgeText').textContent = isOne ? 'One board' : 'Two boards';
+
+    // hero card
+    document.getElementById('heroBoardCount').textContent = isOne ? '1× micro:bit' : '2× micro:bit';
+    document.getElementById('heroBoardDesc').textContent = isOne
+      ? 'Tethered by USB the whole time — no radio, no second board.'
+      : 'One transmitter, one receiver. Any version with a radio module.';
+
+    // step 2 copy
+    document.getElementById('step2Title').textContent = isOne ? 'Flash your board' : 'Flash both boards';
+    document.getElementById('step2Sub').innerHTML = isOne
+      ? 'Plug your micro:bit in, paste the code below into Mu Editor, then click <strong>Flash</strong>.'
+      : 'Plug in one micro:bit at a time. In Mu Editor, paste the matching code below, then click <strong>Flash</strong>. Label the boards — it\'s easy to mix them up later.';
+
+    // step 3 copy
+    document.getElementById('step3Sub').textContent = isOne
+      ? 'Keep your micro:bit plugged into your computer via USB the whole time.'
+      : 'Leave the transmitter running on battery power. Keep the receiver plugged into your computer via USB.';
+    document.getElementById('step3PortLabel').textContent = isOne
+      ? 'Find your board\'s serial port'
+      : 'Find the receiver\'s serial port';
+
+    // sidebar labels
+    document.querySelector('#stepList li[data-step="2"] button').lastChild.textContent = ' ' + (isOne ? 'Flash the board' : 'Flash the boards');
+
+    // step 6 relevance note for one-board mode (clicks already built in)
+    const step6Nav = document.querySelector('.panel[data-panel="5"] .panel-sub');
+    if(step6Nav){
+      step6Nav.innerHTML = isOne
+        ? 'Your single_board.py from step 3 already sends clicks — this step is only needed if you skipped that or want to review how it works.'
+        : 'Buttons A and B on the transmitter become your mouse buttons. Two small additions, one on each board.';
+    }
+  }
 
   function updateProgress(){
     const idx = current === 'done' ? steps.length : current;
