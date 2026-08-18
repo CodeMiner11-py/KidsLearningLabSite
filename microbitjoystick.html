@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>micro:bit Joystick — Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" >
+<style>
+  :root{
+    --black:#000000;
+    --white:#ffffff;
+    --gray-900:#1d1d1f;
+    --gray-600:#6e6e73;
+    --gray-400:#86868b;
+    --gray-200:#d2d2d7;
+    --gray-100:#f5f5f7;
+    --gray-050:#fbfbfd;
+    --line:#e5e5e7;
+    --radius:14px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--font);
+    background:var(--white);
+    color:var(--gray-900);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+
+  .material-symbols-rounded{
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align:middle;
+    line-height:1;
+  }
+
+  a{color:inherit;}
+
+  /* ---------- Top progress bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.82);
+    backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:1120px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-weight:600; font-size:15px; letter-spacing:-0.01em;
+  }
+  .brand-mark{
+    width:26px; height:26px; border-radius:7px;
+    background:var(--black);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .brand-mark .material-symbols-rounded{color:var(--white); font-size:16px;}
+  .progress-track{
+    flex:1; max-width:340px; height:3px; background:var(--gray-200);
+    border-radius:2px; margin:0 32px; overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; width:0%; background:var(--black);
+    transition:width .4s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:12px; color:var(--gray-400); font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  /* ---------- Layout ---------- */
+  .shell{
+    max-width:1120px; margin:0 auto;
+    display:grid; grid-template-columns:240px 1fr;
+    gap:56px;
+    padding:48px 28px 120px;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{ position:sticky; top:84px; align-self:start; }
+  .sidebar-title{
+    font-size:11px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-400); margin-bottom:14px;
+  }
+  .steplist{ list-style:none; display:flex; flex-direction:column; gap:2px; }
+  .steplist button{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; gap:10px;
+    width:100%; padding:9px 10px; border-radius:8px;
+    font-size:13.5px; color:var(--gray-600);
+    transition:background .15s, color .15s;
+  }
+  .steplist button:hover{ background:var(--gray-100); color:var(--gray-900); }
+  .steplist li.active button{ background:var(--gray-100); color:var(--black); font-weight:600; }
+  .step-index{
+    width:20px; height:20px; border-radius:50%;
+    border:1.5px solid var(--gray-200);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10.5px; font-weight:600; color:var(--gray-400);
+    flex-shrink:0; transition:all .15s;
+  }
+  .steplist li.active .step-index{ background:var(--black); border-color:var(--black); color:var(--white); }
+  .steplist li.done .step-index{ background:var(--black); border-color:var(--black); color:var(--white); }
+  .steplist li.done .step-index::before{ content:"✓"; }
+  .steplist li.done .step-index-num{ display:none; }
+
+  /* ---------- Main content ---------- */
+  main{ min-width:0; }
+
+  .hero{ padding-bottom:40px; border-bottom:1px solid var(--line); margin-bottom:44px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:600; color:var(--gray-400);
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px;
+  }
+  h1{
+    font-size:44px; font-weight:700; letter-spacing:-0.02em; line-height:1.05;
+    margin-bottom:16px;
+  }
+  .hero p{ font-size:18px; color:var(--gray-600); line-height:1.5; max-width:560px; }
+
+  .hero-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:32px; }
+  .hero-card{
+    border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; display:flex; flex-direction:column; gap:8px;
+  }
+  .hero-card .material-symbols-rounded{ font-size:22px; }
+  .hero-card h3{ font-size:14px; font-weight:600; }
+  .hero-card p{ font-size:12.5px; color:var(--gray-400); line-height:1.4; }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:rise .35s cubic-bezier(.4,0,.2,1); }
+  @keyframes rise{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; }
+  .panel-num{ font-size:13px; font-weight:600; color:var(--gray-400); font-variant-numeric:tabular-nums; }
+  .panel h2{ font-size:28px; font-weight:700; letter-spacing:-0.015em; }
+  .panel-sub{ color:var(--gray-600); font-size:15px; line-height:1.55; margin-bottom:28px; max-width:640px; }
+
+  .section-block{ margin-bottom:28px; }
+  .section-block h4{
+    font-size:13px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--gray-400); margin-bottom:12px;
+  }
+
+  /* checklist */
+  .checklist{ display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .check-row{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px; border-bottom:1px solid var(--line);
+    font-size:14.5px; cursor:pointer; user-select:none;
+  }
+  .check-row:last-child{ border-bottom:none; }
+  .check-box{
+    width:19px; height:19px; border-radius:6px; border:1.5px solid var(--gray-200);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:all .15s;
+  }
+  .check-box .material-symbols-rounded{ font-size:14px; color:var(--white); opacity:0; transition:opacity .1s; }
+  .check-row.checked .check-box{ background:var(--black); border-color:var(--black); }
+  .check-row.checked .check-box .material-symbols-rounded{ opacity:1; }
+  .check-row.checked .check-label{ color:var(--gray-400); text-decoration:line-through; text-decoration-color:var(--gray-200); }
+  .check-meta{ margin-left:auto; font-size:12px; color:var(--gray-400); }
+
+  /* code blocks */
+  .codeblock{
+    background:var(--gray-900); border-radius:var(--radius);
+    overflow:hidden; margin-bottom:4px;
+  }
+  .codeblock-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .codeblock-name{
+    display:flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12.5px; color:var(--gray-200);
+  }
+  .codeblock-name .material-symbols-rounded{ font-size:15px; color:var(--gray-400); }
+  .copy-btn{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; gap:5px;
+    font-size:12px; color:var(--gray-400);
+    padding:5px 9px; border-radius:6px; transition:all .15s;
+  }
+  .copy-btn:hover{ background:rgba(255,255,255,0.08); color:var(--white); }
+  .copy-btn .material-symbols-rounded{ font-size:14px; }
+  pre{
+    padding:18px 20px; overflow-x:auto;
+    font-family:var(--mono); font-size:13px; line-height:1.65; color:#f0f0f2;
+  }
+  code{ font-family:var(--mono); }
+  .tok-kw{color:#ff8a8a;} .tok-str{color:#9be89b;} .tok-com{color:#8a8a8f;} .tok-fn{color:#8ab8ff;}
+
+  .note{
+    display:flex; gap:10px; padding:14px 16px; border-radius:12px;
+    background:var(--gray-100); font-size:13.5px; line-height:1.5; color:var(--gray-600);
+    margin-top:16px;
+  }
+  .note.warn{ background:#1d1d1f; color:var(--gray-100); }
+  .note .material-symbols-rounded{ font-size:18px; flex-shrink:0; margin-top:1px; }
+
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  .kv{ border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .kv-row{ display:flex; padding:12px 16px; border-bottom:1px solid var(--line); font-size:13.5px; }
+  .kv-row:last-child{ border-bottom:none; }
+  .kv-key{ width:150px; flex-shrink:0; color:var(--gray-400); font-family:var(--mono); font-size:12.5px; }
+  .kv-val{ color:var(--gray-900); }
+
+  .platform-tabs{ display:flex; gap:8px; margin-bottom:14px; }
+  .ptab{
+    all:unset; cursor:pointer; padding:8px 14px; border-radius:999px;
+    font-size:13px; font-weight:500; border:1px solid var(--line); color:var(--gray-600);
+  }
+  .ptab.active{ background:var(--black); border-color:var(--black); color:var(--white); }
+
+  /* nav footer */
+  .step-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:44px; padding-top:24px; border-top:1px solid var(--line);
+  }
+  .nav-btn{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+    padding:11px 20px; border-radius:999px; font-size:14px; font-weight:600;
+    transition:opacity .15s;
+  }
+  .nav-btn.primary{ background:var(--black); color:var(--white); }
+  .nav-btn.primary:hover{ opacity:.82; }
+  .nav-btn.ghost{ color:var(--gray-600); }
+  .nav-btn.ghost:hover{ color:var(--black); }
+  .nav-btn:disabled{ opacity:.3; cursor:not-allowed; pointer-events:none; }
+  .nav-btn .material-symbols-rounded{ font-size:18px; }
+
+  /* completion */
+  .done-panel{ text-align:center; padding:60px 0; }
+  .done-icon{
+    width:72px; height:72px; border-radius:50%; background:var(--black);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 24px;
+  }
+  .done-icon .material-symbols-rounded{ color:var(--white); font-size:36px; }
+
+  @media (max-width:820px){
+    .shell{ grid-template-columns:1fr; padding:24px 18px 100px; }
+    .sidebar{ position:static; }
+    .steplist{ flex-direction:row; overflow-x:auto; gap:6px; padding-bottom:8px; }
+    .steplist button{ width:auto; white-space:nowrap; }
+    h1{ font-size:32px; }
+    .hero-cards{ grid-template-columns:1fr; }
+    .grid-2{ grid-template-columns:1fr; }
+    .progress-track{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark"><span class="material-symbols-rounded">sports_esports</span></div>
+      micro:bit Joystick
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">Step 1 of 6</div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-title">Setup</div>
+    <ul class="steplist" id="stepList">
+      <li data-step="0" class="active"><button onclick="goTo(0)"><span class="step-index"><span class="step-index-num">1</span></span> Overview</button></li>
+      <li data-step="1"><button onclick="goTo(1)"><span class="step-index"><span class="step-index-num">2</span></span> Install tools</button></li>
+      <li data-step="2"><button onclick="goTo(2)"><span class="step-index"><span class="step-index-num">3</span></span> Flash the boards</button></li>
+      <li data-step="3"><button onclick="goTo(3)"><span class="step-index"><span class="step-index-num">4</span></span> Connect &amp; run</button></li>
+      <li data-step="4"><button onclick="goTo(4)"><span class="step-index"><span class="step-index-num">5</span></span> Calibrate</button></li>
+      <li data-step="5"><button onclick="goTo(5)"><span class="step-index"><span class="step-index-num">6</span></span> Add clicks</button></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <div class="hero" id="heroBlock">
+      <div class="eyebrow"><span class="material-symbols-rounded" style="font-size:14px;">memory</span> Hardware guide</div>
+      <h1>Turn a micro:bit into a wireless joystick.</h1>
+      <p>Two micro:bits, no soldering, no extra hardware. Tilt one in your hand, and it moves your cursor — wirelessly, over the built-in radio.</p>
+      <div class="hero-cards">
+        <div class="hero-card">
+          <span class="material-symbols-rounded">memory</span>
+          <h3>2× micro:bit</h3>
+          <p>One transmitter, one receiver. Any version with a radio module.</p>
+        </div>
+        <div class="hero-card">
+          <span class="material-symbols-rounded">usb</span>
+          <h3>USB cable</h3>
+          <p>To flash the boards and keep the receiver connected.</p>
+        </div>
+        <div class="hero-card">
+          <span class="material-symbols-rounded">terminal</span>
+          <h3>Python 3</h3>
+          <p>Runs the script that turns serial data into mouse movement.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 0 -->
+    <section class="panel active" data-panel="0">
+      <div class="panel-head"><span class="panel-num">01</span><h2>How it works</h2></div>
+      <p class="panel-sub">Before touching any code, here's the full signal path — three hops from your hand to your cursor.</p>
+
+      <div class="section-block">
+        <h4>Signal path</h4>
+        <div class="kv">
+          <div class="kv-row"><div class="kv-key">1. Sensor</div><div class="kv-val">Transmitter micro:bit reads its accelerometer as you tilt it.</div></div>
+          <div class="kv-row"><div class="kv-key">2. Radio</div><div class="kv-val">Tilt values are sent wirelessly to a second micro:bit, over the built-in 2.4 GHz radio — no pairing, no Bluetooth.</div></div>
+          <div class="kv-row"><div class="kv-key">3. Serial</div><div class="kv-val">Receiver micro:bit stays plugged into your computer and forwards every reading over USB.</div></div>
+          <div class="kv-row"><div class="kv-key">4. Cursor</div><div class="kv-val">A small Python script reads that stream and moves your mouse to match.</div></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="material-symbols-rounded">info</span>
+        <div>The two boards never touch each other or your computer at the same time — only the receiver plugs in. The transmitter runs untethered, on battery or USB power bank.</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" disabled><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="goTo(1)">Start setup <span class="material-symbols-rounded">arrow_forward</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 1: Install tools -->
+    <section class="panel" data-panel="1">
+      <div class="panel-head"><span class="panel-num">02</span><h2>Install the tools</h2></div>
+      <p class="panel-sub">Everything here is free. Check items off as you go — your progress is tracked locally.</p>
+
+      <div class="section-block">
+        <h4>Required software</h4>
+        <div class="checklist" id="toolsChecklist">
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="check-box"><span class="material-symbols-rounded">check</span></div>
+            <span class="check-label">Python 3.9 or newer</span>
+            <span class="check-meta">python.org</span>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="check-box"><span class="material-symbols-rounded">check</span></div>
+            <span class="check-label">Mu Editor (flashes MicroPython to micro:bit)</span>
+            <span class="check-meta">codewith.mu</span>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="check-box"><span class="material-symbols-rounded">check</span></div>
+            <span class="check-label">pyserial + pyautogui packages</span>
+            <span class="check-meta">pip</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h4>Terminal</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">terminal</span> shell</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code>pip install pyserial pyautogui</code></pre>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="material-symbols-rounded">lightbulb</span>
+        <div>Mu Editor is the easiest way to flash MicroPython onto a micro:bit — plug in, paste code, click Flash. MakeCode's browser editor works too if you prefer blocks or JavaScript.</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" onclick="goTo(0)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="goTo(2)">Next: flash the boards <span class="material-symbols-rounded">arrow_forward</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 2: Flash -->
+    <section class="panel" data-panel="2">
+      <div class="panel-head"><span class="panel-num">03</span><h2>Flash both boards</h2></div>
+      <p class="panel-sub">Plug in one micro:bit at a time. In Mu Editor, paste the matching code below, then click <strong>Flash</strong>. Label the boards — it's easy to mix them up later.</p>
+
+      <div class="section-block">
+        <h4><span class="material-symbols-rounded" style="font-size:16px;">pan_tool</span> Board 1 — Transmitter (handheld)</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">description</span> transmitter.py</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code><span class="tok-kw">from</span> microbit <span class="tok-kw">import</span> *
+<span class="tok-kw">import</span> radio
+
+radio.on()
+radio.config(channel=<span class="tok-str">7</span>, power=<span class="tok-str">7</span>)
+
+<span class="tok-kw">while</span> True:
+    x = accelerometer.get_x()
+    y = accelerometer.get_y()
+    z = accelerometer.get_z()
+
+    <span class="tok-com"># Pack as a simple comma-separated string</span>
+    msg = <span class="tok-str">"{},{},{}"</span>.format(x, y, z)
+    radio.send(msg)
+
+    display.show(Image.ARROW_N <span class="tok-kw">if</span> y &lt; -<span class="tok-str">300</span> <span class="tok-kw">else</span> Image.ARROW_S <span class="tok-kw">if</span> y &gt; <span class="tok-str">300</span> <span class="tok-kw">else</span> Image.SQUARE_SMALL)
+    sleep(<span class="tok-str">50</span>)  <span class="tok-com"># ~20Hz update rate</span></code></pre>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h4><span class="material-symbols-rounded" style="font-size:16px;">usb</span> Board 2 — Receiver (stays plugged in)</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">description</span> receiver.py</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code><span class="tok-kw">from</span> microbit <span class="tok-kw">import</span> *
+<span class="tok-kw">import</span> radio
+
+radio.on()
+radio.config(channel=<span class="tok-str">7</span>, power=<span class="tok-str">7</span>)
+
+<span class="tok-kw">while</span> True:
+    msg = radio.receive()
+    <span class="tok-kw">if</span> msg:
+        print(msg)  <span class="tok-com"># goes out over USB serial</span>
+        display.show(Image.YES)
+        sleep(<span class="tok-str">10</span>)
+        display.clear()</code></pre>
+        </div>
+      </div>
+
+      <div class="note warn">
+        <span class="material-symbols-rounded">priority_high</span>
+        <div>Both boards must use the same <code>channel</code> number. If you have neighbors also playing with micro:bits, pick a channel other than the default (0–83 are valid) so you don't cross signals.</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" onclick="goTo(1)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="goTo(3)">Next: connect &amp; run <span class="material-symbols-rounded">arrow_forward</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 3: Connect & run -->
+    <section class="panel" data-panel="3">
+      <div class="panel-head"><span class="panel-num">04</span><h2>Find the port &amp; run the script</h2></div>
+      <p class="panel-sub">Leave the transmitter running on battery power. Keep the receiver plugged into your computer via USB.</p>
+
+      <div class="section-block">
+        <h4>Find the receiver's serial port</h4>
+        <div class="platform-tabs">
+          <button class="ptab active" onclick="setPlatform(this,'mac')">macOS</button>
+          <button class="ptab" onclick="setPlatform(this,'win')">Windows</button>
+          <button class="ptab" onclick="setPlatform(this,'lin')">Linux</button>
+        </div>
+
+        <div class="codeblock" data-platform-block="mac">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">terminal</span> shell</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code>ls /dev/tty.usbmodem*</code></pre>
+        </div>
+        <div class="codeblock" data-platform-block="win" style="display:none;">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">terminal</span> Device Manager</div>
+          </div>
+          <pre><code><span class="tok-com"># Open Device Manager → Ports (COM &amp; LPT)
+# Look for "mbed Serial Port" — note the COM number, e.g. COM5</span></code></pre>
+        </div>
+        <div class="codeblock" data-platform-block="lin" style="display:none;">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">terminal</span> shell</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code>ls /dev/ttyACM*</code></pre>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h4>Mouse control script</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">description</span> joystick_mouse.py</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code><span class="tok-kw">import</span> serial
+<span class="tok-kw">import</span> pyautogui
+
+PORT = <span class="tok-str">"/dev/tty.usbmodem14102"</span>  <span class="tok-com"># update to your receiver's port</span>
+BAUD = <span class="tok-str">115200</span>
+
+ser = serial.Serial(PORT, BAUD, timeout=<span class="tok-str">1</span>)
+pyautogui.FAILSAFE = True  <span class="tok-com"># yank mouse to top-left corner to abort</span>
+
+screen_w, screen_h = pyautogui.size()
+cx, cy = screen_w // <span class="tok-str">2</span>, screen_h // <span class="tok-str">2</span>
+pyautogui.moveTo(cx, cy)
+
+SENSITIVITY = <span class="tok-str">15</span>   <span class="tok-com"># higher = faster cursor movement</span>
+DEADZONE = <span class="tok-str">60</span>       <span class="tok-com"># ignore small jitter around level</span>
+
+print(<span class="tok-str">"Tilt the transmitter to move the mouse. Ctrl+C to stop."</span>)
+
+<span class="tok-kw">while</span> True:
+    line = ser.readline().decode(<span class="tok-str">"utf-8"</span>, errors=<span class="tok-str">"ignore"</span>).strip()
+    <span class="tok-kw">if not</span> line:
+        <span class="tok-kw">continue</span>
+    <span class="tok-kw">try</span>:
+        x, y, z = map(int, line.split(<span class="tok-str">","</span>))
+    <span class="tok-kw">except</span> ValueError:
+        <span class="tok-kw">continue</span>
+
+    dx = <span class="tok-str">0</span> <span class="tok-kw">if</span> abs(x) &lt; DEADZONE <span class="tok-kw">else</span> x
+    dy = <span class="tok-str">0</span> <span class="tok-kw">if</span> abs(y) &lt; DEADZONE <span class="tok-kw">else</span> y
+
+    move_x = (dx / <span class="tok-str">1024</span>) * SENSITIVITY
+    move_y = (dy / <span class="tok-str">1024</span>) * SENSITIVITY
+
+    <span class="tok-kw">if</span> move_x <span class="tok-kw">or</span> move_y:
+        pyautogui.moveRel(move_x, move_y, duration=<span class="tok-str">0</span>)</code></pre>
+        </div>
+      </div>
+
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <div class="codeblock-name"><span class="material-symbols-rounded">terminal</span> shell</div>
+          <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+        </div>
+        <pre><code>python joystick_mouse.py</code></pre>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" onclick="goTo(2)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="goTo(4)">Next: calibrate <span class="material-symbols-rounded">arrow_forward</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 4: Calibrate -->
+    <section class="panel" data-panel="4">
+      <div class="panel-head"><span class="panel-num">05</span><h2>Calibrate the feel</h2></div>
+      <p class="panel-sub">Two numbers control everything. Tune them until the cursor feels natural in your hand.</p>
+
+      <div class="grid-2">
+        <div class="kv">
+          <div class="kv-row"><div class="kv-key">SENSITIVITY</div><div class="kv-val">How far the cursor moves per unit of tilt. Start at 15. Raise for a twitchier cursor, lower for finer control.</div></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><div class="kv-key">DEADZONE</div><div class="kv-val">How much tilt is ignored around level. Raise this if the cursor drifts when the board is resting flat.</div></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="material-symbols-rounded">tune</span>
+        <div>Hold the transmitter the way you actually plan to use it — flat in your palm reads differently than gripped like a remote. Calibrate in that resting position.</div>
+      </div>
+
+      <div class="note warn">
+        <span class="material-symbols-rounded">emergency</span>
+        <div>If the cursor ever runs away from you, slam it into a screen corner — pyautogui's failsafe will kill the script instantly.</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" onclick="goTo(3)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="goTo(5)">Next: add clicks <span class="material-symbols-rounded">arrow_forward</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 5: Clicks -->
+    <section class="panel" data-panel="5">
+      <div class="panel-head"><span class="panel-num">06</span><h2>Add left and right click</h2></div>
+      <p class="panel-sub">Buttons A and B on the transmitter become your mouse buttons. Two small additions, one on each board.</p>
+
+      <div class="section-block">
+        <h4>Add to transmitter.py</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">add</span> append inside the while loop</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code><span class="tok-kw">if</span> button_a.was_pressed():
+    radio.send(<span class="tok-str">"CLICK_L"</span>)
+<span class="tok-kw">if</span> button_b.was_pressed():
+    radio.send(<span class="tok-str">"CLICK_R"</span>)</code></pre>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h4>Add to joystick_mouse.py</h4>
+        <div class="codeblock">
+          <div class="codeblock-head">
+            <div class="codeblock-name"><span class="material-symbols-rounded">add</span> inside the read loop</div>
+            <button class="copy-btn" onclick="copyCode(this)"><span class="material-symbols-rounded">content_copy</span>Copy</button>
+          </div>
+          <pre><code><span class="tok-kw">if</span> line == <span class="tok-str">"CLICK_L"</span>:
+    pyautogui.click()
+<span class="tok-kw">elif</span> line == <span class="tok-str">"CLICK_R"</span>:
+    pyautogui.click(button=<span class="tok-str">"right"</span>)</code></pre>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="nav-btn ghost" onclick="goTo(4)"><span class="material-symbols-rounded">arrow_back</span> Back</button>
+        <button class="nav-btn primary" onclick="finish()">Finish setup <span class="material-symbols-rounded">check</span></button>
+      </div>
+    </section>
+
+    <!-- DONE -->
+    <section class="panel" data-panel="done">
+      <div class="done-panel">
+        <div class="done-icon"><span class="material-symbols-rounded">check</span></div>
+        <h2 style="font-size:26px; margin-bottom:10px;">Your micro:bit is a joystick.</h2>
+        <p style="color:var(--gray-600); max-width:420px; margin:0 auto;">Tilt to move, press A or B to click. Adjust SENSITIVITY and DEADZONE any time to refine the feel.</p>
+        <div class="step-nav" style="justify-content:center; border-top:none; margin-top:32px;">
+          <button class="nav-btn ghost" onclick="goTo(0)"><span class="material-symbols-rounded">refresh</span> Review steps</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const steps = [0,1,2,3,4,5];
+  let current = 0;
+
+  function updateProgress(){
+    const idx = current === 'done' ? steps.length : current;
+    const pct = (idx / steps.length) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent =
+      current === 'done' ? 'Complete' : `Step ${current+1} of ${steps.length}`;
+  }
+
+  function goTo(step){
+    current = step;
+    document.getElementById('heroBlock').style.display = 'none';
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.panel[data-panel="${step}"]`).classList.add('active');
+
+    document.querySelectorAll('#stepList li').forEach(li => {
+      const s = parseInt(li.dataset.step);
+      li.classList.toggle('active', s === step);
+      li.classList.toggle('done', s < step);
+    });
+
+    updateProgress();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function finish(){
+    current = 'done';
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.panel[data-panel="done"]').classList.add('active');
+    document.querySelectorAll('#stepList li').forEach(li => li.classList.add('done'));
+    updateProgress();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function toggleCheck(el){
+    el.classList.toggle('checked');
+  }
+
+  function copyCode(btn){
+    const pre = btn.closest('.codeblock').querySelector('pre code');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-rounded">check</span>Copied';
+      setTimeout(() => { btn.innerHTML = original; }, 1500);
+    });
+  }
+
+  function setPlatform(btn, plat){
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[data-platform-block]').forEach(b => {
+      b.style.display = b.dataset.platformBlock === plat ? '' : 'none';
+    });
+  }
+
+  updateProgress();
+</script>
+
+</body>
+</html>
