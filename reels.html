@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eshaan's Reel Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,-50..200&display=swap');
+  :root{
+    --bg:#ffffff;
+    --panel:#fafafa;
+    --panel-2:#f2f2f3;
+    --line:#e2e2e4;
+    --text:#0a0a0b;
+    --muted:#6b6b70;
+    --accent:#0a0a0b;
+    --accent-2:#3c3c40;
+    --sans:'Google Sans','Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+    --mono:'Google Sans','Segoe UI',-apple-system,sans-serif;
+  }
+  .msymbol{
+    font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;
+    display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;
+    white-space:nowrap;word-wrap:normal;direction:ltr;
+    -webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--text);color:#fff;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:var(--panel);}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;border-bottom:1px solid var(--line);
+    background:#fff;
+    position:sticky;top:0;z-index:50;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--text);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .brand-mark .msymbol{font-size:20px;}
+  .brand-text{font-family:var(--sans);font-weight:700;font-size:16px;letter-spacing:-.2px;color:var(--text);}
+  .brand-text b{font-weight:700;}
+  .brand-sub{font-size:11px;color:var(--muted);letter-spacing:.3px;margin-top:1px;font-weight:400;}
+  .tc{
+    font-family:var(--sans);font-size:13px;color:var(--muted);
+    display:flex;align-items:center;gap:14px;
+  }
+
+  /* ---------- layout ---------- */
+  .shell{
+    display:grid;grid-template-columns:340px 1fr 300px;
+    min-height:calc(100vh - 69px);
+  }
+  @media (max-width:1100px){
+    .shell{grid-template-columns:1fr;}
+    .col-source, .col-assets{border:none;}
+  }
+  .col{padding:22px;border-right:1px solid var(--line);}
+  .col:last-child{border-right:none;}
+  .col-title{
+    font-family:var(--sans);font-size:12px;letter-spacing:.4px;
+    text-transform:uppercase;color:var(--muted);margin-bottom:16px;
+    display:flex;align-items:center;gap:8px;font-weight:700;
+  }
+  .col-title .idx{color:var(--text);}
+
+  /* ---------- source panel ---------- */
+  .seg-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--panel-2);padding:4px;border-radius:10px;}
+  .seg-tab{
+    flex:1;text-align:center;padding:8px 6px;font-size:12px;font-weight:500;
+    border-radius:7px;cursor:pointer;color:var(--muted);transition:.15s;
+  }
+  .seg-tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:700;}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:12px;color:var(--muted);margin-bottom:6px;
+    font-family:var(--sans);font-weight:500;
+  }
+  input[type=text], input[type=url], input[type=password], textarea, select{
+    width:100%;background:#fff;border:1px solid var(--line);
+    color:var(--text);padding:10px 12px;border-radius:9px;font-size:13px;
+    font-family:var(--sans);outline:none;transition:.15s;
+  }
+  input:focus, textarea:focus, select:focus{border-color:var(--text);}
+  textarea{resize:vertical;min-height:70px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    background:var(--text);color:#fff;border:none;padding:11px 16px;
+    border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;
+    transition:.15s;width:100%;font-family:var(--sans);
+  }
+  .btn:hover{background:var(--accent-2);transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);}
+  .btn-ghost{
+    background:transparent;color:var(--text);border:1px solid var(--line);
+    font-weight:600;
+  }
+  .btn-ghost:hover{border-color:var(--text);background:var(--panel);}
+  .btn-tape{background:var(--text);color:#fff;}
+  .btn-row{display:flex;gap:8px;}
+  .btn-row .btn{width:auto;flex:1;}
+
+  .episode-list{margin-top:14px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;}
+  .ep-card{
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;cursor:pointer;transition:.15s;
+  }
+  .ep-card:hover{border-color:#b5b5b8;}
+  .ep-card.sel{border-color:var(--text);background:var(--panel);}
+  .ep-card .t{font-size:12.5px;font-weight:700;line-height:1.35;margin-bottom:4px;}
+  .ep-card .d{font-size:11px;color:var(--muted);}
+  .hint{font-size:11px;color:var(--muted);line-height:1.55;margin-top:6px;}
+  .hint code{font-family:var(--mono);color:var(--text);background:var(--panel-2);padding:1px 5px;border-radius:4px;}
+
+  /* ---------- center preview ---------- */
+  .col-center{display:flex;flex-direction:column;align-items:center;padding:28px 20px;}
+  .reel-stage{
+    width:270px;height:480px;border-radius:24px;
+    background:#000;position:relative;overflow:hidden;
+    border:1px solid var(--line);box-shadow:0 30px 60px -25px rgba(0,0,0,.35);
+  }
+  .reel-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:grayscale(.15) contrast(1.05);transition:background-image .3s;}
+  .reel-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,0) 55%,rgba(0,0,0,.8) 100%);}
+  .reel-cap{
+    position:absolute;left:16px;right:16px;bottom:78px;
+    font-family:var(--sans);font-weight:700;font-size:19px;line-height:1.3;
+    color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5);
+  }
+  .reel-cap .hl{background:#fff;color:#0a0a0b;padding:0 5px;border-radius:4px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .reel-wave{
+    position:absolute;left:16px;right:16px;bottom:46px;height:22px;
+    display:flex;align-items:flex-end;gap:2px;
+  }
+  .reel-wave i{
+    flex:1;background:#fff;border-radius:2px;opacity:.75;
+    animation:wv 1.1s ease-in-out infinite;
+  }
+  @keyframes wv{0%,100%{transform:scaleY(.3);}50%{transform:scaleY(1);}}
+  .reel-brandline{
+    position:absolute;left:16px;bottom:18px;display:flex;align-items:center;gap:6px;
+  }
+  .reel-brandline span{font-family:var(--sans);font-size:10.5px;color:rgba(255,255,255,.8);letter-spacing:.3px;font-weight:500;}
+  .stage-meta{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:14px;text-align:center;}
+  .timeline{
+    width:270px;margin-top:16px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:10px;
+  }
+  .timeline-track{height:34px;border-radius:7px;background:var(--panel-2);position:relative;overflow:hidden;display:flex;}
+  .clip{
+    height:100%;border-right:1px solid #fff;cursor:pointer;position:relative;
+    background:#dcdce0;
+  }
+  .clip.active{background:var(--text);}
+  .clip:hover{filter:brightness(1.08);}
+  .timeline-labels{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--sans);font-size:10.5px;color:var(--muted);}
+  .center-actions{width:270px;margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+
+  /* ---------- asset / customize panel ---------- */
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .swatch{
+    width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid var(--line);
+    position:relative;transition:.15s;
+  }
+  .swatch.sel{border-color:var(--text);box-shadow:0 0 0 2px #fff, 0 0 0 3px var(--text);transform:scale(1.05);}
+  .preset-row{display:flex;gap:8px;margin-bottom:16px;}
+  .preset{
+    flex:1;padding:9px 4px;border:1px solid var(--line);border-radius:8px;text-align:center;
+    cursor:pointer;font-size:11px;font-family:var(--sans);color:var(--muted);font-weight:600;
+  }
+  .preset:hover{border-color:var(--text);color:var(--text);}
+  .preset.sel{border-color:var(--text);color:#fff;background:var(--text);}
+
+  .stock-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .stock-thumb{
+    aspect-ratio:1;border-radius:9px;overflow:hidden;cursor:pointer;position:relative;
+    border:2px solid transparent;background:var(--panel) center/cover;
+  }
+  .stock-thumb.sel{border-color:var(--text);}
+  .stock-thumb .badge{
+    position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.6);color:#fff;
+    font-family:var(--sans);font-size:8.5px;padding:1px 5px;border-radius:4px;
+  }
+  .stock-thumb .ai-pick{
+    position:absolute;top:3px;right:3px;background:#fff;color:#0a0a0b;
+    font-family:var(--sans);font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;
+  }
+  .kw-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .kw-chip{
+    font-family:var(--sans);font-size:11px;color:var(--text);background:var(--panel-2);
+    border:1px solid var(--line);padding:4px 9px;border-radius:20px;cursor:pointer;font-weight:500;
+  }
+  .kw-chip.sel{background:var(--text);color:#fff;border-color:var(--text);}
+
+  .divider{height:1px;background:var(--line);margin:18px 0;}
+
+  /* ---------- AI chat drawer ---------- */
+  .ai-fab{
+    position:fixed;bottom:22px;right:22px;z-index:80;
+    background:var(--text);color:#fff;border:none;border-radius:50px;
+    padding:13px 20px;display:flex;align-items:center;gap:9px;
+    font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 12px 30px -8px rgba(0,0,0,.35);
+    transition:.15s;font-family:var(--sans);
+  }
+  .ai-fab:hover{transform:translateY(-2px);background:var(--accent-2);}
+
+  .ai-drawer{
+    position:fixed;bottom:0;right:0;width:390px;max-width:100vw;height:0;
+    background:#fff;border-top-left-radius:18px;border:1px solid var(--line);
+    box-shadow:0 -10px 50px -10px rgba(0,0,0,.2);z-index:90;
+    display:flex;flex-direction:column;overflow:hidden;transition:height .28s ease;
+  }
+  .ai-drawer.open{height:min(560px,80vh);}
+  .ai-head{
+    padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;background:var(--panel);flex-shrink:0;
+  }
+  .ai-head .h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;font-family:var(--sans);}
+  .ai-head button{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;}
+  .ai-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:88%;padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.5;font-family:var(--sans);}
+  .msg.user{align-self:flex-end;background:var(--text);color:#fff;font-weight:500;border-bottom-right-radius:3px;}
+  .msg.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:3px;}
+  .msg.sys{align-self:center;font-family:var(--sans);font-size:10.5px;color:var(--muted);}
+  .ai-suggest{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px;flex-shrink:0;}
+  .ai-suggest button{
+    font-size:10.5px;font-family:var(--sans);background:var(--panel);color:var(--muted);
+    border:1px solid var(--line);padding:5px 9px;border-radius:20px;cursor:pointer;font-weight:500;
+  }
+  .ai-suggest button:hover{color:var(--text);border-color:var(--text);}
+  .ai-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);flex-shrink:0;}
+  .ai-input-row input{flex:1;}
+  .ai-send{
+    background:var(--text);border:none;border-radius:8px;width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#fff;font-weight:700;
+  }
+
+  /* ---------- config modal (keys) ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;
+    display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal{
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    width:420px;max-width:92vw;padding:24px;box-shadow:0 30px 60px -15px rgba(0,0,0,.3);
+  }
+  .modal h3{font-size:16px;margin-bottom:4px;font-weight:700;}
+  .modal .sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+  .modal .field label{display:flex;justify-content:space-between;}
+  .modal .field .badge-req{font-family:var(--sans);font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+  .key-hint{
+    font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;color:var(--muted);background:var(--panel);
+    border:1px dashed var(--line);padding:9px 11px;border-radius:9px;margin-top:6px;line-height:1.6;
+  }
+  .modal-actions{display:flex;gap:8px;margin-top:18px;}
+
+  /* ---------- footer / attributions ---------- */
+  .footer{
+    border-top:1px solid var(--line);padding:30px 24px 44px;background:var(--panel);
+  }
+  .footer-inner{max-width:900px;margin:0 auto;}
+  .footer h4{font-family:var(--sans);font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:700;}
+  .attr-list{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);}
+  .attr-list a{color:var(--text);text-decoration:none;font-weight:500;}
+  .attr-list a:hover{text-decoration:underline;}
+  .footer-note{margin-top:16px;font-size:11.5px;color:var(--muted);line-height:1.65;}
+
+  .toast{
+    position:fixed;top:84px;left:50%;transform:translateX(-50%) translateY(-10px);
+    background:var(--text);color:#fff;
+    font-family:var(--sans);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:9px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:200;box-shadow:0 10px 30px -8px rgba(0,0,0,.3);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .empty-state{
+    text-align:center;padding:30px 10px;color:var(--muted);font-size:12px;font-family:var(--sans);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== TOPBAR ============== -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark"><span class="msymbol">mic</span></div>
+    <div>
+      <div class="brand-text">Eshaan's <b>Reel</b> Generator</div>
+      <div class="brand-sub">Podcast &amp; video → vertical reel</div>
+    </div>
+  </div>
+  <div class="tc">
+    <button class="btn-ghost btn" style="width:auto;padding:9px 16px;" onclick="openConfig()">Setup keys</button>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- ============== LEFT: SOURCE ============== -->
+  <div class="col col-source">
+    <div class="col-title"><span class="idx">01</span> Source</div>
+
+    <div class="seg-tabs">
+      <div class="seg-tab active" data-tab="rss" onclick="switchTab('rss')">RSS URL</div>
+      <div class="seg-tab" data-tab="rsspaste" onclick="switchTab('rsspaste')">Paste RSS</div>
+      <div class="seg-tab" data-tab="search" onclick="switchTab('search')">Search</div>
+      <div class="seg-tab" data-tab="upload" onclick="switchTab('upload')">Upload</div>
+    </div>
+
+    <!-- RSS pane -->
+    <div id="pane-rss">
+      <div class="field">
+        <label>Podcast / show RSS URL</label>
+        <input type="url" id="rssUrl" placeholder="https://feeds.example.com/show.xml">
+      </div>
+      <button class="btn" onclick="loadRss()">Fetch episodes</button>
+      <div class="hint">Pulled client-side via a CORS proxy, then parsed as XML. Paste any public podcast RSS URL.</div>
+      <div class="episode-list" id="rssList"></div>
+    </div>
+
+    <!-- Paste raw RSS/XML pane -->
+    <div id="pane-rsspaste" style="display:none;">
+      <div class="field">
+        <label>Paste full RSS / XML feed contents</label>
+        <textarea id="rssPasteBox" style="min-height:160px;font-family:var(--mono);font-size:11px;" placeholder="&lt;?xml version=&quot;1.0&quot;?&gt;&#10;&lt;rss&gt;&lt;channel&gt;&lt;item&gt;…&lt;/item&gt;&lt;/channel&gt;&lt;/rss&gt;"></textarea>
+      </div>
+      <button class="btn" onclick="parsePastedRss()">Parse feed</button>
+      <div class="hint">No network request — parses the XML you paste directly in-browser. Useful when a feed blocks the CORS proxy or you already have the file locally.</div>
+      <div class="episode-list" id="rssPasteList"></div>
+    </div>
+
+    <!-- Search pane -->
+    <div id="pane-search" style="display:none;">
+      <div class="field">
+        <label>Search topic or episode name</label>
+        <input type="text" id="searchQuery" placeholder="e.g. founder burnout, AI safety…">
+      </div>
+      <button class="btn" onclick="searchEpisodes()">Search podcasts</button>
+      <div class="hint">Uses the iTunes Search API (no key required) to find matching shows/episodes.</div>
+      <div class="episode-list" id="searchList"></div>
+    </div>
+
+    <!-- Upload pane -->
+    <div id="pane-upload" style="display:none;">
+      <div class="field">
+        <label>Audio or video file</label>
+        <input type="file" id="fileInput" accept="audio/*,video/*" onchange="handleUpload(event)">
+      </div>
+      <div class="field">
+        <label>Paste transcript / show notes (optional, improves AI captions)</label>
+        <textarea id="transcriptBox" placeholder="Paste transcript or description text here…"></textarea>
+      </div>
+      <button class="btn" onclick="useManualEntry()">Use this source</button>
+      <div class="hint">Local file stays in your browser — nothing is uploaded anywhere.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="col-title"><span class="idx">02</span> Clip selection</div>
+    <div class="field">
+      <label>Selected episode</label>
+      <input type="text" id="selectedEpTitle" readonly placeholder="No episode selected yet">
+    </div>
+    <div class="field">
+      <label>Clip start</label>
+      <input type="text" id="clipStart" placeholder="00:04:12" value="00:00:00">
+    </div>
+    <div class="field">
+      <label>Clip length</label>
+      <select id="clipLen">
+        <option>15s</option>
+        <option selected>30s</option>
+        <option>45s</option>
+        <option>60s</option>
+        <option>90s</option>
+      </select>
+    </div>
+    <button class="btn btn-tape" onclick="generateReel()">▶ Generate reel</button>
+  </div>
+
+  <!-- ============== CENTER: PREVIEW ============== -->
+  <div class="col col-center">
+    <div class="col-title"><span class="idx">03</span> Reel preview — 9:16</div>
+
+    <div class="reel-stage" id="reelStage">
+      <div class="reel-bg" id="reelBg" style="background-image:url('https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=60');"></div>
+      <div class="reel-scrim"></div>
+      <div class="reel-cap" id="reelCaption">Drop in an episode and hit <span class="hl">Generate</span> to cut your first reel.</div>
+      <div class="reel-wave" id="reelWave"></div>
+      <div class="reel-brandline"><span id="reelBrandline">EPISODE 00 · 00:00</span></div>
+    </div>
+
+    <div class="stage-meta" id="stageMeta">1080×1920 · no clip loaded</div>
+
+    <div class="timeline">
+      <div class="timeline-track" id="timelineTrack"></div>
+      <div class="timeline-labels"><span>0:00</span><span id="tlEnd">0:30</span></div>
+    </div>
+
+    <div class="center-actions">
+      <button class="btn-ghost btn" onclick="regenCaptions()">↻ Regenerate captions (AI)</button>
+      <button class="btn-ghost btn" onclick="exportReel()">⬇ Export reel spec (.json)</button>
+    </div>
+  </div>
+
+  <!-- ============== RIGHT: STYLE / ASSETS ============== -->
+  <div class="col col-assets">
+    <div class="col-title"><span class="idx">04</span> Look &amp; feel</div>
+
+    <div class="field">
+      <label>Accent color</label>
+      <div class="swatches" id="accentSwatches">
+        <div class="swatch sel" style="background:#0a0a0b" data-c="#0a0a0b" onclick="setAccent(this,'#0a0a0b')"></div>
+        <div class="swatch" style="background:#3c3c40" data-c="#3c3c40" onclick="setAccent(this,'#3c3c40')"></div>
+        <div class="swatch" style="background:#6b6b70" data-c="#6b6b70" onclick="setAccent(this,'#6b6b70')"></div>
+        <div class="swatch" style="background:#9c9ca2" data-c="#9c9ca2" onclick="setAccent(this,'#9c9ca2')"></div>
+        <div class="swatch" style="background:#ffffff;border:2px solid #d0d0d3;" data-c="#ffffff" onclick="setAccent(this,'#ffffff')"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Caption style</label>
+      <div class="preset-row">
+        <div class="preset sel" data-p="bold" onclick="setPreset(this,'bold')">BOLD</div>
+        <div class="preset" data-p="mono" onclick="setPreset(this,'mono')">TYPED</div>
+        <div class="preset" data-p="clean" onclick="setPreset(this,'clean')">CLEAN</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Watermark line (shown bottom-left, no logo)</label>
+      <input type="text" id="watermarkText" value="EPISODE 00 · 00:00" oninput="updateBrandline()">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="col-title"><span class="idx">05</span> Stock visuals <span style="color:var(--muted);font-weight:400;">(Pexels)</span></div>
+    <div class="field">
+      <label>AI-suggested keywords</label>
+      <div class="kw-chip-row" id="kwRow">
+        <span class="hint">Generate a reel first — the AI agent will propose search terms here.</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Or search manually</label>
+      <div class="btn-row">
+        <input type="text" id="stockQuery" placeholder="e.g. late night studio">
+        <button class="btn" style="width:auto;padding:10px 14px;" onclick="searchStock()">Go</button>
+      </div>
+    </div>
+    <div class="stock-grid" id="stockGrid">
+      <div class="empty-state" style="grid-column:1/-1;">No images yet — search above or let the AI agent pick.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============== AI AGENT FAB + DRAWER ============== -->
+<button class="ai-fab" onclick="toggleDrawer()">AI Agent — edit this reel</button>
+
+<div class="ai-drawer" id="aiDrawer">
+  <div class="ai-head">
+    <div class="h">Reel Agent</div>
+    <button onclick="toggleDrawer()">✕</button>
+  </div>
+  <div class="ai-body" id="aiBody">
+    <div class="msg sys">Connected to your Groq worker · gpt-oss-120b</div>
+    <div class="msg ai">Hey — I'm wired into every part of this reel. Ask me to rewrite captions, change colors, pick new stock footage, retime the clip, or restyle the whole thing. What do you want to change?</div>
+  </div>
+  <div class="ai-suggest">
+    <button onclick="quickPrompt('Make the captions punchier and shorter')">Punchier captions</button>
+    <button onclick="quickPrompt('Switch the accent color to something warmer')">Warmer accent</button>
+    <button onclick="quickPrompt('Find better stock photos for this topic')">Better visuals</button>
+    <button onclick="quickPrompt('Make the watermark line more minimal')">Minimal watermark</button>
+  </div>
+  <div class="ai-input-row">
+    <input type="text" id="aiInput" placeholder="Tell the agent what to change…" onkeydown="if(event.key==='Enter')sendToAgent()">
+    <button class="ai-send" onclick="sendToAgent()">→</button>
+  </div>
+</div>
+
+<!-- ============== CONFIG MODAL ============== -->
+<div class="modal-backdrop" id="configModal">
+  <div class="modal">
+    <h3>Connect your services</h3>
+    <div class="sub">Keys stay in this browser only (localStorage) — never sent anywhere except directly to each API.</div>
+
+    <div class="field">
+      <label>Groq / AI worker URL <span class="badge-req">required for AI agent</span></label>
+      <input type="url" id="cfgWorkerUrl" placeholder="https://textonlygroqfast.nameless-cherry-998c.workers.dev/">
+    </div>
+
+    <div class="field">
+      <label>Pexels API key <span class="badge-req">required for stock visuals</span></label>
+      <input type="text" id="cfgPexelsKey" placeholder="MY_PEXELS_KEY">
+      <div class="key-hint">
+        // PEXELS KEY PLACEHOLDER — "MY_PEXELS_KEY"<br>
+        // Wire up your own key-provisioning service here:<br>
+        // replace loadKeys()/saveKeys() below to fetch the<br>
+        // real key from your backend instead of localStorage,<br>
+        // or auto-fill this field on load.
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ghost btn" onclick="closeConfig()">Cancel</button>
+      <button class="btn" onclick="saveConfig()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============== FOOTER / ATTRIBUTIONS ============== -->
+<div class="footer">
+  <div class="footer-inner">
+    <h4>Photo &amp; video attribution</h4>
+    <div class="attr-list" id="attrList">
+      <div>No stock assets used in this session yet — attributions will populate automatically as you add images from Pexels.</div>
+    </div>
+    <div class="footer-note">
+      Stock photos and videos are served live from the <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels API</a> under the
+      <a href="https://www.pexels.com/license/" target="_blank" rel="noopener">Pexels License</a> (free for commercial use, attribution appreciated but not required).
+      Podcast episode data is fetched from the RSS feed you provide or via the public <a href="https://performance-partners.apple.com/search-api" target="_blank" rel="noopener">iTunes Search API</a>.
+      This tool adds no third-party branding or watermarks of its own — the on-reel watermark line is fully editable text you control.
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Eshaan's Reel Generator — app logic
+   Single-file, no build step. All state lives in JS memory.
+   ========================================================= */
+
+const state = {
+  accent: '#0a0a0b',
+  preset: 'bold',
+  episodes: [],
+  selectedEpisode: null,
+  transcript: '',
+  clipStartSec: 0,
+  clipLenSec: 30,
+  usedAssets: [],   // {photographer, url, thumb}
+  keywords: [],
+  chatHistory: []
+};
+
+/* ---------- keys / config ---------- */
+function loadKeys(){
+  return {
+    workerUrl: localStorage.getItem('erg_worker_url') || 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/',
+    pexelsKey: localStorage.getItem('erg_pexels_key') || 'MY_PEXELS_KEY' // <-- placeholder, see config modal
+  };
+}
+function saveKeys(workerUrl, pexelsKey){
+  localStorage.setItem('erg_worker_url', workerUrl);
+  localStorage.setItem('erg_pexels_key', pexelsKey);
+}
+function openConfig(){
+  const k = loadKeys();
+  document.getElementById('cfgWorkerUrl').value = k.workerUrl;
+  document.getElementById('cfgPexelsKey').value = (k.pexelsKey === 'MY_PEXELS_KEY' ? '' : k.pexelsKey);
+  document.getElementById('configModal').classList.add('open');
+}
+function closeConfig(){ document.getElementById('configModal').classList.remove('open'); }
+function saveConfig(){
+  const w = document.getElementById('cfgWorkerUrl').value.trim() || 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/';
+  const p = document.getElementById('cfgPexelsKey').value.trim() || 'MY_PEXELS_KEY';
+  saveKeys(w, p);
+  closeConfig();
+  showToast('Settings saved');
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------- tabs ---------- */
+function switchTab(tab){
+  document.querySelectorAll('.seg-tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===tab));
+  document.getElementById('pane-rss').style.display      = tab==='rss' ? 'block':'none';
+  document.getElementById('pane-rsspaste').style.display = tab==='rsspaste' ? 'block':'none';
+  document.getElementById('pane-search').style.display   = tab==='search' ? 'block':'none';
+  document.getElementById('pane-upload').style.display   = tab==='upload' ? 'block':'none';
+}
+
+/* ---------- RSS parsing (shared) ---------- */
+function parseRssXmlText(text){
+  const xml = new DOMParser().parseFromString(text, 'application/xml');
+  const errNode = xml.querySelector('parsererror');
+  if(errNode) return null;
+  const items = Array.from(xml.querySelectorAll('item')).slice(0, 30);
+  return items.map(it => ({
+    title: it.querySelector('title')?.textContent?.trim() || 'Untitled episode',
+    desc: (it.querySelector('description')?.textContent || it.getElementsByTagName('itunes\\:summary')[0]?.textContent || '').replace(/<[^>]+>/g,'').trim().slice(0,400),
+    audioUrl: it.querySelector('enclosure')?.getAttribute('url') || ''
+  }));
+}
+
+/* ---------- RSS fetching (by URL) ---------- */
+async function loadRss(){
+  const url = document.getElementById('rssUrl').value.trim();
+  if(!url){ showToast('Paste an RSS URL first'); return; }
+  const list = document.getElementById('rssList');
+  list.innerHTML = '<div class="empty-state">Fetching feed…</div>';
+  try{
+    // public CORS proxy so this works from a static HTML file
+    const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const res = await fetch(proxied);
+    const text = await res.text();
+    const episodes = parseRssXmlText(text);
+    if(!episodes || episodes.length === 0){ list.innerHTML = '<div class="empty-state">No episodes found in that feed.</div>'; return; }
+    state.episodes = episodes;
+    renderEpisodeList('rssList', state.episodes);
+  }catch(err){
+    list.innerHTML = '<div class="empty-state">Could not fetch that feed. Check the URL, or paste the raw feed in the "Paste RSS" tab instead.</div>';
+  }
+}
+
+/* ---------- RSS parsing (pasted raw XML) ---------- */
+function parsePastedRss(){
+  const raw = document.getElementById('rssPasteBox').value.trim();
+  const list = document.getElementById('rssPasteList');
+  if(!raw){ showToast('Paste some feed XML first'); return; }
+  const episodes = parseRssXmlText(raw);
+  if(!episodes){
+    list.innerHTML = '<div class="empty-state">That doesn\'t look like valid XML — check for a stray tag or truncated paste.</div>';
+    return;
+  }
+  if(episodes.length === 0){
+    list.innerHTML = '<div class="empty-state">Valid XML, but no &lt;item&gt; entries found.</div>';
+    return;
+  }
+  state.episodes = episodes;
+  renderEpisodeList('rssPasteList', state.episodes);
+  showToast(`Parsed ${episodes.length} episode(s)`);
+}
+
+/* ---------- iTunes search ---------- */
+async function searchEpisodes(){
+  const q = document.getElementById('searchQuery').value.trim();
+  if(!q){ showToast('Type something to search'); return; }
+  const list = document.getElementById('searchList');
+  list.innerHTML = '<div class="empty-state">Searching…</div>';
+  try{
+    const res = await fetch('https://itunes.apple.com/search?media=podcast&entity=podcastEpisode&limit=15&term=' + encodeURIComponent(q));
+    const data = await res.json();
+    const results = (data.results || []).filter(r => r.trackName);
+    if(results.length === 0){ list.innerHTML = '<div class="empty-state">No results. Try a different search.</div>'; return; }
+    state.episodes = results.map(r => ({
+      title: r.trackName,
+      desc: r.collectionName || r.artistName || '',
+      audioUrl: r.episodeUrl || ''
+    }));
+    renderEpisodeList('searchList', state.episodes);
+  }catch(err){
+    list.innerHTML = '<div class="empty-state">Search failed — try again in a moment.</div>';
+  }
+}
+
+function renderEpisodeList(containerId, episodes){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  episodes.forEach((ep, i) => {
+    const card = document.createElement('div');
+    card.className = 'ep-card';
+    card.innerHTML = `<div class="t">${escapeHtml(ep.title)}</div><div class="d">${escapeHtml((ep.desc||'').slice(0,90))}${ep.desc && ep.desc.length>90?'…':''}</div>`;
+    card.onclick = () => selectEpisode(i, episodes, containerId);
+    el.appendChild(card);
+  });
+}
+
+function selectEpisode(i, episodes, containerId){
+  document.querySelectorAll(`#${containerId} .ep-card`).forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll(`#${containerId} .ep-card`)[i].classList.add('sel');
+  state.selectedEpisode = episodes[i];
+  state.transcript = episodes[i].desc || '';
+  document.getElementById('selectedEpTitle').value = episodes[i].title;
+  showToast('Episode selected');
+}
+
+/* ---------- manual upload ---------- */
+function handleUpload(e){
+  const f = e.target.files[0];
+  if(f){ showToast('Loaded: ' + f.name); }
+}
+function useManualEntry(){
+  const f = document.getElementById('fileInput').files[0];
+  const t = document.getElementById('transcriptBox').value.trim();
+  state.selectedEpisode = { title: f ? f.name : 'Manual entry', desc: t };
+  state.transcript = t;
+  document.getElementById('selectedEpTitle').value = state.selectedEpisode.title;
+  showToast('Source set');
+}
+
+/* ---------- style controls ---------- */
+function setAccent(el, color){
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+  state.accent = color;
+  document.documentElement.style.setProperty('--accent', color);
+  applyAccentToStage();
+  showToast('Accent updated');
+}
+function applyAccentToStage(){
+  const isLight = state.accent.toLowerCase() === '#ffffff';
+  document.querySelectorAll('.reel-cap .hl').forEach(hl=>{
+    hl.style.background = state.accent;
+    hl.style.color = isLight ? '#0a0a0b' : '#fff';
+    if(isLight) hl.style.border = '1px solid #d0d0d3';
+  });
+}
+function setPreset(el, p){
+  document.querySelectorAll('.preset').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+  state.preset = p;
+  applyCaptionStyle();
+}
+function applyCaptionStyle(){
+  const cap = document.getElementById('reelCaption');
+  cap.style.fontFamily = state.preset === 'mono' ? "'IBM Plex Mono',monospace" : "var(--sans)";
+  cap.style.fontWeight = state.preset === 'clean' ? '600' : '800';
+  cap.style.textTransform = state.preset === 'mono' ? 'none' : 'none';
+}
+function updateBrandline(){
+  document.getElementById('reelBrandline').textContent = document.getElementById('watermarkText').value || '';
+}
+
+/* ---------- waveform bars ---------- */
+function buildWaveform(){
+  const wave = document.getElementById('reelWave');
+  wave.innerHTML = '';
+  for(let i=0;i<28;i++){
+    const bar = document.createElement('i');
+    bar.style.animationDelay = (Math.random()*1).toFixed(2)+'s';
+    bar.style.height = (30+Math.random()*70)+'%';
+    wave.appendChild(bar);
+  }
+}
+buildWaveform();
+
+/* ---------- timeline ---------- */
+function buildTimeline(lenSec){
+  const track = document.getElementById('timelineTrack');
+  track.innerHTML = '';
+  const n = 10;
+  for(let i=0;i<n;i++){
+    const c = document.createElement('div');
+    c.className = 'clip' + (i===0 ? ' active':'');
+    c.style.width = (100/n)+'%';
+    c.onclick = () => {
+      document.querySelectorAll('.clip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+    };
+    track.appendChild(c);
+  }
+  document.getElementById('tlEnd').textContent = formatTime(lenSec);
+}
+function formatTime(s){
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m+':'+String(sec).padStart(2,'0');
+}
+
+/* ---------- generate reel (core flow) ---------- */
+async function generateReel(){
+  if(!state.selectedEpisode){
+    showToast('Select or paste an episode first');
+    return;
+  }
+  const lenMap = {'15s':15,'30s':30,'45s':45,'60s':60,'90s':90};
+  state.clipLenSec = lenMap[document.getElementById('clipLen').value] || 30;
+  buildTimeline(state.clipLenSec);
+  document.getElementById('stageMeta').textContent = `1080×1920 · ${state.clipLenSec}s clip · "${state.selectedEpisode.title}"`;
+
+  const wmLabel = (state.selectedEpisode.title || 'EPISODE').toUpperCase().slice(0,28) + ' · ' + document.getElementById('clipStart').value;
+  document.getElementById('watermarkText').value = wmLabel;
+  updateBrandline();
+
+  document.getElementById('reelCaption').textContent = 'Cutting your reel…';
+
+  // 1. Ask the AI worker for a caption + image keywords in one shot
+  const prompt = buildCaptionPrompt(state.selectedEpisode, state.clipLenSec);
+  const aiText = await callWorker(prompt);
+  const parsed = parseAiJson(aiText);
+
+  if(parsed){
+    renderCaption(parsed.caption || state.selectedEpisode.title);
+    state.keywords = parsed.keywords || [];
+    renderKeywordChips(state.keywords);
+    if(state.keywords.length){
+      await searchStockFor(state.keywords[0], true);
+    }
+  } else {
+    renderCaption(state.selectedEpisode.title);
+    showToast('AI worker unreachable — using fallback caption');
+  }
+
+  logAgent(`Generated a ${state.clipLenSec}s reel from "${state.selectedEpisode.title}". Ask me to tweak captions, colors, or visuals anytime.`);
+}
+
+function buildCaptionPrompt(ep, len){
+  return `You are a short-form video editor. Given this podcast episode info, respond with ONLY strict JSON (no markdown fences, no prose) in this exact shape:
+{"caption": "a punchy 1-2 sentence vertical-video caption, max 140 chars, using **word** around 1-3 words to highlight (I will convert ** to a highlight style)", "keywords": ["3 to 5 short stock-photo/video search phrases (2-4 words each) that visually match this episode's topic and mood"]}
+
+Episode title: ${ep.title}
+Episode description: ${(ep.desc || state.transcript || '').slice(0,600)}
+Clip length: ${len} seconds`;
+}
+
+function renderCaption(text){
+  // convert **word** to highlight span
+  const html = escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<span class="hl">$1</span>');
+  document.getElementById('reelCaption').innerHTML = html;
+  applyCaptionStyle();
+  applyAccentToStage();
+}
+
+function renderKeywordChips(keywords){
+  const row = document.getElementById('kwRow');
+  row.innerHTML = '';
+  if(!keywords.length){
+    row.innerHTML = '<span class="hint">No keywords generated.</span>';
+    return;
+  }
+  keywords.forEach((kw,i)=>{
+    const chip = document.createElement('span');
+    chip.className = 'kw-chip' + (i===0?' sel':'');
+    chip.textContent = kw;
+    chip.onclick = () => {
+      document.querySelectorAll('.kw-chip').forEach(c=>c.classList.remove('sel'));
+      chip.classList.add('sel');
+      searchStockFor(kw, true);
+    };
+    row.appendChild(chip);
+  });
+}
+
+function regenCaptions(){
+  if(!state.selectedEpisode){ showToast('Generate a reel first'); return; }
+  generateReel();
+}
+
+/* ---------- AI worker call ---------- */
+async function callWorker(prompt){
+  const { workerUrl } = loadKeys();
+  try{
+    const res = await fetch(workerUrl + (workerUrl.includes('?')?'&':'?') + 'prompt=' + encodeURIComponent(prompt));
+    const data = await res.json();
+    return data.response || '';
+  }catch(err){
+    return null;
+  }
+}
+function parseAiJson(text){
+  if(!text) return null;
+  try{
+    const match = text.match(/\{[\s\S]*\}/);
+    if(!match) return null;
+    return JSON.parse(match[0]);
+  }catch(e){ return null; }
+}
+
+/* ---------- Pexels stock search ---------- */
+async function searchStock(){
+  const q = document.getElementById('stockQuery').value.trim();
+  if(!q){ showToast('Type a search term'); return; }
+  searchStockFor(q, false);
+}
+
+async function searchStockFor(query, aiPicked){
+  const { pexelsKey } = loadKeys();
+  const grid = document.getElementById('stockGrid');
+  grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Searching Pexels…</div>';
+
+  if(!pexelsKey || pexelsKey === 'MY_PEXELS_KEY'){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Add a Pexels key in Setup keys to load real stock photos.</div>';
+    return;
+  }
+
+  try{
+    const res = await fetch('https://api.pexels.com/v1/search?query=' + encodeURIComponent(query) + '&per_page=6&orientation=portrait', {
+      headers: { Authorization: pexelsKey }
+    });
+    const data = await res.json();
+    const photos = data.photos || [];
+    if(photos.length === 0){
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No results for "'+escapeHtml(query)+'".</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    photos.forEach((p, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'stock-thumb' + (i===0 ? ' sel':'');
+      thumb.style.backgroundImage = `url('${p.src.medium}')`;
+      thumb.innerHTML = `<span class="badge">${escapeHtml(p.photographer)}</span>` + (i===0 && aiPicked ? '<span class="ai-pick">AI PICK</span>' : '');
+      thumb.onclick = () => {
+        document.querySelectorAll('.stock-thumb').forEach(t=>t.classList.remove('sel'));
+        thumb.classList.add('sel');
+        applyStockToReel(p);
+      };
+      grid.appendChild(thumb);
+      if(i===0) applyStockToReel(p);
+    });
+  }catch(err){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Pexels request failed. Check your API key.</div>';
+  }
+}
+
+function applyStockToReel(photo){
+  document.getElementById('reelBg').style.backgroundImage = `url('${photo.src.large}')`;
+  const already = state.usedAssets.find(a => a.url === photo.url);
+  if(!already){
+    state.usedAssets.push({ photographer: photo.photographer, url: photo.url, photographerUrl: photo.photographer_url });
+    renderAttributions();
+  }
+}
+
+function renderAttributions(){
+  const list = document.getElementById('attrList');
+  if(state.usedAssets.length === 0){
+    list.innerHTML = '<div>No stock assets used in this session yet — attributions will populate automatically as you add images from Pexels.</div>';
+    return;
+  }
+  list.innerHTML = state.usedAssets.map(a =>
+    `<div>Photo by <a href="${a.photographerUrl}" target="_blank" rel="noopener">${escapeHtml(a.photographer)}</a> on <a href="${a.url}" target="_blank" rel="noopener">Pexels</a></div>`
+  ).join('');
+}
+
+/* ---------- export ---------- */
+function exportReel(){
+  if(!state.selectedEpisode){ showToast('Nothing to export yet'); return; }
+  const spec = {
+    title: state.selectedEpisode.title,
+    caption: document.getElementById('reelCaption').textContent,
+    accent: state.accent,
+    preset: state.preset,
+    clipStart: document.getElementById('clipStart').value,
+    clipLenSec: state.clipLenSec,
+    watermark: document.getElementById('watermarkText').value,
+    keywords: state.keywords,
+    usedAssets: state.usedAssets
+  };
+  const blob = new Blob([JSON.stringify(spec, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reel-spec.json';
+  a.click();
+  showToast('Exported reel-spec.json');
+}
+
+/* ---------- AI agent drawer ---------- */
+function toggleDrawer(){
+  document.getElementById('aiDrawer').classList.toggle('open');
+}
+function quickPrompt(text){
+  document.getElementById('aiInput').value = text;
+  sendToAgent();
+}
+function logAgent(text, asUser){
+  const body = document.getElementById('aiBody');
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + (asUser ? 'user' : 'ai');
+  msg.textContent = text;
+  body.appendChild(msg);
+  body.scrollTop = body.scrollHeight;
+  if(!document.getElementById('aiDrawer').classList.contains('open')) toggleDrawer();
+}
+
+async function sendToAgent(){
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  logAgent(msg, true);
+  input.value = '';
+
+  const thinking = document.createElement('div');
+  thinking.className = 'msg ai';
+  thinking.textContent = '…';
+  thinking.id = 'thinkingMsg';
+  document.getElementById('aiBody').appendChild(thinking);
+
+  const contextPrompt = `You are an editing agent embedded in a vertical video reel-maker called "Eshaan's Reel Generator". The current reel: title="${state.selectedEpisode?.title||'none'}", caption="${document.getElementById('reelCaption').textContent}", accent color=${state.accent}, caption style=${state.preset}, watermark="${document.getElementById('watermarkText').value}".
+
+The user's edit request: "${msg}"
+
+Respond with ONLY strict JSON, no markdown fences:
+{"reply": "a short 1-2 sentence friendly confirmation of what you changed", "caption": "new caption text if it should change, using **word** for highlights, else null", "accent": "a hex color if it should change — keep the design black-and-white/monochrome, so only use grays or white/black, else null", "preset": "one of bold/mono/clean if it should change, else null", "watermark": "new watermark text if it should change, else null", "stock_query": "a new 2-4 word stock photo search phrase if visuals should change, else null"}`;
+
+  const aiText = await callWorker(contextPrompt);
+  document.getElementById('thinkingMsg')?.remove();
+  const parsed = parseAiJson(aiText);
+
+  if(!parsed){
+    logAgent("I couldn't reach the AI worker just now — check the worker URL in Setup keys.");
+    return;
+  }
+
+  if(parsed.caption) renderCaption(parsed.caption);
+  if(parsed.accent){
+    document.documentElement.style.setProperty('--accent', parsed.accent);
+    state.accent = parsed.accent;
+    applyAccentToStage();
+  }
+  if(parsed.preset){ state.preset = parsed.preset; applyCaptionStyle(); }
+  if(parsed.watermark){
+    document.getElementById('watermarkText').value = parsed.watermark;
+    updateBrandline();
+  }
+  if(parsed.stock_query){ searchStockFor(parsed.stock_query, true); }
+
+  logAgent(parsed.reply || 'Done — updated your reel.');
+}
+
+/* ---------- misc ---------- */
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------- fake running timecode ---------- */
+let tcFrames = 0;
+setInterval(()=>{
+  tcFrames++;
+  const totalSec = Math.floor(tcFrames/30);
+  const h = String(Math.floor(totalSec/3600)).padStart(2,'0');
+  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,'0');
+  const s = String(totalSec%60).padStart(2,'0');
+  const f = String(tcFrames%30).padStart(2,'0');
+  document.getElementById('clockOut').textContent = `${h}:${m}:${s}:${f}`;
+}, 33);
+
+buildTimeline(30);
+</script>
+</body>
+</html>
