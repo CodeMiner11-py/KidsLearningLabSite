@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redeem Amazon Gift Card</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: white;
+      width: 360px;
+      padding: 28px;
+      border-radius: 8px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.15);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin: 12px 0;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ff9900;
+      border: 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #message {
+      margin-top: 18px;
+      font-weight: bold;
+      color: #b00000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>Redeem Amazon Gift Card</h2>
+
+    <label for="code">Enter code</label>
+    <input
+      id="code"
+      type="text"
+      inputmode="numeric"
+      pattern="[0-9]{9}"
+      minlength="9"
+      maxlength="9"
+      placeholder="Enter 9-digit code"
+      oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)"
+    >
+
+    <button onclick="redeem()">Redeem</button>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    async function redeem() {
+      const code = document.getElementById("code").value;
+      const message = document.getElementById("message");
+
+      if (!/^\d{9}$/.test(code)) {
+        message.textContent = "Please enter exactly 9 digits.";
+        return;
+      }
+
+      try {
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+
+        if (data.country_code !== "BR") {
+          message.textContent =
+            "YOU ARE NOT IN THE AMAZON RAINFOREST. PLEASE GO THERE TO REDEEM.";
+          return;
+        }
+
+        // Add your legitimate redemption logic here.
+        message.textContent = "Code submitted.";
+      } catch (error) {
+        message.textContent =
+          "YOU ARE NOT IN THE AMAZON RAINFOREST. PLEASE GO THERE TO REDEEM.";
+      }
+    }
+  </script>
+</body>
+</html>
