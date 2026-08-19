@@ -279,9 +279,9 @@
           <div class="contact-icon">📝</div>
           <h3>Fill Out Our Form</h3>
           <p>Prefer a form? Use our quick contact form to reach out!</p>
-          <a href="https://forms.gle/D74qu9snYVfYJCzk7" target="_blank" class="btn-primary">
+          <button type="button" id="kllContactFormBtn" class="btn-primary" style="border:none;cursor:pointer;">
             Contact Form
-          </a>
+          </button>
         </div></div>
 
       <iframe style="padding-top: 7px; padding-bottom: 7px;" src="https://www.speakpipe.com/widget/inline/q5nwmwcx2axgl2i0hb2gpxbti0zo7e2k" allow="microphone" width="100%" height="200" class="contact-method"></iframe>
@@ -339,6 +339,20 @@
   `;
   document.head.appendChild(style);
 
+  // Contact form -> iframe modal (instead of opening a new tab)
+  (function () {
+    function wire() {
+      if (!window.KLLIframeModal) { setTimeout(wire, 50); return; }
+      document.getElementById('kllContactFormBtn').addEventListener('click', function () {
+        window.KLLIframeModal.open({
+          title: 'Contact Form',
+          src: 'https://forms.gle/D74qu9snYVfYJCzk7',
+          openInNewPageUrl: 'https://forms.gle/D74qu9snYVfYJCzk7',
+        });
+      });
+    }
+    wire();
+  })();
 </script>
 </script>
 <div id="footer"></div> <script src='https://www.noupe.com/embed/019a8ad1a5f67153b2d2a2a62cb349011288.js'></script>
