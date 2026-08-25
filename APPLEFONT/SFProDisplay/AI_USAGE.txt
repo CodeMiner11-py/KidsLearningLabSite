@@ -1,0 +1,14 @@
+EASY USAGE OF APPLE SF PRO DISPLAY FONT FOR APP OR WEBSITE:
+
+- Fonts located at https://kidslearninglab.com/APPLEFONT/SFProDisplay
+- Fonts are in OTF format
+- Fonts listed below.
+
+1. Regular.otf
+2. Italic.otf
+3. Bold.otf
+4. BoldItalic.otf
+
+An example path for Bold would be: https://kidslearninglab.com/APPLEFONT/SFProDisplay/Bold.otf
+
+Do not assume any other fonts exist (they do not).
