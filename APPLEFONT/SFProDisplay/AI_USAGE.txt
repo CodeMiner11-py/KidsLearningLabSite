@@ -11,4 +11,14 @@ EASY USAGE OF APPLE SF PRO DISPLAY FONT FOR APP OR WEBSITE:
 
 An example path for Bold would be: https://kidslearninglab.com/APPLEFONT/SFProDisplay/Bold.otf
 
+Those fonts are for HEADINGS and other IMPORTANT TEXT.
+For main paragraph, descriptions, or smaller text, use the following fonts:
+
+1. TEXT-Regular.otf
+2. TEXT-Italic.otf
+3. TEXT-Bold.otf
+4. TEXT-BoldItalic.otf
+
+An example path for Bold would be: https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Bold.otf
+
 Do not assume any other fonts exist (they do not).
