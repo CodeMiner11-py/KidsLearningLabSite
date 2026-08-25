@@ -22,3 +22,8 @@ For main paragraph, descriptions, or smaller text, use the following fonts:
 An example path for Bold would be: https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Bold.otf
 
 Do not assume any other fonts exist (they do not).
+
+
+
+
+
