@@ -247,17 +247,19 @@
     overflow: auto;
     padding: 60px 40px 120px;
   }
-  .cp-graph {
-    display: flex;
-    gap: 60px;
-    align-items: flex-start;
-    min-width: max-content;
+  .cp-tree-wrap {
+    position: relative;
+  }
+  .cp-tree-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
   }
   .cp-node-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    position: absolute;
+    transform: translate(-50%, 0);
+    z-index: 1;
   }
   .cp-node-btn {
     background: var(--white);
@@ -270,10 +272,21 @@
     white-space: nowrap;
   }
   .cp-node-btn.active { outline: 3px solid var(--black); }
-  .cp-children {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  .cp-node-btn.duplicate {
+    background: var(--gray-line);
+    border: 2px dashed #888;
+    opacity: 0.85;
+  }
+  .cp-node-missing {
+    display: inline-block;
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-radius: var(--radius-pill);
+    padding: 12px 22px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--shadow-soft);
   }
 
   .editor-bottom-bar {
@@ -997,29 +1010,98 @@ function drawCpGraph() {
   const story = currentStory;
   const container = document.getElementById("cp-graph-container");
   const visited = new Set();
+  const nodes = [];
+  const edges = [];
+  let leafX = 0;
+  let maxDepth = 0;
 
-  function buildNode(cpId, label) {
-    if (!cpId || !story.pages[cpId] || visited.has(cpId)) {
-      return `<div class="cp-node-wrap"><span style="color:#888;font-size:0.85rem;">(missing)</span></div>`;
+  // Walk the choice tree depth-first, assigning each node a depth (tree
+  // level) and an x "slot". Leaf nodes claim the next free slot left to
+  // right; a parent is centered above the span of its own children. This
+  // is what turns the layout into an actual branching tree instead of a
+  // single stacked column.
+  function layout(cpId, label, depth, parentId) {
+    maxDepth = Math.max(maxDepth, depth);
+
+    if (!cpId || !story.pages[cpId]) {
+      const node = { id: `n${nodes.length}`, kind: "missing", label, depth, x: leafX++ };
+      nodes.push(node);
+      if (parentId) edges.push({ from: parentId, to: node.id });
+      return node;
     }
+
+    if (visited.has(cpId)) {
+      // This page is reachable from more than one branch. Rather than
+      // mislabel it "missing" (the old behavior), show it as a linked
+      // reference back to the page drawn earlier in the tree.
+      const node = { id: `n${nodes.length}`, kind: "duplicate", cpId, label, depth, x: leafX++ };
+      nodes.push(node);
+      if (parentId) edges.push({ from: parentId, to: node.id });
+      return node;
+    }
+
     visited.add(cpId);
     const page = story.pages[cpId];
     const choiceIds = Object.keys(page.choices || {});
-    const childrenHtml = choiceIds.map((choiceKey, idx) => {
-      const choice = page.choices[choiceKey];
-      return buildNode(choice.goto, choice.label || `Choice ${idx + 1}`);
-    }).join("");
+    const node = { id: `n${nodes.length}`, kind: "page", cpId, label, depth, x: 0 };
+    nodes.push(node);
+    if (parentId) edges.push({ from: parentId, to: node.id });
 
-    return `
-      <div class="cp-node-wrap">
-        <button class="cp-node-btn ${cpId === activeCpId ? "active" : ""}" onclick="selectCp('${cpId}')">${escapeHtml(label)}</button>
-        ${childrenHtml ? `<div class="cp-children">${childrenHtml}</div>` : ""}
-      </div>
-    `;
+    if (choiceIds.length === 0) {
+      node.x = leafX++;
+    } else {
+      const childXs = choiceIds.map((choiceKey, idx) => {
+        const choice = page.choices[choiceKey];
+        const child = layout(choice.goto, choice.label || `Choice ${idx + 1}`, depth + 1, node.id);
+        return child.x;
+      });
+      node.x = (Math.min(...childXs) + Math.max(...childXs)) / 2;
+    }
+    return node;
   }
 
-  const rootLabel = "Choice Page (C.P.) 1";
-  container.innerHTML = `<div class="cp-graph">${buildNode(story.firstPage, rootLabel)}</div>`;
+  layout(story.firstPage, "Choice Page (C.P.) 1", 0, null);
+
+  const NODE_W = 210;
+  const LEVEL_H = 140;
+  const NODE_H = 56;
+  const PAD = 40;
+
+  const width = Math.max(leafX, 1) * NODE_W + PAD * 2;
+  const height = (maxDepth + 1) * LEVEL_H + PAD * 2;
+
+  const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const px = n => PAD + n.x * NODE_W + NODE_W / 2;
+  const py = n => PAD + n.depth * LEVEL_H;
+
+  const edgePaths = edges.map(e => {
+    const from = byId[e.from], to = byId[e.to];
+    const x1 = px(from), y1 = py(from) + NODE_H;
+    const x2 = px(to), y2 = py(to);
+    const midY = (y1 + y2) / 2;
+    return `<path d="M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}" stroke="rgba(17,17,17,0.35)" stroke-width="2.5" fill="none" />`;
+  }).join("");
+
+  const nodesHtml = nodes.map(n => {
+    const left = px(n);
+    const top = py(n);
+    let inner;
+    if (n.kind === "missing") {
+      inner = `<span class="cp-node-missing">${escapeHtml(n.label)} — missing</span>`;
+    } else if (n.kind === "duplicate") {
+      inner = `<button class="cp-node-btn duplicate ${n.cpId === activeCpId ? "active" : ""}" onclick="selectCp('${n.cpId}')" title="This page already appears earlier in the tree">${escapeHtml(n.label)} ↺</button>`;
+    } else {
+      inner = `<button class="cp-node-btn ${n.cpId === activeCpId ? "active" : ""}" onclick="selectCp('${n.cpId}')">${escapeHtml(n.label)}</button>`;
+    }
+    return `<div class="cp-node-wrap" style="left:${left}px; top:${top}px;">${inner}</div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="cp-tree-wrap" style="width:${width}px; height:${height}px;">
+      <svg class="cp-tree-svg" width="${width}" height="${height}">${edgePaths}</svg>
+      ${nodesHtml}
+    </div>
+  `;
 }
 
 function selectCp(cpId) {
