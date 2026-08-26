@@ -368,15 +368,28 @@
   .play-bg {
     width: 100%;
     min-height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-color: #cfcfcf;
+    background-color: #000000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     padding: 90px 20px 40px;
     gap: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .play-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  .play-bg-img.fit-height { object-fit: cover; }
+  .play-bg-img.fit-width { object-fit: contain; background-color: #000000; }
+  .play-bg > *:not(.play-bg-img) {
+    position: relative;
+    z-index: 1;
   }
   .play-title-pill {
     position: fixed;
@@ -1053,7 +1066,16 @@ function drawCpPanel() {
           <input type="file" accept="image/*" style="display:none" onchange="uploadCpImage(this.files[0])" />
         </label>
       </div>
-      ${page.image ? `<img src="${escapeHtml(page.image)}" alt="Choice page image preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:16px;box-shadow:var(--shadow-soft);" />` : ""}
+      ${page.image ? `
+        <img src="${escapeHtml(page.image)}" alt="Choice page image preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:16px;box-shadow:var(--shadow-soft);" />
+        <div>
+          <label class="field-label">Image fit (in Play view)</label>
+          <select class="goto-select" onchange="updatePageField('imageFit', this.value)">
+            <option value="height" ${page.imageFit !== "width" ? "selected" : ""}>Snap to height (fills screen, may crop sides)</option>
+            <option value="width" ${page.imageFit === "width" ? "selected" : ""}>Snap to width (shows full image, black bars if room)</option>
+          </select>
+        </div>
+      ` : ""}
 
       <div>
         <label class="field-label">Sound effect</label>
@@ -1679,7 +1701,8 @@ function drawPlayPage() {
       <div class="play-card">
         <button class="back-link" onclick="exitPlay()">&larr; Exit</button>
         <button class="pill corner-btn corner-br" style="position:fixed;" onclick="openProgressModal()">Progress</button>
-        <div class="play-bg" style="${page.image ? `background-image:url('${escapeHtml(page.image)}')` : ""}">
+        <div class="play-bg">
+          ${page.image ? `<img class="play-bg-img ${page.imageFit === 'width' ? 'fit-width' : 'fit-height'}" src="${escapeHtml(page.image)}" alt="" />` : ""}
           <div class="play-title-pill">${escapeHtml(story.title)}</div>
           <div class="play-text-pill">${escapeHtml(page.text || "")}</div>
           ${isEnd ? `
