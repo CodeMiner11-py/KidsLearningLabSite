@@ -1037,8 +1037,15 @@ function drawCpPanel() {
     return;
   }
 
+  function cpLabel(id) {
+    const p = story.pages[id];
+    const text = (p && p.text || "").trim();
+    const snippet = text ? (text.length > 28 ? text.slice(0, 28) + "…" : text) : "(empty page)";
+    return (id === story.firstPage ? "Start — " : "") + snippet;
+  }
+
   const allCpOptions = Object.keys(story.pages).map(id =>
-    `<option value="${id}">${id === story.firstPage ? "Start — " : ""}${id.slice(0, 6)}</option>`
+    `<option value="${id}">${escapeHtml(cpLabel(id))}</option>`
   ).join("");
 
   const choicesHtml = Object.entries(page.choices || {}).map(([choiceId, choice]) => `
