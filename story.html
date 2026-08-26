@@ -356,24 +356,18 @@
   /* ---------- Play screen ---------- */
   .play-screen {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    width: 100%;
     background: var(--gray-bg);
   }
   .play-card {
     width: 100%;
-    max-width: 640px;
+    min-height: 100vh;
     background: var(--gray-bg);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    box-shadow: var(--shadow-soft);
     position: relative;
   }
   .play-bg {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    min-height: 100vh;
     background-size: cover;
     background-position: center;
     background-color: #cfcfcf;
@@ -381,16 +375,20 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 24px 20px;
+    padding: 90px 20px 40px;
     gap: 20px;
   }
   .play-title-pill {
-    align-self: flex-start;
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--white);
     border-radius: var(--radius-pill);
     padding: 10px 20px;
     font-weight: 700;
     box-shadow: var(--shadow-soft);
+    z-index: 4;
   }
   .play-text-pill {
     background: var(--white);
@@ -399,13 +397,15 @@
     text-align: center;
     font-size: 1.05rem;
     box-shadow: var(--shadow-soft);
-    max-width: 90%;
+    max-width: 640px;
+    width: 90%;
   }
   .play-choices {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    width: 100%;
+    width: 90%;
+    max-width: 640px;
     margin-top: auto;
   }
   .play-choice-btn {
@@ -457,6 +457,10 @@
     font-size: 0.9rem;
     box-shadow: var(--shadow-soft);
     z-index: 5;
+  }
+  .play-card .back-link {
+    position: fixed;
+    z-index: 6;
   }
 
   .loading-note {
@@ -1041,15 +1045,15 @@ function drawCpPanel() {
         <input type="text" id="cp-aiprompt" value="${escapeHtml(page.aiPrompt || "")}" placeholder="e.g. a foggy pier at midnight, storybook style" onchange="updatePageField('aiPrompt', this.value)" />
       </div>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
         <button class="btn btn-secondary" onclick="generateAiImage()">Generate AI image</button>
         <button class="btn btn-secondary" onclick="openStockImageSearch()">Search stock image</button>
         <label class="btn btn-secondary" style="cursor:pointer;">
           Upload image
           <input type="file" accept="image/*" style="display:none" onchange="uploadCpImage(this.files[0])" />
         </label>
-        ${page.image ? `<span style="align-self:center;color:var(--success);font-size:0.85rem;">Image set ✓</span>` : ""}
       </div>
+      ${page.image ? `<img src="${escapeHtml(page.image)}" alt="Choice page image preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:16px;box-shadow:var(--shadow-soft);" />` : ""}
 
       <div>
         <label class="field-label">Sound effect</label>
@@ -1063,8 +1067,8 @@ function drawCpPanel() {
             <option value="start" ${page.soundTiming === "start" ? "selected" : ""}>Play at start</option>
             <option value="afterSelect" ${page.soundTiming === "afterSelect" ? "selected" : ""}>Play after selecting</option>
           </select>
-          ${page.sound ? `<span style="color:var(--success);font-size:0.85rem;">Sound set ✓</span>` : ""}
         </div>
+        ${page.sound ? `<audio controls src="${escapeHtml(page.sound)}" style="width:100%;margin-top:8px;"></audio>` : ""}
       </div>
 
       <div class="choices-list">
@@ -1451,10 +1455,16 @@ function openStorySettings() {
       </div>
       <div>
         <label class="field-label">Background music</label>
-        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
-          Upload
-          <input type="file" accept="audio/*" id="s-music" style="display:none" />
-        </label>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary" id="s-music-search-btn">Search music</button>
+          <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+            Upload
+            <input type="file" accept="audio/*" id="s-music" style="display:none" />
+          </label>
+        </div>
+        <div id="s-music-preview">
+          ${story.backgroundMusic ? `<audio controls src="${escapeHtml(story.backgroundMusic)}" style="width:100%;margin-top:8px;"></audio>` : ""}
+        </div>
       </div>
       <div>
         <label class="field-label">End credits</label>
@@ -1474,6 +1484,9 @@ function openStorySettings() {
   overlay.querySelector("#s-cancel").onclick = () => overlay.remove();
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
   overlay.querySelector("#s-delete").onclick = () => confirmDeleteStory(overlay);
+
+  overlay.dataset.pendingMusicUrl = "";
+  overlay.querySelector("#s-music-search-btn").onclick = () => openMusicSearch(overlay);
 
   overlay.querySelector("#s-save").onclick = async () => {
     const errEl = overlay.querySelector("#s-error");
@@ -1505,6 +1518,8 @@ function openStorySettings() {
         const ref = storage.ref(`stories/${currentStoryId}/music_${Date.now()}_${musicFile.name}`);
         await ref.put(musicFile);
         updates.backgroundMusic = await ref.getDownloadURL();
+      } else if (overlay.dataset.pendingMusicUrl) {
+        updates.backgroundMusic = overlay.dataset.pendingMusicUrl;
       }
 
       await db.ref(`stories/${currentStoryId}`).update(updates);
@@ -1517,6 +1532,83 @@ function openStorySettings() {
       errEl.style.display = "block";
     }
   };
+}
+
+/* ---------- Background music search (Freesound), used from Story Settings ---------- */
+function openMusicSearch(settingsOverlay) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="search-modal-box">
+      <h2 style="font-size:1.05rem;">Search background music</h2>
+      <input type="text" id="music-q" style="border:1px solid var(--gray-line);border-radius:14px;padding:14px 16px;font-size:1rem;font-family:inherit;" placeholder="e.g. calm piano loop, adventure theme" autofocus />
+      <div class="search-modal-results">
+        <div id="music-results" class="empty-note">Type something and press Enter to search.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="music-cancel">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#music-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  const input = overlay.querySelector("#music-q");
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") runMusicSearch(input.value.trim(), overlay, settingsOverlay);
+  });
+}
+
+async function runMusicSearch(query, overlay, settingsOverlay) {
+  const resultsEl = overlay.querySelector("#music-results");
+  if (!query) return;
+  resultsEl.innerHTML = `<div class="empty-note">Searching...</div>`;
+
+  try {
+    const res = await fetch(
+      `https://freesound.org/apiv2/search/text/?query=${encodeURIComponent(query)}&fields=id,name,previews&page_size=12&token=${FREESOUND_API_KEY}`
+    );
+    if (!res.ok) throw new Error("Freesound request failed (" + res.status + ")");
+    const data = await res.json();
+    const results = data.results || [];
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = `<div class="empty-note">No tracks found. Try a different search.</div>`;
+      return;
+    }
+
+    resultsEl.innerHTML = `
+      <div class="sfx-list">
+        ${results.map(r => {
+          const previewUrl = r.previews?.["preview-hq-mp3"] || r.previews?.["preview-lq-mp3"] || "";
+          return `
+            <div class="sfx-row">
+              <span>${escapeHtml(r.name)}</span>
+              <button class="icon-btn" title="Preview" onclick='previewSfx(${JSON.stringify(previewUrl)})'>&#9658;</button>
+              <button class="btn btn-secondary" onclick='selectMusic(${JSON.stringify(previewUrl)})'>Use this</button>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="empty-note">Search failed: ${escapeHtml(e.message)}</div>`;
+  }
+
+  window.__musicSettingsOverlay = settingsOverlay;
+}
+
+function selectMusic(url) {
+  if (!url) { showToast("No preview available for this track"); return; }
+  const settingsOverlay = window.__musicSettingsOverlay;
+  if (settingsOverlay) {
+    settingsOverlay.dataset.pendingMusicUrl = url;
+    const preview = settingsOverlay.querySelector("#s-music-preview");
+    if (preview) preview.innerHTML = `<audio controls src="${escapeHtml(url)}" style="width:100%;margin-top:8px;"></audio>`;
+  }
+  document.querySelectorAll(".search-modal-box").forEach(el => el.closest(".modal-overlay")?.remove());
+  showToast("Music selected — click Save settings to apply");
 }
 
 /* =========================================================================
@@ -1586,6 +1678,7 @@ function drawPlayPage() {
     <div class="play-screen">
       <div class="play-card">
         <button class="back-link" onclick="exitPlay()">&larr; Exit</button>
+        <button class="pill corner-btn corner-br" style="position:fixed;" onclick="openProgressModal()">Progress</button>
         <div class="play-bg" style="${page.image ? `background-image:url('${escapeHtml(page.image)}')` : ""}">
           <div class="play-title-pill">${escapeHtml(story.title)}</div>
           <div class="play-text-pill">${escapeHtml(page.text || "")}</div>
@@ -1600,6 +1693,103 @@ function drawPlayPage() {
       </div>
     </div>
   `;
+}
+
+/* ---------- Progress save/load ---------- */
+function makeProgressCode() {
+  const payload = `${playStoryId}:${playCpId}`;
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  const decorativeUuid = crypto.randomUUID();
+  return `${encoded}.${decorativeUuid}`;
+}
+
+function parseProgressCode(code) {
+  const trimmed = (code || "").trim();
+  const encodedPart = trimmed.split(".")[0];
+  try {
+    const decoded = decodeURIComponent(escape(atob(encodedPart)));
+    const [storyId, cpId] = decoded.split(":");
+    if (!storyId || !cpId) return null;
+    return { storyId, cpId };
+  } catch (e) {
+    return null;
+  }
+}
+
+function openProgressModal() {
+  const code = makeProgressCode();
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>Save or load progress</h2>
+      <div>
+        <label class="field-label">Your progress code</label>
+        <input type="text" id="progress-code-out" value="${escapeHtml(code)}" readonly onclick="this.select()" />
+      </div>
+      <button class="btn btn-secondary" id="progress-copy">Copy code</button>
+
+      <div style="border-top:1px solid var(--gray-line); margin-top:6px; padding-top:16px;">
+        <label class="field-label">Load a progress code</label>
+        <input type="text" id="progress-code-in" placeholder="Paste a progress code..." />
+        <p id="progress-error" class="error-text" style="display:none;"></p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="progress-cancel">Close</button>
+        <button class="btn btn-primary" id="progress-load">Load progress</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#progress-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  overlay.querySelector("#progress-copy").onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("Progress code copied");
+    } catch (e) {
+      overlay.querySelector("#progress-code-out").select();
+      showToast("Select and copy manually");
+    }
+  };
+
+  overlay.querySelector("#progress-load").onclick = async () => {
+    const input = overlay.querySelector("#progress-code-in").value;
+    const errEl = overlay.querySelector("#progress-error");
+    const parsed = parseProgressCode(input);
+    if (!parsed) {
+      errEl.textContent = "That doesn't look like a valid progress code.";
+      errEl.style.display = "block";
+      return;
+    }
+    if (parsed.storyId !== playStoryId) {
+      // Loading progress for a different story — fetch it.
+      overlay.remove();
+      navigate("play/" + parsed.storyId);
+      // wait for story to load, then jump to the saved page
+      const trySetCp = () => {
+        if (playStory && playStoryId === parsed.storyId && playStory.pages[parsed.cpId]) {
+          playCpId = parsed.cpId;
+          drawPlayPage();
+        } else {
+          setTimeout(trySetCp, 150);
+        }
+      };
+      setTimeout(trySetCp, 150);
+      return;
+    }
+    if (!playStory.pages[parsed.cpId]) {
+      errEl.textContent = "That page no longer exists in this story.";
+      errEl.style.display = "block";
+      return;
+    }
+    playCpId = parsed.cpId;
+    overlay.remove();
+    drawPlayPage();
+    showToast("Progress loaded");
+  };
 }
 
 function selectPlayChoice(choiceId) {
