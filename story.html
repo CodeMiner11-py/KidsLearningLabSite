@@ -605,6 +605,12 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function toArray(val) {
+  if (Array.isArray(val)) return val;
+  if (val && typeof val === "object") return Object.keys(val).sort().map(k => val[k]);
+  return [];
+}
+
 let toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById("toast");
@@ -653,6 +659,7 @@ function render() {
     case "create": return renderCreate();
     case "edit-search": return renderStorySearch("edit");
     case "play-search": return renderStorySearch("play");
+    case "story-intro": return renderStoryIntro(params[0]);
     case "editor": return renderEditor(params[0]);
     case "play": return renderPlay(params[0] || urlParams.get("story_id"));
     default: return renderHome();
@@ -823,7 +830,7 @@ function filterResults() {
 
   resultsEl.innerHTML = list.map((s, i) => `
     <button class="story-result" style="background:${RESULT_COLORS[i % RESULT_COLORS.length]}"
-      onclick="${window.__searchMode === "edit" ? `promptEditPassword('${s.id}')` : `navigate('play/${s.id}')`}">
+      onclick="${window.__searchMode === "edit" ? `promptEditPassword('${s.id}')` : `navigate('story-intro/${s.id}')`}">
       <span class="story-title">${escapeHtml(s.title)}</span>
       <span class="story-author">${s.author ? "by " + escapeHtml(s.author) : ""}${s.description ? " — " + escapeHtml(s.description) : ""}</span>
     </button>
@@ -1441,118 +1448,192 @@ function confirmDeleteStory(settingsOverlay) {
   };
 }
 
-/* ---------- Story Settings modal ---------- */
+/* ---------- Story Settings (full page) ---------- */
 function openStorySettings() {
-  const story = currentStory;
-  const overlay = document.createElement("div");
-  overlay.className = "modal-overlay";
-  overlay.innerHTML = `
-    <div class="modal-box" style="max-width:480px;">
-      <h2>Story Settings</h2>
-      <div>
-        <label class="field-label">Title</label>
-        <input type="text" id="s-title" value="${escapeHtml(story.title || "")}" />
-      </div>
-      <div>
-        <label class="field-label">Author</label>
-        <input type="text" id="s-author" value="${escapeHtml(story.author || "")}" />
-      </div>
-      <div>
-        <label class="field-label">Description</label>
-        <input type="text" id="s-desc" value="${escapeHtml(story.description || "")}" />
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <input type="checkbox" id="s-ai" ${story.aiImagesEnabled !== false ? "checked" : ""} style="width:auto;" />
-        <label for="s-ai" style="font-size:0.9rem;">Enable AI image generation for new choices</label>
-      </div>
-      <div>
-        <label class="field-label">Background image</label>
-        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
-          Upload
-          <input type="file" accept="image/*" id="s-bg" style="display:none" />
-        </label>
-      </div>
-      <div>
-        <label class="field-label">Cover art</label>
-        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
-          Upload
-          <input type="file" accept="image/*" id="s-cover" style="display:none" />
-        </label>
-      </div>
-      <div>
-        <label class="field-label">Background music</label>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="btn btn-secondary" id="s-music-search-btn">Search music</button>
-          <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
-            Upload
-            <input type="file" accept="audio/*" id="s-music" style="display:none" />
-          </label>
-        </div>
-        <div id="s-music-preview">
-          ${story.backgroundMusic ? `<audio controls src="${escapeHtml(story.backgroundMusic)}" style="width:100%;margin-top:8px;"></audio>` : ""}
-        </div>
-      </div>
-      <div>
-        <label class="field-label">End credits</label>
-        <input type="text" id="s-credits" value="${escapeHtml(story.endCredits || "")}" placeholder="e.g. Written by..." />
-      </div>
-      <p id="s-error" class="error-text" style="display:none;"></p>
-      <div class="modal-actions" style="justify-content:space-between;">
-        <button class="btn" style="background:var(--danger-bg);color:var(--danger);" id="s-delete">Delete story</button>
-        <div style="display:flex; gap:12px;">
-          <button class="btn btn-secondary" id="s-cancel">Close</button>
-          <button class="btn btn-primary" id="s-save">Save settings</button>
+  navigate("story-settings/" + currentStoryId);
+}
+
+async function renderStorySettings(storyId) {
+  const storedPw = sessionStorage.getItem("edit_pw_" + storyId);
+  app.innerHTML = `<div class="wood-screen"><div class="loading-note">Loading settings...</div></div>`;
+
+  let snap;
+  try {
+    snap = await db.ref("stories/" + storyId).once("value");
+  } catch (e) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Failed to load: ${escapeHtml(e.message)}</div></div>`;
+    return;
+  }
+  const story = snap.val();
+  if (!story) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Story not found.</div></div>`;
+    return;
+  }
+  if (!storedPw || storedPw !== story.password) {
+    promptEditPasswordThen(storyId, () => renderStorySettings(storyId));
+    return;
+  }
+
+  currentStory = story;
+  currentStoryId = storyId;
+
+  const container = document.createElement("div");
+  container.id = "settings-page-root";
+
+  app.innerHTML = `
+    <div class="editor-wrap">
+      <div class="editor-canvas" style="background:var(--white); padding:40px 24px 100px; display:flex; justify-content:center;">
+        <button class="back-link" onclick="navigate('editor/${storyId}')">&larr; Back to editor</button>
+        <div style="width:100%; max-width:640px; display:flex; flex-direction:column; gap:20px; margin-top:50px;">
+          <h1 class="heading" style="font-size:1.6rem;">Story Settings</h1>
+
+          <div>
+            <label class="field-label">Title</label>
+            <input type="text" id="s-title" value="${escapeHtml(story.title || "")}" class="search-input" />
+          </div>
+          <div>
+            <label class="field-label">Author</label>
+            <input type="text" id="s-author" value="${escapeHtml(story.author || "")}" class="search-input" />
+          </div>
+          <div>
+            <label class="field-label">Description</label>
+            <input type="text" id="s-desc" value="${escapeHtml(story.description || "")}" class="search-input" />
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="s-ai" ${story.aiImagesEnabled !== false ? "checked" : ""} style="width:auto;" />
+            <label for="s-ai" style="font-size:0.9rem;">Enable AI image generation for new choices</label>
+          </div>
+          <div>
+            <label class="field-label">Background image</label>
+            <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+              Upload
+              <input type="file" accept="image/*" id="s-bg" style="display:none" />
+            </label>
+          </div>
+          <div>
+            <label class="field-label">Cover art</label>
+            <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+              Upload
+              <input type="file" accept="image/*" id="s-cover" style="display:none" />
+            </label>
+          </div>
+          <div>
+            <label class="field-label">Background music</label>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn btn-secondary" id="s-music-search-btn">Search music</button>
+              <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+                Upload
+                <input type="file" accept="audio/*" id="s-music" style="display:none" />
+              </label>
+            </div>
+            <div id="s-music-preview">
+              ${story.backgroundMusic ? `<audio controls src="${escapeHtml(story.backgroundMusic)}" style="width:100%;margin-top:8px;"></audio>` : ""}
+            </div>
+          </div>
+          <div>
+            <label class="field-label">End credits</label>
+            <input type="text" id="s-credits" value="${escapeHtml(story.endCredits || "")}" placeholder="e.g. Written by..." class="search-input" />
+          </div>
+
+          <div style="border-top:2px solid var(--gray-line); padding-top:20px; margin-top:6px;">
+            <h2 class="heading" style="font-size:1.15rem; margin-bottom:6px;">Story Intro / Title Page</h2>
+            <p style="font-size:0.88rem; color:#666; margin:0 0 16px;">
+              This is the screen players see after pressing Play, before the story starts —
+              built from the title, author, description and cover art above, plus the FAQ below.
+            </p>
+            <label class="field-label">FAQ</label>
+            <div id="s-faq-list" class="choices-list"></div>
+            <button type="button" class="icon-btn add-choice" id="s-faq-add" style="margin-top:8px;">+ Add FAQ item</button>
+          </div>
+
+          <p id="s-error" class="error-text" style="display:none;"></p>
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <button class="btn" style="background:var(--danger-bg);color:var(--danger);" id="s-delete">Delete story</button>
+            <button class="btn btn-primary" id="s-save">Save settings</button>
+          </div>
         </div>
       </div>
     </div>
   `;
-  document.body.appendChild(overlay);
-  overlay.querySelector("#s-cancel").onclick = () => overlay.remove();
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-  overlay.querySelector("#s-delete").onclick = () => confirmDeleteStory(overlay);
 
-  overlay.dataset.pendingMusicUrl = "";
-  overlay.querySelector("#s-music-search-btn").onclick = () => openMusicSearch(overlay);
+  const pageRoot = app; // querySelector scope for handlers below
+  pageRoot.dataset.pendingMusicUrl = "";
+  pageRoot.querySelector("#s-music-search-btn").onclick = () => openMusicSearch(pageRoot);
+  pageRoot.querySelector("#s-delete").onclick = () => confirmDeleteStory(null);
 
-  overlay.querySelector("#s-save").onclick = async () => {
-    const errEl = overlay.querySelector("#s-error");
+  let faqItems = toArray(story.faq).map(f => ({ question: f.question || "", answer: f.answer || "" }));
+
+  function drawFaqList() {
+    const listEl = pageRoot.querySelector("#s-faq-list");
+    listEl.innerHTML = faqItems.map((f, i) => `
+      <div class="choice-row" style="flex-direction:column; align-items:stretch; gap:6px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" placeholder="Question" value="${escapeHtml(f.question)}" data-faq-idx="${i}" data-faq-field="question" style="flex:1;" />
+          <button type="button" class="icon-btn remove" data-faq-remove="${i}">&times;</button>
+        </div>
+        <input type="text" placeholder="Answer" value="${escapeHtml(f.answer)}" data-faq-idx="${i}" data-faq-field="answer" />
+      </div>
+    `).join("") || `<span style="color:#888;font-size:0.9rem;">No FAQ items yet.</span>`;
+
+    listEl.querySelectorAll("[data-faq-field]").forEach(input => {
+      input.addEventListener("input", () => {
+        const idx = parseInt(input.dataset.faqIdx, 10);
+        faqItems[idx][input.dataset.faqField] = input.value;
+      });
+    });
+    listEl.querySelectorAll("[data-faq-remove]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        faqItems.splice(parseInt(btn.dataset.faqRemove, 10), 1);
+        drawFaqList();
+      });
+    });
+  }
+  drawFaqList();
+
+  pageRoot.querySelector("#s-faq-add").onclick = () => {
+    faqItems.push({ question: "", answer: "" });
+    drawFaqList();
+  };
+
+  pageRoot.querySelector("#s-save").onclick = async () => {
+    const errEl = pageRoot.querySelector("#s-error");
     try {
       const updates = {
-        title: overlay.querySelector("#s-title").value.trim(),
-        author: overlay.querySelector("#s-author").value.trim(),
-        description: overlay.querySelector("#s-desc").value.trim(),
-        aiImagesEnabled: overlay.querySelector("#s-ai").checked,
-        endCredits: overlay.querySelector("#s-credits").value.trim(),
+        title: pageRoot.querySelector("#s-title").value.trim(),
+        author: pageRoot.querySelector("#s-author").value.trim(),
+        description: pageRoot.querySelector("#s-desc").value.trim(),
+        aiImagesEnabled: pageRoot.querySelector("#s-ai").checked,
+        endCredits: pageRoot.querySelector("#s-credits").value.trim(),
+        faq: faqItems.filter(f => f.question.trim() || f.answer.trim()),
         password: story.password // required by RTDB rule on every write
       };
 
-      const bgFile = overlay.querySelector("#s-bg").files[0];
-      const coverFile = overlay.querySelector("#s-cover").files[0];
-      const musicFile = overlay.querySelector("#s-music").files[0];
+      const bgFile = pageRoot.querySelector("#s-bg").files[0];
+      const coverFile = pageRoot.querySelector("#s-cover").files[0];
+      const musicFile = pageRoot.querySelector("#s-music").files[0];
 
       if (bgFile) {
-        const ref = storage.ref(`stories/${currentStoryId}/background_${Date.now()}_${bgFile.name}`);
+        const ref = storage.ref(`stories/${storyId}/background_${Date.now()}_${bgFile.name}`);
         await ref.put(bgFile);
         updates.backgroundImage = await ref.getDownloadURL();
       }
       if (coverFile) {
-        const ref = storage.ref(`stories/${currentStoryId}/cover_${Date.now()}_${coverFile.name}`);
+        const ref = storage.ref(`stories/${storyId}/cover_${Date.now()}_${coverFile.name}`);
         await ref.put(coverFile);
         updates.coverArt = await ref.getDownloadURL();
       }
       if (musicFile) {
-        const ref = storage.ref(`stories/${currentStoryId}/music_${Date.now()}_${musicFile.name}`);
+        const ref = storage.ref(`stories/${storyId}/music_${Date.now()}_${musicFile.name}`);
         await ref.put(musicFile);
         updates.backgroundMusic = await ref.getDownloadURL();
-      } else if (overlay.dataset.pendingMusicUrl) {
-        updates.backgroundMusic = overlay.dataset.pendingMusicUrl;
+      } else if (pageRoot.dataset.pendingMusicUrl) {
+        updates.backgroundMusic = pageRoot.dataset.pendingMusicUrl;
       }
 
-      await db.ref(`stories/${currentStoryId}`).update(updates);
+      await db.ref(`stories/${storyId}`).update(updates);
       Object.assign(currentStory, updates);
-      overlay.remove();
-      drawEditor();
       showToast("Settings saved");
+      navigate("editor/" + storyId);
     } catch (e) {
       errEl.textContent = "Save failed: " + e.message;
       errEl.style.display = "block";
@@ -1635,6 +1716,62 @@ function selectMusic(url) {
   }
   document.querySelectorAll(".search-modal-box").forEach(el => el.closest(".modal-overlay")?.remove());
   showToast("Music selected — click Save settings to apply");
+}
+
+/* =========================================================================
+   STORY INTRO (title page before Play)
+   ========================================================================= */
+async function renderStoryIntro(storyId) {
+  if (!storyId) { navigate("play-search"); return; }
+
+  app.innerHTML = `<div class="wood-screen"><div class="loading-note">Loading story...</div></div>`;
+
+  let snap;
+  try {
+    snap = await db.ref("stories/" + storyId).once("value");
+  } catch (e) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Failed to load: ${escapeHtml(e.message)}</div></div>`;
+    return;
+  }
+
+  const story = snap.val();
+  if (!story) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Story not found.</div></div>`;
+    return;
+  }
+
+  const faqEntries = toArray(story.faq).filter(f => f && (f.question || f.answer));
+
+  app.innerHTML = `
+    <div class="wood-screen" style="justify-content:flex-start; padding-top:80px; padding-bottom:60px; overflow-y:auto;">
+      <button class="back-link" onclick="navigate('play-search')">&larr; Back</button>
+      <div class="panel-stack">
+        ${story.coverArt ? `<img src="${escapeHtml(story.coverArt)}" alt="" style="width:100%;max-width:420px;border-radius:var(--radius-card);box-shadow:var(--shadow-soft);object-fit:cover;aspect-ratio:4/3;" />` : ""}
+
+        <div class="pill home-title" style="padding:20px 36px;font-size:1.4rem;">${escapeHtml(story.title || "Untitled")}</div>
+
+        ${story.author ? `<div class="empty-note">by ${escapeHtml(story.author)}</div>` : ""}
+
+        ${story.description ? `<div class="card">${escapeHtml(story.description)}</div>` : ""}
+
+        ${faqEntries.length ? `
+          <div class="card" style="text-align:left;">
+            <div class="heading" style="font-size:1.05rem;margin-bottom:14px;">FAQ</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              ${faqEntries.map(f => `
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px;">${escapeHtml(f.question || "")}</div>
+                  <div style="color:#444;">${escapeHtml(f.answer || "")}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        ` : ""}
+
+        <button class="pill" onclick="navigate('play/${storyId}')">Start</button>
+      </div>
+    </div>
+  `;
 }
 
 /* =========================================================================
