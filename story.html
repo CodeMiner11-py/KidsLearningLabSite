@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactive Story Maker v1</title>
+
+<style>
+  @font-face {
+    font-family: 'SFHeading';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Regular.otf') format('opentype');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'SFHeading';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Bold.otf') format('opentype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'SFHeading';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+  @font-face {
+    font-family: 'SFText';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Regular.otf') format('opentype');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'SFText';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Bold.otf') format('opentype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'SFText';
+    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  :root {
+    --black: #111111;
+    --white: #ffffff;
+    --gray-bg: #b9b9b9;
+    --gray-line: #d8d8d8;
+    --danger: #d64545;
+    --danger-bg: #fdecec;
+    --success: #2f8f4e;
+    --radius-pill: 999px;
+    --radius-card: 28px;
+    --shadow-soft: 0 6px 20px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--white);
+    color: var(--black);
+    font-family: 'SFText', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  h1, h2, h3, .heading {
+    font-family: 'SFHeading', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  #app {
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* ---------- Wood background screens (Home / About / Create / Edit-search / Play-search) ---------- */
+  .wood-screen {
+    min-height: 100vh;
+    width: 100%;
+    background-image: url('https://kidslearninglab.com/wood.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 24px;
+  }
+
+  .pill {
+    background: var(--white);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 18px 32px;
+    font-size: 1.1rem;
+    box-shadow: var(--shadow-soft);
+    color: var(--black);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .pill:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
+  .pill:active { transform: translateY(0); }
+  .pill:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+
+  .corner-btn {
+    position: absolute;
+  }
+  .corner-tl { top: 28px; left: 28px; }
+  .corner-tr { top: 28px; right: 28px; }
+  .corner-bl { bottom: 28px; left: 28px; }
+  .corner-br { bottom: 28px; right: 28px; }
+
+  .home-title {
+    font-size: 1.6rem;
+    padding: 26px 48px;
+  }
+  .home-title b { font-weight: 700; }
+
+  /* ---------- Generic centered card panel (About / Create / Search) ---------- */
+  .panel-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 640px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
+    padding: 32px 36px;
+    width: 100%;
+    text-align: center;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .search-input {
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 18px 26px;
+    font-size: 1.05rem;
+    background: var(--white);
+    box-shadow: var(--shadow-soft);
+    font-family: inherit;
+  }
+  .search-input:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+
+  .story-result {
+    width: 100%;
+    text-align: left;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 18px 26px;
+    color: var(--white);
+    font-size: 1rem;
+    box-shadow: var(--shadow-soft);
+  }
+  .story-result:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+  .story-result .story-title { font-weight: 700; display: block; margin-bottom: 2px; }
+  .story-result .story-author { opacity: 0.85; font-size: 0.85rem; }
+
+  .results-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 4px;
+  }
+
+  .empty-note {
+    color: var(--black);
+    background: var(--white);
+    border-radius: var(--radius-pill);
+    padding: 14px 22px;
+    box-shadow: var(--shadow-soft);
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  /* ---------- Password modal ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-box {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .modal-box h2 { font-size: 1.2rem; }
+  .modal-box input {
+    border: 1px solid var(--gray-line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .btn {
+    border: none;
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-secondary { background: var(--gray-line); color: var(--black); }
+  .error-text { color: var(--danger); font-size: 0.9rem; margin: 0; }
+
+  /* ---------- Editor screen ---------- */
+  .editor-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--gray-bg);
+  }
+  .editor-canvas {
+    flex: 1;
+    background-image: url('https://kidslearninglab.com/wood.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: auto;
+    padding: 60px 40px 120px;
+  }
+  .cp-graph {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+    min-width: max-content;
+  }
+  .cp-node-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .cp-node-btn {
+    background: var(--white);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 16px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    white-space: nowrap;
+  }
+  .cp-node-btn.active { outline: 3px solid var(--black); }
+  .cp-children {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .editor-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    background: var(--white);
+    border-top: 1px solid var(--gray-line);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- CP edit panel ---------- */
+  .cp-panel {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
+    padding: 28px;
+    max-width: 520px;
+    margin: 0 auto 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .cp-panel-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .cp-panel textarea, .cp-panel input[type=text] {
+    width: 100%;
+    border: 1px solid var(--gray-line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 0.98rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .field-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #555;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .choices-list { display: flex; flex-direction: column; gap: 10px; }
+  .choice-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f4f4f4;
+    border-radius: 16px;
+    padding: 10px 12px;
+  }
+  .choice-row input { flex: 1; border: none; background: transparent; font-family: inherit; font-size: 0.95rem; }
+  .icon-btn {
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 10px;
+  }
+  .icon-btn.remove { color: var(--danger); }
+  .icon-btn.add-choice {
+    align-self: flex-start;
+    background: #e8f5ec;
+    color: var(--success);
+    border-radius: var(--radius-pill);
+    padding: 8px 16px;
+    font-weight: 600;
+  }
+  .goto-select {
+    border: 1px solid var(--gray-line);
+    border-radius: 10px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+  }
+
+  /* ---------- Play screen ---------- */
+  .play-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--gray-bg);
+  }
+  .play-card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--gray-bg);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+  }
+  .play-bg {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-size: cover;
+    background-position: center;
+    background-color: #cfcfcf;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 20px;
+    gap: 20px;
+  }
+  .play-title-pill {
+    align-self: flex-start;
+    background: var(--white);
+    border-radius: var(--radius-pill);
+    padding: 10px 20px;
+    font-weight: 700;
+    box-shadow: var(--shadow-soft);
+  }
+  .play-text-pill {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: 20px 26px;
+    text-align: center;
+    font-size: 1.05rem;
+    box-shadow: var(--shadow-soft);
+    max-width: 90%;
+  }
+  .play-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    margin-top: auto;
+  }
+  .play-choice-btn {
+    background: var(--white);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 16px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+  }
+  .play-choice-btn:focus-visible, .pill:focus-visible, .cp-node-btn:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+
+  .end-screen {
+    text-align: center;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--black);
+    color: var(--white);
+    padding: 14px 24px;
+    border-radius: var(--radius-pill);
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-soft);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .toast.show { opacity: 1; }
+
+  .back-link {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background: var(--white);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-soft);
+    z-index: 5;
+  }
+
+  .loading-note {
+    color: var(--white);
+    background: rgba(0,0,0,0.5);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 0.9rem;
+  }
+
+  .top-settings-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding: 20px 20px 0;
+  }
+
+  @media (max-width: 560px) {
+    .home-title { font-size: 1.2rem; padding: 18px 28px; }
+    .corner-tl, .corner-tr, .corner-bl, .corner-br { position: static; }
+    .wood-screen { gap: 16px; }
+    .play-choices { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pill, .cp-node-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<!-- Firebase SDK (compat build — simplest for a single-file app) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<script>
+/* =========================================================================
+   CONFIG
+   ========================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyDAp80zzXcRamUog1yTgPoHjC158LD1lpY",
+  authDomain: "interactivestorygame-wilson.firebaseapp.com",
+  databaseURL: "https://interactivestorygame-wilson-default-rtdb.firebaseio.com",
+  projectId: "interactivestorygame-wilson",
+  storageBucket: "interactivestorygame-wilson.firebasestorage.app",
+  messagingSenderId: "438319334696",
+  appId: "1:438319334696:web:8e3c1cb258a2f89611bc1d"
+};
+
+const WORKER_URL = "https://onlyshouldgenerateonceeverforeachindividualchoiceeveronceonly.nameless-cherry-998c.workers.dev";
+const CLICK_SOUND_URL = "https://kidslearninglab.com/click.mp3";
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10mb per doc spec
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const storage = firebase.storage();
+
+/* =========================================================================
+   UTIL
+   ========================================================================= */
+function genId(len = 20) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let out = "";
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < len; i++) out += chars[arr[i] % chars.length];
+  return out;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+const clickAudio = new Audio(CLICK_SOUND_URL);
+function playClick() {
+  try {
+    clickAudio.currentTime = 0;
+    clickAudio.play().catch(() => {});
+  } catch (e) {}
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("button")) playClick();
+});
+
+/* =========================================================================
+   ROUTER
+   ========================================================================= */
+const app = document.getElementById("app");
+
+function parseHash() {
+  const h = location.hash.replace(/^#\/?/, "");
+  const parts = h.split("/").filter(Boolean);
+  return { route: parts[0] || "home", params: parts.slice(1) };
+}
+
+window.addEventListener("hashchange", render);
+window.addEventListener("DOMContentLoaded", render);
+
+function navigate(path) {
+  location.hash = path;
+}
+
+function render() {
+  const { route, params } = parseHash();
+  const urlParams = new URLSearchParams(location.search);
+
+  switch (route) {
+    case "home": return renderHome();
+    case "about": return renderAbout();
+    case "create": return renderCreate();
+    case "edit-search": return renderStorySearch("edit");
+    case "play-search": return renderStorySearch("play");
+    case "editor": return renderEditor(params[0]);
+    case "play": return renderPlay(params[0] || urlParams.get("story_id"));
+    default: return renderHome();
+  }
+}
+
+/* =========================================================================
+   HOME
+   ========================================================================= */
+function renderHome() {
+  app.innerHTML = `
+    <div class="wood-screen">
+      <button class="pill corner-btn corner-tl" onclick="navigate('create')">Create</button>
+      <button class="pill corner-btn corner-tr" onclick="navigate('play-search')">Play</button>
+      <div class="pill home-title"><span>Interactive Story Maker <b>v1</b></span></div>
+      <button class="pill corner-btn corner-bl" onclick="navigate('edit-search')">Edit</button>
+      <button class="pill corner-btn corner-br" onclick="navigate('about')">About</button>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   ABOUT
+   ========================================================================= */
+function renderAbout() {
+  app.innerHTML = `
+    <div class="wood-screen">
+      <button class="back-link" onclick="navigate('home')">&larr; Back</button>
+      <div class="panel-stack">
+        <div class="pill home-title" style="padding:20px 36px;font-size:1.3rem;">Interactive Story Maker <b>v1</b></div>
+        <div class="card">
+          Interactive Story Maker <b>v1</b> is an interactive story website created by Eshaan Buddhisagar.
+          Here you can create your own interactive stories and share your stories with other people.
+          © 2026 Eshaan Buddhisagar
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   CREATE
+   ========================================================================= */
+function renderCreate() {
+  app.innerHTML = `
+    <div class="wood-screen">
+      <button class="back-link" onclick="navigate('home')">&larr; Back</button>
+      <div class="panel-stack">
+        <div class="pill home-title" style="padding:20px 36px;font-size:1.3rem;">Interactive Story Maker <b>v1</b></div>
+        <div class="card" style="text-align:left;">
+          <label class="field-label" for="c-title">Story title</label>
+          <input id="c-title" type="text" class="search-input" style="margin-bottom:14px;" placeholder="e.g. The Lost Lighthouse" />
+
+          <label class="field-label" for="c-author">Author name</label>
+          <input id="c-author" type="text" class="search-input" style="margin-bottom:14px;" placeholder="Your name" />
+
+          <label class="field-label" for="c-desc">Description</label>
+          <input id="c-desc" type="text" class="search-input" style="margin-bottom:14px;" placeholder="One line about your story" />
+
+          <label class="field-label" for="c-password">Secret editing password</label>
+          <input id="c-password" type="text" class="search-input" style="margin-bottom:14px;" placeholder="Only you should know this" />
+
+          <p id="c-error" class="error-text" style="display:none;"></p>
+        </div>
+        <button class="pill" style="align-self:flex-end;" onclick="submitCreate()">Create</button>
+      </div>
+    </div>
+  `;
+}
+
+async function submitCreate() {
+  const title = document.getElementById("c-title").value.trim();
+  const author = document.getElementById("c-author").value.trim();
+  const desc = document.getElementById("c-desc").value.trim();
+  const password = document.getElementById("c-password").value;
+  const errEl = document.getElementById("c-error");
+
+  if (!title || !password) {
+    errEl.textContent = "Title and secret password are required.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const storyId = genId(20);
+  const firstCpId = genId(10);
+
+  const storyData = {
+    title,
+    author,
+    description: desc,
+    password,
+    coverArt: "",
+    backgroundImage: "",
+    aiImagesEnabled: true,
+    createdAt: Date.now(),
+    firstPage: firstCpId,
+    pages: {
+      [firstCpId]: {
+        text: "Your story begins here...",
+        image: "",
+        aiPrompt: "",
+        sound: "",
+        soundTiming: "start",
+        choices: {}
+      }
+    }
+  };
+
+  try {
+    await db.ref("stories/" + storyId).set(storyData);
+    showToast("Story created!");
+    navigate("editor/" + storyId);
+  } catch (e) {
+    errEl.textContent = "Couldn't create story: " + e.message;
+    errEl.style.display = "block";
+  }
+}
+
+/* =========================================================================
+   SEARCH (shared by Edit + Play)
+   ========================================================================= */
+async function renderStorySearch(mode) {
+  const heading = mode === "edit" ? "Search for your story..." : "Search for a story to play...";
+  app.innerHTML = `
+    <div class="wood-screen">
+      <button class="back-link" onclick="navigate('home')">&larr; Back</button>
+      <div class="panel-stack">
+        <div class="pill home-title" style="padding:20px 36px;font-size:1.3rem;">Interactive Story ${mode === "edit" ? "Maker " : ""}<b>v1</b></div>
+        <input id="search-input" class="search-input" placeholder="${heading}" oninput="filterResults()" />
+        <div id="results" class="results-list"><div class="empty-note">Loading stories...</div></div>
+        <button class="pill" style="align-self:flex-end;" onclick="location.hash='#/${mode === "edit" ? "edit-search" : "play-search"}'">${mode === "edit" ? "Edit" : "Play"}</button>
+      </div>
+    </div>
+  `;
+
+  window.__searchMode = mode;
+  window.__allStories = [];
+
+  try {
+    const snap = await db.ref("stories").once("value");
+    const val = snap.val() || {};
+    window.__allStories = Object.entries(val).map(([id, s]) => ({
+      id,
+      title: s.title || "Untitled",
+      author: s.author || "",
+      description: s.description || ""
+    }));
+    filterResults();
+  } catch (e) {
+    document.getElementById("results").innerHTML = `<div class="empty-note">Couldn't load stories: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+const RESULT_COLORS = ["#2f6fb0", "#6a4a2f", "#6a4fd6", "#2f8f6a", "#b0552f"];
+
+function filterResults() {
+  const q = (document.getElementById("search-input")?.value || "").toLowerCase();
+  const list = (window.__allStories || []).filter(s =>
+    s.title.toLowerCase().includes(q) || s.author.toLowerCase().includes(q)
+  );
+  const resultsEl = document.getElementById("results");
+  if (!resultsEl) return;
+
+  if (list.length === 0) {
+    resultsEl.innerHTML = `<div class="empty-note">No stories found. ${window.__searchMode === "edit" ? "Create one first!" : "Check back later."}</div>`;
+    return;
+  }
+
+  resultsEl.innerHTML = list.map((s, i) => `
+    <button class="story-result" style="background:${RESULT_COLORS[i % RESULT_COLORS.length]}"
+      onclick="${window.__searchMode === "edit" ? `promptEditPassword('${s.id}')` : `navigate('play/${s.id}')`}">
+      <span class="story-title">${escapeHtml(s.title)}</span>
+      <span class="story-author">${s.author ? "by " + escapeHtml(s.author) : ""}${s.description ? " — " + escapeHtml(s.description) : ""}</span>
+    </button>
+  `).join("");
+}
+
+/* =========================================================================
+   PASSWORD MODAL (Edit gate)
+   ========================================================================= */
+function promptEditPassword(storyId) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>Enter secret editing password</h2>
+      <input type="text" id="pw-input" placeholder="Password" autofocus />
+      <p id="pw-error" class="error-text" style="display:none;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="pw-cancel">Cancel</button>
+        <button class="btn btn-primary" id="pw-submit">Continue</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelector("#pw-cancel").onclick = close;
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+
+  const submit = async () => {
+    const pw = overlay.querySelector("#pw-input").value;
+    const errEl = overlay.querySelector("#pw-error");
+    try {
+      const snap = await db.ref("stories/" + storyId + "/password").once("value");
+      const realPw = snap.val();
+      if (realPw === null) {
+        errEl.textContent = "Story not found.";
+        errEl.style.display = "block";
+        return;
+      }
+      if (pw === realPw) {
+        sessionStorage.setItem("edit_pw_" + storyId, pw);
+        close();
+        navigate("editor/" + storyId);
+      } else {
+        errEl.textContent = "Incorrect password.";
+        errEl.style.display = "block";
+      }
+    } catch (e) {
+      errEl.textContent = "Error checking password: " + e.message;
+      errEl.style.display = "block";
+    }
+  };
+  overlay.querySelector("#pw-submit").onclick = submit;
+  overlay.querySelector("#pw-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submit();
+  });
+}
+
+/* =========================================================================
+   EDITOR (CP tree + panel)
+   ========================================================================= */
+let currentStory = null;
+let currentStoryId = null;
+let activeCpId = null;
+
+async function renderEditor(storyId) {
+  currentStoryId = storyId;
+  const storedPw = sessionStorage.getItem("edit_pw_" + storyId);
+
+  app.innerHTML = `<div class="wood-screen"><div class="loading-note">Loading story...</div></div>`;
+
+  let snap;
+  try {
+    snap = await db.ref("stories/" + storyId).once("value");
+  } catch (e) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Failed to load: ${escapeHtml(e.message)}</div></div>`;
+    return;
+  }
+
+  const story = snap.val();
+  if (!story) {
+    app.innerHTML = `<div class="wood-screen"><div class="empty-note">Story not found.</div><button class="pill" style="margin-top:16px;" onclick="navigate('home')">Home</button></div>`;
+    return;
+  }
+
+  if (!storedPw || storedPw !== story.password) {
+    // require password again
+    app.innerHTML = `<div class="wood-screen"></div>`;
+    promptEditPasswordThen(storyId, () => renderEditor(storyId));
+    return;
+  }
+
+  currentStory = story;
+  activeCpId = story.firstPage;
+  drawEditor();
+}
+
+function promptEditPasswordThen(storyId, onSuccess) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>Enter secret editing password</h2>
+      <input type="text" id="pw-input2" placeholder="Password" autofocus />
+      <p id="pw-error2" class="error-text" style="display:none;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="pw-cancel2">Cancel</button>
+        <button class="btn btn-primary" id="pw-submit2">Continue</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#pw-cancel2").onclick = () => { overlay.remove(); navigate("home"); };
+
+  const submit = async () => {
+    const pw = overlay.querySelector("#pw-input2").value;
+    const errEl = overlay.querySelector("#pw-error2");
+    const snap = await db.ref("stories/" + storyId + "/password").once("value");
+    if (snap.val() === pw) {
+      sessionStorage.setItem("edit_pw_" + storyId, pw);
+      overlay.remove();
+      onSuccess();
+    } else {
+      errEl.textContent = "Incorrect password.";
+      errEl.style.display = "block";
+    }
+  };
+  overlay.querySelector("#pw-submit2").onclick = submit;
+  overlay.querySelector("#pw-input2").addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+}
+
+function drawEditor() {
+  const story = currentStory;
+  const bg = story.backgroundImage || "https://kidslearninglab.com/wood.jpg";
+
+  app.innerHTML = `
+    <div class="editor-wrap">
+      <div class="editor-canvas" style="background-image:url('${escapeHtml(bg)}')">
+        <button class="back-link" onclick="exitEditor()">&larr; Exit</button>
+        <div id="cp-graph-container" style="margin-top:60px;"></div>
+      </div>
+      <div id="cp-panel-slot"></div>
+      <div class="editor-bottom-bar">
+        <button class="pill" onclick="navigate('home')">Interactive Story Maker</button>
+        <button class="pill" onclick="openStorySettings()">Story Settings</button>
+      </div>
+    </div>
+  `;
+
+  drawCpGraph();
+  drawCpPanel();
+}
+
+function exitEditor() {
+  currentStory = null;
+  currentStoryId = null;
+  activeCpId = null;
+  navigate("home");
+}
+
+function drawCpGraph() {
+  const story = currentStory;
+  const container = document.getElementById("cp-graph-container");
+  const visited = new Set();
+
+  function buildNode(cpId, label) {
+    if (!cpId || !story.pages[cpId] || visited.has(cpId)) {
+      return `<div class="cp-node-wrap"><span style="color:#888;font-size:0.85rem;">(missing)</span></div>`;
+    }
+    visited.add(cpId);
+    const page = story.pages[cpId];
+    const choiceIds = Object.keys(page.choices || {});
+    const childrenHtml = choiceIds.map((choiceKey, idx) => {
+      const choice = page.choices[choiceKey];
+      return buildNode(choice.goto, choice.label || `Choice ${idx + 1}`);
+    }).join("");
+
+    return `
+      <div class="cp-node-wrap">
+        <button class="cp-node-btn ${cpId === activeCpId ? "active" : ""}" onclick="selectCp('${cpId}')">${escapeHtml(label)}</button>
+        ${childrenHtml ? `<div class="cp-children">${childrenHtml}</div>` : ""}
+      </div>
+    `;
+  }
+
+  const rootLabel = "Choice Page (C.P.) 1";
+  container.innerHTML = `<div class="cp-graph">${buildNode(story.firstPage, rootLabel)}</div>`;
+}
+
+function selectCp(cpId) {
+  activeCpId = cpId;
+  drawCpGraph();
+  drawCpPanel();
+}
+
+function drawCpPanel() {
+  const slot = document.getElementById("cp-panel-slot");
+  const story = currentStory;
+  const page = story.pages[activeCpId];
+  if (!page) {
+    slot.innerHTML = "";
+    return;
+  }
+
+  const allCpOptions = Object.keys(story.pages).map(id =>
+    `<option value="${id}">${id === story.firstPage ? "Start — " : ""}${id.slice(0, 6)}</option>`
+  ).join("");
+
+  const choicesHtml = Object.entries(page.choices || {}).map(([choiceId, choice]) => `
+    <div class="choice-row">
+      <input type="text" value="${escapeHtml(choice.label || "")}" placeholder="Choice text"
+        onchange="updateChoiceLabel('${choiceId}', this.value)" />
+      <select class="goto-select" onchange="updateChoiceGoto('${choiceId}', this.value)">
+        <option value="">New page...</option>
+        ${allCpOptions}
+      </select>
+      <button class="icon-btn remove" title="Remove choice" onclick="removeChoice('${choiceId}')">&times;</button>
+    </div>
+  `).join("");
+
+  slot.innerHTML = `
+    <div class="cp-panel">
+      <div class="cp-panel-header">
+        <span class="heading" style="font-size:1.05rem;">Choice Page</span>
+        ${activeCpId !== story.firstPage ? `<button class="icon-btn remove" onclick="deleteCp()">Delete page</button>` : ""}
+      </div>
+
+      <div>
+        <label class="field-label">Page text</label>
+        <textarea rows="3" id="cp-text" onchange="updatePageField('text', this.value)">${escapeHtml(page.text || "")}</textarea>
+      </div>
+
+      <div>
+        <label class="field-label">AI image prompt</label>
+        <input type="text" id="cp-aiprompt" value="${escapeHtml(page.aiPrompt || "")}" placeholder="e.g. a foggy pier at midnight, storybook style" onchange="updatePageField('aiPrompt', this.value)" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="generateAiImage()">Generate AI image</button>
+        <label class="btn btn-secondary" style="cursor:pointer;">
+          Upload image
+          <input type="file" accept="image/*" style="display:none" onchange="uploadCpImage(this.files[0])" />
+        </label>
+        ${page.image ? `<span style="align-self:center;color:var(--success);font-size:0.85rem;">Image set ✓</span>` : ""}
+      </div>
+
+      <div>
+        <label class="field-label">Sound effect</label>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <label class="btn btn-secondary" style="cursor:pointer;">
+            Upload sound
+            <input type="file" accept="audio/*" style="display:none" onchange="uploadCpSound(this.files[0])" />
+          </label>
+          <select class="goto-select" onchange="updatePageField('soundTiming', this.value)">
+            <option value="start" ${page.soundTiming === "start" ? "selected" : ""}>Play at start</option>
+            <option value="afterSelect" ${page.soundTiming === "afterSelect" ? "selected" : ""}>Play after selecting</option>
+          </select>
+          ${page.sound ? `<span style="color:var(--success);font-size:0.85rem;">Sound set ✓</span>` : ""}
+        </div>
+      </div>
+
+      <div class="choices-list">
+        <label class="field-label">Choices</label>
+        ${choicesHtml || `<span style="color:#888;font-size:0.9rem;">No choices yet — this is an ending page.</span>`}
+        <button class="icon-btn add-choice" onclick="addChoice()">+ Add choice</button>
+      </div>
+    </div>
+  `;
+}
+
+function updatePageField(field, value) {
+  currentStory.pages[activeCpId][field] = value;
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/${field}`).set(value)
+    .then(() => showToast("Saved"))
+    .catch(e => showToast("Save failed: " + e.message));
+}
+
+function addChoice() {
+  const newChoiceId = genId(8);
+  const newCpId = genId(10);
+  if (!currentStory.pages[activeCpId].choices) currentStory.pages[activeCpId].choices = {};
+  currentStory.pages[activeCpId].choices[newChoiceId] = { label: "New choice", goto: newCpId };
+  currentStory.pages[newCpId] = { text: "", image: "", aiPrompt: "", sound: "", soundTiming: "start", choices: {} };
+
+  const updates = {};
+  updates[`stories/${currentStoryId}/pages/${activeCpId}/choices/${newChoiceId}`] = { label: "New choice", goto: newCpId };
+  updates[`stories/${currentStoryId}/pages/${newCpId}`] = { text: "", image: "", aiPrompt: "", sound: "", soundTiming: "start", choices: {} };
+
+  db.ref().update(updates)
+    .then(() => { drawCpGraph(); drawCpPanel(); showToast("Choice added"); })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+function updateChoiceLabel(choiceId, label) {
+  currentStory.pages[activeCpId].choices[choiceId].label = label;
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/choices/${choiceId}/label`).set(label)
+    .then(() => { drawCpGraph(); showToast("Saved"); })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+function updateChoiceGoto(choiceId, gotoId) {
+  if (!gotoId) {
+    gotoId = genId(10);
+    currentStory.pages[gotoId] = { text: "", image: "", aiPrompt: "", sound: "", soundTiming: "start", choices: {} };
+    db.ref(`stories/${currentStoryId}/pages/${gotoId}`).set(currentStory.pages[gotoId]);
+  }
+  currentStory.pages[activeCpId].choices[choiceId].goto = gotoId;
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/choices/${choiceId}/goto`).set(gotoId)
+    .then(() => { drawCpGraph(); showToast("Saved"); })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+function removeChoice(choiceId) {
+  delete currentStory.pages[activeCpId].choices[choiceId];
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/choices/${choiceId}`).remove()
+    .then(() => { drawCpGraph(); drawCpPanel(); showToast("Choice removed"); })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+function deleteCp() {
+  if (!confirm("Delete this choice page? This won't delete choices pointing to it elsewhere.")) return;
+  const idToDelete = activeCpId;
+  db.ref(`stories/${currentStoryId}/pages/${idToDelete}`).remove()
+    .then(() => {
+      delete currentStory.pages[idToDelete];
+      activeCpId = currentStory.firstPage;
+      drawCpGraph();
+      drawCpPanel();
+      showToast("Page deleted");
+    })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+async function generateAiImage() {
+  const page = currentStory.pages[activeCpId];
+  const prompt = page.aiPrompt;
+  if (!prompt) {
+    showToast("Add an AI image prompt first");
+    return;
+  }
+  if (currentStory.aiImagesEnabled === false) {
+    showToast("AI images are turned off in Story Settings");
+    return;
+  }
+  showToast("Generating image...");
+  try {
+    const res = await fetch(WORKER_URL + "/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || "Generation failed");
+    }
+    const blob = await res.blob();
+    if (blob.size > MAX_IMAGE_BYTES) throw new Error("Generated image exceeds 10mb limit");
+
+    const path = `stories/${currentStoryId}/pages/${activeCpId}/${Date.now()}.png`;
+    const ref = storage.ref(path);
+    await ref.put(blob);
+    const url = await ref.getDownloadURL();
+
+    currentStory.pages[activeCpId].image = url;
+    await db.ref(`stories/${currentStoryId}/pages/${activeCpId}/image`).set(url);
+    drawCpPanel();
+    showToast("Image generated!");
+  } catch (e) {
+    showToast("Image generation failed: " + e.message);
+  }
+}
+
+async function uploadCpImage(file) {
+  if (!file) return;
+  if (file.size > MAX_IMAGE_BYTES) {
+    showToast("Image must be under 10mb");
+    return;
+  }
+  showToast("Uploading image...");
+  try {
+    const path = `stories/${currentStoryId}/pages/${activeCpId}/${Date.now()}_${file.name}`;
+    const ref = storage.ref(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    currentStory.pages[activeCpId].image = url;
+    await db.ref(`stories/${currentStoryId}/pages/${activeCpId}/image`).set(url);
+    drawCpPanel();
+    showToast("Image uploaded!");
+  } catch (e) {
+    showToast("Upload failed: " + e.message);
+  }
+}
+
+async function uploadCpSound(file) {
+  if (!file) return;
+  showToast("Uploading sound...");
+  try {
+    const path = `stories/${currentStoryId}/pages/${activeCpId}/sound_${Date.now()}_${file.name}`;
+    const ref = storage.ref(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    currentStory.pages[activeCpId].sound = url;
+    await db.ref(`stories/${currentStoryId}/pages/${activeCpId}/sound`).set(url);
+    drawCpPanel();
+    showToast("Sound uploaded!");
+  } catch (e) {
+    showToast("Upload failed: " + e.message);
+  }
+}
+
+/* ---------- Story Settings modal ---------- */
+function openStorySettings() {
+  const story = currentStory;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box" style="max-width:480px;">
+      <h2>Story Settings</h2>
+      <div>
+        <label class="field-label">Title</label>
+        <input type="text" id="s-title" value="${escapeHtml(story.title || "")}" />
+      </div>
+      <div>
+        <label class="field-label">Author</label>
+        <input type="text" id="s-author" value="${escapeHtml(story.author || "")}" />
+      </div>
+      <div>
+        <label class="field-label">Description</label>
+        <input type="text" id="s-desc" value="${escapeHtml(story.description || "")}" />
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" id="s-ai" ${story.aiImagesEnabled !== false ? "checked" : ""} style="width:auto;" />
+        <label for="s-ai" style="font-size:0.9rem;">Enable AI image generation for new choices</label>
+      </div>
+      <div>
+        <label class="field-label">Background image</label>
+        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+          Upload
+          <input type="file" accept="image/*" id="s-bg" style="display:none" />
+        </label>
+      </div>
+      <div>
+        <label class="field-label">Cover art</label>
+        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+          Upload
+          <input type="file" accept="image/*" id="s-cover" style="display:none" />
+        </label>
+      </div>
+      <div>
+        <label class="field-label">Background music</label>
+        <label class="btn btn-secondary" style="cursor:pointer; display:inline-block;">
+          Upload
+          <input type="file" accept="audio/*" id="s-music" style="display:none" />
+        </label>
+      </div>
+      <div>
+        <label class="field-label">End credits</label>
+        <input type="text" id="s-credits" value="${escapeHtml(story.endCredits || "")}" placeholder="e.g. Written by..." />
+      </div>
+      <p id="s-error" class="error-text" style="display:none;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="s-cancel">Close</button>
+        <button class="btn btn-primary" id="s-save">Save settings</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#s-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  overlay.querySelector("#s-save").onclick = async () => {
+    const errEl = overlay.querySelector("#s-error");
+    try {
+      const updates = {
+        title: overlay.querySelector("#s-title").value.trim(),
+        author: overlay.querySelector("#s-author").value.trim(),
+        description: overlay.querySelector("#s-desc").value.trim(),
+        aiImagesEnabled: overlay.querySelector("#s-ai").checked,
+        endCredits: overlay.querySelector("#s-credits").value.trim(),
+        password: story.password // required by RTDB rule on every write
+      };
+
+      const bgFile = overlay.querySelector("#s-bg").files[0];
+      const coverFile = overlay.querySelector("#s-cover").files[0];
+      const musicFile = overlay.querySelector("#s-music").files[0];
+
+      if (bgFile) {
+        const ref = storage.ref(`stories/${currentStoryId}/background_${Date.now()}_${bgFile.name}`);
+        await ref.put(bgFile);
+        updates.backgroundImage = await ref.getDownloadURL();
+      }
+      if (coverFile) {
+        const ref = storage.ref(`stories/${currentStoryId}/cover_${Date.now()}_${coverFile.name}`);
+        await ref.put(coverFile);
+        updates.coverArt = await ref.getDownloadURL();
+      }
+      if (musicFile) {
+        const ref = storage.ref(`stories/${currentStoryId}/music_${Date.now()}_${musicFile.name}`);
+        await ref.put(musicFile);
+        updates.backgroundMusic = await ref.getDownloadURL();
+      }
+
+      await db.ref(`stories/${currentStoryId}`).update(updates);
+      Object.assign(currentStory, updates);
+      overlay.remove();
+      drawEditor();
+      showToast("Settings saved");
+    } catch (e) {
+      errEl.textContent = "Save failed: " + e.message;
+      errEl.style.display = "block";
+    }
+  };
+}
+
+/* =========================================================================
+   PLAY (story runner)
+   ========================================================================= */
+let playStory = null;
+let playStoryId = null;
+let playCpId = null;
+let bgMusicEl = null;
+
+async function renderPlay(storyId) {
+  if (!storyId) {
+    app.innerHTML = `<div class="play-screen"><div class="empty-note">No story specified.</div></div>`;
+    return;
+  }
+  playStoryId = storyId;
+  app.innerHTML = `<div class="play-screen"><div class="loading-note">Loading story...</div></div>`;
+
+  let snap;
+  try {
+    snap = await db.ref("stories/" + storyId).once("value");
+  } catch (e) {
+    app.innerHTML = `<div class="play-screen"><div class="empty-note">Failed to load: ${escapeHtml(e.message)}</div></div>`;
+    return;
+  }
+
+  const story = snap.val();
+  if (!story) {
+    app.innerHTML = `<div class="play-screen"><div class="empty-note">Story not found.</div></div>`;
+    return;
+  }
+
+  playStory = story;
+  playCpId = story.firstPage;
+
+  if (story.backgroundMusic) {
+    bgMusicEl = new Audio(story.backgroundMusic);
+    bgMusicEl.loop = true;
+    bgMusicEl.volume = 0.4;
+    bgMusicEl.play().catch(() => {});
+  }
+
+  drawPlayPage();
+}
+
+function drawPlayPage() {
+  const story = playStory;
+  const page = story.pages[playCpId];
+
+  if (!page) {
+    app.innerHTML = `<div class="play-screen"><div class="empty-note">This page is missing from the story.</div></div>`;
+    return;
+  }
+
+  const choiceEntries = Object.entries(page.choices || {});
+  const isEnd = choiceEntries.length === 0;
+
+  if (page.sound && page.soundTiming === "start") {
+    new Audio(page.sound).play().catch(() => {});
+  }
+
+  const choicesHtml = choiceEntries.map(([choiceId, choice]) => `
+    <button class="play-choice-btn" onclick="selectPlayChoice('${choiceId}')">${escapeHtml(choice.label || "Continue")}</button>
+  `).join("");
+
+  app.innerHTML = `
+    <div class="play-screen">
+      <div class="play-card">
+        <button class="back-link" onclick="exitPlay()">&larr; Exit</button>
+        <div class="play-bg" style="${page.image ? `background-image:url('${escapeHtml(page.image)}')` : ""}">
+          <div class="play-title-pill">${escapeHtml(story.title)}</div>
+          <div class="play-text-pill">${escapeHtml(page.text || "")}</div>
+          ${isEnd ? `
+            <div class="end-screen">
+              <div class="play-text-pill">The End</div>
+              ${story.endCredits ? `<div class="play-text-pill" style="font-size:0.9rem;">${escapeHtml(story.endCredits)}</div>` : ""}
+              <button class="pill" onclick="exitPlay()">Back to stories</button>
+            </div>
+          ` : `<div class="play-choices">${choicesHtml}</div>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function selectPlayChoice(choiceId) {
+  const page = playStory.pages[playCpId];
+  const choice = page.choices[choiceId];
+  if (page.sound && page.soundTiming === "afterSelect") {
+    new Audio(page.sound).play().catch(() => {});
+  }
+  playCpId = choice.goto;
+  drawPlayPage();
+}
+
+function exitPlay() {
+  if (bgMusicEl) { bgMusicEl.pause(); bgMusicEl = null; }
+  playStory = null;
+  playStoryId = null;
+  playCpId = null;
+  navigate("home");
+}
+</script>
+</body>
+</html>
