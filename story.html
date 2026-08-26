@@ -475,6 +475,10 @@
     position: fixed;
     z-index: 6;
   }
+  .play-progress-btn {
+    position: fixed !important;
+    z-index: 6;
+  }
 
   .loading-note {
     color: var(--white);
@@ -1700,7 +1704,7 @@ function drawPlayPage() {
     <div class="play-screen">
       <div class="play-card">
         <button class="back-link" onclick="exitPlay()">&larr; Exit</button>
-        <button class="pill corner-btn corner-br" style="position:fixed;" onclick="openProgressModal()">Progress</button>
+        <button class="pill corner-btn corner-br play-progress-btn" onclick="openProgressModal()">Progress</button>
         <div class="play-bg">
           ${page.image ? `<img class="play-bg-img ${page.imageFit === 'width' ? 'fit-width' : 'fit-height'}" src="${escapeHtml(page.image)}" alt="" />` : ""}
           <div class="play-title-pill">${escapeHtml(story.title)}</div>
