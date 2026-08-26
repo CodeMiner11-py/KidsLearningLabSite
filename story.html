@@ -474,6 +474,51 @@
     padding: 20px 20px 0;
   }
 
+  /* ---------- Stock search modals ---------- */
+  .search-modal-box {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: 28px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 82vh;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .search-modal-results {
+    overflow-y: auto;
+    flex: 1;
+  }
+  .stock-image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stock-image-item {
+    border: none;
+    padding: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 4/3;
+    background: #eee;
+  }
+  .stock-image-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .stock-image-item:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+
+  .sfx-list { display: flex; flex-direction: column; gap: 10px; }
+  .sfx-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f4f4f4;
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .sfx-row span { flex: 1; font-size: 0.9rem; }
+
   @media (max-width: 560px) {
     .home-title { font-size: 1.2rem; padding: 18px 28px; }
     .corner-tl, .corner-tr, .corner-bl, .corner-br { position: static; }
@@ -513,6 +558,9 @@ const firebaseConfig = {
 const WORKER_URL = "https://onlyshouldgenerateonceeverforeachindividualchoiceeveronceonly.nameless-cherry-998c.workers.dev";
 const CLICK_SOUND_URL = "https://kidslearninglab.com/click.mp3";
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10mb per doc spec
+
+const UNSPLASH_ACCESS_KEY = "nhCfu_YETFkoe8zt8QKpG4_uDtp0EAYcFS6oTbqcan4";
+const FREESOUND_API_KEY = "tOiVXkCa422Q49ktr5n6GvEL1dlkeQ24ZxnoDXhR";
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -995,6 +1043,7 @@ function drawCpPanel() {
 
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn btn-secondary" onclick="generateAiImage()">Generate AI image</button>
+        <button class="btn btn-secondary" onclick="openStockImageSearch()">Search stock image</button>
         <label class="btn btn-secondary" style="cursor:pointer;">
           Upload image
           <input type="file" accept="image/*" style="display:none" onchange="uploadCpImage(this.files[0])" />
@@ -1005,6 +1054,7 @@ function drawCpPanel() {
       <div>
         <label class="field-label">Sound effect</label>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="openSfxSearch()">Search SFX</button>
           <label class="btn btn-secondary" style="cursor:pointer;">
             Upload sound
             <input type="file" accept="audio/*" style="display:none" onchange="uploadCpSound(this.files[0])" />
@@ -1128,6 +1178,159 @@ async function generateAiImage() {
   }
 }
 
+/* ---------- Stock image search (Unsplash) ---------- */
+function openStockImageSearch() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="search-modal-box">
+      <h2 style="font-size:1.05rem;">Search stock images</h2>
+      <input type="text" id="stock-img-q" class="modal-box input" style="border:1px solid var(--gray-line);border-radius:14px;padding:14px 16px;font-size:1rem;font-family:inherit;" placeholder="e.g. dark forest, lighthouse, spaceship" autofocus />
+      <div class="search-modal-results">
+        <div id="stock-img-results" class="empty-note">Type something and press Enter to search.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="stock-img-cancel">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#stock-img-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  const input = overlay.querySelector("#stock-img-q");
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") runStockImageSearch(input.value.trim(), overlay);
+  });
+}
+
+async function runStockImageSearch(query, overlay) {
+  const resultsEl = overlay.querySelector("#stock-img-results");
+  if (!query) return;
+  resultsEl.innerHTML = `<div class="empty-note">Searching...</div>`;
+
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` } }
+    );
+    if (!res.ok) throw new Error("Unsplash request failed (" + res.status + ")");
+    const data = await res.json();
+    const results = data.results || [];
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = `<div class="empty-note">No images found. Try a different search.</div>`;
+      return;
+    }
+
+    resultsEl.innerHTML = `
+      <div class="stock-image-grid">
+        ${results.map(r => `
+          <button class="stock-image-item" onclick='selectStockImage(${JSON.stringify(r.urls.regular)})'>
+            <img src="${escapeHtml(r.urls.small)}" alt="${escapeHtml(r.alt_description || query)}" loading="lazy" />
+          </button>
+        `).join("")}
+      </div>
+    `;
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="empty-note">Search failed: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function selectStockImage(url) {
+  currentStory.pages[activeCpId].image = url;
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/image`).set(url)
+    .then(() => {
+      document.querySelectorAll(".modal-overlay").forEach(el => el.remove());
+      drawCpPanel();
+      showToast("Image set from stock search");
+    })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
+/* ---------- SFX search (Freesound) ---------- */
+function openSfxSearch() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="search-modal-box">
+      <h2 style="font-size:1.05rem;">Search sound effects</h2>
+      <input type="text" id="sfx-q" style="border:1px solid var(--gray-line);border-radius:14px;padding:14px 16px;font-size:1rem;font-family:inherit;" placeholder="e.g. door creak, footsteps, thunder" autofocus />
+      <div class="search-modal-results">
+        <div id="sfx-results" class="empty-note">Type something and press Enter to search.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="sfx-cancel">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#sfx-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  const input = overlay.querySelector("#sfx-q");
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") runSfxSearch(input.value.trim(), overlay);
+  });
+}
+
+async function runSfxSearch(query, overlay) {
+  const resultsEl = overlay.querySelector("#sfx-results");
+  if (!query) return;
+  resultsEl.innerHTML = `<div class="empty-note">Searching...</div>`;
+
+  try {
+    const res = await fetch(
+      `https://freesound.org/apiv2/search/text/?query=${encodeURIComponent(query)}&fields=id,name,previews&page_size=12&token=${FREESOUND_API_KEY}`
+    );
+    if (!res.ok) throw new Error("Freesound request failed (" + res.status + ")");
+    const data = await res.json();
+    const results = data.results || [];
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = `<div class="empty-note">No sounds found. Try a different search.</div>`;
+      return;
+    }
+
+    resultsEl.innerHTML = `
+      <div class="sfx-list">
+        ${results.map(r => {
+          const previewUrl = r.previews?.["preview-hq-mp3"] || r.previews?.["preview-lq-mp3"] || "";
+          return `
+            <div class="sfx-row">
+              <span>${escapeHtml(r.name)}</span>
+              <button class="icon-btn" title="Preview" onclick='previewSfx(${JSON.stringify(previewUrl)})'>&#9658;</button>
+              <button class="btn btn-secondary" onclick='selectSfx(${JSON.stringify(previewUrl)})'>Use this</button>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="empty-note">Search failed: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+let sfxPreviewAudio = null;
+function previewSfx(url) {
+  if (!url) return;
+  if (sfxPreviewAudio) sfxPreviewAudio.pause();
+  sfxPreviewAudio = new Audio(url);
+  sfxPreviewAudio.play().catch(() => {});
+}
+
+function selectSfx(url) {
+  if (!url) { showToast("No preview available for this sound"); return; }
+  currentStory.pages[activeCpId].sound = url;
+  db.ref(`stories/${currentStoryId}/pages/${activeCpId}/sound`).set(url)
+    .then(() => {
+      document.querySelectorAll(".modal-overlay").forEach(el => el.remove());
+      drawCpPanel();
+      showToast("Sound set from search");
+    })
+    .catch(e => showToast("Failed: " + e.message));
+}
+
 async function uploadCpImage(file) {
   if (!file) return;
   if (file.size > MAX_IMAGE_BYTES) {
@@ -1164,6 +1367,48 @@ async function uploadCpSound(file) {
   } catch (e) {
     showToast("Upload failed: " + e.message);
   }
+}
+
+/* ---------- Delete story ---------- */
+function confirmDeleteStory(settingsOverlay) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>Delete "${escapeHtml(currentStory.title || "this story")}"?</h2>
+      <p style="font-size:0.92rem; color:#555;">This permanently deletes the story and every choice page in it. This can't be undone. Type the story's secret password to confirm.</p>
+      <input type="text" id="del-pw" placeholder="Secret password" autofocus />
+      <p id="del-error" class="error-text" style="display:none;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="del-cancel">Cancel</button>
+        <button class="btn" style="background:var(--danger);color:var(--white);" id="del-confirm">Delete permanently</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#del-cancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+
+  overlay.querySelector("#del-confirm").onclick = async () => {
+    const pw = overlay.querySelector("#del-pw").value;
+    const errEl = overlay.querySelector("#del-error");
+    if (pw !== currentStory.password) {
+      errEl.textContent = "Incorrect password.";
+      errEl.style.display = "block";
+      return;
+    }
+    try {
+      await db.ref(`stories/${currentStoryId}`).remove();
+      sessionStorage.removeItem("edit_pw_" + currentStoryId);
+      overlay.remove();
+      if (settingsOverlay) settingsOverlay.remove();
+      showToast("Story deleted");
+      navigate("home");
+    } catch (e) {
+      errEl.textContent = "Delete failed: " + e.message;
+      errEl.style.display = "block";
+    }
+  };
 }
 
 /* ---------- Story Settings modal ---------- */
@@ -1216,15 +1461,19 @@ function openStorySettings() {
         <input type="text" id="s-credits" value="${escapeHtml(story.endCredits || "")}" placeholder="e.g. Written by..." />
       </div>
       <p id="s-error" class="error-text" style="display:none;"></p>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" id="s-cancel">Close</button>
-        <button class="btn btn-primary" id="s-save">Save settings</button>
+      <div class="modal-actions" style="justify-content:space-between;">
+        <button class="btn" style="background:var(--danger-bg);color:var(--danger);" id="s-delete">Delete story</button>
+        <div style="display:flex; gap:12px;">
+          <button class="btn btn-secondary" id="s-cancel">Close</button>
+          <button class="btn btn-primary" id="s-save">Save settings</button>
+        </div>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
   overlay.querySelector("#s-cancel").onclick = () => overlay.remove();
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  overlay.querySelector("#s-delete").onclick = () => confirmDeleteStory(overlay);
 
   overlay.querySelector("#s-save").onclick = async () => {
     const errEl = overlay.querySelector("#s-error");
