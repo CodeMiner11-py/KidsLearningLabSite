@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids Learning Lab · How Do Balloons Go Up?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0..200">
+<style>
+  :root{
+    --navy:#0B1D3A;
+    --blue:#2E6BFF;
+    --blue-deep:#1746C4;
+    --sky:#EAF3FF;
+    --sky-2:#F5FAFF;
+    --yellow:#FFC93C;
+    --coral:#FF5C72;
+    --green:#2FBE8F;
+    --white:#FFFFFF;
+    --ink:#12213F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'DM Sans', sans-serif;
+    color:var(--ink);
+    background:var(--sky-2);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block;}
+  .wrap{max-width:720px;margin:0 auto;}
+  .material-symbols-outlined{
+    font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;
+    vertical-align:middle;
+    line-height:1;
+  }
+  .eyebrow{
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--blue-deep);
+  }
+  .eyebrow.on-dark{color:var(--yellow);}
+  h1,h2,h3{font-family:'DM Sans', sans-serif;margin:0;}
+  p{line-height:1.55;margin:0;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(180deg,#EAF3FF 0%, #DCEBFF 60%, #cfe3ff 100%);
+    padding:36px 20px 0;
+    position:relative;
+  }
+  .hero-inner{
+    max-width:680px;margin:0 auto;
+    text-align:center;
+  }
+  .logo{
+    width:84px;height:84px;border-radius:22px;
+    margin:0 auto 14px;
+    box-shadow:0 10px 24px rgba(23,70,196,.25);
+  }
+  .hero h1{
+    font-size:clamp(28px,7vw,42px);
+    font-weight:900;
+    color:var(--navy);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-top:10px;
+  }
+  .hero h1 span{color:var(--blue-deep);}
+  .hero p.sub{
+    max-width:480px;margin:14px auto 0;
+    font-size:16px;color:#33456e;font-weight:500;
+  }
+  .badge-row{
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+    margin:20px 0 0;
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--white);
+    border:2px solid #d5e5ff;
+    color:var(--blue-deep);
+    font-weight:700;font-size:13px;
+    padding:6px 14px;border-radius:999px;
+  }
+  .pill .material-symbols-outlined{font-size:16px;}
+
+  .balloon-scene{margin-top:26px;position:relative;}
+  .balloon-scene svg{display:block;width:100%;height:auto;}
+  .coaster-badge{
+    position:absolute;top:6%;left:12%;
+    width:44px;height:44px;border-radius:50%;
+    background:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 18px rgba(23,70,196,.35);
+  }
+  .coaster-badge .material-symbols-outlined{color:var(--white);font-size:24px;}
+
+  /* ---------- DIVIDER (hill silhouette) ---------- */
+  .hill-divider{display:block;width:100%;line-height:0;}
+  .hill-divider svg{display:block;width:100%;height:60px;}
+
+  /* ---------- SECTION SHELLS ---------- */
+  section{padding:44px 20px;}
+  .section-inner{max-width:640px;margin:0 auto;}
+  .light{background:var(--sky-2);}
+  .navy-section{background:var(--navy);color:var(--white);}
+  .navy-section .eyebrow{color:var(--yellow);}
+  .navy-section h2{color:var(--white);}
+  .navy-section p{color:#c9d7f5;}
+
+  h2.section-title{
+    font-size:clamp(22px,5.5vw,30px);
+    font-weight:900;
+    letter-spacing:-.01em;
+    margin:6px 0 12px;
+  }
+
+  /* ---------- DID YOU KNOW STRIP ---------- */
+  .dyk-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .dyk-card{
+    background:var(--white);
+    border-radius:16px;
+    padding:16px 14px;
+    border:2px solid #E1EDFF;
+    position:relative;
+  }
+  .dyk-card .icon-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--sky);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;
+  }
+  .dyk-card .icon-badge .material-symbols-outlined{color:var(--blue-deep);font-size:20px;}
+  .dyk-card p{font-size:14px;font-weight:600;color:var(--navy);}
+  @media(max-width:480px){
+    .dyk-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- DENSITY GAME ---------- */
+  .game-card{
+    background:var(--white);
+    border-radius:22px;
+    padding:24px 20px 26px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .stage-wrap{
+    border-radius:16px;
+    overflow:hidden;
+    position:relative;
+    height:220px;
+    background:linear-gradient(180deg,#EAF3FF 0%,#EAF3FF 45%,#7FB2FF 45%,#3E7FE0 100%);
+  }
+  .stage-wrap svg{width:100%;height:100%;display:block;}
+  .scene-buttons{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;
+  }
+  .scene-btn{
+    font-family:'DM Sans',sans-serif;
+    display:flex;align-items:center;gap:8px;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:12px;padding:10px 12px;
+    font-weight:700;font-size:13.5px;color:var(--navy);
+    cursor:pointer;transition:all .12s ease;
+  }
+  .scene-btn .material-symbols-outlined{font-size:18px;color:var(--blue-deep);}
+  .scene-btn.active{background:var(--blue-deep);border-color:var(--blue-deep);color:var(--white);}
+  .scene-btn.active .material-symbols-outlined{color:var(--yellow);}
+  .game-note{font-size:13px;color:#5a6f9c;margin-top:14px;text-align:center;}
+
+  /* ---------- GHOST CHAT ---------- */
+  .ghost-card{
+    background:var(--white);
+    border-radius:22px;
+    padding:20px 18px 22px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .ghost-header{
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  }
+  .ghost-avatar{
+    width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(160deg,#2E6BFF,#1746C4);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 6px 14px rgba(23,70,196,.3);
+  }
+  .ghost-avatar .material-symbols-outlined{color:var(--white);font-size:24px;}
+  .ghost-header h3{font-size:15.5px;font-weight:800;color:var(--navy);}
+  .ghost-header p{font-size:12.5px;color:#5a6f9c;font-weight:600;margin-top:1px;}
+  .ghost-log{
+    background:var(--sky-2);
+    border-radius:14px;
+    padding:14px;
+    height:230px;
+    overflow-y:auto;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .ghost-msg{
+    max-width:82%;
+    padding:9px 13px;
+    border-radius:14px;
+    font-size:14px;
+    line-height:1.45;
+    font-weight:600;
+  }
+  .ghost-msg.bot{
+    background:var(--white);
+    border:2px solid #E1EDFF;
+    color:var(--navy);
+    align-self:flex-start;
+    border-bottom-left-radius:4px;
+  }
+  .ghost-msg.user{
+    background:var(--blue-deep);
+    color:var(--white);
+    align-self:flex-end;
+    border-bottom-right-radius:4px;
+  }
+  .ghost-msg.typing{
+    display:flex;gap:4px;align-items:center;
+    padding:12px 14px;
+  }
+  .ghost-msg.typing span{
+    width:6px;height:6px;border-radius:50%;
+    background:#9db3e0;
+    animation:ghostBlink 1.1s infinite ease-in-out;
+  }
+  .ghost-msg.typing span:nth-child(2){animation-delay:.15s;}
+  .ghost-msg.typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes ghostBlink{
+    0%,80%,100%{opacity:.25;transform:translateY(0);}
+    40%{opacity:1;transform:translateY(-2px);}
+  }
+  .ghost-chips{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;
+  }
+  .ghost-chip{
+    font-family:'DM Sans',sans-serif;
+    background:var(--sky);border:2px solid #d5e5ff;color:var(--blue-deep);
+    font-weight:700;font-size:12.5px;
+    padding:6px 12px;border-radius:999px;cursor:pointer;
+  }
+  .ghost-chip:hover{border-color:var(--blue);}
+  .ghost-input-row{
+    display:flex;gap:8px;margin-top:14px;
+  }
+  .ghost-input-row input{
+    flex:1;
+    font-family:'DM Sans',sans-serif;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:999px;padding:11px 16px;
+    font-size:14px;font-weight:600;color:var(--navy);
+    outline:none;
+  }
+  .ghost-input-row input:focus{border-color:var(--blue);}
+  .ghost-input-row input:disabled{background:#EDF1F9;color:#9aa8c7;cursor:not-allowed;}
+  .ghost-send{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--blue-deep);border:none;color:var(--white);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .ghost-send:disabled{background:#c7d6f5;cursor:default;}
+  .ghost-note{font-size:12px;color:#8496bd;margin-top:10px;text-align:center;}
+
+  /* ---------- ZOOM LEVELS ---------- */
+  .gforce-row{
+    display:flex;gap:14px;margin-top:18px;overflow-x:auto;
+    padding-bottom:6px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gforce-card{
+    flex:0 0 auto;width:150px;
+    background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.18);
+    border-radius:16px;padding:14px;text-align:center;
+  }
+  .gforce-card .g{font-size:20px;font-weight:900;color:var(--yellow);}
+  .gforce-card .desc{font-size:12.5px;color:#c9d7f5;margin-top:6px;line-height:1.4;}
+
+  /* ---------- SCIENCE SHOWDOWN ---------- */
+  .records-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;
+  }
+  .record-card{
+    background:var(--white);border-radius:16px;padding:16px;
+    border:2px solid #E1EDFF;
+  }
+  .record-card .tag{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.06em;
+    background:var(--sky);color:var(--blue-deep);
+    padding:3px 8px;border-radius:999px;margin-bottom:8px;
+  }
+  .record-card .tag .material-symbols-outlined{font-size:14px;}
+  .record-card h3{font-size:16px;font-weight:800;color:var(--navy);}
+  .record-card .stat{font-size:18px;font-weight:900;color:var(--coral);margin-top:4px;}
+  .record-card .loc{font-size:12.5px;color:#5a6f9c;margin-top:4px;font-weight:600;}
+  @media(max-width:480px){
+    .records-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card{
+    background:var(--white);border-radius:22px;
+    padding:22px 18px 24px;
+    box-shadow:0 18px 40px rgba(23,70,196,.12);
+    border:2px solid #E1EDFF;
+    margin-top:18px;
+  }
+  .quiz-progress{
+    display:flex;gap:6px;margin-bottom:16px;
+  }
+  .quiz-progress .dot{
+    flex:1;height:6px;border-radius:999px;background:#E1EDFF;
+  }
+  .quiz-progress .dot.done{background:var(--blue);}
+  .quiz-progress .dot.current{background:var(--yellow);}
+  .quiz-question{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:14px;}
+  .quiz-options{display:flex;flex-direction:column;gap:10px;}
+  .quiz-opt{
+    text-align:left;
+    border:2px solid #E1EDFF;background:var(--sky-2);
+    border-radius:12px;padding:12px 14px;
+    font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+    color:var(--navy);cursor:pointer;
+    transition:all .12s ease;
+  }
+  .quiz-opt:hover{border-color:var(--blue);}
+  .quiz-opt.correct{background:#e6faf3;border-color:var(--green);color:#146c4e;}
+  .quiz-opt.incorrect{background:#ffeff1;border-color:var(--coral);color:#a3172c;}
+  .quiz-opt[disabled]{cursor:default;}
+  .quiz-feedback{
+    margin-top:12px;font-size:14px;font-weight:700;min-height:20px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .quiz-feedback .material-symbols-outlined{font-size:18px;}
+  .quiz-feedback.correct{color:var(--green);}
+  .quiz-feedback.incorrect{color:var(--coral);}
+  .quiz-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+  .btn{
+    font-family:'DM Sans',sans-serif;
+    background:var(--blue-deep);color:var(--white);
+    border:none;padding:10px 20px;border-radius:999px;
+    font-weight:800;font-size:14px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn .material-symbols-outlined{font-size:18px;}
+  .btn:disabled{background:#c7d6f5;cursor:default;}
+  .quiz-result{text-align:center;display:none;}
+  .quiz-result .score{
+    font-size:40px;font-weight:900;color:var(--blue-deep);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .quiz-result .score .material-symbols-outlined{font-size:34px;color:var(--yellow);}
+  .quiz-result p{margin-top:8px;color:#5a6f9c;font-weight:600;font-size:14px;}
+  .quiz-result .btn{margin-top:16px;justify-content:center;}
+
+  /* ---------- SPONSOR ---------- */
+  .sponsor{
+    background:var(--sky);
+    border-radius:18px;padding:18px 18px;
+    display:flex;gap:14px;align-items:center;
+    margin-top:8px;
+    border:2px dashed #b9d3ff;
+  }
+  .sponsor img{width:44px;height:44px;border-radius:10px;flex-shrink:0;}
+  .sponsor h4{font-size:14px;font-weight:800;color:var(--blue-deep);margin:0 0 4px;}
+  .sponsor p{font-size:13px;color:#4a5d85;font-weight:500;}
+  .sponsor a{color:var(--blue-deep);font-weight:800;text-decoration:underline;}
+
+  /* ---------- UP NEXT ---------- */
+  .upnext{
+    display:flex;align-items:center;gap:14px;
+    background:var(--white);border:2px solid #E1EDFF;
+    border-radius:18px;padding:16px 18px;margin-top:22px;
+  }
+  .upnext .icon-badge{
+    width:44px;height:44px;border-radius:12px;background:var(--sky);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .upnext .icon-badge .material-symbols-outlined{color:var(--blue-deep);font-size:22px;}
+  .upnext .eyebrow{margin-bottom:2px;}
+  .upnext h4{font-size:15px;font-weight:800;color:var(--navy);}
+
+  /* ---------- SIGN-OFF ---------- */
+  .signoff{
+    background:var(--navy);color:var(--white);
+    padding:44px 20px 52px;text-align:center;
+  }
+  .signoff .material-symbols-outlined{font-size:36px;color:var(--yellow);margin-bottom:12px;}
+  .signoff h3{font-size:clamp(20px,5vw,26px);font-weight:900;}
+  .signoff .btn{
+    margin-top:20px;background:var(--yellow);color:var(--navy);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <img class="logo" src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab logo">
+    <div class="eyebrow">Kids Learning Lab · New Episode</div>
+    <h1>How Do <span>Balloons</span> Go Up?</h1>
+    <p class="sub">We zoom into an atom, meet Scientist Bob, and figure out why a helium balloon floats to the ceiling while a regular one just sits there. Atoms, molecules, and physics — explained.</p>
+    <div class="badge-row">
+      <span class="pill"><span class="material-symbols-outlined">blur_circular</span>Atoms</span>
+      <span class="pill"><span class="material-symbols-outlined">science</span>Physics</span>
+      <span class="pill"><span class="material-symbols-outlined">bubble_chart</span>Density</span>
+      <span class="pill"><span class="material-symbols-outlined">quiz</span>Quiz</span>
+    </div>
+  </div>
+
+  <div class="balloon-scene">
+    <div class="coaster-badge"><span class="material-symbols-outlined">bubble_chart</span></div>
+    <svg viewBox="0 0 680 170" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,150 C 90,10 170,10 260,90 C 330,150 380,150 440,70 C 500,-10 560,20 620,90 C 650,125 665,140 680,150 L680,170 L0,170 Z" fill="#B9D6FF" opacity="0.7"></path>
+      <g transform="translate(255,30)">
+        <line x1="20" y1="80" x2="20" y2="120" stroke="#1746C4" stroke-width="2"></line>
+        <ellipse cx="20" cy="45" rx="34" ry="42" fill="#FF5C72"></ellipse>
+        <ellipse cx="10" cy="28" rx="10" ry="14" fill="#ffffff" opacity="0.35"></ellipse>
+      </g>
+      <g transform="translate(400,60)">
+        <line x1="0" y1="70" x2="0" y2="105" stroke="#1746C4" stroke-width="2"></line>
+        <ellipse cx="0" cy="38" rx="28" ry="36" fill="#FFC93C"></ellipse>
+        <ellipse cx="-8" cy="22" rx="8" ry="12" fill="#ffffff" opacity="0.35"></ellipse>
+      </g>
+      <g transform="translate(490,20)">
+        <line x1="0" y1="80" x2="0" y2="118" stroke="#1746C4" stroke-width="2"></line>
+        <ellipse cx="0" cy="44" rx="30" ry="38" fill="#2FBE8F"></ellipse>
+        <ellipse cx="-9" cy="26" rx="9" ry="13" fill="#ffffff" opacity="0.35"></ellipse>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,10 L600,40 L600,60 L0,60 Z" fill="#F5FAFF"></path></svg>
+</div>
+
+<!-- DID YOU KNOW -->
+<section class="light">
+  <div class="section-inner">
+    <div class="eyebrow">Did you know?</div>
+    <h2 class="section-title">Four things that might surprise you</h2>
+    <div class="dyk-grid">
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">blur_circular</span></div>
+        <p>Atoms are so tiny that millions of them could fit on the tip of a pencil.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">explore</span></div>
+        <p>Electrons zoom around the nucleus of an atom kind of like planets orbiting the sun.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">water_drop</span></div>
+        <p>Air counts as a fluid too — it's made of gas molecules that flow and push, just like water.</p>
+      </div>
+      <div class="dyk-card">
+        <div class="icon-badge"><span class="material-symbols-outlined">air</span></div>
+        <p>Helium floats up because it's less dense than the air around it — lighter stuff gets pushed to the top.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DENSITY GAME -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Try it yourself</div>
+    <h2 class="section-title">Sink or float?</h2>
+    <p style="color:#3d517c;font-size:15px;">Density decides who wins — whatever has more mass packed into the same space gets pulled down harder by gravity, and sinks below the rest. Tap something below and see what happens.</p>
+
+    <div class="game-card">
+      <div class="stage-wrap" id="stageWrap">
+        <svg viewBox="0 0 300 200" preserveAspectRatio="none" id="stageSvg">
+          <g id="itemGroup" transform="translate(150,40)">
+            <circle r="22" fill="#FFC93C"></circle>
+          </g>
+        </svg>
+      </div>
+
+      <div class="scene-buttons" id="sceneButtons">
+        <button class="scene-btn active" data-scene="helium"><span class="material-symbols-outlined">bubble_chart</span>Helium balloon</button>
+        <button class="scene-btn" data-scene="air"><span class="material-symbols-outlined">air</span>Air-filled balloon</button>
+        <button class="scene-btn" data-scene="oil"><span class="material-symbols-outlined">opacity</span>Drop of oil</button>
+        <button class="scene-btn" data-scene="rock"><span class="material-symbols-outlined">circle</span>Small pebble</button>
+      </div>
+      <p class="game-note" id="stageNote">Helium is less dense than air, so gravity pulls harder on the air around it — up it goes!</p>
+    </div>
+
+    <div class="eyebrow" style="margin-top:32px;">Try it yourself</div>
+    <h2 class="section-title">Ask Scientist Bob</h2>
+    <p style="color:#3d517c;font-size:15px;">Remember Scientist Bob from the episode? Ask him anything about atoms, molecules, fluids, or why balloons float.</p>
+
+    <div class="ghost-card">
+      <div class="ghost-header">
+        <div class="ghost-avatar"><span class="material-symbols-outlined">science</span></div>
+        <div>
+          <h3>Scientist Bob</h3>
+          <p>Ask away — I once fell through a dimension to show you an atom.</p>
+        </div>
+      </div>
+
+      <div class="ghost-log" id="ghostLog">
+        <div class="ghost-msg bot">Hello! I'm Scientist Bob. Ask me anything about atoms, molecules, density, or why balloons float, and I'll do my best to explain it.</div>
+      </div>
+
+      <div class="ghost-chips" id="ghostChips">
+        <button class="ghost-chip" data-q="What are protons, neutrons, and electrons?">Protons, neutrons, electrons?</button>
+        <button class="ghost-chip" data-q="Why does helium float but regular air doesn't?">Why does helium float?</button>
+        <button class="ghost-chip" data-q="What is density?">What is density?</button>
+      </div>
+
+      <div class="ghost-input-row">
+        <input type="text" id="ghostInput" placeholder="Ask Scientist Bob a question…" maxlength="140">
+        <button class="ghost-send" id="ghostSend"><span class="material-symbols-outlined">arrow_upward</span></button>
+      </div>
+      <p class="ghost-note">Scientist Bob is an AI and can make mistakes — always double check with a grown-up.</p>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,60 L300,5 L600,50 L600,60 L0,60 Z" fill="#0B1D3A"></path></svg>
+</div>
+
+<!-- ZOOM LEVELS -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">A quick trip inward</div>
+    <h2 class="section-title">Zooming into an atom</h2>
+    <p>Scientist Bob walked us through it — here's the zoom, level by level.</p>
+    <div class="gforce-row">
+      <div class="gforce-card"><div class="g">Balloon</div><div class="desc">Made of rubber molecules, filled with a gas like air or helium.</div></div>
+      <div class="gforce-card"><div class="g">Molecule</div><div class="desc">Two or more atoms sharing electrons and sticking together.</div></div>
+      <div class="gforce-card"><div class="g">Atom</div><div class="desc">A nucleus in the middle, with electrons zooming around outside.</div></div>
+      <div class="gforce-card"><div class="g">Nucleus</div><div class="desc">Protons (positive) and neutrons (no charge) packed in tight.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,5 L300,55 L600,15 L600,60 L0,60 Z" fill="#F5FAFF"></path></svg>
+</div>
+
+<!-- SCIENCE SHOWDOWN -->
+<section class="light" style="padding-top:8px;">
+  <div class="section-inner">
+    <div class="eyebrow">Science showdown</div>
+    <h2 class="section-title">Who sinks, who floats</h2>
+    <div class="records-grid">
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">bubble_chart</span>Gas</span>
+        <h3>Helium vs. air</h3>
+        <div class="stat">Helium wins</div>
+        <div class="loc">Less dense, so it floats up past regular air</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">opacity</span>Liquid</span>
+        <h3>Oil vs. water</h3>
+        <div class="stat">Oil wins</div>
+        <div class="loc">Oil is less dense, so it floats on top</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">grain</span>Molecule</span>
+        <h3>Water (H2O)</h3>
+        <div class="stat">3 atoms</div>
+        <div class="loc">Two hydrogens share electrons with one oxygen</div>
+      </div>
+      <div class="record-card">
+        <span class="tag"><span class="material-symbols-outlined">tag</span>Element</span>
+        <h3>Oxygen</h3>
+        <div class="stat">8 protons</div>
+        <div class="loc">Proton count is what makes an atom oxygen</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hill-divider">
+  <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M0,50 L300,10 L600,45 L600,60 L0,60 Z" fill="#0B1D3A"></path></svg>
+</div>
+
+<!-- QUIZ -->
+<section class="navy-section">
+  <div class="section-inner">
+    <div class="eyebrow">Quiz time</div>
+    <h2 class="section-title">Were you paying attention?</h2>
+    <p>Five questions. See if you can float your way to a perfect score.</p>
+
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-progress" id="quizProgress"><div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+      <div id="quizBody">
+        <div class="quiz-question" id="quizQuestion">1. What's in the nucleus of an atom?</div>
+        <div class="quiz-options" id="quizOptions"><button class="quiz-opt">Protons and neutrons</button><button class="quiz-opt">Electrons</button><button class="quiz-opt">Molecules</button></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-nav">
+          <button class="btn" id="nextBtn" disabled="">Next question<span class="material-symbols-outlined">arrow_forward</span></button>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="score"><span class="material-symbols-outlined">emoji_events</span><span id="quizScore">0/5</span></div>
+        <p id="quizResultMsg">Nice work!</p>
+        <button class="btn" id="retryBtn"><span class="material-symbols-outlined">replay</span>Listen again</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSOR -->
+<section class="light">
+  <div class="section-inner">
+    <div class="sponsor">
+      <img src="https://pearai.kidslearninglab.com/pear.png" alt="Pear AI logo">
+      <div>
+        <h4>Pear AI</h4>
+        <p>Snap a photo of any food and Pear AI whips up a recipe with nutrition facts. Get it free at <a href="#">kidslearninglab.com/pear</a>.</p>
+      </div>
+    </div>
+
+    <div class="upnext">
+      <div class="icon-badge"><span class="material-symbols-outlined">arrow_forward</span></div>
+      <div>
+        <div class="eyebrow">Up next episode</div>
+        <h4>Coming soon on Kids Learning Lab</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGN-OFF -->
+<div class="signoff">
+  <span class="material-symbols-outlined">celebration</span>
+  <h3>Thanks for signing up for the newsletter!</h3>
+  <a href="https://news.kidslearninglab.com" class="btn">Access your account<span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+
+<script>
+// ---------- DENSITY GAME ----------
+(function(){
+  const itemGroup = document.getElementById('itemGroup');
+  const note = document.getElementById('stageNote');
+  const buttons = document.querySelectorAll('.scene-btn');
+
+  const scenes = {
+    helium: {
+      shape: '<ellipse cx="0" cy="0" rx="20" ry="26" fill="#FFC93C"></ellipse><line x1="0" y1="26" x2="0" y2="40" stroke="#1746C4" stroke-width="2"></line>',
+      startY: 150,
+      endY: 20,
+      note: "Helium is less dense than air, so gravity pulls harder on the air around it — up it goes!"
+    },
+    air: {
+      shape: '<ellipse cx="0" cy="0" rx="20" ry="26" fill="#2FBE8F"></ellipse><line x1="0" y1="26" x2="0" y2="40" stroke="#1746C4" stroke-width="2"></line>',
+      startY: 100,
+      endY: 100,
+      note: "A regular air-filled balloon is about as dense as the air around it, so it just floats in place or drifts down."
+    },
+    oil: {
+      shape: '<ellipse cx="0" cy="0" rx="22" ry="14" fill="#FFC93C"></ellipse>',
+      startY: 150,
+      endY: 90,
+      note: "Oil is less dense than water, so it rises and sits on top instead of sinking."
+    },
+    rock: {
+      shape: '<circle r="16" fill="#8C5A2B"></circle>',
+      startY: 40,
+      endY: 175,
+      note: "A pebble is way denser than water or air, so gravity pulls it straight to the bottom."
+    }
+  };
+
+  function applyScene(key){
+    const s = scenes[key];
+    itemGroup.innerHTML = s.shape;
+    itemGroup.setAttribute('transform', 'translate(150,' + s.startY + ')');
+    itemGroup.style.transition = 'none';
+    // force reflow so the transition re-triggers
+    void itemGroup.getBoundingClientRect();
+    requestAnimationFrame(() => {
+      itemGroup.style.transition = 'transform 1s ease';
+      itemGroup.setAttribute('transform', 'translate(150,' + s.endY + ')');
+    });
+    note.textContent = s.note;
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.scene === key));
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => applyScene(btn.dataset.scene));
+  });
+
+  applyScene('helium');
+})();
+
+// ---------- SCIENTIST BOB CHAT ----------
+(function(){
+  const WORKER_URL = 'https://textonlygroqfast.nameless-cherry-998c.workers.dev/';
+  const log = document.getElementById('ghostLog');
+  const input = document.getElementById('ghostInput');
+  const sendBtn = document.getElementById('ghostSend');
+  const chips = document.getElementById('ghostChips');
+  const note = document.querySelector('.ghost-note');
+
+  const PERSONA = "You are Scientist Bob, the friendly, goofy, nerdy, enthusiastic scientist character from the Kids Learning Lab podcast episode 'How Do Balloons Go Up? Atoms and Physics'. You love teaching kids ages 6-12 about atoms, protons, neutrons, electrons, molecules, fluids, pressure, density, and why helium balloons float. Rules: keep every reply to 2-3 short sentences in simple, friendly language a child would understand. Stay in character as an enthusiastic scientist. Only talk about atoms, physics, and balloons/science topics from the episode. If the question is unrelated, off-topic, or inappropriate, gently and briefly redirect back to atoms and physics topics without lecturing. Never mention that you are an AI language model unless asked directly.";
+
+  // Fallback pool used only if the live AI worker is unreachable.
+  // Rotates so repeated taps on the same chip don't repeat an answer.
+  const fallbackResponses = {
+    "What are protons, neutrons, and electrons?": [
+      "Protons and neutrons live together in the nucleus, right in the middle of the atom. Protons have a positive charge, and neutrons have no charge at all — neutral, just like their name!",
+      "Electrons are the tiny sparks zooming around the outside of the atom, kind of like planets orbiting a sun. They have a negative charge.",
+      "Protons pull electrons in, kind of like a magnet — and that pulling helps hold the whole atom together!",
+      "The number of protons an atom has decides what kind of atom it is. One proton makes hydrogen. Eight protons makes oxygen!",
+      "Neutrons don't have a charge, but they still add mass — they help make the nucleus heavier and sturdier.",
+      "Electrons move so fast around the nucleus that scientists just picture them as a fuzzy cloud instead of tracking each one!",
+      "Fun fact: atoms can trade or share electrons with other atoms. That's actually how molecules get built!",
+      "Even though protons and neutrons are already tiny, electrons are way, way smaller and lighter than both of them.",
+      "Protons, neutrons, and electrons are called subatomic particles — 'sub' just means smaller than the atom itself.",
+      "If an atom has the same number of protons and electrons, the positive and negative charges balance out and the atom is neutral overall.",
+      "Every single atom of gold, oxygen, or hydrogen has its own special number of protons — that's basically its ID card!",
+      "Neutrons were actually the last of the three to be discovered by scientists, way after protons and electrons.",
+      "You could say protons and neutrons are the heavyweights sitting in the middle, while electrons are the lightweight speedsters zipping around them."
+    ],
+    "Why does helium float but regular air doesn't?": [
+      "Helium is less dense than the air around it — that means helium atoms are lighter and more spread out than air molecules of the same size.",
+      "Gravity pulls harder on things with more mass packed in. Since air has more mass than the same amount of helium, gravity pulls the air down and pushes the lighter helium balloon up!",
+      "A regular air-filled balloon is about as dense as the air around it, so it doesn't really float — it just kind of hangs there or sinks slowly.",
+      "Think about a bathtub — push a balloon underwater and it pops right back up. That's the same idea as helium rising through air, just with gas instead of water!",
+      "It's not that helium 'wants' to fly — it's that the heavier air around it sinks and shoves the lighter helium up and out of the way.",
+      "Density is really about how tightly packed the atoms are. Helium atoms are much lighter than the nitrogen and oxygen atoms that make up most of our air.",
+      "That's also why a helium balloon slowly sinks after a day or two — tiny helium atoms are so small they can sneak out through little gaps in the rubber!",
+      "The same rule explains hot air balloons too — heating the air inside makes it less dense, so it rises just like helium does."
+    ],
+    "What is density?": [
+      "Density just means how tightly packed the atoms or molecules are in something, or how much mass is squeezed into a certain amount of space.",
+      "Two things can be the same size but have totally different densities — a balloon full of air weighs way less than a rock the same size!",
+      "Oil is less dense than water, which is why it floats on top instead of mixing in and sinking.",
+      "The rule is simple: whatever has more mass packed into the same space gets pulled down harder by gravity, so it sinks below the less dense stuff.",
+      "Fluids aren't just liquids — gases like air count as fluids too, because they can flow and take the shape of whatever holds them.",
+      "Air is made of gas molecules bumping into everything around them, including each other — all that bumping creates something called pressure.",
+      "When you blow air into a balloon, you're packing molecules in tightly, and they push outward hard enough to keep the balloon puffed up instead of flat.",
+      "Density is why a big beach ball can float on water, but a tiny pebble sinks straight to the bottom — it's all about mass versus space, not just size!",
+      "Scientists measure density by comparing mass to volume — basically, weight divided by how much space something takes up."
+    ]
+  };
+  const fallbackCounters = {};
+  Object.keys(fallbackResponses).forEach(k => fallbackCounters[k] = 0);
+  let workerDown = false;
+
+  let history = [];
+  let waiting = false;
+
+  function addMessage(text, who){
+    const div = document.createElement('div');
+    div.className = 'ghost-msg ' + who;
+    div.textContent = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  function addTyping(){
+    const div = document.createElement('div');
+    div.className = 'ghost-msg bot typing';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  function buildPrompt(question){
+    let convo = '';
+    history.slice(-6).forEach(turn => {
+      convo += (turn.who === 'user' ? 'Kid' : 'Bob') + ': ' + turn.text + '\n';
+    });
+    return PERSONA + '\n\nHere is the conversation so far:\n' + convo + 'Kid: ' + question + '\nBob:';
+  }
+
+  function lockToButtonsOnly(){
+    // Called once we know the live worker is unreachable — from then on,
+    // only the prewritten chip questions can be asked, so gray out typing.
+    if(workerDown) return;
+    workerDown = true;
+    input.value = '';
+    input.disabled = true;
+    input.placeholder = 'Tap a question above to ask Bob…';
+    sendBtn.disabled = true;
+    if(note) note.textContent = 'Bob\'s connection is down for now — tap a question above to hear what he thinks!';
+  }
+
+  async function ask(question){
+    if(waiting || !question.trim()) return;
+    waiting = true;
+    sendBtn.disabled = true;
+    input.disabled = true;
+
+    addMessage(question, 'user');
+    history.push({who:'user', text:question});
+    input.value = '';
+
+    const typingEl = addTyping();
+
+    if(!workerDown){
+      try{
+        const prompt = buildPrompt(question);
+        const url = WORKER_URL + '?prompt=' + encodeURIComponent(prompt);
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('bad response');
+        const data = await res.json();
+        const reply = (data.response || '').trim();
+        if(!reply) throw new Error('empty response');
+        typingEl.remove();
+        addMessage(reply, 'bot');
+        history.push({who:'bot', text:reply});
+        waiting = false;
+        sendBtn.disabled = false;
+        input.disabled = false;
+        input.focus();
+        return;
+      } catch(err){
+        // Worker failed — fall through to the prewritten fallback below.
+      }
+    }
+
+    // Fallback path: only works for the three known chip questions.
+    // Keep the typing indicator up for ~3s so it still feels like Bob
+    // is thinking, even though this is a prewritten answer.
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const pool = fallbackResponses[question];
+    if(pool){
+      const reply = pool[fallbackCounters[question] % pool.length];
+      fallbackCounters[question]++;
+      typingEl.remove();
+      addMessage(reply, 'bot');
+    } else {
+      typingEl.remove();
+      addMessage("Ooo, my lab equipment is acting up right now. Try one of the buttons above!", 'bot');
+    }
+    lockToButtonsOnly();
+    waiting = false;
+    sendBtn.disabled = workerDown ? true : false;
+    input.disabled = workerDown ? true : false;
+    if(!workerDown) input.focus();
+  }
+
+  sendBtn.addEventListener('click', () => ask(input.value));
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') ask(input.value);
+  });
+  chips.addEventListener('click', (e) => {
+    const btn = e.target.closest('.ghost-chip');
+    if(btn) ask(btn.dataset.q);
+  });
+})();
+
+// ---------- QUIZ ----------
+(function(){
+  const questions = [
+    {
+      q: "What's in the nucleus of an atom?",
+      options: ["Protons and neutrons", "Electrons", "Molecules"],
+      answer: 0
+    },
+    {
+      q: "What charge do electrons have?",
+      options: ["Positive", "Negative", "No charge"],
+      answer: 1
+    },
+    {
+      q: "How many protons does an atom need to be oxygen?",
+      options: ["One", "Eight", "Twenty"],
+      answer: 1
+    },
+    {
+      q: "What happens when atoms share electrons?",
+      options: ["They explode", "Nothing changes", "They form a new molecule"],
+      answer: 2
+    },
+    {
+      q: "Why does a helium balloon float up into the sky?",
+      options: ["Helium is denser than air", "Helium is less dense than air", "Helium has no atoms"],
+      answer: 1
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  const progressEl = document.getElementById('quizProgress');
+  const qEl = document.getElementById('quizQuestion');
+  const optsEl = document.getElementById('quizOptions');
+  const feedbackEl = document.getElementById('quizFeedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const quizBody = document.getElementById('quizBody');
+  const quizResult = document.getElementById('quizResult');
+  const quizScore = document.getElementById('quizScore');
+  const quizResultMsg = document.getElementById('quizResultMsg');
+  const retryBtn = document.getElementById('retryBtn');
+
+  function renderProgress(){
+    progressEl.innerHTML = '';
+    questions.forEach((_,i)=>{
+      const d = document.createElement('div');
+      d.className = 'dot' + (i<current?' done':'') + (i===current?' current':'');
+      progressEl.appendChild(d);
+    });
+  }
+
+  function renderQuestion(){
+    answered = false;
+    nextBtn.disabled = true;
+    feedbackEl.innerHTML = '';
+    feedbackEl.className = 'quiz-feedback';
+    renderProgress();
+    const item = questions[current];
+    qEl.textContent = (current+1) + '. ' + item.q;
+    optsEl.innerHTML = '';
+    item.options.forEach((opt, i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>selectOption(i, btn));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function selectOption(i, btn){
+    if(answered) return;
+    answered = true;
+    const item = questions[current];
+    const allBtns = optsEl.querySelectorAll('.quiz-opt');
+    allBtns.forEach(b=>b.setAttribute('disabled','true'));
+
+    if(i === item.answer){
+      btn.classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Correct!';
+      feedbackEl.className = 'quiz-feedback correct';
+      score++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns[item.answer].classList.add('correct');
+      feedbackEl.innerHTML = '<span class="material-symbols-outlined">info</span>Not quite — the right answer is highlighted above.';
+      feedbackEl.className = 'quiz-feedback incorrect';
+    }
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion(){
+    current++;
+    if(current >= questions.length){
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showResult(){
+    quizBody.style.display = 'none';
+    quizResult.style.display = 'block';
+    quizScore.textContent = score + '/' + questions.length;
+    let msg = 'Nice work!';
+    if(score === questions.length) msg = 'Perfect score — future scientist!';
+    else if(score >= questions.length - 1) msg = 'So close to a perfect score!';
+    else if(score <= 2) msg = "Give it another listen — you've got this!";
+    quizResultMsg.textContent = msg;
+  }
+
+  function restart(){
+    current = 0;
+    score = 0;
+    quizBody.style.display = 'block';
+    quizResult.style.display = 'none';
+    renderQuestion();
+  }
+
+  nextBtn.addEventListener('click', nextQuestion);
+  retryBtn.addEventListener('click', restart);
+  renderQuestion();
+})();
+</script>
+
+</body></html>
