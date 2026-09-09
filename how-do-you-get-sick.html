@@ -281,9 +281,9 @@ h2.section-title{
   }
 }
 
-/* ---------- GERM GAME ---------- */
+/* ---------- HOW GERMS SPREAD ---------- */
 
-.germ-game{
+.spread-game{
   background:var(--white);
   border-radius:22px;
   padding:24px 20px 26px;
@@ -292,28 +292,91 @@ h2.section-title{
   margin-top:18px;
 }
 
-.germ-stage{
+.spread-stage{
   border-radius:16px;
   overflow:hidden;
   position:relative;
-  height:210px;
+  min-height:210px;
   background:#EAF3FF;
+  padding:24px 18px 18px;
+  text-align:center;
+  transition:background .18s ease;
 }
 
-.germ-stage svg{
-  width:100%;
-  height:100%;
-  display:block;
+.spread-icon{
+  width:52px;
+  height:52px;
+  margin:0 auto 10px;
+  border-radius:16px;
+  background:var(--white);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 7px 18px rgba(23,70,196,.12);
 }
 
-.germ-buttons{
+.spread-icon .material-symbols-outlined{
+  color:var(--blue-deep);
+  font-size:28px;
+}
+
+.spread-title{
+  color:var(--navy);
+  font-size:18px;
+  font-weight:900;
+}
+
+.spread-path{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin:16px auto 12px;
+}
+
+.person{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  background:var(--white);
+  border:2px solid #d5e5ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.person .material-symbols-outlined{
+  color:var(--blue-deep);
+  font-size:28px;
+}
+
+.path-line{
+  display:flex;
+  gap:0;
+  color:var(--green);
+}
+
+.path-line .material-symbols-outlined{
+  font-size:20px;
+}
+
+.spread-note{
+  max-width:480px;
+  margin:0 auto;
+  color:#4d6088;
+  font-size:13.5px;
+  font-weight:600;
+  line-height:1.45;
+}
+
+.spread-buttons{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:16px;
 }
 
-.germ-btn{
+.spread-btn{
   font-family:'DM Sans',sans-serif;
   display:flex;
   align-items:center;
@@ -329,26 +392,23 @@ h2.section-title{
   transition:all .12s ease;
 }
 
-.germ-btn .material-symbols-outlined{
+.spread-btn .material-symbols-outlined{
   font-size:18px;
   color:var(--blue-deep);
 }
 
-.germ-btn.active{
+.spread-btn.active{
   background:var(--blue-deep);
   border-color:var(--blue-deep);
   color:var(--white);
 }
 
-.germ-btn.active .material-symbols-outlined{
+.spread-btn.active .material-symbols-outlined{
   color:var(--yellow);
 }
 
-.game-note{
-  font-size:13px;
-  color:#5a6f9c;
-  margin-top:14px;
-  text-align:center;
+@media(max-width:480px){
+  .spread-buttons{grid-template-columns:1fr;}
 }
 
 /* ---------- IMMUNE SYSTEM CHAT ---------- */
@@ -1091,117 +1151,41 @@ h2.section-title{
   </div>
 </section>
 
-<!-- GERM GAME -->
-
+<!-- HOW GERMS SPREAD -->
 <section class="light" style="padding-top:8px;">
   <div class="section-inner">
 
-```
-<div class="eyebrow">Try it yourself</div>
+    <div class="eyebrow">Try it yourself</div>
 
-<h2 class="section-title">
-  Look closer at a germ
-</h2>
+    <h2 class="section-title">
+      How can germs spread?
+    </h2>
 
-<p style="color:#3d517c;font-size:15px;">
-  Germs are far too small to see with your eyes alone. Tap the buttons to switch between a normal view, a microscope-style view, and a view showing your immune system responding.
-</p>
+    <p style="color:#3d517c;font-size:15px;">
+      Germs can move from place to place in several ways. Tap a scenario to see what happens.
+    </p>
 
-<div class="germ-game">
+    <div class="spread-game">
+      <div class="spread-stage" id="spreadStage">
+        <div class="spread-icon"><span class="material-symbols-outlined" id="spreadIcon">air</span></div>
+        <div class="spread-title" id="spreadTitle">Through the air</div>
+        <div class="spread-path" id="spreadPath">
+          <div class="person"><span class="material-symbols-outlined">person</span></div>
+          <div class="path-line"><span class="material-symbols-outlined">arrow_forward</span><span class="material-symbols-outlined">arrow_forward</span><span class="material-symbols-outlined">arrow_forward</span></div>
+          <div class="person"><span class="material-symbols-outlined">person</span></div>
+        </div>
+        <p class="spread-note" id="spreadNote">Some germs can travel through tiny droplets or particles in the air.</p>
+      </div>
 
-  <div class="germ-stage">
+      <div class="spread-buttons">
+        <button class="spread-btn active" data-spread="air"><span class="material-symbols-outlined">air</span>Air</button>
+        <button class="spread-btn" data-spread="touch"><span class="material-symbols-outlined">touch_app</span>Touch</button>
+        <button class="spread-btn" data-spread="food"><span class="material-symbols-outlined">restaurant</span>Food &amp; water</button>
+        <button class="spread-btn" data-spread="surfaces"><span class="material-symbols-outlined">table_restaurant</span>Surfaces</button>
+      </div>
 
-    <svg viewBox="0 0 320 210" preserveAspectRatio="none" id="germSvg">
-
-      <rect
-        id="germBg"
-        x="0"
-        y="0"
-        width="320"
-        height="210"
-        fill="#EAF3FF">
-      </rect>
-
-      <g id="germScene">
-
-        <circle
-          cx="160"
-          cy="105"
-          r="24"
-          fill="#2FBE8F">
-        </circle>
-
-        <circle
-          cx="152"
-          cy="99"
-          r="4"
-          fill="#0B1D3A">
-        </circle>
-
-        <circle
-          cx="168"
-          cy="99"
-          r="4"
-          fill="#0B1D3A">
-        </circle>
-
-        <path
-          d="M152,112 Q160,118 168,112"
-          stroke="#0B1D3A"
-          stroke-width="3"
-          fill="none"
-          stroke-linecap="round">
-        </path>
-
-      </g>
-
-      <g id="immuneCells"></g>
-
-      <text
-        id="stageLabel"
-        x="160"
-        y="28"
-        text-anchor="middle"
-        font-family="DM Sans, sans-serif"
-        font-size="13"
-        font-weight="800"
-        fill="#1746C4">
-        Germ
-      </text>
-
-    </svg>
-
-  </div>
-
-  <div class="germ-buttons">
-
-    <button class="germ-btn active" data-view="normal">
-      <span class="material-symbols-outlined">visibility</span>
-      Normal view
-    </button>
-
-    <button class="germ-btn" data-view="micro">
-      <span class="material-symbols-outlined">search</span>
-      Microscope
-    </button>
-
-    <button class="germ-btn" data-view="immune">
-      <span class="material-symbols-outlined">shield</span>
-      Immune response
-    </button>
-
-    <button class="germ-btn" data-view="clean">
-      <span class="material-symbols-outlined">clean_hands</span>
-      Wash hands
-    </button>
-
-  </div>
-
-  <p class="game-note" id="germNote">
-    With your eyes alone, this tiny germ would be invisible.
-  </p>
-
-</div>
+      <p class="game-note" id="spreadGameNote">Different germs spread in different ways.</p>
+    </div>
 
 <!-- IMMUNE SYSTEM CHAT -->
 
@@ -1615,99 +1599,61 @@ arrow_forward </span> </a>
 
 <script>
 
-/* ---------- GERM GAME ---------- */
+/* ---------- HOW GERMS SPREAD ---------- */
 
 (function(){
-
-  const bg = document.getElementById('germBg');
-  const germScene = document.getElementById('germScene');
-  const immuneCells = document.getElementById('immuneCells');
-  const label = document.getElementById('stageLabel');
-  const note = document.getElementById('germNote');
-  const buttons = document.querySelectorAll('.germ-btn');
+  const stage = document.getElementById('spreadStage');
+  const icon = document.getElementById('spreadIcon');
+  const title = document.getElementById('spreadTitle');
+  const path = document.getElementById('spreadPath');
+  const note = document.getElementById('spreadNote');
+  const buttons = document.querySelectorAll('.spread-btn');
 
   const views = {
-
-    normal:{
-      bg:'#EAF3FF',
-      label:'Germ',
-      note:'With your eyes alone, this tiny germ would be invisible.',
-      germScale:1,
-      cells:''
+    air:{
+      bg:'#EAF3FF', icon:'air', title:'Through the air',
+      note:'Some germs can travel through tiny droplets or particles in the air.',
+      path:'air'
     },
-
-    micro:{
-      bg:'#D9F7EE',
-      label:'Microscope view',
-      note:'A microscope can magnify tiny organisms so scientists can study them.',
-      germScale:2.4,
-      cells:''
+    touch:{
+      bg:'#FFF7E1', icon:'touch_app', title:'Through touch',
+      note:'Germs can move from one person or object to another when people touch them.',
+      path:'touch'
     },
-
-    immune:{
-      bg:'#EAF3FF',
-      label:'Immune response',
-      note:'Immune cells can recognize and respond to germs that enter your body.',
-      germScale:1,
-      cells:`
-        <circle cx="70" cy="70" r="18" fill="#FFC93C"/>
-        <circle cx="245" cy="80" r="21" fill="#FFC93C"/>
-        <circle cx="75" cy="155" r="16" fill="#2E6BFF"/>
-        <circle cx="250" cy="155" r="18" fill="#2E6BFF"/>
-        <path d="M92,83 L135,98"
-              stroke="#1746C4"
-              stroke-width="4"
-              stroke-linecap="round"/>
-        <path d="M225,91 L187,99"
-              stroke="#1746C4"
-              stroke-width="4"
-              stroke-linecap="round"/>
-      `
+    food:{
+      bg:'#E6FAF3', icon:'restaurant', title:'Through food & water',
+      note:'Some germs can spread through food or water when they are contaminated.',
+      path:'food'
     },
-
-    clean:{
-      bg:'#E6FAF3',
-      label:'Clean hands',
-      note:'Washing your hands helps remove germs before they can get into your body.',
-      germScale:.55,
-      cells:''
+    surfaces:{
+      bg:'#F1EDFF', icon:'table_restaurant', title:'From surfaces',
+      note:'Germs can sometimes remain on surfaces and move when someone touches them.',
+      path:'surfaces'
     }
-
   };
 
   function applyView(key){
+    const view=views[key];
+    stage.style.background=view.bg;
+    icon.textContent=view.icon;
+    title.textContent=view.title;
+    note.textContent=view.note;
 
-    const view = views[key];
-
-    bg.setAttribute('fill',view.bg);
-
-    label.textContent = view.label;
-
-    germScene.setAttribute(
-      'transform',
-      `translate(160 105) scale(${view.germScale}) translate(-160 -105)`
-    );
-
-    immuneCells.innerHTML = view.cells;
-
-    note.textContent = view.note;
+    const lineIcon = view.path === 'touch' ? 'touch_app' :
+                     view.path === 'food' ? 'water_drop' :
+                     view.path === 'surfaces' ? 'arrow_forward' : 'arrow_forward';
+    path.querySelectorAll('.path-line .material-symbols-outlined').forEach(function(el){
+      el.textContent=lineIcon;
+    });
 
     buttons.forEach(function(button){
-      button.classList.toggle(
-        'active',
-        button.dataset.view === key
-      );
+      button.classList.toggle('active',button.dataset.spread===key);
     });
   }
 
   buttons.forEach(function(button){
-
-    button.addEventListener('click',function(){
-      applyView(button.dataset.view);
-    });
-
+    button.addEventListener('click',function(){ applyView(button.dataset.spread); });
   });
-
 })();
 
 
