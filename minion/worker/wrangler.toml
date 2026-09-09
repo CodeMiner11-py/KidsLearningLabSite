@@ -1,0 +1,9 @@
+name = "minion-airways-seats"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+# After running: wrangler kv namespace create SEATS_KV
+# paste the returned "id" below.
+[[kv_namespaces]]
+binding = "SEATS_KV"
+id = "349fe70cfa2d4c81bdc18596bae92d10"

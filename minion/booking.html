@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Flight | Minion Airways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Roboto', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+  button, input, select, textarea { font-family: 'Roboto', sans-serif; }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal; font-style: normal; font-size: 22px; line-height: 1;
+    letter-spacing: normal; text-transform: none; display: inline-block;
+    white-space: nowrap; word-wrap: normal; direction: ltr;
+    -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background: #0a2540; display: flex; align-items: center; justify-content: space-between; padding: 16px 40px;
+  }
+  .logo { display: flex; align-items: center; }
+  .logo img { height: 40px; display: block; }
+  nav ul { display: flex; list-style: none; gap: 32px; }
+  nav a { color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; }
+  nav a:hover { color: #ffd400; }
+  nav a.active { color: #ffd400; }
+  .header-btn {
+    background: #ffd400; color: #0a2540; border: none; padding: 10px 22px;
+    border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Roboto', sans-serif;
+  }
+
+  .page-hero { background: #0a2540; padding: 40px 40px 90px; text-align: center; }
+  .page-hero h1 { color: #fff; font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+  .page-hero p { color: #cfe0f0; font-size: 15px; }
+
+  .search-box {
+    background: #fff; max-width: 1000px; margin: -56px auto 0; border-radius: 14px;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.14); padding: 26px 30px; position: relative; z-index: 5;
+  }
+  .search-fields { display: grid; grid-template-columns: 1.1fr 1.1fr 0.9fr 0.9fr 0.85fr 0.9fr auto; gap: 14px; align-items: end; }
+  .field { position: relative; }
+  .field label {
+    display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #6b7280; margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 11px 12px; border: 1px solid #d6dbe1; border-radius: 8px;
+    font-family: 'Roboto', sans-serif; font-size: 14px; color: #1a1a2e;
+  }
+  .field input.invalid { border-color: #d1004b; }
+  .field input:disabled { background: #f5f7fa; color: #b8bfc9; cursor: not-allowed; }
+
+  .field-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .field-label-row label { margin-bottom: 0; }
+  .field-label-row .no-return-toggle { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; text-transform: none; letter-spacing: 0; color: #6b7280; cursor: pointer; }
+  .field-label-row .no-return-toggle input { width: 13px; height: 13px; cursor: pointer; margin: 0; accent-color: #0a2540; }
+
+  .autocomplete-list {
+    position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px;
+    background: #fff; border: 1px solid #e1e5eb; border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.16); max-height: 260px; overflow-y: auto;
+    z-index: 20; display: none;
+  }
+  .autocomplete-list.show { display: block; }
+  .ac-item { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ac-item:hover, .ac-item.active { background: #eef4fb; }
+  .ac-item .ac-main { font-size: 13.5px; color: #0a2540; font-weight: 600; }
+  .ac-item .ac-main b { color: #d1004b; }
+  .ac-item .ac-code { font-size: 11.5px; font-weight: 800; color: #14395e; background: #eef1f5; padding: 2px 7px; border-radius: 5px; }
+  .ac-empty { padding: 12px 14px; font-size: 12.5px; color: #9aa4b2; }
+  .search-btn {
+    background: #0a2540; color: #fff; border: none; padding: 12px 22px; border-radius: 8px;
+    font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; height: 43px;
+  }
+  .search-btn:hover { background: #14395e; }
+  .search-msg { font-size: 12.5px; color: #d1004b; margin-top: 12px; display: none; }
+  .search-msg.show { display: block; }
+
+  /* Progress bar / stepper */
+  .progress-wrap { margin-bottom: 20px; }
+  .stepper { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
+  .step { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; min-width: 68px; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: #eef1f5; color: #6b7280; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+  .step-label { font-size: 10.5px; color: #6b7280; font-weight: 600; line-height: 1.3; max-width: 92px; }
+  .step.active .step-num { background: #ffd400; color: #0a2540; }
+  .step.active .step-label { color: #0a2540; }
+  .step.skipped .step-num { background: #eef1f5; color: #c3c9d1; }
+  .step.skipped .step-label { color: #c3c9d1; text-decoration: line-through; }
+
+  /* Flight-number search */
+  .flightno-toggle { margin-top: 12px; font-size: 12px; color: #6b7280; }
+  .flightno-toggle button { background: none; border: none; color: #0a2540; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 0; }
+  .flightno-row { display: none; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .flightno-row.show { display: flex; }
+  .flightno-row input { padding: 10px 12px; border: 1px solid #d6dbe1; border-radius: 8px; font-size: 14px; width: 160px; }
+  .flightno-row .search-btn { height: 41px; }
+  .flightno-cancel { background: none; border: none; color: #6b7280; font-size: 12.5px; cursor: pointer; text-decoration: underline; }
+
+  /* Class selector button + modal */
+  .class-select-btn {
+    width: 100%; padding: 11px 12px; border: 1px solid #d6dbe1; border-radius: 8px;
+    font-size: 14px; color: #1a1a2e; background: #fff; text-align: left; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .class-select-btn:hover { border-color: #b8bfc9; }
+  .class-select-btn .material-symbols-outlined { font-size: 18px; color: #9aa4b2; }
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(10,37,64,0.55);
+    align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 16px; max-width: 920px; width: 100%;
+    max-height: 88vh; overflow-y: auto; padding: 28px 30px;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .modal-head h3 { font-size: 21px; font-weight: 900; color: #0a2540; }
+  .modal-head p { color: #6b7280; font-size: 13.5px; margin-bottom: 18px; }
+  .modal-close { background: none; border: none; font-size: 24px; line-height: 1; color: #9aa4b2; cursor: pointer; padding: 4px 8px; }
+  .modal-close:hover { color: #0a2540; }
+  .modal-class-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 18px; }
+  .modal-class-card {
+    border: 2px solid #eef1f5; border-radius: 14px; padding: 20px 18px; cursor: pointer;
+    display: flex; flex-direction: column; transition: border-color 0.15s ease;
+  }
+  .modal-class-card:hover { border-color: #d6dbe1; }
+  .modal-class-card.selected { border-color: #ffd400; background: #fffdf3; }
+  .modal-class-card.unavailable { opacity: 0.55; cursor: not-allowed; }
+  .modal-class-card .class-icon { width: 40px; height: 40px; border-radius: 10px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .modal-class-card .class-icon .material-symbols-outlined { color: #0a2540; font-size: 22px; }
+  .modal-class-card h4 { font-size: 16px; font-weight: 900; color: #0a2540; margin-bottom: 3px; }
+  .modal-class-card .class-tag { font-size: 11.5px; color: #6b7280; margin-bottom: 10px; }
+  .modal-class-card .avail-badge { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 3px 8px; border-radius: 20px; display: inline-block; margin-bottom: 12px; width: fit-content; }
+  .avail-badge.yes { background: #e6f4ea; color: #2f8f5b; }
+  .avail-badge.no { background: #fdeaea; color: #c0392b; }
+  .modal-class-card ul { list-style: none; flex: 1; }
+  .modal-class-card li { font-size: 12.5px; color: #4b5563; padding: 4px 0 4px 20px; position: relative; line-height: 1.5; }
+  .modal-class-card li .material-symbols-outlined { font-size: 14px; color: #2f8f5b; position: absolute; left: 0; top: 5px; }
+  .modal-class-card .modal-restriction { font-size: 10.5px; color: #9aa4b2; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eef1f5; line-height: 1.5; }
+  .modal-class-card .choose-btn {
+    margin-top: 14px; background: #0a2540; color: #fff; border: none; padding: 9px 0; border-radius: 8px;
+    font-weight: 700; font-size: 12.5px; cursor: pointer;
+  }
+  .modal-class-card.selected .choose-btn { background: #ffd400; color: #0a2540; }
+  .modal-class-card.unavailable .choose-btn { background: #d6dbe1; color: #6b7280; cursor: not-allowed; }
+  @media (max-width: 900px) {
+    .modal-class-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .modal-class-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Passenger picker modal */
+  .pax-modal-box { max-width: 460px; padding: 26px 26px 22px; }
+  .pax-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #eef1f5; }
+  .pax-row:last-of-type { border-bottom: none; }
+  .pax-row-label { font-size: 14.5px; font-weight: 700; color: #0a2540; }
+  .pax-row-sub { font-size: 11.5px; color: #6b7280; margin-top: 2px; }
+  .pax-stepper { display: flex; align-items: center; gap: 14px; }
+  .pax-stepper button {
+    width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #d6dbe1; background: #fff;
+    font-size: 17px; font-weight: 700; color: #0a2540; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .pax-stepper button:hover:not(:disabled) { border-color: #0a2540; }
+  .pax-stepper button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .pax-stepper .pax-count { width: 20px; text-align: center; font-weight: 800; font-size: 15px; color: #0a2540; }
+  .pax-modal-note { font-size: 11.5px; color: #9aa4b2; margin-top: 4px; line-height: 1.5; }
+  .pax-modal-done { width: 100%; margin-top: 18px; background: #ffd400; color: #0a2540; border: none; padding: 12px 0; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .pax-modal-done:hover { background: #ffe14d; }
+
+  .section { max-width: 1100px; margin: 70px auto 0; padding: 0 40px; }
+  .section-head { margin-bottom: 28px; }
+  .section-eyebrow { font-size: 12px; font-weight: 700; color: #d1004b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .section h2 { font-size: 26px; font-weight: 900; color: #0a2540; margin-bottom: 8px; }
+  .section-head p { color: #6b7280; font-size: 14.5px; max-width: 680px; line-height: 1.6; }
+
+  .route-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .route-table th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #6b7280; background: #eef1f5; padding: 12px 18px; font-weight: 700;
+  }
+  .route-table td { padding: 12px 18px; font-size: 14px; border-top: 1px solid #eef1f5; }
+  .route-table tr:hover td { background: #fafbfc; }
+  .route { font-weight: 700; color: #0a2540; }
+  .route .material-symbols-outlined { font-size: 16px; vertical-align: -3px; color: #b8bfc9; margin: 0 4px; }
+  .freq { color: #4b5563; }
+  .fare { font-weight: 900; color: #0a2540; }
+  .fare-note { color: #9aa4b2; font-size: 11.5px; }
+  .table-wrap { margin-bottom: 20px; overflow-x: auto; }
+  .table-label { font-size: 13px; font-weight: 700; color: #0a2540; margin: 26px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .table-label .material-symbols-outlined { font-size: 18px; color: #d1004b; }
+
+  /* Route map */
+  .map-wrap { background: #0c2e4d; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .map-wrap svg { display: block; width: 100%; height: auto; }
+  .map-legend { display: flex; gap: 18px; flex-wrap: wrap; padding: 14px 20px; background: #0a2540; font-size: 12px; color: #cfe0f0; }
+  .map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .class-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .class-card { background: #fff; border-radius: 14px; padding: 26px 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 4px solid #d6dbe1; }
+  .class-card.economy { border-top-color: #9aa4b2; }
+  .class-card.good { border-top-color: #2f8f5b; }
+  .class-card.better { border-top-color: #1c5aa8; }
+  .class-card.greatest { border-top-color: #ffd400; }
+  .class-icon { width: 42px; height: 42px; border-radius: 10px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .class-icon .material-symbols-outlined { color: #0a2540; font-size: 24px; }
+  .class-card h3 { font-size: 17px; font-weight: 900; color: #0a2540; margin-bottom: 4px; }
+  .class-tag { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+  .class-card ul { list-style: none; }
+  .class-card li { font-size: 13px; color: #4b5563; padding: 6px 0 6px 22px; position: relative; line-height: 1.5; }
+  .class-card li .material-symbols-outlined { font-size: 15px; color: #2f8f5b; position: absolute; left: 0; top: 7px; }
+  .class-restriction { font-size: 11.5px; color: #9aa4b2; margin-top: 14px; padding-top: 12px; border-top: 1px solid #eef1f5; line-height: 1.5; }
+
+  .fare-example { background: #fff; border-radius: 12px; padding: 24px 26px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 26px; }
+  .fare-example-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .fare-example-head h4 { font-size: 14px; color: #0a2540; font-weight: 700; }
+  .fare-example-head span { font-size: 12px; color: #9aa4b2; }
+  .fare-row { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 12px 0; border-top: 1px solid #eef1f5; align-items: center; }
+  .fare-row:first-of-type { border-top: none; }
+  .fare-row .cls { font-weight: 700; color: #0a2540; font-size: 14px; }
+  .fare-row .mult { color: #9aa4b2; font-size: 12.5px; }
+  .fare-row .amt { text-align: right; font-weight: 900; color: #0a2540; font-size: 15px; }
+
+  .hq-note { background: #fff; text-align: center; padding: 22px 20px; font-size: 13px; color: #6b7280; margin-top: 70px; border-top: 1px solid #e8ecf1; border-bottom: 1px solid #e8ecf1; }
+  .hq-note strong { color: #0a2540; }
+
+  .disclaimers { max-width: 1100px; margin: 30px auto 0; padding: 0 40px; }
+  .disclaimers p { color: #9aa4b2; font-size: 11.5px; line-height: 1.7; margin-bottom: 4px; }
+
+  footer { background: #06182c; color: #7c8ea3; text-align: center; padding: 30px 20px; font-size: 13px; margin-top: 50px; }
+  footer a { color: #ffd400; text-decoration: none; margin: 0 10px; }
+
+  /* Search results */
+  .results-wrap { max-width: 1000px; margin: 22px auto 0; display: none; }
+  .results-wrap.show { display: block; }
+  .results-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
+  .results-head h3 { font-size: 17px; color: #0a2540; }
+  .results-head span { font-size: 12.5px; color: #6b7280; }
+  .flight-card {
+    background: #fff; border-radius: 12px; padding: 18px 22px; margin-bottom: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: space-between;
+  }
+  .flight-legs { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 260px; }
+  .leg-pt { text-align: center; }
+  .leg-pt .time { font-size: 19px; font-weight: 900; color: #0a2540; }
+  .leg-pt .code { font-size: 12px; color: #6b7280; font-weight: 700; }
+  .leg-line { flex: 1; text-align: center; min-width: 100px; }
+  .leg-line .dur { font-size: 11.5px; color: #6b7280; margin-bottom: 4px; }
+  .leg-line .track { position: relative; height: 2px; background: #d6dbe1; margin: 0 4px; }
+  .leg-line .track::after { content: "✈"; position: absolute; right: -2px; top: -9px; font-size: 12px; color: #9aa4b2; }
+  .leg-line .stops { font-size: 11px; color: #d1004b; font-weight: 700; margin-top: 4px; }
+  .flight-meta { display: flex; align-items: center; gap: 20px; }
+  .flight-price { text-align: right; }
+  .flight-price .amt { font-size: 22px; font-weight: 900; color: #0a2540; }
+  .flight-price .lbl { font-size: 11px; color: #9aa4b2; }
+  .select-btn { background: #ffd400; color: #0a2540; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; white-space: nowrap; }
+  .select-btn:hover { background: #ffe14d; }
+  .flight-info { flex-basis: 100%; margin-top: 4px; padding-top: 12px; border-top: 1px solid #eef1f5; font-size: 12px; color: #6b7280; display: flex; flex-direction: column; gap: 8px; }
+  .flight-info-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .flight-tag b { color: #0a2540; }
+  .flight-sep { color: #b8bfc9; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .layover-note { font-size: 11.5px; color: #9a7300; background: #fff7e0; border: 1px solid #ffe9a8; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+  .cabin-note { font-size: 11.5px; color: #7a5b00; background: #fff7e0; border: 1px solid #ffe9a8; padding: 8px 12px; border-radius: 8px; line-height: 1.5; }
+  .no-results { background: #fff; border-radius: 12px; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
+  .booking-note { background: #fff7e0; border: 1px solid #ffe9a8; color: #7a5b00; font-size: 12.5px; padding: 10px 16px; border-radius: 8px; margin-top: 14px; display: none; }
+  .booking-note.show { display: block; }
+  .see-more-wrap { text-align: center; margin-top: 6px; display: none; }
+  .see-more-wrap.show { display: block; }
+  .see-more-btn {
+    background: #fff; color: #0a2540; border: 1.5px solid #d6dbe1; padding: 11px 26px; border-radius: 8px;
+    font-weight: 700; font-size: 13.5px; cursor: pointer;
+  }
+  .see-more-btn:hover { border-color: #0a2540; background: #f5f7fa; }
+
+  /* Loading spinner (between selecting departure & showing return flights) */
+  .loading-wrap {
+    display: none; max-width: 1000px; margin: 60px auto; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; gap: 18px;
+  }
+  .loading-wrap.show { display: flex; }
+  .loading-spinner {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 4px solid #eef1f5; border-top-color: #ffd400;
+    animation: minion-spin 0.8s linear infinite;
+  }
+  @keyframes minion-spin { to { transform: rotate(360deg); } }
+  .loading-wrap p { color: #0a2540; font-weight: 700; font-size: 14.5px; }
+  .loading-wrap span { color: #6b7280; font-size: 12.5px; }
+
+  /* Seat selection (Step 3 / Step 4) */
+  .seat-wrap { max-width: 1000px; margin: 22px auto 0; display: none; }
+  .seat-wrap.show { display: block; }
+  .seat-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .seat-head h3 { font-size: 17px; color: #0a2540; margin-bottom: 4px; }
+  .seat-head .seat-sub { font-size: 12.5px; color: #6b7280; }
+  .seat-progress { font-size: 13px; font-weight: 700; color: #0a2540; background: #eef1f5; padding: 8px 14px; border-radius: 20px; white-space: nowrap; }
+  .seat-progress.complete { background: #e6f4ea; color: #2f8f5b; }
+  .seat-panel { background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); padding: 22px 26px 26px; margin-bottom: 18px; }
+  .seat-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 8px; }
+  .seat-panel-head .flight-tag-sm { font-size: 12.5px; color: #6b7280; }
+  .seat-panel-head .flight-tag-sm b { color: #0a2540; }
+  .seat-aircraft-note { font-size: 11.5px; color: #9aa4b2; margin-bottom: 18px; }
+  .seat-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; font-size: 11.5px; color: #6b7280; }
+  .seat-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .seat-legend-box { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1.5px solid #d6dbe1; }
+  .sl-avail { background: #fff; }
+  .sl-selected { background: #ffd400; border-color: #ffd400; }
+  .sl-taken { background: #e1e5eb; border-color: #e1e5eb; }
+  .sl-premium { background: #fff7e0; border-color: #ffe9a8; }
+  .sl-held { background: #fdeaea; border-color: #f3c6c6; }
+  .hold-note { font-size: 11.5px; color: #9a7300; background: #fff7e0; border: 1px solid #ffe9a8; padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; line-height: 1.5; }
+  .deck-block { margin-bottom: 22px; }
+  .deck-label { font-size: 12.5px; font-weight: 900; color: #0a2540; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #eef1f5; }
+  .cabin-block { margin-bottom: 22px; }
+  .cabin-block-label { font-size: 12px; font-weight: 800; color: #0a2540; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .cabin-block-label .material-symbols-outlined { font-size: 16px; color: #d1004b; }
+  .seat-grid-scroll { overflow-x: auto; padding-bottom: 4px; }
+  .seat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .seat-row-num { width: 22px; font-size: 11px; color: #9aa4b2; font-weight: 700; text-align: right; flex-shrink: 0; }
+  .seat-col-group { display: flex; gap: 4px; }
+  .seat-aisle-gap { width: 18px; flex-shrink: 0; }
+  .seat-btn {
+    width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid #d6dbe1; background: #fff;
+    font-size: 9.5px; font-weight: 800; color: #6b7280; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.1s ease;
+  }
+  .seat-btn:hover:not(:disabled) { border-color: #0a2540; }
+  .seat-btn.premium { background: #fff7e0; border-color: #ffe9a8; color: #7a5b00; }
+  .seat-btn.selected { background: #ffd400; border-color: #ffd400; color: #0a2540; }
+  .seat-btn.taken { background: #e1e5eb; border-color: #e1e5eb; color: #b8bfc9; cursor: not-allowed; }
+  .seat-btn.held { background: #fdeaea; border-color: #f3c6c6; color: #c0392b; cursor: not-allowed; }
+  .seat-btn:disabled:not(.taken) { opacity: 0.4; cursor: not-allowed; }
+  .seat-pax-tray { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding-top: 18px; border-top: 1px solid #eef1f5; }
+  .seat-pax-chip {
+    display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 20px;
+    background: #eef1f5; font-size: 12.5px; font-weight: 700; color: #6b7280; border: 1.5px solid transparent; cursor: pointer;
+  }
+  .seat-pax-chip.active { background: #fffdf3; border-color: #ffd400; color: #0a2540; }
+  .seat-pax-chip.done { background: #e6f4ea; color: #2f8f5b; }
+  .seat-pax-chip .material-symbols-outlined { font-size: 15px; }
+  .seat-infant-note { font-size: 11.5px; color: #9a7300; background: #fff7e0; border: 1px solid #ffe9a8; padding: 8px 12px; border-radius: 8px; margin-top: 14px; line-height: 1.5; }
+  .seat-continue-row { display: flex; justify-content: flex-end; align-items: center; margin-top: 4px; gap: 10px; }
+  .seat-back-btn { background: none; border: none; color: #6b7280; font-size: 12.5px; cursor: pointer; text-decoration: underline; margin-right: auto; }
+  .seat-continue-btn {
+    background: #ffd400; color: #0a2540; border: none; padding: 12px 26px; border-radius: 8px;
+    font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .seat-continue-btn:disabled { background: #eef1f5; color: #b8bfc9; cursor: not-allowed; }
+  .seat-continue-btn:not(:disabled):hover { background: #ffe14d; }
+  @media (max-width: 560px) {
+    .seat-btn { width: 27px; height: 27px; }
+  }
+
+  @media (max-width: 900px) {
+    .search-fields { grid-template-columns: 1fr 1fr; }
+    .class-grid { grid-template-columns: 1fr 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 560px) {
+    .flight-card { flex-direction: column; align-items: stretch; }
+    .flight-meta { justify-content: space-between; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><a href="index.html"><img src="logo.png" alt="Minion Airways"></a></div>
+  <nav>
+    <ul>
+      <li><a href="booking.html" class="active">Book</a></li>
+      <li><a href="#">Check-in</a></li>
+      <li><a href="#">Flight Status</a></li>
+      <li><a href="#">My Trips</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+  </nav>
+  <button class="header-btn">Sign In</button>
+</header>
+
+<section class="page-hero">
+  <h1>Book a flight</h1>
+  <p>Search nonstop and connecting service across the Minion Airways network.</p>
+</section>
+
+<div class="search-box">
+  <div class="progress-wrap">
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="1"><span class="step-num">1</span><span class="step-label">Departure Flight Booking</span></div>
+      <div class="step" data-step="2"><span class="step-num">2</span><span class="step-label">Departure Seats</span></div>
+      <div class="step" data-step="3"><span class="step-num">3</span><span class="step-label">Return Flight Booking</span></div>
+      <div class="step" data-step="4"><span class="step-num">4</span><span class="step-label">Return Seats</span></div>
+      <div class="step" data-step="5"><span class="step-num">5</span><span class="step-label">Upgrades</span></div>
+      <div class="step" data-step="6"><span class="step-num">6</span><span class="step-label">Complete Booking</span></div>
+    </div>
+  </div>
+  <div class="search-fields">
+    <div class="field">
+      <label>From</label>
+      <input type="text" id="fromInput" value="San Jose (SJC)" autocomplete="off">
+      <div class="autocomplete-list" id="fromList"></div>
+    </div>
+    <div class="field">
+      <label>To</label>
+      <input type="text" id="toInput" placeholder="City or airport code" autocomplete="off">
+      <div class="autocomplete-list" id="toList"></div>
+    </div>
+    <div class="field">
+      <label>Depart</label>
+      <input type="date" id="departInput">
+    </div>
+    <div class="field">
+      <div class="field-label-row">
+        <label>Return</label>
+        <label class="no-return-toggle"><input type="checkbox" id="noReturnCheck">No return flight</label>
+      </div>
+      <input type="date" id="returnInput">
+    </div>
+    <div class="field">
+      <label>Class</label>
+      <button type="button" class="class-select-btn" id="classSelectBtn">Economy<span class="material-symbols-outlined">expand_more</span></button>
+      <input type="hidden" id="classInput" value="Economy">
+    </div>
+    <div class="field">
+      <label>Passengers</label>
+      <button type="button" class="class-select-btn" id="paxSelectBtn">1 Adult<span class="material-symbols-outlined">expand_more</span></button>
+    </div>
+    <button class="search-btn" id="searchBtn"><span class="material-symbols-outlined">search</span>Search</button>
+  </div>
+  <div class="search-msg" id="searchMsg"></div>
+  <div class="flightno-toggle" id="flightnoToggle">Know your flight number? <button type="button" id="flightnoToggleBtn">Search by flight number</button></div>
+  <div class="flightno-row" id="flightnoRow">
+    <input type="text" id="flightnoInput" placeholder="e.g. MA328" autocomplete="off">
+    <button class="search-btn" id="flightnoSearchBtn" type="button"><span class="material-symbols-outlined">search</span>Find Flight</button>
+    <button type="button" class="flightno-cancel" id="flightnoCancel">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="classModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Choose your class</h3>
+      <button class="modal-close" id="classModalClose">&times;</button>
+    </div>
+    <p>Every fare includes a seat assignment and standard beverage service. Availability reflects the route you've entered.</p>
+    <div class="modal-class-grid" id="modalClassGrid"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="paxModalOverlay">
+  <div class="modal-box pax-modal-box">
+    <div class="modal-head">
+      <h3>Passengers</h3>
+      <button class="modal-close" id="paxModalClose">&times;</button>
+    </div>
+    <div class="pax-row">
+      <div>
+        <div class="pax-row-label">Adult</div>
+        <div class="pax-row-sub">Age 12–65</div>
+      </div>
+      <div class="pax-stepper">
+        <button type="button" id="paxAdultMinus">&minus;</button>
+        <span class="pax-count" id="paxAdultCount">1</span>
+        <button type="button" id="paxAdultPlus">+</button>
+      </div>
+    </div>
+    <div class="pax-row">
+      <div>
+        <div class="pax-row-label">Child</div>
+        <div class="pax-row-sub">Age 2–11 &middot; 20% off</div>
+      </div>
+      <div class="pax-stepper">
+        <button type="button" id="paxChildMinus">&minus;</button>
+        <span class="pax-count" id="paxChildCount">0</span>
+        <button type="button" id="paxChildPlus">+</button>
+      </div>
+    </div>
+    <div class="pax-row">
+      <div>
+        <div class="pax-row-label">Infant</div>
+        <div class="pax-row-sub">Age 0–2 &middot; free seat with adult purchase</div>
+      </div>
+      <div class="pax-stepper">
+        <button type="button" id="paxInfantMinus">&minus;</button>
+        <span class="pax-count" id="paxInfantCount">0</span>
+        <button type="button" id="paxInfantPlus">+</button>
+      </div>
+    </div>
+    <div class="pax-row">
+      <div>
+        <div class="pax-row-label">Senior</div>
+        <div class="pax-row-sub">Age 66+ &middot; 15% off</div>
+      </div>
+      <div class="pax-stepper">
+        <button type="button" id="paxSeniorMinus">&minus;</button>
+        <span class="pax-count" id="paxSeniorCount">0</span>
+        <button type="button" id="paxSeniorPlus">+</button>
+      </div>
+    </div>
+    <p class="pax-modal-note">Each infant must be accompanied by at least one adult or senior. Up to 9 passengers per booking.</p>
+    <button type="button" class="pax-modal-done" id="paxModalDone">Done</button>
+  </div>
+</div>
+
+<div class="results-wrap" id="resultsWrap">
+  <div class="results-head">
+    <h3 id="resultsTitle">Flights</h3>
+    <span id="resultsSub"></span>
+  </div>
+  <div id="resultsList"></div>
+  <div class="see-more-wrap" id="seeMoreWrap"><button class="see-more-btn" id="seeMoreBtn">See More Flights</button></div>
+  <div class="booking-note" id="bookingNote">Booking isn't live yet — selecting a flight is just a preview of how results will look. Check back soon to complete a purchase!</div>
+</div>
+
+<div class="loading-wrap" id="loadingWrap">
+  <div class="loading-spinner"></div>
+  <p>Finding your return flights&hellip;</p>
+  <span>Checking availability for the trip back</span>
+</div>
+
+<div class="results-wrap" id="returnResultsWrap">
+  <div class="results-head">
+    <div>
+      <button type="button" class="flightno-cancel" id="backToDepartureBtn" style="display:block; margin-bottom:8px;">&larr; Back to departure flights</button>
+      <h3 id="returnResultsTitle">Return flights</h3>
+    </div>
+    <span id="returnResultsSub"></span>
+  </div>
+  <div id="returnResultsList"></div>
+  <div class="see-more-wrap" id="returnSeeMoreWrap"><button class="see-more-btn" id="returnSeeMoreBtn">See More Flights</button></div>
+  <div class="booking-note" id="returnBookingNote">Booking isn't live yet — selecting a flight is just a preview of how results will look. Check back soon to complete a purchase!</div>
+</div>
+
+<div class="seat-wrap" id="seatWrap">
+  <div class="seat-head">
+    <div>
+      <h3 id="seatTitle">Choose your seats</h3>
+      <div class="seat-sub" id="seatSub">Departure flight</div>
+    </div>
+    <div class="seat-progress" id="seatProgress">0 of 0 seated</div>
+  </div>
+  <div id="seatPanels"></div>
+  <div class="seat-continue-row">
+    <button type="button" class="seat-back-btn" id="seatBackBtn">&larr; Back</button>
+    <button type="button" class="seat-continue-btn" id="seatContinueBtn" disabled>Continue</button>
+  </div>
+</div>
+
+<div class="hq-note">Minion Airways is headquartered at <strong>San Jose International Airport (SJC)</strong>, California, with a secondary West Coast hub at San Francisco International Airport (SFO).</div>
+
+<section class="section">
+  <div class="section-head">
+    <div class="section-eyebrow">Route Network</div>
+    <h2>Nonstop destinations</h2>
+    <p>Fares shown are starting one-way Economy prices and vary by date and demand. Routes with lower demand operate on a reduced weekly schedule.</p>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-label"><span class="material-symbols-outlined">flight_takeoff</span>Nonstop from San Jose (SJC)</div>
+    <table class="route-table">
+      <thead><tr><th>Route</th><th>Frequency</th><th>From</th></tr></thead>
+      <tbody>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> SFO</td><td class="freq">Daily</td><td class="fare">$39</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> LAX</td><td class="freq">Daily</td><td class="fare">$49</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Seattle (SEA)</td><td class="freq">Daily</td><td class="fare">$59</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Newark (EWR)</td><td class="freq">Daily</td><td class="fare">$129</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> New York (JFK)</td><td class="freq">Daily</td><td class="fare">$139</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> New York (LGA)</td><td class="freq">5x weekly</td><td class="fare">$119</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Miami (MIA)</td><td class="freq">Daily</td><td class="fare">$149</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> London Gatwick (LGW)</td><td class="freq">4x weekly</td><td class="fare">$329</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> London Heathrow (LHR)</td><td class="freq">Daily</td><td class="fare">$349</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Paris (CDG)</td><td class="freq">Daily</td><td class="fare">$339</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Rome (FCO)</td><td class="freq">4x weekly</td><td class="fare">$359</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Mumbai (BOM)</td><td class="freq">Daily</td><td class="fare">$429</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Pune (PNQ)</td><td class="freq">2x weekly</td><td class="fare">$449</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Hong Kong (HKG)</td><td class="freq">Daily</td><td class="fare">$389</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Singapore (SIN)</td><td class="freq">5x weekly</td><td class="fare">$399</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Narita (NRT)</td><td class="freq">Daily</td><td class="fare">$359</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Haneda (HND)</td><td class="freq">Daily</td><td class="fare">$369</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Sydney (SYD)</td><td class="freq">4x weekly</td><td class="fare">$499</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Melbourne (MEL)</td><td class="freq">3x weekly</td><td class="fare">$519</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Buenos Aires (EZE)</td><td class="freq">3x weekly</td><td class="fare">$429</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Rio de Janeiro (GIG)</td><td class="freq">3x weekly</td><td class="fare">$419</td></tr>
+        <tr><td class="route">SJC <span class="material-symbols-outlined">arrow_right_alt</span> Dubai (DXB)</td><td class="freq">Daily</td><td class="fare">$459</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-label"><span class="material-symbols-outlined">flight_takeoff</span>Nonstop from San Francisco (SFO)</div>
+    <p class="fare-note" style="margin-bottom:10px;">SFO offers every SJC destination above except Seattle (SEA), at comparable fares and frequency.</p>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-label"><span class="material-symbols-outlined">public</span>Hub connectivity map</div>
+    <p class="fare-note" style="margin-bottom:16px;">Every hub below operates multiple nonstop connections to other hubs in the Minion Airways network, in addition to service from San Jose (SJC) and San Francisco (SFO).</p>
+    <div class="map-wrap">
+      <div id="mapContainer"></div>
+      <div class="map-legend">
+        <span><span class="legend-dot" style="background:#ffd400;"></span>West Coast base (SJC / SFO)</span>
+        <span><span class="legend-dot" style="background:#5ec9ff;"></span>Europe</span>
+        <span><span class="legend-dot" style="background:#ff8a65;"></span>South Asia</span>
+        <span><span class="legend-dot" style="background:#a5d6a7;"></span>East Asia / Pacific</span>
+        <span><span class="legend-dot" style="background:#ce93d8;"></span>Middle East</span>
+        <span><span class="legend-dot" style="background:#fff59d;"></span>North America</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <div class="section-eyebrow">Fare Classes</div>
+    <h2>Choose your class</h2>
+    <p>Every fare includes a seat assignment and standard beverage service. Higher classes add space, flexibility, and dining.</p>
+  </div>
+
+  <div class="class-grid">
+    <div class="class-card economy">
+      <div class="class-icon"><span class="material-symbols-outlined">event_seat</span></div>
+      <h3>Economy</h3>
+      <div class="class-tag">Standard cabin</div>
+      <ul>
+        <li><span class="material-symbols-outlined">check</span>Standard seat</li>
+        <li><span class="material-symbols-outlined">check</span>One meal on long-haul flights</li>
+        <li><span class="material-symbols-outlined">check</span>Refunds issued as Minion BananaRewards™ credit</li>
+      </ul>
+      <div class="class-restriction">No flight changes permitted after booking.</div>
+    </div>
+    <div class="class-card good">
+      <div class="class-icon"><span class="material-symbols-outlined">airline_seat_legroom_extra</span></div>
+      <h3>Good</h3>
+      <div class="class-tag">Extra comfort</div>
+      <ul>
+        <li><span class="material-symbols-outlined">check</span>Extra legroom seating</li>
+        <li><span class="material-symbols-outlined">check</span>Two meals on long-haul flights</li>
+        <li><span class="material-symbols-outlined">check</span>Extra snack service</li>
+        <li><span class="material-symbols-outlined">check</span>Refunds issued in USD</li>
+      </ul>
+      <div class="class-restriction">No flight changes permitted after booking.</div>
+    </div>
+    <div class="class-card better">
+      <div class="class-icon"><span class="material-symbols-outlined">airline_seat_flat</span></div>
+      <h3>Better</h3>
+      <div class="class-tag">Business class</div>
+      <ul>
+        <li><span class="material-symbols-outlined">check</span>Business-class seat</li>
+        <li><span class="material-symbols-outlined">check</span>Unlimited meal service on long-haul flights</li>
+        <li><span class="material-symbols-outlined">check</span>Priority boarding</li>
+      </ul>
+      <div class="class-restriction">Not available on Boeing 737, Airbus A320, or Boeing 757 aircraft.</div>
+    </div>
+    <div class="class-card greatest">
+      <div class="class-icon"><span class="material-symbols-outlined">workspace_premium</span></div>
+      <h3>Greatest</h3>
+      <div class="class-tag">First class</div>
+      <ul>
+        <li><span class="material-symbols-outlined">check</span>First-class suite</li>
+        <li><span class="material-symbols-outlined">check</span>All Better-class benefits</li>
+        <li><span class="material-symbols-outlined">check</span>Dedicated cabin service</li>
+      </ul>
+      <div class="class-restriction">Not available on flights under 5 hours.</div>
+    </div>
+  </div>
+
+  <div class="fare-example">
+    <div class="fare-example-head">
+      <h4>Example fares — San Jose (SJC) to London Heathrow (LHR)</h4>
+      <span>One-way, per person</span>
+    </div>
+    <div class="fare-row"><span class="cls">Economy</span><span class="mult">Base fare</span><span class="amt">$349</span></div>
+    <div class="fare-row"><span class="cls">Good</span><span class="mult">1.4x Economy</span><span class="amt">$489</span></div>
+    <div class="fare-row"><span class="cls">Better</span><span class="mult">2.6x Economy</span><span class="amt">$899</span></div>
+    <div class="fare-row"><span class="cls">Greatest</span><span class="mult">4.2x Economy</span><span class="amt">$1,459</span></div>
+  </div>
+</section>
+
+<div class="disclaimers">
+  <p>*We carry no more than 600 bananas on each flight.</p>
+  <p>**Except any flights departing Washington Dulles (IAD) or any flights on Embraer E175 aircraft (except those flown by MinionDomestic™).</p>
+  <p>***Only possible on flights serviced by the Airbus A321neo, Boeing 737 MAX 8 or 9, Boeing 787-9, or Airbus A380-800.</p>
+  <p>Fares shown are starting prices, subject to availability, and may not include applicable taxes and fees.</p>
+</div>
+
+<footer>
+  <div>
+    <a href="#">About Us</a>
+    <a href="#">Careers</a>
+    <a href="#">Contact</a>
+    <a href="#">Terms</a>
+    <a href="#">Privacy</a>
+  </div>
+  <p style="margin-top:16px;">© 2026 Minion Airways. All rights reserved.</p>
+</footer>
+
+<script>
+/* ---------- Network data ---------- */
+const AIRPORTS = {
+  SJC:{name:"San Jose",city:"San Jose",lat:37.36,lon:-121.93,region:"base"},
+  SFO:{name:"San Francisco",city:"San Francisco",lat:37.62,lon:-122.38,region:"base"},
+  LAX:{name:"Los Angeles",city:"Los Angeles",lat:33.94,lon:-118.41,region:"na"},
+  SEA:{name:"Seattle",city:"Seattle",lat:47.45,lon:-122.31,region:"na"},
+  EWR:{name:"Newark",city:"Newark",lat:40.69,lon:-74.17,region:"na"},
+  JFK:{name:"New York JFK",city:"New York",lat:40.64,lon:-73.78,region:"na"},
+  LGA:{name:"New York LaGuardia",city:"New York",lat:40.78,lon:-73.87,region:"na"},
+  IAD:{name:"Washington Dulles",city:"Washington",lat:38.95,lon:-77.46,region:"na"},
+  BOS:{name:"Boston",city:"Boston",lat:42.36,lon:-71.01,region:"na"},
+  IAH:{name:"Houston",city:"Houston",lat:29.98,lon:-95.34,region:"na"},
+  DFW:{name:"Dallas",city:"Dallas",lat:32.90,lon:-97.04,region:"na"},
+  AUS:{name:"Austin",city:"Austin",lat:30.20,lon:-97.67,region:"na"},
+  MIA:{name:"Miami",city:"Miami",lat:25.80,lon:-80.29,region:"na"},
+  FLL:{name:"Fort Lauderdale",city:"Fort Lauderdale",lat:26.07,lon:-80.15,region:"na"},
+  MCO:{name:"Orlando",city:"Orlando",lat:28.43,lon:-81.31,region:"na"},
+  FNC:{name:"Madeira",city:"Madeira",lat:32.70,lon:-16.78,region:"eu"},
+  LHR:{name:"London Heathrow",city:"London",lat:51.47,lon:-0.45,region:"eu"},
+  LGW:{name:"London Gatwick",city:"London",lat:51.15,lon:-0.19,region:"eu"},
+  CDG:{name:"Paris Charles de Gaulle",city:"Paris",lat:49.01,lon:2.55,region:"eu"},
+  ORY:{name:"Paris Orly",city:"Paris",lat:48.72,lon:2.36,region:"eu"},
+  FCO:{name:"Rome Fiumicino",city:"Rome",lat:41.80,lon:12.25,region:"eu"},
+  MAD:{name:"Madrid",city:"Madrid",lat:40.47,lon:-3.56,region:"eu"},
+  BCN:{name:"Barcelona",city:"Barcelona",lat:41.30,lon:2.08,region:"eu"},
+  DXB:{name:"Dubai",city:"Dubai",lat:25.25,lon:55.36,region:"me"},
+  BOM:{name:"Mumbai",city:"Mumbai",lat:19.09,lon:72.87,region:"sa"},
+  DEL:{name:"Delhi",city:"Delhi",lat:28.56,lon:77.10,region:"sa"},
+  PNQ:{name:"Pune",city:"Pune",lat:18.58,lon:73.92,region:"sa"},
+  HND:{name:"Tokyo Haneda",city:"Tokyo",lat:35.55,lon:139.78,region:"ap"},
+  NRT:{name:"Tokyo Narita",city:"Tokyo",lat:35.76,lon:140.39,region:"ap"},
+  PEK:{name:"Beijing",city:"Beijing",lat:40.08,lon:116.58,region:"ap"},
+  PVG:{name:"Shanghai",city:"Shanghai",lat:31.14,lon:121.80,region:"ap"},
+  SYD:{name:"Sydney",city:"Sydney",lat:-33.95,lon:151.18,region:"ap"},
+  MEL:{name:"Melbourne",city:"Melbourne",lat:-37.67,lon:144.84,region:"ap"},
+  HKG:{name:"Hong Kong",city:"Hong Kong",lat:22.31,lon:113.91,region:"ap"},
+  SIN:{name:"Singapore",city:"Singapore",lat:1.36,lon:103.99,region:"ap"},
+  EZE:{name:"Buenos Aires",city:"Buenos Aires",lat:-34.82,lon:-58.54,region:"sam"},
+  GIG:{name:"Rio de Janeiro",city:"Rio de Janeiro",lat:-22.81,lon:-43.24,region:"sam"}
+};
+const REGION_COLOR = {base:"#ffd400",eu:"#5ec9ff",sa:"#ff8a65",ap:"#a5d6a7",me:"#ce93d8",na:"#fff59d",sam:"#f48fb1"};
+
+// SJC/SFO nonstop destinations (SFO gets everything except SEA)
+const SJC_NONSTOP = ["SFO","LAX","SEA","EWR","JFK","LGA","MIA","LGW","LHR","CDG","FCO","BOM","PNQ","HKG","SIN","NRT","HND","SYD","MEL","EZE","GIG","DXB"];
+
+// Hub-to-hub network edges (expanded per hub list, incl. bigger EWR & BOM networks)
+const HUB_EDGES = [
+  ["LHR","CDG"],["LHR","MAD"],["LHR","BCN"],["LHR","FCO"],["LHR","DXB"],["LHR","BOM"],["LHR","DEL"],
+  ["LHR","JFK"],["LHR","BOS"],["LHR","IAD"],["LHR","EWR"],
+  ["LGW","CDG"],["LGW","MAD"],["LGW","BCN"],["LGW","FCO"],["LGW","DXB"],["LGW","JFK"],
+  ["CDG","MAD"],["CDG","FCO"],["CDG","DXB"],["CDG","BOM"],["CDG","JFK"],["CDG","EWR"],
+  ["ORY","MAD"],["ORY","BCN"],["ORY","FCO"],
+  ["FCO","MAD"],["FCO","DXB"],["FCO","JFK"],["FCO","EWR"],
+  ["MAD","BCN"],["MAD","JFK"],["MAD","BOM"],
+  ["BOM","DXB"],["BOM","DEL"],["BOM","PNQ"],["BOM","HND"],["BOM","SYD"],["BOM","FCO"],["BOM","JFK"],
+  ["DEL","DXB"],["DEL","PNQ"],
+  ["PNQ","DXB"],
+  ["HND","DXB"],["HND","PEK"],["HND","PVG"],["HND","SYD"],
+  ["SYD","DXB"],
+  ["PEK","DXB"],["PEK","PVG"],
+  ["PVG","DXB"],
+  ["DXB","MEL"],
+  ["JFK","FNC"],["JFK","IAH"],["JFK","DFW"],["JFK","AUS"],["JFK","MIA"],["JFK","FLL"],["JFK","MCO"],["JFK","BOS"],["JFK","IAD"],
+  ["EWR","IAH"],["EWR","DFW"],["EWR","MIA"],["EWR","BOS"],["EWR","IAD"],["EWR","LGA"],["EWR","DXB"],["EWR","MCO"],["EWR","AUS"],["EWR","BCN"],
+  ["LGA","BOS"],["LGA","IAD"],
+  ["IAD","BOS"],["IAD","LGA"],
+  ["BOS","LGA"],
+  ["IAH","DFW"],["IAH","AUS"],["IAH","MIA"],
+  ["DFW","AUS"],
+  ["MIA","MCO"],["MIA","FNC"],
+  ["FLL","MCO"],
+  ["MCO","FLL"]
+];
+
+// Build undirected adjacency graph including SJC/SFO nonstops + hub edges
+const GRAPH = {};
+function addEdge(a,b){ (GRAPH[a] = GRAPH[a]||new Set()).add(b); (GRAPH[b] = GRAPH[b]||new Set()).add(a); }
+SJC_NONSTOP.forEach(d=>{ addEdge("SJC",d); if(d!=="SEA" && d!=="SFO") addEdge("SFO",d); });
+addEdge("SJC","SFO");
+HUB_EDGES.forEach(([a,b])=>addEdge(a,b));
+
+/* ---------- Map render ---------- */
+function project(lat,lon){
+  const x = (lon+180)/360*1000;
+  const y = (90-lat)/180*460 + 20;
+  return [x,y];
+}
+function buildMap(){
+  const w=1000,h=500;
+  let dots="", lines="";
+  const seen=new Set();
+  Object.entries(GRAPH).forEach(([a,set])=>{
+    set.forEach(b=>{
+      const key=[a,b].sort().join("-");
+      if(seen.has(key) || !AIRPORTS[a] || !AIRPORTS[b]) return;
+      seen.add(key);
+      const [x1,y1]=project(AIRPORTS[a].lat,AIRPORTS[a].lon);
+      const [x2,y2]=project(AIRPORTS[b].lat,AIRPORTS[b].lon);
+      const bold = (a==="SJC"||b==="SJC"||a==="SFO"||b==="SFO");
+      lines += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${bold?'#ffd400':'#5ec9ff'}" stroke-opacity="${bold?0.55:0.25}" stroke-width="${bold?1.4:0.8}"/>`;
+    });
+  });
+  Object.entries(AIRPORTS).forEach(([code,a])=>{
+    const [x,y]=project(a.lat,a.lon);
+    const color = REGION_COLOR[a.region] || "#fff";
+    const r = (code==="SJC"||code==="SFO") ? 6 : 4;
+    dots += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" stroke="#0c2e4d" stroke-width="1"><title>${code} — ${a.name}</title></circle>`;
+    dots += `<text x="${x}" y="${y-8}" font-size="9" fill="#cfe0f0" text-anchor="middle" font-family="Roboto, sans-serif">${code}</text>`;
+  });
+  document.getElementById("mapContainer").innerHTML =
+    `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${w}" height="${h}" fill="#0c2e4d"/>
+      ${Array.from({length:12}).map((_,i)=>`<line x1="${i*w/12}" y1="0" x2="${i*w/12}" y2="${h}" stroke="#153a5c" stroke-width="0.5"/>`).join("")}
+      ${Array.from({length:6}).map((_,i)=>`<line x1="0" y1="${i*h/6}" x2="${w}" y2="${i*h/6}" stroke="#153a5c" stroke-width="0.5"/>`).join("")}
+      ${lines}
+      ${dots}
+    </svg>`;
+}
+buildMap();
+
+/* ---------- Search ---------- */
+function findAirport(text){
+  if(!text) return null;
+  const t = text.trim().toLowerCase();
+  const codeMatch = text.trim().toUpperCase().match(/\(([A-Z]{3})\)\s*$/) || text.trim().toUpperCase().match(/^([A-Z]{3})$/);
+  if(codeMatch && AIRPORTS[codeMatch[1]]) return codeMatch[1];
+  for(const [code,a] of Object.entries(AIRPORTS)){
+    if(code.toLowerCase()===t || a.city.toLowerCase()===t || a.name.toLowerCase()===t) return code;
+  }
+  for(const [code,a] of Object.entries(AIRPORTS)){
+    if(a.city.toLowerCase().includes(t) || a.name.toLowerCase().includes(t)) return code;
+  }
+  return null;
+}
+
+/* ---------- Live autocomplete ---------- */
+function searchAirports(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  const scored = [];
+  Object.entries(AIRPORTS).forEach(([code,a])=>{
+    const hay = `${code} ${a.city} ${a.name}`.toLowerCase();
+    let score = -1;
+    if(code.toLowerCase()===q) score = 0;
+    else if(code.toLowerCase().startsWith(q)) score = 1;
+    else if(a.city.toLowerCase().startsWith(q)) score = 2;
+    else if(a.name.toLowerCase().startsWith(q)) score = 3;
+    else if(hay.includes(q)) score = 4;
+    if(score>=0) scored.push({code,a,score});
+  });
+  scored.sort((x,y)=> x.score-y.score || x.a.city.localeCompare(y.a.city));
+  return scored.slice(0,8);
+}
+function highlight(text,q){
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  if(i<0) return text;
+  return `${text.slice(0,i)}<b>${text.slice(i,i+q.length)}</b>${text.slice(i+q.length)}`;
+}
+function setupAutocomplete(inputId, listId){
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  let activeIdx = -1;
+  let items = [];
+
+  function render(query){
+    const matches = searchAirports(query);
+    items = matches;
+    activeIdx = -1;
+    if(!matches.length){
+      list.innerHTML = query.trim() ? `<div class="ac-empty">No matching airports</div>` : "";
+      list.classList.toggle("show", !!query.trim());
+      return;
+    }
+    list.innerHTML = matches.map((m,i)=>
+      `<div class="ac-item" data-idx="${i}" data-code="${m.code}">
+        <span class="ac-main">${highlight(m.a.city,query)} — ${highlight(m.a.name,query)}</span>
+        <span class="ac-code">${m.code}</span>
+      </div>`
+    ).join("");
+    list.classList.add("show");
+  }
+  function selectItem(code){
+    const a = AIRPORTS[code];
+    input.value = `${a.city} (${code})`;
+    input.classList.remove("invalid");
+    list.classList.remove("show");
+    doSearch(false);
+  }
+  input.addEventListener("input", ()=>{
+    input.classList.remove("invalid");
+    render(input.value);
+  });
+  input.addEventListener("focus", ()=>{ if(input.value.trim()) render(input.value); });
+  input.addEventListener("blur", ()=>{
+    setTimeout(()=>{
+      list.classList.remove("show");
+      // Soft-validate: if text doesn't resolve to a known airport, flag it
+      if(input.value.trim() && !findAirport(input.value)) input.classList.add("invalid");
+    }, 150);
+  });
+  input.addEventListener("keydown", (e)=>{
+    if(!list.classList.contains("show") || !items.length) return;
+    if(e.key==="ArrowDown"){ e.preventDefault(); activeIdx=(activeIdx+1)%items.length; updateActive(); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); activeIdx=(activeIdx-1+items.length)%items.length; updateActive(); }
+    else if(e.key==="Enter"){ e.preventDefault(); if(activeIdx>=0) selectItem(items[activeIdx].code); }
+    else if(e.key==="Escape"){ list.classList.remove("show"); }
+  });
+  function updateActive(){
+    [...list.children].forEach((el,i)=> el.classList.toggle("active", i===activeIdx));
+    if(items[activeIdx]) items[activeIdx].__el = list.children[activeIdx];
+    if(list.children[activeIdx]) list.children[activeIdx].scrollIntoView({block:"nearest"});
+  }
+  list.addEventListener("mousedown", (e)=>{
+    const item = e.target.closest(".ac-item");
+    if(item && item.dataset.code) selectItem(item.dataset.code);
+  });
+}
+setupAutocomplete("fromInput","fromList");
+setupAutocomplete("toInput","toList");
+function haversine(a,b){
+  const R=6371, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLon=toRad(b.lon-a.lon);
+  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+function fmtDur(hoursFloat){
+  const h=Math.floor(hoursFloat), m=Math.round((hoursFloat-h)*60);
+  return `${h}h ${m.toString().padStart(2,"0")}m`;
+}
+function classMult(cls){ return {Economy:1,Good:1.4,Better:2.6,Greatest:4.2}[cls] || 1; }
+function segDetails(a,b){
+  const km = haversine(AIRPORTS[a],AIRPORTS[b]);
+  const hrs = km/820 + 0.7;
+  const price = Math.round((45 + km*0.085)/5)*5;
+  return {km,hrs,price};
+}
+function randTime(minH,maxH,rng=Math.random){
+  const h = Math.floor(rng()*(maxH-minH))+minH;
+  const m = [0,15,20,30,40,45][Math.floor(rng()*6)];
+  return {h,m,str:to12h(h,m)};
+}
+function to12h(h24,m){
+  const period = h24>=12 ? "PM" : "AM";
+  let h12 = h24%12; if(h12===0) h12=12;
+  return `${h12}:${m.toString().padStart(2,"0")} ${period}`;
+}
+const AIRCRAFT = [
+  "Embraer E175 (MinionDomestic™)","Embraer E175","Bombardier CRJ-700 (MinionDomestic™)","Bombardier CRJ-700",
+  "Airbus A318","Airbus A319","Airbus A320","Airbus A320neo","Airbus A321","Airbus A321neo","Airbus A321XLR",
+  "Airbus A350-900","Airbus A350-1000","Airbus A350-1000ULR","Airbus A380-800",
+  "Boeing 737 MAX 8","Boeing 737 MAX 9","Boeing 737-800","Boeing 747-8","Boeing 747-400","Boeing 747 Combi",
+  "Boeing 757-300","Boeing 767-200","Boeing 767-300","Boeing 767-300ER",
+  "Boeing 777-200","Boeing 777-300","Boeing 777-300ER","Boeing 777X","Boeing 787-8","Boeing 787-9"
+];
+// Max realistic flight duration (hours) each airframe can operate. A flight longer than this
+// for a given aircraft is physically implausible and that aircraft is excluded from the pool.
+const AIRCRAFT_RANGE_HRS = {
+  "Embraer E175 (MinionDomestic™)":3.5, "Embraer E175":3.5,
+  "Bombardier CRJ-700 (MinionDomestic™)":3, "Bombardier CRJ-700":3,
+  "Airbus A318":6, "Airbus A319":6.5, "Airbus A320":6.5, "Airbus A320neo":7,
+  "Airbus A321":6.5, "Airbus A321neo":7.5, "Airbus A321XLR":11,
+  "Boeing 737-800":6.5, "Boeing 737 MAX 8":7, "Boeing 737 MAX 9":7,
+  "Boeing 757-300":8.5,
+  "Boeing 767-200":10, "Boeing 767-300":10, "Boeing 767-300ER":10,
+  "Boeing 747-8":15, "Boeing 747-400":14, "Boeing 747 Combi":13,
+  "Airbus A380-800":15.5,
+  "Airbus A350-900":16, "Airbus A350-1000":17, "Airbus A350-1000ULR":19.5,
+  "Boeing 777-200":15.5, "Boeing 777-300":14.5, "Boeing 777-300ER":17, "Boeing 777X":17.5,
+  "Boeing 787-8":16, "Boeing 787-9":17
+};
+const SHORTHAUL = ["Embraer E175 (MinionDomestic™)","Embraer E175","Bombardier CRJ-700 (MinionDomestic™)","Bombardier CRJ-700","Airbus A318","Airbus A319","Airbus A320","Airbus A320neo","Airbus A321","Airbus A321neo","Boeing 737-800","Boeing 737 MAX 8","Boeing 737 MAX 9"];
+// Widebodies airlines actually fly on premium DOMESTIC long-haul routes (e.g. SFO-EWR, SJC-JFK).
+// Deliberately excludes the largest international flagship jets (777X, 747s, A380, A350-1000ULR) —
+// those are reserved for international long-haul below.
+const DOMESTIC_LONGHAUL = ["Airbus A321XLR","Boeing 757-300","Boeing 767-200","Boeing 767-300","Boeing 767-300ER","Boeing 787-8","Boeing 787-9"];
+const INTL_LONGHAUL = ["Airbus A321XLR","Airbus A350-900","Airbus A350-1000","Airbus A350-1000ULR","Airbus A380-800","Airbus A380-800","Boeing 747-8","Boeing 757-300","Boeing 767-200","Boeing 767-300","Boeing 767-300ER","Boeing 777-200","Boeing 777-300","Boeing 777-300ER","Boeing 777X","Boeing 787-8","Boeing 787-9"];
+function pickAircraft(hrs, rng=Math.random, isDomestic=false){
+  const basePool = hrs >= 5.5 ? (isDomestic ? DOMESTIC_LONGHAUL : INTL_LONGHAUL) : SHORTHAUL;
+  // Filter out anything whose max range can't actually cover this flight's duration
+  const pool = basePool.filter(ac => hrs <= (AIRCRAFT_RANGE_HRS[ac] || 0));
+  if(!pool.length){
+    // Fallback: widen to any aircraft in range, ignoring the domestic/intl split, rather than crash
+    const fallback = AIRCRAFT.filter(ac => hrs <= (AIRCRAFT_RANGE_HRS[ac] || 0));
+    return fallback.length ? fallback[Math.floor(rng()*fallback.length)] : "Boeing 777X";
+  }
+  return pool[Math.floor(rng()*pool.length)];
+}
+function isDomesticRoute(from,to){
+  const ra = AIRPORTS[from] && AIRPORTS[from].region;
+  const rb = AIRPORTS[to] && AIRPORTS[to].region;
+  return (ra==="na"||ra==="base") && (rb==="na"||rb==="base");
+}
+function genFlightNumber(rng=Math.random){
+  const n = Math.floor(rng()*899)+100;
+  return `MA${n}`;
+}
+function seededRandom(seedStr){
+  let h = 1779033703 ^ seedStr.length;
+  for(let i=0;i<seedStr.length;i++){
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function(){
+    h = Math.imul(h ^ (h>>>16), 2246822507);
+    h = Math.imul(h ^ (h>>>13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- Aircraft layout families ----------
+   Different variants of the same base airframe share a cabin layout
+   (e.g. 737 MAX 8 / MAX 9 / -800 all fly a 3-3 single-aisle layout). */
+const LAYOUT_FAMILY = {
+  "Embraer E175 (MinionDomestic™)":"regional", "Embraer E175":"regional",
+  "Bombardier CRJ-700 (MinionDomestic™)":"regional", "Bombardier CRJ-700":"regional",
+  // Standard single-aisle domestic jets: 3-3, no Better (Business) cabin — real-world 737/A320s don't fly it.
+  "Airbus A318":"narrowbody", "Airbus A319":"narrowbody", "Airbus A320":"narrowbody", "Airbus A320neo":"narrowbody",
+  "Airbus A321":"narrowbody", "Airbus A321neo":"narrowbody",
+  "Boeing 737 MAX 8":"narrowbody", "Boeing 737 MAX 9":"narrowbody", "Boeing 737-800":"narrowbody",
+  // Long-range single-aisle jets used on premium transcon/long routes: get a small Better cabin.
+  "Airbus A321XLR":"narrowbody_lr", "Boeing 757-300":"narrowbody_lr",
+  "Airbus A350-900":"widebody", "Airbus A350-1000":"widebody", "Airbus A350-1000ULR":"widebody",
+  "Boeing 767-200":"widebody", "Boeing 767-300":"widebody", "Boeing 767-300ER":"widebody",
+  "Boeing 777-200":"widebody", "Boeing 777-300":"widebody", "Boeing 777-300ER":"widebody", "Boeing 777X":"widebody",
+  "Boeing 787-8":"widebody", "Boeing 787-9":"widebody",
+  "Boeing 747-8":"jumbo", "Boeing 747-400":"jumbo", "Boeing 747 Combi":"jumbo",
+  "Airbus A380-800":"a380"
+};
+// Each layout family: seating chart per class (row range + column pattern), grouped into decks.
+// Columns pattern is an array of "seat groups" separated by aisles, e.g. ["ABC","DEF"] = 3-3 with one aisle.
+const LAYOUTS = {
+  regional: {
+    cabins: [
+      { cls:"Good", rows:[1,2], cols:["AB","CD"], premium:true, deck:1 },
+      { cls:"Economy", rows:[3,14], cols:["AB","CD"], premium:false, deck:1 }
+    ]
+  },
+  narrowbody: {
+    cabins: [
+      { cls:"Good", rows:[1,5], cols:["ABC","DEF"], premium:true, deck:1 },
+      { cls:"Economy", rows:[6,30], cols:["ABC","DEF"], premium:false, deck:1 }
+    ]
+  },
+  narrowbody_lr: {
+    cabins: [
+      { cls:"Better", rows:[1,3], cols:["AB","CD"], premium:true, deck:1 },
+      { cls:"Good", rows:[4,8], cols:["ABC","DEF"], premium:true, deck:1 },
+      { cls:"Economy", rows:[9,33], cols:["ABC","DEF"], premium:false, deck:1 }
+    ]
+  },
+  widebody: {
+    cabins: [
+      { cls:"Greatest", rows:[1,2], cols:["AB","DE","FG"], premium:true, deck:1 },
+      { cls:"Better", rows:[3,7], cols:["AB","DE","FG"], premium:true, deck:1 },
+      { cls:"Good", rows:[8,13], cols:["ABC","DEFG","HJK"], premium:true, deck:1 },
+      { cls:"Economy", rows:[14,42], cols:["ABC","DEFG","HJK"], premium:false, deck:1 }
+    ]
+  },
+  jumbo: {
+    cabins: [
+      { cls:"Greatest", rows:[1,3], cols:["AB","DE"], premium:true, deck:1 },
+      { cls:"Better", rows:[4,9], cols:["AB","DEF","HJ"], premium:true, deck:1 },
+      { cls:"Good", rows:[10,16], cols:["ABC","DEFG","HJK"], premium:true, deck:1 },
+      { cls:"Economy", rows:[17,52], cols:["ABC","DEFG","HJK"], premium:false, deck:1 }
+    ]
+  },
+  // A380: true two-deck layout. Upper deck carries Greatest + Better in a narrower fuselage (2-4-2).
+  // Main (lower) deck carries Good + Economy in the full-width 3-4-3.
+  a380: {
+    cabins: [
+      { cls:"Greatest", rows:[1,2], cols:["AB","CD","EF"], premium:true, deck:1 },
+      { cls:"Better", rows:[3,9], cols:["AB","CD","EF"], premium:true, deck:1 },
+      { cls:"Good", rows:[10,16], cols:["ABC","DEFG","HJK"], premium:true, deck:2 },
+      { cls:"Economy", rows:[17,55], cols:["ABC","DEFG","HJK"], premium:false, deck:2 }
+    ]
+  }
+};
+const DECK_LABEL = { 1:"Upper Deck", 2:"Main Deck" };
+// Given a flight's aircraft + requested class, build the actual seat map plus
+// mark a deterministic (seeded) set of seats already taken by other passengers.
+function buildSeatMap(aircraft, flightNo, dateStr){
+  const family = LAYOUT_FAMILY[aircraft] || "narrowbody";
+  const layout = LAYOUTS[family];
+  // Seats start empty — real availability now comes from the seat-hold worker (see fetchSeatStatus),
+  // which is the single source of truth for what's taken/held across all users.
+  const cabins = layout.cabins.map(c=>{
+    const seats = [];
+    for(let r=c.rows[0]; r<=c.rows[1]; r++){
+      c.cols.forEach(group=>{
+        for(const letter of group){
+          seats.push({ id:`${r}${letter}`, row:r, taken:false, held:false, heldByMe:false });
+        }
+      });
+    }
+    return { cls:c.cls, cols:c.cols, rows:c.rows, premium:c.premium, deck:c.deck||1, seats };
+  });
+  return { family, cabins };
+}
+// A single nonstop city-pair's schedule (time, flight number, aircraft) is generated once,
+// seeded only by the pair + date — so the SAME real flight shows up whether it's booked as
+// a standalone nonstop or as one leg of somebody else's connection on that date.
+function legSchedule(from,to,dateStr){
+  const seg = segDetails(from,to);
+  const rng = seededRandom(`LEG|${from}|${to}|${dateStr||"no-date"}`);
+  const dep = randTime(6,21,rng);
+  const flightNo = genFlightNumber(rng);
+  const aircraft = pickAircraft(seg.hrs,rng,isDomesticRoute(from,to));
+  return {from,to,dep,hrs:seg.hrs,flightNo,aircraft,price:seg.price};
+}
+// Greatest needs 5+ hours in the air; Better isn't offered on narrowbody short-haul jets.
+// A leg that can't support the requested class is quietly downgraded to the best it can offer.
+function resolveLegClass(requestedCls, hrs, aircraft){
+  let cls = requestedCls;
+  const family = LAYOUT_FAMILY[aircraft];
+  const availableClasses = new Set((LAYOUTS[family] ? LAYOUTS[family].cabins : []).map(c=>c.cls));
+  if(!availableClasses.has(cls)){
+    // Fall back to the next-best class this aircraft's cabin actually offers
+    const order = ["Greatest","Better","Good","Economy"];
+    cls = order.find(c => availableClasses.has(c)) || "Economy";
+  }
+  return cls;
+}
+function buildResults(from,to,cls,dateStr){
+  const mult = classMult(cls);
+  const results = [];
+  // Baseline nonstop-equivalent fare for this city pair, used to price both nonstops and connections
+  const directRef = segDetails(from,to);
+  const priceRng = seededRandom(`PRICE|${from}|${to}|${dateStr||"no-date"}`);
+  // Direct — uses the real, standalone scheduled flight for this pair/date
+  if(GRAPH[from] && GRAPH[from].has(to)){
+    const leg = legSchedule(from,to,dateStr);
+    results.push({
+      stops:0,
+      legs:[{from,to,dep:leg.dep,dur:leg.hrs,flightNo:leg.flightNo,aircraft:leg.aircraft}],
+      price:Math.round(leg.price*mult),
+      totalHrs:leg.hrs
+    });
+  }
+  // 1-stop connections — chains two real, independently scheduled nonstop flights and
+  // computes the actual gap between them as the layover (minimum 45 min connection time)
+  if(GRAPH[from] && GRAPH[to]){
+    const hubs = [...GRAPH[from]].filter(h=>h!==to && h!==from && GRAPH[to].has(h) && AIRPORTS[h]);
+    const used = new Set();
+    hubs.slice(0,10).forEach(h=>{
+      if(used.has(h)) return; used.add(h);
+      const leg1 = legSchedule(from,h,dateStr);
+      const leg2 = legSchedule(h,to,dateStr);
+      const dep1Min = leg1.dep.h*60+leg1.dep.m;
+      const arr1ClockMin = (Math.round(dep1Min+leg1.hrs*60)%1440+1440)%1440;
+      const dep2ClockMin = leg2.dep.h*60+leg2.dep.m;
+      let layoverMin = dep2ClockMin - arr1ClockMin;
+      if(layoverMin < 45) layoverMin += 1440; // next connection isn't until the following day
+      const totalHrs = leg1.hrs + layoverMin/60 + leg2.hrs;
+      const discount = 0.68 + priceRng()*0.14; // ~68-82% of the nonstop fare
+      const price = Math.round(directRef.price*discount*mult);
+      const leg1Cls = resolveLegClass(cls, leg1.hrs, leg1.aircraft);
+      const leg2Cls = resolveLegClass(cls, leg2.hrs, leg2.aircraft);
+      results.push({
+        stops:1,
+        via:h,
+        legs:[
+          {from,to:h,dep:leg1.dep,dur:leg1.hrs,flightNo:leg1.flightNo,aircraft:leg1.aircraft,legClass:leg1Cls},
+          {from:h,to,dep:leg2.dep,dur:leg2.hrs,flightNo:leg2.flightNo,aircraft:leg2.aircraft,legClass:leg2Cls,layover:layoverMin/60}
+        ],
+        price,
+        totalHrs
+      });
+    });
+  }
+  results.sort((a,b)=> a.stops-b.stops || a.price-b.price);
+  return results.slice(0,12);
+}
+function addMinutes(t,mins){
+  let total = t.h*60+t.m+Math.round(mins);
+  total = ((total%1440)+1440)%1440;
+  const h = Math.floor(total/60), m = total%60;
+  return {h, m, str: to12h(h,m)};
+}
+let currentResults = [];
+let currentShown = 0;
+let currentFrom = null, currentTo = null, currentCls = null;
+let returnResults = [];
+let returnShown = 0;
+let returnFrom = null, returnTo = null;
+let selectedDeparture = null, selectedReturn = null;
+function flightCardHTML(r,from,to,cls,legType,idx){
+  const dep = r.legs[0].dep;
+  const arr = addMinutes(dep, r.totalHrs*60);
+  const layoverLeg = r.legs.find(l=>l.layover!=null);
+  const stopsLabel = r.stops===0 ? "Nonstop" : `1 stop · ${r.via}`;
+  const flightInfo = r.legs.map(l=>`<span class="flight-tag"><b>${l.flightNo}</b> · ${l.aircraft}${l.dep?` · ${l.dep.str}`:""}</span>`).join('<span class="flight-sep">then</span>');
+  const layoverNote = layoverLeg ? `<span class="layover-note">${fmtDur(layoverLeg.layover)} layover in ${r.via}</span>` : "";
+  const downgraded = r.legs.filter(l=>l.legClass && l.legClass!==cls);
+  let cabinNote = "";
+  if(downgraded.length){
+    const parts = downgraded.map(l=>`${l.from}\u2013${l.to}`).join(" and ");
+    const toClass = downgraded[0].legClass;
+    cabinNote = `<div class="cabin-note">${cls} is not available on the ${parts} flight (${downgraded[0].dur<5?"under 5 hours":"aircraft restriction"}). You will be seated in ${toClass} class on that segment.</div>`;
+  }
+  return `
+    <div class="flight-card">
+      <div class="flight-legs">
+        <div class="leg-pt"><div class="time">${dep.str}</div><div class="code">${from}</div></div>
+        <div class="leg-line">
+          <div class="dur">${fmtDur(r.totalHrs)}</div>
+          <div class="track"></div>
+          <div class="stops">${stopsLabel}</div>
+        </div>
+        <div class="leg-pt"><div class="time">${arr.str}</div><div class="code">${to}</div></div>
+      </div>
+      <div class="flight-meta">
+        <div class="flight-price"><div class="amt">$${r.price}</div><div class="lbl">per person</div></div>
+        <button class="select-btn" onclick="selectFlight('${legType}',${idx})">Select</button>
+      </div>
+      <div class="flight-info">
+        <div class="flight-info-row">${flightInfo}${layoverNote}</div>
+        ${cabinNote}
+      </div>
+    </div>`;
+}
+function renderResults(from,to,cls,results){
+  const wrap = document.getElementById("resultsWrap");
+  const list = document.getElementById("resultsList");
+  const title = document.getElementById("resultsTitle");
+  const sub = document.getElementById("resultsSub");
+  const note = document.getElementById("bookingNote");
+  const seeMoreWrap = document.getElementById("seeMoreWrap");
+  wrap.classList.add("show");
+  title.textContent = `${AIRPORTS[from].city} (${from}) → ${AIRPORTS[to].city} (${to})`;
+  sub.textContent = `${results.length} option${results.length===1?"":"s"} · ${cls} class`;
+  currentResults = results;
+  currentFrom = from;
+  currentTo = to;
+  currentCls = cls;
+  currentShown = 0;
+  if(!results.length){
+    list.innerHTML = `<div class="no-results">No nonstop or one-stop itinerary found between these airports right now. Try a nearby hub, or check back as we add routes.</div>`;
+    note.classList.remove("show");
+    seeMoreWrap.classList.remove("show");
+    return;
+  }
+  note.classList.add("show");
+  const firstBatch = results.slice(0,6);
+  list.innerHTML = firstBatch.map((r,i)=>flightCardHTML(r,from,to,cls,'out',i)).join("");
+  currentShown = firstBatch.length;
+  seeMoreWrap.classList.toggle("show", currentShown < results.length);
+}
+document.getElementById("seeMoreBtn").addEventListener("click", ()=>{
+  const list = document.getElementById("resultsList");
+  const nextBatch = currentResults.slice(currentShown, currentShown+6);
+  list.insertAdjacentHTML("beforeend", nextBatch.map((r,i)=>flightCardHTML(r,currentFrom,currentTo,currentCls,'out',currentShown+i)).join(""));
+  currentShown += nextBatch.length;
+  document.getElementById("seeMoreWrap").classList.toggle("show", currentShown < currentResults.length);
+});
+
+/* ---------- Return flights (Step 2) ---------- */
+function renderReturnResults(from,to,cls,results){
+  const list = document.getElementById("returnResultsList");
+  const title = document.getElementById("returnResultsTitle");
+  const sub = document.getElementById("returnResultsSub");
+  const note = document.getElementById("returnBookingNote");
+  const seeMoreWrap = document.getElementById("returnSeeMoreWrap");
+  title.textContent = `Return: ${AIRPORTS[from].city} (${from}) → ${AIRPORTS[to].city} (${to})`;
+  sub.textContent = `${results.length} option${results.length===1?"":"s"} · ${cls} class`;
+  returnResults = results;
+  returnFrom = from; returnTo = to;
+  returnShown = 0;
+  if(!results.length){
+    list.innerHTML = `<div class="no-results">No nonstop or one-stop return itinerary found for this date. Try a nearby hub, or a different return date.</div>`;
+    note.classList.remove("show");
+    seeMoreWrap.classList.remove("show");
+    return;
+  }
+  note.classList.add("show");
+  const firstBatch = results.slice(0,6);
+  list.innerHTML = firstBatch.map((r,i)=>flightCardHTML(r,from,to,cls,'return',i)).join("");
+  returnShown = firstBatch.length;
+  seeMoreWrap.classList.toggle("show", returnShown < results.length);
+}
+document.getElementById("returnSeeMoreBtn").addEventListener("click", ()=>{
+  const list = document.getElementById("returnResultsList");
+  const cls = document.getElementById("classInput").value;
+  const nextBatch = returnResults.slice(returnShown, returnShown+6);
+  list.insertAdjacentHTML("beforeend", nextBatch.map((r,i)=>flightCardHTML(r,returnFrom,returnTo,cls,'return',returnShown+i)).join(""));
+  returnShown += nextBatch.length;
+  document.getElementById("returnSeeMoreWrap").classList.toggle("show", returnShown < returnResults.length);
+});
+// Precomputes the return itinerary data so it's ready the instant a departure flight is
+// selected, but does NOT reveal it — return flights only appear once Step 2 is reached.
+function doReturnSearch(){
+  const noReturn = document.getElementById("noReturnCheck").checked;
+  const returnDate = document.getElementById("returnInput").value;
+  const from = findAirport(document.getElementById("toInput").value); // return leg departs from destination
+  const to = findAirport(document.getElementById("fromInput").value); // and arrives back at origin
+  const cls = document.getElementById("classInput").value;
+  if(noReturn || !returnDate || !from || !to || from===to){
+    returnResults = [];
+    return;
+  }
+  const results = buildResults(from,to,cls,returnDate);
+  renderReturnResults(from,to,cls,results);
+}
+function setActiveStep(n){
+  document.querySelectorAll('.step').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.step,10)===n);
+  });
+}
+function goToStep1(scrollTo){
+  document.getElementById("returnResultsWrap").classList.remove("show");
+  document.getElementById("loadingWrap").classList.remove("show");
+  document.getElementById("resultsWrap").classList.add("show");
+  setActiveStep(1);
+  if(scrollTo) document.getElementById("resultsWrap").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function goToStep2(scrollTo){
+  document.getElementById("resultsWrap").classList.remove("show");
+  document.getElementById("returnResultsWrap").classList.remove("show");
+  const loading = document.getElementById("loadingWrap");
+  loading.classList.add("show");
+  setActiveStep(2);
+  if(scrollTo) loading.scrollIntoView({behavior:"smooth", block:"start"});
+  setTimeout(()=>{
+    loading.classList.remove("show");
+    document.getElementById("returnResultsWrap").classList.add("show");
+  }, 3000);
+}
+document.getElementById("backToDepartureBtn").addEventListener("click", ()=> goToStep1(true));
+
+/* ---------- Seat-hold worker client ---------- */
+// Set this to your deployed Worker's URL (see worker/wrangler.toml). Left blank/unreachable,
+// the page falls back to a local-only hold simulation so seat selection still works standalone.
+const WORKER_URL = "https://minion-airways-seats.nameless-cherry-998c.workers.dev";
+const SESSION_ID = (()=>{
+  let id = null;
+  try { id = sessionStorage.getItem("minionSessionId"); } catch(e){}
+  if(!id){ id = `sess_${Date.now()}_${Math.random().toString(36).slice(2,10)}`; try{ sessionStorage.setItem("minionSessionId", id); }catch(e){} }
+  return id;
+})();
+const localHolds = {}; // fallback store when WORKER_URL isn't configured/reachable: `${flight}|${date}` -> {seatId:{status,expiresAt,sessionId}}
+function localKey(flight,date){ return `${flight}|${date||"no-date"}`; }
+async function fetchSeatStatus(flight, date){
+  if(WORKER_URL){
+    try {
+      const res = await fetch(`${WORKER_URL}/seats?flight=${encodeURIComponent(flight)}&date=${encodeURIComponent(date||"no-date")}&sessionId=${encodeURIComponent(SESSION_ID)}`);
+      if(res.ok) return (await res.json()).seats || {};
+    } catch(e){ /* fall through to local */ }
+  }
+  const rec = localHolds[localKey(flight,date)] || {};
+  const now = Date.now();
+  Object.keys(rec).forEach(id=>{ if(rec[id].status==="held" && rec[id].expiresAt<=now) delete rec[id]; });
+  // Match the worker's response shape (adds `mine`) for the local fallback too
+  const out = {};
+  Object.entries(rec).forEach(([id,s])=>{ out[id] = {status:s.status, expiresAt:s.expiresAt, mine:s.sessionId===SESSION_ID}; });
+  return out;
+}
+async function holdSeat(flight, date, seatId){
+  if(WORKER_URL){
+    try {
+      const res = await fetch(`${WORKER_URL}/hold`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({flight, date: date||"no-date", seatId, sessionId: SESSION_ID})
+      });
+      const data = await res.json();
+      if(res.ok) return {ok:true, expiresAt:data.expiresAt};
+      return {ok:false, reason:data.reason||"unavailable"};
+    } catch(e){ /* fall through to local */ }
+  }
+  const key = localKey(flight,date);
+  localHolds[key] = localHolds[key] || {};
+  const existing = localHolds[key][seatId];
+  const now = Date.now();
+  if(existing && existing.status==="held" && existing.expiresAt>now && existing.sessionId!==SESSION_ID){
+    return {ok:false, reason:"held"};
+  }
+  const expiresAt = now + 10*60*1000;
+  localHolds[key][seatId] = {status:"held", sessionId:SESSION_ID, expiresAt};
+  return {ok:true, expiresAt};
+}
+async function releaseSeat(flight, date, seatId){
+  if(WORKER_URL){
+    try {
+      await fetch(`${WORKER_URL}/release`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({flight, date: date||"no-date", seatId, sessionId: SESSION_ID})
+      });
+      return;
+    } catch(e){ /* fall through to local */ }
+  }
+  const key = localKey(flight,date);
+  if(localHolds[key] && localHolds[key][seatId] && localHolds[key][seatId].sessionId===SESSION_ID){
+    delete localHolds[key][seatId];
+  }
+}
+
+/* ---------- Passenger seat-assignment queue ---------- */
+// Infants don't get their own seat (lap-held), so they're excluded from the seat queue.
+// Each paying passenger becomes one entry to seat, tagged by type for the pax chip tray.
+function buildPaxQueue(){
+  const queue = [];
+  for(let i=0;i<paxCounts.adult;i++) queue.push({type:"adult", label:`Adult ${i+1}`});
+  for(let i=0;i<paxCounts.child;i++) queue.push({type:"child", label:`Child ${i+1}`});
+  for(let i=0;i<paxCounts.senior;i++) queue.push({type:"senior", label:`Senior ${i+1}`});
+  return queue;
+}
+const PAX_ICON = { adult:"person", child:"child_care", senior:"elderly" };
+
+/* ---------- Seat selection (Step 3 / Step 4) ---------- */
+// seatState holds one entry per leg being seated right now (1 for nonstop, 2 for a connection),
+// each with its own seat map, its own assignment of pax->seat, and which pax is "active".
+let seatState = null; // { legs:[{leg, seatMap, assigned:{paxIdx:seatId}}], paxQueue, activePax, stepAfter }
+function legLabel(l){ return `${l.from} → ${l.to}`; }
+function cabinIcon(cls){ return {Economy:"event_seat",Good:"airline_seat_legroom_extra",Better:"airline_seat_flat",Greatest:"workspace_premium"}[cls] || "event_seat"; }
+function seatCountAssigned(){
+  return seatState.legs.reduce((sum,l)=> sum + Object.keys(l.assigned).length, 0);
+}
+function seatCountNeeded(){
+  return seatState.legs.length * seatState.paxQueue.length;
+}
+function renderSeatUI(){
+  const wrap = document.getElementById("seatWrap");
+  const title = document.getElementById("seatTitle");
+  const sub = document.getElementById("seatSub");
+  const progress = document.getElementById("seatProgress");
+  const panels = document.getElementById("seatPanels");
+  const continueBtn = document.getElementById("seatContinueBtn");
+
+  title.textContent = seatState.title;
+  sub.textContent = seatState.sub;
+
+  const assigned = seatCountAssigned();
+  const needed = seatCountNeeded();
+  progress.textContent = `${assigned} of ${needed} seated`;
+  progress.classList.toggle("complete", assigned===needed);
+  continueBtn.disabled = assigned < needed;
+  continueBtn.textContent = seatState.isLast ? "Continue to Upgrades" : "Continue";
+
+  panels.innerHTML = seatState.legs.map((legState,legIdx)=>{
+    const l = legState.leg;
+    const map = legState.seatMap;
+    const requestedCls = legState.legClass || seatState.cls;
+    const legendHTML = `
+      <div class="seat-legend">
+        <span><span class="seat-legend-box sl-avail"></span>Available</span>
+        <span><span class="seat-legend-box sl-premium"></span>Premium cabin</span>
+        <span><span class="seat-legend-box sl-selected"></span>Your selection</span>
+        <span><span class="seat-legend-box sl-held"></span>Held by another traveler</span>
+        <span><span class="seat-legend-box sl-taken"></span>Taken</span>
+      </div>
+      <div class="hold-note">Seats held for 10 min once selected — if not confirmed in time, they're released back to everyone.</div>`;
+    function renderCabinBlock(cabin){
+      const rowsHTML = [];
+      for(let r=cabin.rows[0]; r<=cabin.rows[1]; r++){
+        const groupsHTML = cabin.cols.map(group=>{
+          const seatsHTML = [...group].map(letter=>{
+            const id = `${r}${letter}`;
+            const seat = cabin.seats.find(s=>s.id===id);
+            const assignedPaxIdx = Object.entries(legState.assigned).find(([,sid])=>sid===id);
+            const isSelected = !!assignedPaxIdx;
+            let cls = cabin.premium ? "premium" : "";
+            if(seat.taken) cls = "taken";
+            else if(seat.held && !isSelected) cls = "held";
+            else if(isSelected) cls = "selected";
+            const disabled = seat.taken || (seat.held && !isSelected);
+            const label = isSelected ? (seatState.paxQueue[assignedPaxIdx[0]].label.match(/\d+$/)?.[0] || "✓") : id;
+            return `<button type="button" class="seat-btn ${cls}" data-leg="${legIdx}" data-seat="${id}" ${disabled?"disabled":""} title="${id} · ${cabin.cls}${seat.held&&!isSelected?" · held by another traveler":""}">${label}</button>`;
+          }).join("");
+          return `<div class="seat-col-group">${seatsHTML}</div>`;
+        }).join(`<div class="seat-aisle-gap"></div>`);
+        rowsHTML.push(`<div class="seat-row"><span class="seat-row-num">${r}</span>${groupsHTML}</div>`);
+      }
+      return `
+        <div class="cabin-block">
+          <div class="cabin-block-label"><span class="material-symbols-outlined">${cabinIcon(cabin.cls)}</span>${cabin.cls}${cabin.cls===requestedCls?" (your fare class)":""}</div>
+          <div class="seat-grid-scroll">${rowsHTML.join("")}</div>
+        </div>`;
+    }
+    // Group cabins by deck (only the A380 has more than one deck; others render a single implicit deck)
+    const deckNums = [...new Set(map.cabins.map(c=>c.deck||1))].sort((a,b)=>a-b);
+    const cabinsHTML = deckNums.length > 1
+      ? deckNums.map(dn => `
+          <div class="deck-block">
+            <div class="deck-label">${DECK_LABEL[dn] || `Deck ${dn}`}</div>
+            ${map.cabins.filter(c=>(c.deck||1)===dn).map(renderCabinBlock).join("")}
+          </div>`).join("")
+      : map.cabins.map(renderCabinBlock).join("");
+    const downgradeNote = legState.legClass && legState.legClass !== seatState.cls
+      ? `<div class="seat-aircraft-note">Note: this segment is seated in ${legState.legClass} class, not ${seatState.cls} — see the flight results for why.</div>` : "";
+    return `
+      <div class="seat-panel">
+        <div class="seat-panel-head">
+          <div class="flight-tag-sm"><b>${l.flightNo}</b> · ${legLabel(l)} · ${l.aircraft}</div>
+        </div>
+        <div class="seat-aircraft-note">${map.family==="a380"?"Two-deck":map.family[0].toUpperCase()+map.family.slice(1)}-layout cabin. Seat map applies to this specific flight.</div>
+        ${downgradeNote}
+        ${legendHTML}
+        ${cabinsHTML}
+      </div>`;
+  }).join("") + `
+    <div class="seat-pax-tray" id="seatPaxTray"></div>
+    <div class="seat-infant-note" style="${paxCounts.infant>0?"":"display:none"}">
+      ${paxCounts.infant} infant${paxCounts.infant===1?"":"s"} will ride on an accompanying adult or senior's lap and do${paxCounts.infant===1?"es":""} not need a separate seat.
+    </div>`;
+
+  renderPaxTray();
+  wrap.querySelectorAll(".seat-btn:not(.taken)").forEach(btn=>{
+    btn.addEventListener("click", ()=> onSeatClick(parseInt(btn.dataset.leg,10), btn.dataset.seat));
+  });
+}
+function renderPaxTray(){
+  const tray = document.getElementById("seatPaxTray");
+  if(!tray) return;
+  tray.innerHTML = seatState.paxQueue.map((p,i)=>{
+    const seatedOnAllLegs = seatState.legs.every(l=> l.assigned[i] != null);
+    const isActive = i === seatState.activePax;
+    const cls = seatedOnAllLegs ? "done" : (isActive ? "active" : "");
+    const icon = seatedOnAllLegs ? "check_circle" : PAX_ICON[p.type];
+    return `<div class="seat-pax-chip ${cls}" data-pax="${i}"><span class="material-symbols-outlined">${icon}</span>${p.label}</div>`;
+  }).join("");
+  tray.querySelectorAll(".seat-pax-chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{ seatState.activePax = parseInt(chip.dataset.pax,10); renderSeatUI(); });
+  });
+}
+async function onSeatClick(legIdx, seatId){
+  const legState = seatState.legs[legIdx];
+  const paxIdx = seatState.activePax;
+  const flightNo = legState.leg.flightNo;
+  const dateStr = legState.dateStr;
+  // If this pax already has a seat on this leg, clicking a new one moves them
+  const alreadyHere = Object.entries(legState.assigned).find(([,sid])=>sid===seatId);
+  if(alreadyHere && parseInt(alreadyHere[0],10) !== paxIdx) return; // someone else's just-picked seat
+
+  if(legState.assigned[paxIdx] === seatId){
+    // Toggle off — release the hold
+    delete legState.assigned[paxIdx];
+    const seat = legState.seatMap.cabins.flatMap(c=>c.seats).find(s=>s.id===seatId);
+    if(seat) seat.heldByMe = false;
+    releaseSeat(flightNo, dateStr, seatId);
+    renderSeatUI();
+    return;
+  }
+
+  // Release any prior seat this pax held on this leg before taking the new one
+  const priorSeatId = legState.assigned[paxIdx];
+  if(priorSeatId){
+    delete legState.assigned[paxIdx];
+    const priorSeat = legState.seatMap.cabins.flatMap(c=>c.seats).find(s=>s.id===priorSeatId);
+    if(priorSeat) priorSeat.heldByMe = false;
+    releaseSeat(flightNo, dateStr, priorSeatId);
+  }
+
+  const result = await holdSeat(flightNo, dateStr, seatId);
+  if(!result.ok){
+    // Someone else grabbed it between render and click — refresh live status and bail
+    const statusMap = await fetchSeatStatus(flightNo, dateStr);
+    legState.seatMap.cabins.forEach(cabin=>cabin.seats.forEach(seat=>{
+      const s = statusMap[seat.id];
+      seat.taken = !!s && s.status==="taken";
+      seat.held = !!s && s.status==="held" && s.sessionId!==SESSION_ID;
+      seat.heldByMe = !!s && s.status==="held" && s.sessionId===SESSION_ID;
+    }));
+    renderSeatUI();
+    return;
+  }
+  legState.assigned[paxIdx] = seatId;
+  const seat = legState.seatMap.cabins.flatMap(c=>c.seats).find(s=>s.id===seatId);
+  if(seat) seat.heldByMe = true;
+
+  // Auto-advance to next unseated passenger for convenience
+  const next = seatState.paxQueue.findIndex((p,i)=> !seatState.legs.every(l=> l.assigned[i]!=null));
+  if(next !== -1) seatState.activePax = next;
+  renderSeatUI();
+}
+async function openSeatSelection(kind){
+  // kind: 'departure' or 'return'
+  const flight = kind === 'departure' ? selectedDeparture : selectedReturn;
+  const cls = document.getElementById("classInput").value;
+  const dateStr = kind === 'departure' ? document.getElementById("departInput").value : document.getElementById("returnInput").value;
+  const paxQueue = buildPaxQueue();
+  const legs = flight.legs.map(l=>({
+    leg: l,
+    legClass: l.legClass || cls,
+    seatMap: buildSeatMap(l.aircraft, l.flightNo, dateStr),
+    assigned: {}
+  }));
+  const noReturn = document.getElementById("noReturnCheck").checked || !document.getElementById("returnInput").value;
+  seatState = {
+    kind, cls, paxQueue, legs,
+    activePax: 0,
+    title: kind === 'departure' ? "Choose your departure seats" : "Choose your return seats",
+    sub: kind === 'departure'
+      ? `${flight.legs[0].from} → ${flight.legs[flight.legs.length-1].to}`
+      : `${flight.legs[0].from} → ${flight.legs[flight.legs.length-1].to}`,
+    isLast: kind === 'departure' ? noReturn : true
+  };
+  document.getElementById("resultsWrap").classList.remove("show");
+  document.getElementById("returnResultsWrap").classList.remove("show");
+  document.getElementById("loadingWrap").classList.remove("show");
+  document.getElementById("seatWrap").classList.add("show");
+  setActiveStep(kind === 'departure' ? 3 : 4);
+  renderSeatUI();
+  document.getElementById("seatWrap").scrollIntoView({behavior:"smooth", block:"start"});
+  // Pull live hold/taken status from the seat-hold worker for each leg and re-render
+  await Promise.all(legs.map(async legState=>{
+    const statusMap = await fetchSeatStatus(legState.leg.flightNo, dateStr);
+    legState.dateStr = dateStr;
+    legState.seatMap.cabins.forEach(cabin=>{
+      cabin.seats.forEach(seat=>{
+        const s = statusMap[seat.id];
+        if(!s){ seat.taken=false; seat.held=false; seat.heldByMe=false; return; }
+        seat.taken = s.status==="taken";
+        seat.held = s.status==="held" && s.sessionId!==SESSION_ID;
+        seat.heldByMe = s.status==="held" && s.sessionId===SESSION_ID;
+      });
+    });
+  }));
+  if(seatState) renderSeatUI();
+}
+document.getElementById("seatBackBtn").addEventListener("click", ()=>{
+  document.getElementById("seatWrap").classList.remove("show");
+  if(seatState && seatState.kind === 'return'){
+    goToStep2(true);
+  } else {
+    goToStep1(true);
+  }
+});
+document.getElementById("seatContinueBtn").addEventListener("click", ()=>{
+  if(seatCountAssigned() < seatCountNeeded()) return;
+  if(seatState.kind === 'departure'){
+    const hasReturn = !document.getElementById("noReturnCheck").checked && document.getElementById("returnInput").value;
+    if(hasReturn && returnResults.length){
+      document.getElementById("seatWrap").classList.remove("show");
+      goToStep2(true);
+    } else if(hasReturn && !returnResults.length){
+      alert("No return itinerary is available for that date, so there's nothing to show next. Try a different return date.");
+    } else {
+      alert("Seats confirmed! Booking isn't live yet — steps 5–6 (upgrades, checkout) aren't built. Check back soon!");
+    }
+  } else {
+    alert("Seats confirmed for both flights! Booking isn't live yet — steps 5–6 (upgrades, checkout) aren't built. Check back soon!");
+  }
+});
+
+// Called from each flight card's Select button
+function selectFlight(legType, idx){
+  if(legType === 'out'){
+    selectedDeparture = currentResults[idx];
+    openSeatSelection('departure');
+  } else if(legType === 'return'){
+    selectedReturn = returnResults[idx];
+    document.getElementById("returnResultsWrap").classList.remove("show");
+    openSeatSelection('return');
+  }
+}
+/* ---------- URL query-param sync ---------- */
+// Booking state is mirrored into the URL (dep, dest, date, ret, cls, adults, children, seniors, infants, noret)
+// so a search is shareable/bookmarkable and survives a page reload.
+function syncURL(){
+  const params = new URLSearchParams();
+  const fromCode = findAirport(document.getElementById("fromInput").value);
+  const toCode = findAirport(document.getElementById("toInput").value);
+  if(fromCode) params.set("dep", fromCode);
+  if(toCode) params.set("dest", toCode);
+  const dateStr = document.getElementById("departInput").value;
+  if(dateStr) params.set("date", dateStr);
+  const noReturn = document.getElementById("noReturnCheck").checked;
+  const returnStr = document.getElementById("returnInput").value;
+  if(noReturn) params.set("noret","1");
+  else if(returnStr) params.set("ret", returnStr);
+  params.set("cls", document.getElementById("classInput").value);
+  if(paxCounts.adult!==1) params.set("adults", paxCounts.adult);
+  if(paxCounts.child) params.set("children", paxCounts.child);
+  if(paxCounts.senior) params.set("seniors", paxCounts.senior);
+  if(paxCounts.infant) params.set("infants", paxCounts.infant);
+  const newURL = `${location.pathname}?${params.toString()}`;
+  history.replaceState(null, "", newURL);
+}
+function loadFromURL(){
+  const params = new URLSearchParams(location.search);
+  if(!params.toString()) return false;
+  const dep = params.get("dep");
+  const dest = params.get("dest");
+  const date = params.get("date");
+  const ret = params.get("ret");
+  const noret = params.get("noret");
+  const cls = params.get("cls");
+  if(dep && AIRPORTS[dep]) document.getElementById("fromInput").value = `${AIRPORTS[dep].city} (${dep})`;
+  if(dest && AIRPORTS[dest]) document.getElementById("toInput").value = `${AIRPORTS[dest].city} (${dest})`;
+  if(date) document.getElementById("departInput").value = date;
+  if(noret==="1"){
+    document.getElementById("noReturnCheck").checked = true;
+    document.getElementById("returnInput").disabled = true;
+    updateStepper();
+  } else if(ret){
+    document.getElementById("returnInput").value = ret;
+  }
+  if(cls && ["Economy","Good","Better","Greatest"].includes(cls)){
+    document.getElementById("classInput").value = cls;
+    document.getElementById("classSelectBtn").innerHTML = `${cls}<span class="material-symbols-outlined">expand_more</span>`;
+  }
+  ["adults","children","seniors","infants"].forEach(key=>{
+    const val = params.get(key);
+    if(val==null) return;
+    const type = key==="adults"?"adult":key==="children"?"child":key==="seniors"?"senior":"infant";
+    const n = parseInt(val,10);
+    if(!isNaN(n) && n>=0) paxCounts[type] = n;
+  });
+  updatePaxUI();
+  return !!(dep && dest && date);
+}
+
+function doSearch(scrollTo){
+  const msg = document.getElementById("searchMsg");
+  const from = findAirport(document.getElementById("fromInput").value);
+  const to = findAirport(document.getElementById("toInput").value);
+  const cls = document.getElementById("classInput").value;
+  const dateStr = document.getElementById("departInput").value;
+  selectedDeparture = null; selectedReturn = null;
+  if(!from || !to){
+    msg.textContent = "We couldn't match one of those airports. Try a city name or 3-letter code (e.g. SJC, London, LHR).";
+    msg.classList.add("show");
+    document.getElementById("resultsWrap").classList.remove("show");
+    document.getElementById("returnResultsWrap").classList.remove("show");
+    return;
+  }
+  if(from===to){
+    msg.textContent = "Departure and arrival airports can't be the same.";
+    msg.classList.add("show");
+    document.getElementById("resultsWrap").classList.remove("show");
+    document.getElementById("returnResultsWrap").classList.remove("show");
+    return;
+  }
+  if(!dateStr){
+    msg.textContent = "Please choose a departure date to search.";
+    msg.classList.add("show");
+    document.getElementById("resultsWrap").classList.remove("show");
+    document.getElementById("returnResultsWrap").classList.remove("show");
+    return;
+  }
+  msg.classList.remove("show");
+  const results = buildResults(from,to,cls,dateStr);
+  renderResults(from,to,cls,results);
+  document.getElementById("returnResultsWrap").classList.remove("show");
+  document.getElementById("loadingWrap").classList.remove("show");
+  setActiveStep(1);
+  doReturnSearch();
+  syncURL();
+  if(scrollTo) document.getElementById("resultsWrap").scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.getElementById("searchBtn").addEventListener("click", ()=> doSearch(true));
+// Auto-search whenever a filter changes
+document.getElementById("fromInput").addEventListener("change", ()=> doSearch(false));
+document.getElementById("toInput").addEventListener("change", ()=> doSearch(false));
+document.getElementById("departInput").addEventListener("change", ()=> doSearch(false));
+document.getElementById("returnInput").addEventListener("change", ()=> doSearch(false));
+
+/* ---------- Class selector modal ---------- */
+const CLASS_INFO = [
+  {
+    key:"Economy", tag:"Standard cabin", icon:"event_seat",
+    perks:["Standard seat","One meal on long-haul flights","Refunds issued as Minion BananaRewards™ credit"],
+    restriction:"No flight changes permitted after booking.",
+    minHrs:0
+  },
+  {
+    key:"Good", tag:"Extra comfort", icon:"airline_seat_legroom_extra",
+    perks:["Extra legroom seating","Two meals on long-haul flights","Extra snack service","Refunds issued in USD"],
+    restriction:"No flight changes permitted after booking.",
+    minHrs:0
+  },
+  {
+    key:"Better", tag:"Business class", icon:"airline_seat_flat",
+    perks:["Business-class seat","Unlimited meal service on long-haul flights","Priority boarding"],
+    restriction:"Not available on Boeing 737, Airbus A320, or Boeing 757 aircraft.",
+    minHrs:0
+  },
+  {
+    key:"Greatest", tag:"First class", icon:"workspace_premium",
+    perks:["First-class suite","All Better-class benefits","Dedicated cabin service"],
+    restriction:"Not available on flights under 5 hours.",
+    minHrs:5
+  }
+];
+function routeHrsForAvailability(){
+  const from = findAirport(document.getElementById("fromInput").value);
+  const to = findAirport(document.getElementById("toInput").value);
+  if(!from || !to || from===to) return null;
+  return segDetails(from,to).hrs;
+}
+function renderClassModal(){
+  const grid = document.getElementById("modalClassGrid");
+  const selected = document.getElementById("classInput").value;
+  const hrs = routeHrsForAvailability();
+  grid.innerHTML = CLASS_INFO.map(c=>{
+    const available = hrs===null || hrs >= c.minHrs;
+    const isSelected = c.key===selected;
+    const perksHTML = c.perks.map(p=>`<li><span class="material-symbols-outlined">check</span>${p}</li>`).join("");
+    return `
+    <div class="modal-class-card ${isSelected?"selected":""} ${available?"":"unavailable"}" data-cls="${c.key}">
+      <div class="class-icon"><span class="material-symbols-outlined">${c.icon}</span></div>
+      <span class="avail-badge ${available?"yes":"no"}">${available?"Available":"Not on this route"}</span>
+      <h4>${c.key}</h4>
+      <div class="class-tag">${c.tag}</div>
+      <ul>${perksHTML}</ul>
+      <div class="modal-restriction">${c.restriction}</div>
+      <button class="choose-btn" type="button" ${available?"":"disabled"}>${isSelected?"Selected":"Choose "+c.key}</button>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".modal-class-card").forEach(card=>{
+    card.addEventListener("click", ()=>{
+      if(card.classList.contains("unavailable")) return;
+      const cls = card.dataset.cls;
+      document.getElementById("classInput").value = cls;
+      document.getElementById("classSelectBtn").innerHTML = `${cls}<span class="material-symbols-outlined">expand_more</span>`;
+      closeClassModal();
+      doSearch(false);
+    });
+  });
+}
+function openClassModal(){
+  renderClassModal();
+  document.getElementById("classModalOverlay").classList.add("show");
+}
+function closeClassModal(){
+  document.getElementById("classModalOverlay").classList.remove("show");
+}
+document.getElementById("classSelectBtn").addEventListener("click", openClassModal);
+document.getElementById("classModalClose").addEventListener("click", closeClassModal);
+document.getElementById("classModalOverlay").addEventListener("click", (e)=>{
+  if(e.target.id === "classModalOverlay") closeClassModal();
+});
+
+/* ---------- Passengers ---------- */
+const PAX_TYPES = {
+  adult:  {label:"Adult",   mult:1,    min:1, ageNote:"12–65"},
+  child:  {label:"Child",   mult:0.8,  min:0, ageNote:"2–11"},
+  infant: {label:"Infant",  mult:0,    min:0, ageNote:"0–2"},
+  senior: {label:"Senior",  mult:0.85, min:0, ageNote:"66+"}
+};
+let paxCounts = { adult:1, child:0, infant:0, senior:0 };
+function paxTotal(){ return paxCounts.adult+paxCounts.child+paxCounts.infant+paxCounts.senior; }
+function payingPaxTotal(){ return paxCounts.adult+paxCounts.child+paxCounts.senior; } // infants ride free
+function updatePaxUI(){
+  Object.keys(PAX_TYPES).forEach(k=>{
+    document.getElementById(`pax${k[0].toUpperCase()+k.slice(1)}Count`).textContent = paxCounts[k];
+  });
+  const minusAdult = document.getElementById("paxAdultMinus");
+  minusAdult.disabled = paxCounts.adult <= 1;
+  document.getElementById("paxInfantPlus").disabled = paxCounts.infant >= (paxCounts.adult+paxCounts.senior);
+  const btn = document.getElementById("paxSelectBtn");
+  const nonInfantAdults = paxCounts.adult+paxCounts.senior;
+  const parts = [];
+  Object.keys(PAX_TYPES).forEach(k=>{
+    if(paxCounts[k]>0) parts.push(`${paxCounts[k]} ${PAX_TYPES[k].label}${paxCounts[k]>1?"s":""}`);
+  });
+  btn.innerHTML = `${parts.join(", ")}<span class="material-symbols-outlined">expand_more</span>`;
+}
+function changePax(type, delta){
+  const next = paxCounts[type] + delta;
+  if(next < PAX_TYPES[type].min) return;
+  if(paxTotal() + delta > 9) return;
+  if(type==="infant" && delta>0 && next > (paxCounts.adult+paxCounts.senior)) return; // needs an accompanying adult/senior
+  if(type==="adult" && delta<0 && (paxCounts.adult-1) < paxCounts.infant) return; // can't drop below infants needing them (senior can also cover, checked loosely)
+  paxCounts[type] = next;
+  updatePaxUI();
+}
+document.getElementById("paxAdultMinus").addEventListener("click", ()=> changePax("adult",-1));
+document.getElementById("paxAdultPlus").addEventListener("click", ()=> changePax("adult",1));
+document.getElementById("paxChildMinus").addEventListener("click", ()=> changePax("child",-1));
+document.getElementById("paxChildPlus").addEventListener("click", ()=> changePax("child",1));
+document.getElementById("paxInfantMinus").addEventListener("click", ()=> changePax("infant",-1));
+document.getElementById("paxInfantPlus").addEventListener("click", ()=> changePax("infant",1));
+document.getElementById("paxSeniorMinus").addEventListener("click", ()=> changePax("senior",-1));
+document.getElementById("paxSeniorPlus").addEventListener("click", ()=> changePax("senior",1));
+document.getElementById("paxSelectBtn").addEventListener("click", ()=>{
+  document.getElementById("paxModalOverlay").classList.add("show");
+});
+function closePaxModal(){
+  document.getElementById("paxModalOverlay").classList.remove("show");
+  doSearch(false);
+}
+document.getElementById("paxModalDone").addEventListener("click", closePaxModal);
+document.getElementById("paxModalClose").addEventListener("click", closePaxModal);
+document.getElementById("paxModalOverlay").addEventListener("click", (e)=>{
+  if(e.target.id === "paxModalOverlay") closePaxModal();
+});
+updatePaxUI();
+// Blended per-passenger price multiplier for the current pax mix (infants ride free)
+function paxPriceMultiplier(){
+  const sum = paxCounts.adult*PAX_TYPES.adult.mult + paxCounts.child*PAX_TYPES.child.mult + paxCounts.senior*PAX_TYPES.senior.mult;
+  const payers = payingPaxTotal();
+  return payers>0 ? sum/payers : 1;
+}
+function paxSummaryLabel(){
+  const parts = [];
+  Object.keys(PAX_TYPES).forEach(k=>{ if(paxCounts[k]>0) parts.push(`${paxCounts[k]} ${PAX_TYPES[k].label}${paxCounts[k]>1?"s":""}`); });
+  return parts.join(", ");
+}
+
+/* ---------- No return flight / stepper ---------- */
+function updateStepper(){
+  const noReturn = document.getElementById("noReturnCheck").checked;
+  document.querySelectorAll('.step[data-step="2"], .step[data-step="4"]').forEach(el=>{
+    el.classList.toggle("skipped", noReturn);
+  });
+}
+document.getElementById("noReturnCheck").addEventListener("change", (e)=>{
+  const returnInput = document.getElementById("returnInput");
+  returnInput.disabled = e.target.checked;
+  if(e.target.checked){
+    returnInput.value = "";
+    returnResults = [];
+    document.getElementById("loadingWrap").classList.remove("show");
+    goToStep1(false);
+  } else {
+    doReturnSearch();
+  }
+  updateStepper();
+  syncURL();
+});
+updateStepper();
+
+/* ---------- Search by flight number ---------- */
+document.getElementById("flightnoToggleBtn").addEventListener("click", ()=>{
+  document.getElementById("flightnoRow").classList.add("show");
+  document.getElementById("flightnoToggle").style.display = "none";
+  document.getElementById("flightnoInput").focus();
+});
+document.getElementById("flightnoCancel").addEventListener("click", ()=>{
+  document.getElementById("flightnoRow").classList.remove("show");
+  document.getElementById("flightnoToggle").style.display = "block";
+});
+function findFlightByNumber(){
+  const msg = document.getElementById("searchMsg");
+  const num = document.getElementById("flightnoInput").value.trim().toUpperCase();
+  const dateStr = document.getElementById("departInput").value;
+  if(!dateStr){
+    msg.textContent = "Please choose a departure date first, then search by flight number.";
+    msg.classList.add("show");
+    return;
+  }
+  if(!num) return;
+  let found = null;
+  outer:
+  for(const a of Object.keys(GRAPH)){
+    for(const b of GRAPH[a]){
+      if(!AIRPORTS[a] || !AIRPORTS[b]) continue;
+      const leg = legSchedule(a,b,dateStr);
+      if(leg.flightNo === num){ found = {from:a,to:b}; break outer; }
+    }
+  }
+  if(!found){
+    msg.textContent = `No flight ${num} found for that date. Try a different date or check the number.`;
+    msg.classList.add("show");
+    document.getElementById("resultsWrap").classList.remove("show");
+    return;
+  }
+  msg.classList.remove("show");
+  document.getElementById("fromInput").value = `${AIRPORTS[found.from].city} (${found.from})`;
+  document.getElementById("toInput").value = `${AIRPORTS[found.to].city} (${found.to})`;
+  doSearch(true);
+}
+document.getElementById("flightnoSearchBtn").addEventListener("click", findFlightByNumber);
+document.getElementById("flightnoInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){ e.preventDefault(); findFlightByNumber(); }
+});
+
+/* ---------- Bootstrap: restore booking from URL, if present ---------- */
+(function initFromURL(){
+  const hadFullSearch = loadFromURL();
+  if(hadFullSearch){
+    doSearch(false);
+  } else {
+    syncURL();
+  }
+})();
+</script>
+
+</body>
+</html>

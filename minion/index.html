@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minion Airways | Book Flights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Roboto', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+
+  /* Header */
+  header {
+    background: #0a2540;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+  }
+  .logo { display: flex; align-items: center; }
+  .logo img { height: 40px; display: block; }
+  nav ul { display: flex; list-style: none; gap: 32px; }
+  nav a { color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; }
+  nav a:hover { color: #ffd400; }
+  .header-btn {
+    background: #ffd400; color: #0a2540; border: none; padding: 10px 22px;
+    border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    background: linear-gradient(180deg, #0a2540 0%, #14395e 100%);
+    padding: 70px 40px 120px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero img {
+    width: 100%;
+    max-width: 900px;
+    display: block;
+    margin: 0 auto 10px;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+  }
+  .hero h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .hero p {
+    font-size: 17px;
+    color: #cfe0f0;
+    font-weight: 400;
+    max-width: 560px;
+    margin: 0 auto 34px;
+  }
+  .book-now-btn {
+    display: inline-block;
+    background: #ffd400;
+    color: #0a2540;
+    border: none;
+    padding: 18px 48px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    transition: background 0.15s ease;
+  }
+  .book-now-btn:hover { background: #ffe14d; }
+
+  /* Perks strip */
+  .perks {
+    background: #0a2540;
+    padding: 60px 40px 50px;
+    margin-top: 30px;
+  }
+  .perks-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 34px;
+    text-align: left;
+  }
+  .perk-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: rgba(255,212,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .perk-icon .material-symbols-outlined { color: #ffd400; font-size: 26px; }
+  .perk h3 { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .perk p { color: #9fb3c8; font-size: 13px; line-height: 1.6; }
+  .disclaimers {
+    max-width: 1100px;
+    margin: 34px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .disclaimers p { color: #5f7690; font-size: 11.5px; line-height: 1.7; margin-bottom: 4px; }
+  .hq-note {
+    background: #fff;
+    text-align: center;
+    padding: 22px 20px;
+    font-size: 13px;
+    color: #6b7280;
+    border-bottom: 1px solid #e8ecf1;
+  }
+  .hq-note strong { color: #0a2540; }
+
+  /* Deals */
+  .deals {
+    background: #f5f7fa;
+    padding: 60px 40px 10px;
+    text-align: center;
+  }
+  .deals-head { max-width: 680px; margin: 0 auto 34px; }
+  .section-eyebrow { font-size: 12px; font-weight: 700; color: #d1004b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .deals-head h2 { font-size: 26px; font-weight: 900; color: #0a2540; margin-bottom: 8px; }
+  .deals-head p { color: #6b7280; font-size: 14.5px; line-height: 1.6; }
+  .deals-grid {
+    max-width: 1100px; margin: 0 auto; display: grid;
+    grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left;
+  }
+  .deal-card {
+    background: #fff; border-radius: 14px; padding: 22px 22px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: pointer; border: 1px solid transparent; transition: border-color 0.15s ease, transform 0.15s ease;
+    display: flex; flex-direction: column;
+  }
+  .deal-card:hover { border-color: #ffd400; transform: translateY(-2px); }
+  .deal-route { display: flex; align-items: center; gap: 6px; font-weight: 900; color: #0a2540; font-size: 16px; margin-bottom: 4px; }
+  .deal-route .material-symbols-outlined { font-size: 16px; color: #b8bfc9; }
+  .deal-cities { font-size: 12.5px; color: #6b7280; margin-bottom: 14px; }
+  .deal-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .deal-meta .material-symbols-outlined { font-size: 15px; color: #9aa4b2; }
+  .deal-stops { font-size: 11.5px; font-weight: 700; color: #2f8f5b; margin-bottom: 14px; }
+  .deal-stops.stop { color: #d1004b; }
+  .deal-bottom { margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; padding-top: 12px; border-top: 1px solid #eef1f5; }
+  .deal-price { font-size: 21px; font-weight: 900; color: #0a2540; }
+  .deal-price span { font-size: 11px; font-weight: 400; color: #9aa4b2; }
+  .deal-book { background: #ffd400; color: #0a2540; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; }
+  .deal-book:hover { background: #ffe14d; }
+  .deals-more { text-align: center; margin: 30px 0 10px; }
+  .deals-more a { color: #0a2540; font-weight: 700; font-size: 13.5px; text-decoration: none; border-bottom: 2px solid #ffd400; padding-bottom: 2px; }
+  @media (max-width: 900px) {
+    .deals-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .deals-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Footer */
+  footer {
+    background: #06182c;
+    color: #7c8ea3;
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 13px;
+  }
+  footer a { color: #ffd400; text-decoration: none; margin: 0 10px; }
+
+  @media (max-width: 900px) {
+    .book-fields { grid-template-columns: repeat(2, 1fr); }
+    .offer-grid { grid-template-columns: 1fr; }
+    .perks-grid { grid-template-columns: repeat(2, 1fr); }
+    nav { display: none; }
+    .hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="logo.png" alt="Minion Airways"></div>
+  <nav>
+    <ul>
+      <li><a href="booking.html">Book</a></li>
+      <li><a href="#">Check-in</a></li>
+      <li><a href="#">Flight Status</a></li>
+      <li><a href="#">My Trips</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+  </nav>
+  <button class="header-btn">Sign In</button>
+</header>
+
+<section class="hero">
+  <img src="hero.png" alt="Minion Airways aircraft above the clouds">
+  <h1>Fly further with Minion Airways</h1>
+  <p>Nonstop and connecting service to destinations across North America, Europe, Asia, and beyond.</p>
+  <a href="booking.html" class="book-now-btn">BOOK NOW</a>
+</section>
+
+<section class="deals">
+  <div class="deals-head">
+    <div class="section-eyebrow">Today's Picks</div>
+    <h2>Flight deals</h2>
+    <p>A sample of live fares across our network, generated fresh today. Prices are Economy, one-way, per person.</p>
+  </div>
+  <div class="deals-grid" id="dealsGrid"></div>
+  <div class="deals-more"><a href="booking.html">See all flights &rarr;</a></div>
+</section>
+
+<div class="hq-note">Minion Airways is headquartered at <strong>San Jose International Airport (SJC)</strong>, California, with a secondary hub at San Francisco International Airport (SFO).</div>
+
+<section class="perks">
+  <div class="perks-grid">
+    <div class="perk">
+      <div class="perk-icon"><span class="material-symbols-outlined">nutrition</span></div>
+      <h3>Unlimited Snacks</h3>
+      <p>Minion Airways BananaSnack™ Program delivers unlimited bananas to your seat*.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-icon"><span class="material-symbols-outlined">luggage</span></div>
+      <h3>Free Carry-On</h3>
+      <p>Minion Airways allows a free carry-on to any domestic destination**. On flights over 14 hours, a free check-in bag under 23 kg is allowed.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-icon"><span class="material-symbols-outlined">airline_seat_recline_extra</span></div>
+      <h3>Claim Extra Legroom</h3>
+      <p>By joining BananaRewards™, you could get a free upgrade from Economy to Good class***.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-icon"><span class="material-symbols-outlined">support_agent</span></div>
+      <h3>24/7 Customer Support</h3>
+      <p>MinionCustomer™ provides customer support for all travelers.</p>
+    </div>
+  </div>
+
+  <div class="disclaimers">
+    <p>*We carry no more than 600 bananas on each flight.</p>
+    <p>**Except any flights departing Washington Dulles (IAD) or any flights on Embraer E175 aircraft (except those flown by MinionDomestic™).</p>
+    <p>***Only possible on flights serviced by the Airbus A321neo, Boeing 737 MAX 8 or 9, Boeing 787-9, or Airbus A380-800.</p>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <a href="#">About Us</a>
+    <a href="#">Careers</a>
+    <a href="#">Contact</a>
+    <a href="#">Terms</a>
+    <a href="#">Privacy</a>
+  </div>
+  <p style="margin-top:16px;">© 2026 Minion Airways. All rights reserved.</p>
+</footer>
+
+<script>
+/* ---------- Same flight-generation logic as booking.html ---------- */
+const AIRPORTS = {
+  SJC:{name:"San Jose",city:"San Jose",lat:37.36,lon:-121.93,region:"base"},
+  SFO:{name:"San Francisco",city:"San Francisco",lat:37.62,lon:-122.38,region:"base"},
+  LAX:{name:"Los Angeles",city:"Los Angeles",lat:33.94,lon:-118.41,region:"na"},
+  SEA:{name:"Seattle",city:"Seattle",lat:47.45,lon:-122.31,region:"na"},
+  EWR:{name:"Newark",city:"Newark",lat:40.69,lon:-74.17,region:"na"},
+  JFK:{name:"New York JFK",city:"New York",lat:40.64,lon:-73.78,region:"na"},
+  LGA:{name:"New York LaGuardia",city:"New York",lat:40.78,lon:-73.87,region:"na"},
+  IAD:{name:"Washington Dulles",city:"Washington",lat:38.95,lon:-77.46,region:"na"},
+  BOS:{name:"Boston",city:"Boston",lat:42.36,lon:-71.01,region:"na"},
+  IAH:{name:"Houston",city:"Houston",lat:29.98,lon:-95.34,region:"na"},
+  DFW:{name:"Dallas",city:"Dallas",lat:32.90,lon:-97.04,region:"na"},
+  AUS:{name:"Austin",city:"Austin",lat:30.20,lon:-97.67,region:"na"},
+  MIA:{name:"Miami",city:"Miami",lat:25.80,lon:-80.29,region:"na"},
+  FLL:{name:"Fort Lauderdale",city:"Fort Lauderdale",lat:26.07,lon:-80.15,region:"na"},
+  MCO:{name:"Orlando",city:"Orlando",lat:28.43,lon:-81.31,region:"na"},
+  FNC:{name:"Madeira",city:"Madeira",lat:32.70,lon:-16.78,region:"eu"},
+  LHR:{name:"London Heathrow",city:"London",lat:51.47,lon:-0.45,region:"eu"},
+  LGW:{name:"London Gatwick",city:"London",lat:51.15,lon:-0.19,region:"eu"},
+  CDG:{name:"Paris Charles de Gaulle",city:"Paris",lat:49.01,lon:2.55,region:"eu"},
+  ORY:{name:"Paris Orly",city:"Paris",lat:48.72,lon:2.36,region:"eu"},
+  FCO:{name:"Rome Fiumicino",city:"Rome",lat:41.80,lon:12.25,region:"eu"},
+  MAD:{name:"Madrid",city:"Madrid",lat:40.47,lon:-3.56,region:"eu"},
+  BCN:{name:"Barcelona",city:"Barcelona",lat:41.30,lon:2.08,region:"eu"},
+  DXB:{name:"Dubai",city:"Dubai",lat:25.25,lon:55.36,region:"me"},
+  BOM:{name:"Mumbai",city:"Mumbai",lat:19.09,lon:72.87,region:"sa"},
+  DEL:{name:"Delhi",city:"Delhi",lat:28.56,lon:77.10,region:"sa"},
+  PNQ:{name:"Pune",city:"Pune",lat:18.58,lon:73.92,region:"sa"},
+  HND:{name:"Tokyo Haneda",city:"Tokyo",lat:35.55,lon:139.78,region:"ap"},
+  NRT:{name:"Tokyo Narita",city:"Tokyo",lat:35.76,lon:140.39,region:"ap"},
+  PEK:{name:"Beijing",city:"Beijing",lat:40.08,lon:116.58,region:"ap"},
+  PVG:{name:"Shanghai",city:"Shanghai",lat:31.14,lon:121.80,region:"ap"},
+  SYD:{name:"Sydney",city:"Sydney",lat:-33.95,lon:151.18,region:"ap"},
+  MEL:{name:"Melbourne",city:"Melbourne",lat:-37.67,lon:144.84,region:"ap"},
+  HKG:{name:"Hong Kong",city:"Hong Kong",lat:22.31,lon:113.91,region:"ap"},
+  SIN:{name:"Singapore",city:"Singapore",lat:1.36,lon:103.99,region:"ap"},
+  EZE:{name:"Buenos Aires",city:"Buenos Aires",lat:-34.82,lon:-58.54,region:"sam"},
+  GIG:{name:"Rio de Janeiro",city:"Rio de Janeiro",lat:-22.81,lon:-43.24,region:"sam"}
+};
+const SJC_NONSTOP = ["SFO","LAX","SEA","EWR","JFK","LGA","MIA","LGW","LHR","CDG","FCO","BOM","PNQ","HKG","SIN","NRT","HND","SYD","MEL","EZE","GIG","DXB"];
+const HUB_EDGES = [
+  ["LHR","CDG"],["LHR","MAD"],["LHR","BCN"],["LHR","FCO"],["LHR","DXB"],["LHR","BOM"],["LHR","DEL"],
+  ["LHR","JFK"],["LHR","BOS"],["LHR","IAD"],["LHR","EWR"],
+  ["LGW","CDG"],["LGW","MAD"],["LGW","BCN"],["LGW","FCO"],["LGW","DXB"],["LGW","JFK"],
+  ["CDG","MAD"],["CDG","FCO"],["CDG","DXB"],["CDG","BOM"],["CDG","JFK"],["CDG","EWR"],
+  ["ORY","MAD"],["ORY","BCN"],["ORY","FCO"],
+  ["FCO","MAD"],["FCO","DXB"],["FCO","JFK"],["FCO","EWR"],
+  ["MAD","BCN"],["MAD","JFK"],["MAD","BOM"],
+  ["BOM","DXB"],["BOM","DEL"],["BOM","PNQ"],["BOM","HND"],["BOM","SYD"],["BOM","FCO"],["BOM","JFK"],
+  ["DEL","DXB"],["DEL","PNQ"],
+  ["PNQ","DXB"],
+  ["HND","DXB"],["HND","PEK"],["HND","PVG"],["HND","SYD"],
+  ["SYD","DXB"],
+  ["PEK","DXB"],["PEK","PVG"],
+  ["PVG","DXB"],
+  ["DXB","MEL"],
+  ["JFK","FNC"],["JFK","IAH"],["JFK","DFW"],["JFK","AUS"],["JFK","MIA"],["JFK","FLL"],["JFK","MCO"],["JFK","BOS"],["JFK","IAD"],
+  ["EWR","IAH"],["EWR","DFW"],["EWR","MIA"],["EWR","BOS"],["EWR","IAD"],["EWR","LGA"],["EWR","DXB"],["EWR","MCO"],["EWR","AUS"],["EWR","BCN"],
+  ["LGA","BOS"],["LGA","IAD"],
+  ["IAD","BOS"],["IAD","LGA"],
+  ["BOS","LGA"],
+  ["IAH","DFW"],["IAH","AUS"],["IAH","MIA"],
+  ["DFW","AUS"],
+  ["MIA","MCO"],["MIA","FNC"],
+  ["FLL","MCO"],
+  ["MCO","FLL"]
+];
+const GRAPH = {};
+function addEdge(a,b){ (GRAPH[a] = GRAPH[a]||new Set()).add(b); (GRAPH[b] = GRAPH[b]||new Set()).add(a); }
+SJC_NONSTOP.forEach(d=>{ addEdge("SJC",d); if(d!=="SEA" && d!=="SFO") addEdge("SFO",d); });
+addEdge("SJC","SFO");
+HUB_EDGES.forEach(([a,b])=>addEdge(a,b));
+
+function haversine(a,b){
+  const R=6371, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLon=toRad(b.lon-a.lon);
+  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+function fmtDur(hoursFloat){
+  const h=Math.floor(hoursFloat), m=Math.round((hoursFloat-h)*60);
+  return `${h}h ${m.toString().padStart(2,"0")}m`;
+}
+function segDetails(a,b){
+  const km = haversine(AIRPORTS[a],AIRPORTS[b]);
+  const hrs = km/820 + 0.7;
+  const price = Math.round((45 + km*0.085)/5)*5;
+  return {km,hrs,price};
+}
+function seededRandom(seedStr){
+  let h = 1779033703 ^ seedStr.length;
+  for(let i=0;i<seedStr.length;i++){
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function(){
+    h = Math.imul(h ^ (h>>>16), 2246822507);
+    h = Math.imul(h ^ (h>>>13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+function legSchedule(from,to,dateStr){
+  const seg = segDetails(from,to);
+  return {from,to,hrs:seg.hrs,price:seg.price};
+}
+
+/* ---------- Build today's deals (nonstop from SJC/SFO, seeded by today's date) ---------- */
+function todayStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,"0")}-${d.getDate().toString().padStart(2,"0")}`;
+}
+function buildDeals(){
+  const date = todayStr();
+  const rng = seededRandom(`DEALS|${date}`);
+  const bases = ["SJC","SFO"];
+  const candidates = [];
+  bases.forEach(base=>{
+    (GRAPH[base] ? [...GRAPH[base]] : []).forEach(dest=>{
+      if(!AIRPORTS[dest]) return;
+      const leg = legSchedule(base,dest,date);
+      candidates.push({from:base,to:dest,...leg});
+    });
+  });
+  // shuffle deterministically, then take a spread of destinations (no duplicate "to" airport)
+  for(let i=candidates.length-1;i>0;i--){
+    const j=Math.floor(rng()*(i+1));
+    [candidates[i],candidates[j]]=[candidates[j],candidates[i]];
+  }
+  const seen = new Set();
+  const picks = [];
+  for(const c of candidates){
+    if(seen.has(c.to)) continue;
+    seen.add(c.to);
+    picks.push(c);
+    if(picks.length>=6) break;
+  }
+  return picks;
+}
+function renderDeals(){
+  const grid = document.getElementById("dealsGrid");
+  const deals = buildDeals();
+  grid.innerHTML = deals.map(d=>{
+    const fromA = AIRPORTS[d.from], toA = AIRPORTS[d.to];
+    return `
+    <div class="deal-card" onclick="location.href='booking.html'">
+      <div class="deal-route">${d.from}<span class="material-symbols-outlined">arrow_right_alt</span>${d.to}</div>
+      <div class="deal-cities">${fromA.city} to ${toA.city}</div>
+      <div class="deal-meta"><span class="material-symbols-outlined">schedule</span>${fmtDur(d.hrs)} nonstop</div>
+      <div class="deal-stops">Nonstop</div>
+      <div class="deal-bottom">
+        <div class="deal-price">$${d.price}<span> one-way</span></div>
+        <button class="deal-book" type="button" onclick="event.stopPropagation();location.href='booking.html'">Book</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+renderDeals();
+</script>
+
+</body>
+</html>
