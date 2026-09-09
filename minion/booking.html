@@ -6,12 +6,12 @@
 <title>Book a Flight | Minion Airways</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Roboto', sans-serif; color: #1a1a2e; background: #f5f7fa; }
-  button, input, select, textarea { font-family: 'Roboto', sans-serif; }
+  body { font-family: 'Google Sans Flex', 'Roboto', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+  button, input, select, textarea { font-family: 'Google Sans Flex', 'Roboto', sans-serif; }
   .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
     font-weight: normal; font-style: normal; font-size: 22px; line-height: 1;
@@ -31,7 +31,7 @@
   nav a.active { color: #ffd400; }
   .header-btn {
     background: #ffd400; color: #0a2540; border: none; padding: 10px 22px;
-    border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Roboto', sans-serif;
+    border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Google Sans Flex', sans-serif;
   }
 
   .page-hero { background: #0a2540; padding: 40px 40px 90px; text-align: center; }
@@ -50,7 +50,7 @@
   }
   .field input, .field select {
     width: 100%; padding: 11px 12px; border: 1px solid #d6dbe1; border-radius: 8px;
-    font-family: 'Roboto', sans-serif; font-size: 14px; color: #1a1a2e;
+    font-family: 'Google Sans Flex', sans-serif; font-size: 14px; color: #1a1a2e;
   }
   .field input.invalid { border-color: #d1004b; }
   .field input:disabled { background: #f5f7fa; color: #b8bfc9; cursor: not-allowed; }
@@ -226,6 +226,135 @@
   .fare-row .cls { font-weight: 700; color: #0a2540; font-size: 14px; }
   .fare-row .mult { color: #9aa4b2; font-size: 12.5px; }
   .fare-row .amt { text-align: right; font-weight: 900; color: #0a2540; font-size: 15px; }
+
+  /* Upgrades (Step 5) */
+  .upgrades-wrap { max-width: 1000px; margin: 22px auto 0; display: none; }
+  .upgrades-wrap.show { display: block; }
+  .upgrade-section { background: #fff; border-radius: 12px; padding: 20px 22px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .upgrade-section h4 { font-size: 14.5px; color: #0a2540; margin-bottom: 3px; }
+  .upgrade-section .upg-sub { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+  .upgrade-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .upgrade-card {
+    border: 2px solid #eef1f5; border-radius: 10px; padding: 14px 14px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s ease;
+  }
+  .upgrade-card:hover { border-color: #d6dbe1; }
+  .upgrade-card.selected { border-color: #ffd400; background: #fffdf3; }
+  .upgrade-card .upg-icon { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: #0a2540; }
+  .upgrade-card .upg-icon .material-symbols-outlined { color: #1c5aa8; font-size: 19px; }
+  .upgrade-card .upg-desc { font-size: 11.5px; color: #6b7280; line-height: 1.45; flex: 1; }
+  .upgrade-card .upg-price { font-size: 14px; font-weight: 900; color: #0a2540; }
+  .upgrade-card .upg-price span { font-size: 10.5px; font-weight: 400; color: #9aa4b2; }
+  .upgrade-qty { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+  .upgrade-qty button { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #d6dbe1; background: #fff; font-weight: 700; cursor: pointer; }
+  .upgrade-qty button:hover { border-color: #0a2540; }
+  .upgrade-qty span { font-weight: 800; color: #0a2540; min-width: 14px; text-align: center; }
+  .upgrades-continue-row { display: flex; justify-content: flex-end; align-items: center; margin-top: 4px; gap: 10px; }
+  .upgrades-back-btn { background: none; border: none; color: #6b7280; font-size: 12.5px; cursor: pointer; text-decoration: underline; margin-right: auto; }
+  .upgrades-continue-btn {
+    background: #ffd400; color: #0a2540; border: none; padding: 13px 30px; border-radius: 8px;
+    font-weight: 700; font-size: 14.5px; cursor: pointer;
+  }
+  .upgrades-continue-btn:hover { background: #ffe14d; }
+
+  /* Checkout (Step 6) */
+  .checkout-wrap { max-width: 1000px; margin: 22px auto 0; display: none; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start; }
+  .checkout-wrap.show { display: grid; }
+  @media (max-width: 800px) { .checkout-wrap { grid-template-columns: 1fr; } }
+  .checkout-form-box { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .checkout-form-box h4 { font-size: 15px; color: #0a2540; margin: 0 0 4px; }
+  .checkout-form-box .co-sub { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+  .co-pax-block { border-top: 1px solid #eef1f5; padding-top: 14px; margin-top: 14px; }
+  .co-pax-block:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .co-pax-block .co-pax-label { font-size: 12.5px; font-weight: 800; color: #0a2540; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .co-field label { display: block; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+  .co-field input { width: 100%; padding: 10px 12px; border: 1px solid #d6dbe1; border-radius: 8px; font-size: 13.5px; font-family: 'Google Sans Flex', sans-serif; }
+  .co-field input.invalid { border-color: #d1004b; }
+  .co-contact { border-top: 1px solid #eef1f5; margin-top: 16px; padding-top: 16px; }
+  .co-payment { margin-top: 18px; border-top: 1px solid #eef1f5; padding-top: 16px; }
+  .co-payment h4 { font-size: 14px; color: #0a2540; margin-bottom: 12px; }
+  .co-card-icons { display: flex; gap: 8px; margin-bottom: 12px; }
+  .co-card-icons .material-symbols-outlined { color: #9aa4b2; font-size: 22px; }
+  .checkout-summary-box { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); position: sticky; top: 20px; }
+  .checkout-summary-box h4 { font-size: 15px; color: #0a2540; margin-bottom: 14px; }
+  .cs-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: #4b5563; padding: 6px 0; }
+  .cs-row.total { border-top: 1px solid #eef1f5; margin-top: 8px; padding-top: 12px; font-size: 16px; font-weight: 900; color: #0a2540; }
+  .cs-flight { font-size: 12px; color: #6b7280; padding: 8px 0; border-bottom: 1px solid #eef1f5; margin-bottom: 8px; line-height: 1.5; }
+  .checkout-error { background: #fdeaea; border: 1px solid #f4c1c1; color: #c0392b; font-size: 12.5px; padding: 10px 14px; border-radius: 8px; margin-top: 14px; display: none; }
+  .checkout-error.show { display: block; }
+  .checkout-pay-btn {
+    width: 100%; margin-top: 16px; background: #ffd400; color: #0a2540; border: none; padding: 14px 0;
+    border-radius: 8px; font-weight: 800; font-size: 14.5px; cursor: pointer;
+  }
+  .checkout-pay-btn:hover { background: #ffe14d; }
+  .checkout-back-btn { background: none; border: none; color: #6b7280; font-size: 12.5px; cursor: pointer; text-decoration: underline; margin-bottom: 14px; display: inline-block; }
+
+  /* Confirmation + check-in + boarding pass */
+  .confirm-wrap { max-width: 760px; margin: 30px auto 0; display: none; }
+  .confirm-wrap.show { display: block; }
+  .confirm-hero { background: #fff; border-radius: 14px; padding: 34px 30px; text-align: center; box-shadow: 0 2px 14px rgba(0,0,0,0.07); margin-bottom: 18px; }
+  .confirm-hero .confirm-check { width: 60px; height: 60px; border-radius: 50%; background: #e6f4ea; color: #2f8f5b; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-hero .confirm-check .material-symbols-outlined { font-size: 34px; }
+  .confirm-hero h2 { font-size: 22px; color: #0a2540; margin-bottom: 6px; }
+  .confirm-hero p { color: #6b7280; font-size: 13.5px; }
+  .confirm-code { display: inline-block; margin-top: 14px; background: #eef4fb; color: #0a2540; font-weight: 900; font-size: 18px; letter-spacing: 2px; padding: 8px 20px; border-radius: 8px; }
+  .confirm-details { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px; }
+  .confirm-details h4 { font-size: 14px; color: #0a2540; margin-bottom: 12px; }
+  .confirm-leg { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eef1f5; font-size: 13px; color: #4b5563; }
+  .confirm-leg:last-child { border-bottom: none; }
+  .confirm-leg b { color: #0a2540; }
+  .checkin-box { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px; }
+  .checkin-box h4 { font-size: 14px; color: #0a2540; margin-bottom: 6px; }
+  .checkin-box p { font-size: 12.5px; color: #6b7280; margin-bottom: 14px; line-height: 1.55; }
+  .checkin-status { font-size: 12.5px; font-weight: 700; padding: 8px 14px; border-radius: 8px; margin-bottom: 14px; display: inline-block; }
+  .checkin-status.locked { background: #fff7e0; color: #7a5b00; }
+  .checkin-status.open { background: #e6f4ea; color: #2f8f5b; }
+  .checkin-btn { background: #0a2540; color: #fff; border: none; padding: 12px 26px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; }
+  .checkin-btn:hover:not(:disabled) { background: #14395e; }
+  .checkin-btn:disabled { background: #eef1f5; color: #b8bfc9; cursor: not-allowed; }
+  .checkin-pax-list { margin-top: 14px; display: none; flex-direction: column; gap: 8px; }
+  .checkin-pax-list.show { display: flex; }
+  .checkin-pax-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f5f7fa; border-radius: 8px; font-size: 13px; color: #0a2540; }
+  .checkin-pax-row .material-symbols-outlined { color: #2f8f5b; font-size: 18px; vertical-align: -4px; margin-right: 6px; }
+  .bpass-btn { background: #ffd400; color: #0a2540; border: none; padding: 12px 26px; border-radius: 8px; font-weight: 800; font-size: 13.5px; cursor: pointer; margin-top: 6px; }
+  .bpass-btn:hover { background: #ffe14d; }
+
+  /* Boarding pass */
+  .bpass-wrap { display: none; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .bpass-wrap.show { display: flex; }
+  .bpass-card {
+    background: #0a2540; border-radius: 16px; overflow: hidden; color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25); position: relative;
+  }
+  .bpass-top { padding: 18px 22px 14px; display: flex; justify-content: space-between; align-items: flex-start; background: linear-gradient(135deg, #0a2540 0%, #14395e 100%); }
+  .bpass-airline { font-size: 15px; font-weight: 900; letter-spacing: 0.3px; display: flex; align-items: center; gap: 8px; }
+  .bpass-airline .material-symbols-outlined { color: #ffd400; }
+  .bpass-class { background: #ffd400; color: #0a2540; font-size: 10.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px; }
+  .bpass-route { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: #0d2c4a; }
+  .bpass-city { text-align: center; }
+  .bpass-city .code { font-size: 30px; font-weight: 900; letter-spacing: 1px; }
+  .bpass-city .name { font-size: 10.5px; color: #9fb3c8; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+  .bpass-plane { color: #ffd400; font-size: 22px; }
+  .bpass-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 16px 22px; background: #fff; color: #1a1a2e; }
+  .bpass-grid .bg-item .lbl { font-size: 9.5px; color: #9aa4b2; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .bpass-grid .bg-item .val { font-size: 14px; font-weight: 800; color: #0a2540; }
+  .bpass-grid .bg-item .val.small { font-size: 12px; }
+  .bpass-perf { position: relative; height: 0; }
+  .bpass-perf::before, .bpass-perf::after {
+    content: ""; position: absolute; top: -10px; width: 20px; height: 20px; background: #f5f7fa; border-radius: 50%;
+  }
+  .bpass-perf::before { left: -10px; }
+  .bpass-perf::after { right: -10px; }
+  .bpass-stub { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 16px 22px 20px; color: #1a1a2e; border-top: 1.5px dashed #d6dbe1; }
+  .bpass-stub .stub-info .lbl { font-size: 9.5px; color: #9aa4b2; text-transform: uppercase; letter-spacing: 0.4px; }
+  .bpass-stub .stub-info .val { font-size: 15px; font-weight: 900; color: #0a2540; }
+  .bpass-barcode { display: flex; align-items: flex-end; gap: 2px; height: 42px; }
+  .bpass-barcode span { display: inline-block; width: 2px; background: #0a2540; }
+  .bpass-pnr { font-family: 'Courier New', monospace; font-size: 11px; color: #6b7280; text-align: center; margin-top: 4px; letter-spacing: 2px; }
+  .bpass-download-row { text-align: center; }
+  .bpass-download-btn { background: #fff; color: #0a2540; border: 1.5px solid #d6dbe1; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; }
+  .bpass-download-btn:hover { border-color: #0a2540; }
 
   .hq-note { background: #fff; text-align: center; padding: 22px 20px; font-size: 13px; color: #6b7280; margin-top: 70px; border-top: 1px solid #e8ecf1; border-bottom: 1px solid #e8ecf1; }
   .hq-note strong { color: #0a2540; }
@@ -550,6 +679,94 @@
     <button type="button" class="seat-back-btn" id="seatBackBtn">&larr; Back</button>
     <button type="button" class="seat-continue-btn" id="seatContinueBtn" disabled>Continue</button>
   </div>
+</div>
+
+<!-- ============ STEP 5: UPGRADES ============ -->
+<div class="upgrades-wrap" id="upgradesWrap">
+  <div class="upgrade-section">
+    <h4>Extra legroom &amp; seating</h4>
+    <div class="upg-sub">Optional add-ons for this trip. Prices are per passenger, per direction.</div>
+    <div class="upgrade-grid" id="upgSeatingGrid"></div>
+  </div>
+  <div class="upgrade-section">
+    <h4>Baggage</h4>
+    <div class="upg-sub">Add checked bags for the whole party.</div>
+    <div class="upgrade-grid" id="upgBaggageGrid"></div>
+  </div>
+  <div class="upgrade-section">
+    <h4>Extras</h4>
+    <div class="upg-sub">A little something extra for the flight.</div>
+    <div class="upgrade-grid" id="upgExtrasGrid"></div>
+  </div>
+  <div class="upgrades-continue-row">
+    <button type="button" class="upgrades-back-btn" id="upgradesBackBtn">&larr; Back to seats</button>
+    <button type="button" class="upgrades-continue-btn" id="upgradesContinueBtn">Continue to Checkout</button>
+  </div>
+</div>
+
+<!-- ============ STEP 6: COMPLETE BOOKING ============ -->
+<div class="checkout-wrap" id="checkoutWrap">
+  <div class="checkout-form-box">
+    <button type="button" class="checkout-back-btn" id="checkoutBackBtn">&larr; Back to upgrades</button>
+    <h4>Passenger details</h4>
+    <div class="co-sub">Enter the legal name for each traveler exactly as it appears on government ID.</div>
+    <div id="checkoutPaxFields"></div>
+    <div class="co-contact">
+      <h4 style="font-size:14px;margin-bottom:12px;">Contact information</h4>
+      <div class="co-row">
+        <div class="co-field"><label>Email</label><input type="email" id="coEmail" placeholder="you@example.com"></div>
+        <div class="co-field"><label>Phone</label><input type="tel" id="coPhone" placeholder="(555) 555-5555"></div>
+      </div>
+    </div>
+    <div class="co-payment">
+      <h4>Payment</h4>
+      <div class="co-card-icons">
+        <span class="material-symbols-outlined">credit_card</span>
+        <span style="font-size:11.5px;color:#9aa4b2;align-self:center;">Simulated payment — no real card is charged.</span>
+      </div>
+      <div class="co-row">
+        <div class="co-field" style="grid-column: span 2;"><label>Name on card</label><input type="text" id="coCardName" placeholder="Jane Traveler"></div>
+      </div>
+      <div class="co-row">
+        <div class="co-field" style="grid-column: span 2;"><label>Card number</label><input type="text" id="coCardNumber" placeholder="4242 4242 4242 4242" inputmode="numeric" maxlength="19"></div>
+      </div>
+      <div class="co-row">
+        <div class="co-field"><label>Expiry</label><input type="text" id="coCardExpiry" placeholder="MM/YY" maxlength="5"></div>
+        <div class="co-field"><label>CVC</label><input type="text" id="coCardCvc" placeholder="123" inputmode="numeric" maxlength="4"></div>
+      </div>
+    </div>
+    <div class="checkout-error" id="checkoutError"></div>
+  </div>
+  <div class="checkout-summary-box">
+    <h4>Order summary</h4>
+    <div id="checkoutFlightSummary"></div>
+    <div id="checkoutPriceLines"></div>
+    <div class="cs-row total"><span>Total</span><span id="checkoutTotal">$0</span></div>
+    <button type="button" class="checkout-pay-btn" id="checkoutPayBtn">Complete Booking</button>
+  </div>
+</div>
+
+<!-- ============ CONFIRMATION / CHECK-IN / BOARDING PASS ============ -->
+<div class="confirm-wrap" id="confirmWrap">
+  <div class="confirm-hero">
+    <div class="confirm-check"><span class="material-symbols-outlined">check</span></div>
+    <h2>You're booked!</h2>
+    <p>A confirmation has been sent to <span id="confirmEmail"></span>.</p>
+    <div class="confirm-code" id="confirmCode"></div>
+  </div>
+  <div class="confirm-details">
+    <h4>Itinerary</h4>
+    <div id="confirmLegs"></div>
+  </div>
+  <div class="checkin-box">
+    <h4>Online check-in</h4>
+    <p>Check-in opens 24 hours before your scheduled departure and closes 45 minutes before takeoff.</p>
+    <div class="checkin-status" id="checkinStatus"></div>
+    <br>
+    <button type="button" class="checkin-btn" id="checkinBtn">Check In Now</button>
+    <div class="checkin-pax-list" id="checkinPaxList"></div>
+  </div>
+  <div class="bpass-wrap" id="bpassWrap"></div>
 </div>
 
 <div class="hq-note">Minion Airways is headquartered at <strong>San Jose International Airport (SJC)</strong>, California, with a secondary West Coast hub at San Francisco International Airport (SFO).</div>
@@ -1411,6 +1628,7 @@ const PAX_ICON = { adult:"person", child:"child_care", senior:"elderly" };
 // seatState holds one entry per leg being seated right now (1 for nonstop, 2 for a connection),
 // each with its own seat map, its own assignment of pax->seat, and which pax is "active".
 let seatState = null; // { legs:[{leg, seatMap, assigned:{paxIdx:seatId}}], paxQueue, activePax, stepAfter }
+let savedSeatAssignments = { departure: null, return: null }; // kind -> [ {paxIdx:seatId}, ... ] one entry per leg, captured when leaving that step
 function legLabel(l){ return `${l.from} → ${l.to}`; }
 function cabinIcon(cls){ return {Economy:"event_seat",Good:"airline_seat_legroom_extra",Better:"airline_seat_flat",Greatest:"workspace_premium"}[cls] || "event_seat"; }
 function seatCountAssigned(){
@@ -1628,6 +1846,8 @@ document.getElementById("seatBackBtn").addEventListener("click", ()=>{
 });
 document.getElementById("seatContinueBtn").addEventListener("click", ()=>{
   if(seatCountAssigned() < seatCountNeeded()) return;
+  // Persist this leg's seat assignments before seatState gets overwritten (e.g. by the return leg).
+  savedSeatAssignments[seatState.kind] = seatState.legs.map(l => ({ ...l.assigned }));
   if(seatState.kind === 'departure'){
     const hasReturn = !document.getElementById("noReturnCheck").checked && document.getElementById("returnInput").value;
     if(hasReturn && returnResults.length){
@@ -1636,10 +1856,12 @@ document.getElementById("seatContinueBtn").addEventListener("click", ()=>{
     } else if(hasReturn && !returnResults.length){
       alert("No return itinerary is available for that date, so there's nothing to show next. Try a different return date.");
     } else {
-      alert("Seats confirmed! Booking isn't live yet — steps 5–6 (upgrades, checkout) aren't built. Check back soon!");
+      document.getElementById("seatWrap").classList.remove("show");
+      goToStep5(true);
     }
   } else {
-    alert("Seats confirmed for both flights! Booking isn't live yet — steps 5–6 (upgrades, checkout) aren't built. Check back soon!");
+    document.getElementById("seatWrap").classList.remove("show");
+    goToStep5(true);
   }
 });
 
@@ -1966,6 +2188,362 @@ document.getElementById("flightnoSearchBtn").addEventListener("click", findFligh
 document.getElementById("flightnoInput").addEventListener("keydown", (e)=>{
   if(e.key === "Enter"){ e.preventDefault(); findFlightByNumber(); }
 });
+
+/* ================= STEP 5: UPGRADES ================= */
+const UPGRADE_CATALOG = {
+  seating: [
+    { id:"extraLegroom", icon:"airline_seat_legroom_extra", name:"Extra Legroom Seat", desc:"Reassign to an extra-legroom row, subject to availability.", price:35, perPax:true },
+    { id:"windowPref",   icon:"window",                    name:"Window Seat Guarantee", desc:"We'll do our best to lock in a window for every passenger.", price:12, perPax:true },
+    { id:"priorityBoard",icon:"priority_high",             name:"Priority Boarding", desc:"Board in the first group, right after families and elite members.", price:18, perPax:true }
+  ],
+  baggage: [
+    { id:"checkedBag1", icon:"luggage",        name:"1st Checked Bag", desc:"Up to 50 lb / 23 kg, for the whole party.", price:30, perPax:false },
+    { id:"checkedBag2", icon:"work",           name:"2nd Checked Bag", desc:"Up to 50 lb / 23 kg, for the whole party.", price:45, perPax:false },
+    { id:"oversizedBag",icon:"sports_golf",    name:"Oversized/Sports Item", desc:"Golf clubs, skis, surfboards, and the like.", price:75, perPax:false }
+  ],
+  extras: [
+    { id:"wifi",       icon:"wifi",          name:"In-Flight Wi-Fi", desc:"Full-flight streaming-speed Wi-Fi pass.", price:15, perPax:true },
+    { id:"mealUpgrade",icon:"restaurant",    name:"Chef's Meal Upgrade", desc:"Swap the standard meal for a chef-curated entrée.", price:22, perPax:true },
+    { id:"loungePass", icon:"local_bar",     name:"Airport Lounge Pass", desc:"Same-day access to the Minion Airways lounge.", price:40, perPax:false }
+  ]
+};
+let selectedUpgrades = {}; // id -> qty
+function upgradeCardHTML(u){
+  const qty = selectedUpgrades[u.id] || 0;
+  const maxQty = u.perPax ? payingPaxTotal() : 1;
+  return `
+    <div class="upgrade-card ${qty>0?'selected':''}" data-upg="${u.id}">
+      <div class="upg-icon"><span class="material-symbols-outlined">${u.icon}</span>${u.name}</div>
+      <div class="upg-desc">${u.desc}</div>
+      <div class="upg-price">$${u.price}<span> ${u.perPax?"/ passenger":"/ trip"}</span></div>
+      <div class="upgrade-qty">
+        <button type="button" class="upg-minus" data-upg="${u.id}">&minus;</button>
+        <span id="upgQty-${u.id}">${qty}</span>
+        <button type="button" class="upg-plus" data-upg="${u.id}" ${qty>=maxQty?'disabled':''}>+</button>
+      </div>
+    </div>`;
+}
+function renderUpgrades(){
+  document.getElementById("upgSeatingGrid").innerHTML = UPGRADE_CATALOG.seating.map(upgradeCardHTML).join("");
+  document.getElementById("upgBaggageGrid").innerHTML = UPGRADE_CATALOG.baggage.map(upgradeCardHTML).join("");
+  document.getElementById("upgExtrasGrid").innerHTML = UPGRADE_CATALOG.extras.map(upgradeCardHTML).join("");
+}
+function allUpgrades(){ return [...UPGRADE_CATALOG.seating, ...UPGRADE_CATALOG.baggage, ...UPGRADE_CATALOG.extras]; }
+function changeUpgradeQty(id, delta){
+  const u = allUpgrades().find(x=>x.id===id);
+  if(!u) return;
+  const maxQty = u.perPax ? payingPaxTotal() : 1;
+  const next = (selectedUpgrades[id]||0) + delta;
+  if(next < 0 || next > maxQty) return;
+  selectedUpgrades[id] = next;
+  renderUpgrades();
+}
+document.getElementById("upgradesWrap").addEventListener("click",(e)=>{
+  const plus = e.target.closest(".upg-plus");
+  const minus = e.target.closest(".upg-minus");
+  if(plus) changeUpgradeQty(plus.dataset.upg, 1);
+  else if(minus) changeUpgradeQty(minus.dataset.upg, -1);
+});
+function upgradesTotal(){
+  return allUpgrades().reduce((sum,u)=> sum + (selectedUpgrades[u.id]||0)*u.price, 0);
+}
+function goToStep5(scrollTo){
+  document.getElementById("resultsWrap").classList.remove("show");
+  document.getElementById("returnResultsWrap").classList.remove("show");
+  document.getElementById("seatWrap").classList.remove("show");
+  renderUpgrades();
+  document.getElementById("upgradesWrap").classList.add("show");
+  setActiveStep(5);
+  if(scrollTo) document.getElementById("upgradesWrap").scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.getElementById("upgradesBackBtn").addEventListener("click", ()=>{
+  document.getElementById("upgradesWrap").classList.remove("show");
+  if(selectedReturn){
+    openSeatSelection('return');
+  } else {
+    openSeatSelection('departure');
+  }
+});
+document.getElementById("upgradesContinueBtn").addEventListener("click", ()=>{
+  document.getElementById("upgradesWrap").classList.remove("show");
+  goToStep6(true);
+});
+
+/* ================= STEP 6: CHECKOUT / COMPLETE BOOKING ================= */
+function fareTotal(){
+  const mult = paxPriceMultiplier();
+  const payers = payingPaxTotal();
+  let total = 0;
+  if(selectedDeparture) total += Math.round(selectedDeparture.price*mult*(payers||1));
+  if(selectedReturn) total += Math.round(selectedReturn.price*mult*(payers||1));
+  return total;
+}
+function renderCheckoutPaxFields(){
+  const wrap = document.getElementById("checkoutPaxFields");
+  const queue = buildPaxQueue();
+  wrap.innerHTML = queue.map((p,i)=>`
+    <div class="co-pax-block">
+      <div class="co-pax-label">${p.label}</div>
+      <div class="co-row">
+        <div class="co-field"><label>First name</label><input type="text" id="coFirst-${i}" data-pax="${i}"></div>
+        <div class="co-field"><label>Last name</label><input type="text" id="coLast-${i}" data-pax="${i}"></div>
+      </div>
+    </div>`).join("");
+}
+function renderCheckoutSummary(){
+  const summary = document.getElementById("checkoutFlightSummary");
+  const cls = document.getElementById("classInput").value;
+  let html = "";
+  if(selectedDeparture){
+    html += `<div class="cs-flight"><b style="color:#0a2540;">Departure</b><br>${selectedDeparture.legs[0].from} → ${selectedDeparture.legs[selectedDeparture.legs.length-1].to} · ${cls}</div>`;
+  }
+  if(selectedReturn){
+    html += `<div class="cs-flight"><b style="color:#0a2540;">Return</b><br>${selectedReturn.legs[0].from} → ${selectedReturn.legs[selectedReturn.legs.length-1].to} · ${cls}</div>`;
+  }
+  summary.innerHTML = html;
+  const lines = document.getElementById("checkoutPriceLines");
+  const fareLine = `<div class="cs-row"><span>Fare (${paxSummaryLabel()})</span><span>$${fareTotal()}</span></div>`;
+  const upgLines = allUpgrades().filter(u=>selectedUpgrades[u.id]>0).map(u=>
+    `<div class="cs-row"><span>${u.name} × ${selectedUpgrades[u.id]}</span><span>$${u.price*selectedUpgrades[u.id]}</span></div>`
+  ).join("");
+  lines.innerHTML = fareLine + upgLines;
+  document.getElementById("checkoutTotal").textContent = `$${fareTotal()+upgradesTotal()}`;
+}
+function goToStep6(scrollTo){
+  renderCheckoutPaxFields();
+  renderCheckoutSummary();
+  document.getElementById("checkoutWrap").classList.add("show");
+  setActiveStep(6);
+  if(scrollTo) document.getElementById("checkoutWrap").scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.getElementById("checkoutBackBtn").addEventListener("click", ()=>{
+  document.getElementById("checkoutWrap").classList.remove("show");
+  goToStep5(true);
+});
+
+let bookingRecord = null; // populated once payment "succeeds"
+
+function luhnValid(num){
+  const digits = num.replace(/\D/g,"");
+  if(digits.length < 12) return false;
+  let sum=0, alt=false;
+  for(let i=digits.length-1;i>=0;i--){
+    let d = parseInt(digits[i],10);
+    if(alt){ d*=2; if(d>9) d-=9; }
+    sum+=d; alt=!alt;
+  }
+  return sum%10===0;
+}
+function genConfirmationCode(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+document.getElementById("checkoutPayBtn").addEventListener("click", ()=>{
+  const err = document.getElementById("checkoutError");
+  err.classList.remove("show");
+  const queue = buildPaxQueue();
+  const passengers = [];
+  for(let i=0;i<queue.length;i++){
+    const first = document.getElementById(`coFirst-${i}`).value.trim();
+    const last = document.getElementById(`coLast-${i}`).value.trim();
+    document.getElementById(`coFirst-${i}`).classList.toggle("invalid", !first);
+    document.getElementById(`coLast-${i}`).classList.toggle("invalid", !last);
+    if(!first || !last){ err.textContent = "Please enter a first and last name for every passenger."; err.classList.add("show"); return; }
+    passengers.push({ ...queue[i], first, last });
+  }
+  const email = document.getElementById("coEmail").value.trim();
+  const emailField = document.getElementById("coEmail");
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  emailField.classList.toggle("invalid", !emailValid);
+  if(!emailValid){ err.textContent = "Please enter a valid email address."; err.classList.add("show"); return; }
+  const cardName = document.getElementById("coCardName").value.trim();
+  const cardNumberField = document.getElementById("coCardNumber");
+  const cardNumber = cardNumberField.value.trim();
+  const cardOk = luhnValid(cardNumber);
+  cardNumberField.classList.toggle("invalid", !cardOk);
+  document.getElementById("coCardName").classList.toggle("invalid", !cardName);
+  if(!cardName || !cardOk){ err.textContent = "Please enter a valid name on card and card number."; err.classList.add("show"); return; }
+  const expiry = document.getElementById("coCardExpiry").value.trim();
+  const cvc = document.getElementById("coCardCvc").value.trim();
+  const expiryOk = /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry);
+  const cvcOk = /^\d{3,4}$/.test(cvc);
+  document.getElementById("coCardExpiry").classList.toggle("invalid", !expiryOk);
+  document.getElementById("coCardCvc").classList.toggle("invalid", !cvcOk);
+  if(!expiryOk || !cvcOk){ err.textContent = "Please enter a valid card expiry and CVC."; err.classList.add("show"); return; }
+
+  const cls = document.getElementById("classInput").value;
+  bookingRecord = {
+    code: genConfirmationCode(),
+    email,
+    cls,
+    passengers,
+    departure: selectedDeparture,
+    return: selectedReturn,
+    upgrades: allUpgrades().filter(u=>selectedUpgrades[u.id]>0).map(u=>({name:u.name, qty:selectedUpgrades[u.id]})),
+    total: fareTotal()+upgradesTotal(),
+    departDate: document.getElementById("departInput").value,
+    returnDate: document.getElementById("returnInput").value,
+    checkedIn: {}
+  };
+  document.getElementById("checkoutWrap").classList.remove("show");
+  showConfirmation();
+});
+
+/* ================= CONFIRMATION / CHECK-IN / BOARDING PASS ================= */
+function flightDepDateTime(flight, dateStr){
+  // Combine the leg's scheduled clock time with the chosen calendar date to get a real Date object.
+  const dep = flight.legs[0].dep;
+  const d = new Date(`${dateStr}T00:00:00`);
+  d.setHours(dep.h, dep.m, 0, 0);
+  return d;
+}
+function fmtLongDate(d){
+  return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric", year:"numeric" });
+}
+function showConfirmation(){
+  document.getElementById("confirmEmail").textContent = bookingRecord.email;
+  document.getElementById("confirmCode").textContent = bookingRecord.code;
+  const legsWrap = document.getElementById("confirmLegs");
+  let html = "";
+  if(bookingRecord.departure){
+    const dt = flightDepDateTime(bookingRecord.departure, bookingRecord.departDate);
+    html += `<div class="confirm-leg"><span>Departure — <b>${bookingRecord.departure.legs[0].from} → ${bookingRecord.departure.legs[bookingRecord.departure.legs.length-1].to}</b></span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
+  }
+  if(bookingRecord.return){
+    const dt = flightDepDateTime(bookingRecord.return, bookingRecord.returnDate);
+    html += `<div class="confirm-leg"><span>Return — <b>${bookingRecord.return.legs[0].from} → ${bookingRecord.return.legs[bookingRecord.return.legs.length-1].to}</b></span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
+  }
+  legsWrap.innerHTML = html;
+  document.getElementById("confirmWrap").classList.add("show");
+  document.getElementById("bpassWrap").classList.remove("show");
+  document.getElementById("bpassWrap").innerHTML = "";
+  document.getElementById("checkinPaxList").classList.remove("show");
+  updateCheckinStatus();
+  document.getElementById("confirmWrap").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function nextUncheckedInFlight(){
+  // Whichever flight departs soonest and hasn't been fully checked in yet
+  const candidates = [];
+  if(bookingRecord.departure) candidates.push({kind:'departure', flight:bookingRecord.departure, date:bookingRecord.departDate});
+  if(bookingRecord.return) candidates.push({kind:'return', flight:bookingRecord.return, date:bookingRecord.returnDate});
+  candidates.sort((a,b)=> flightDepDateTime(a.flight,a.date) - flightDepDateTime(b.flight,b.date));
+  return candidates.find(c => !bookingRecord.checkedIn[c.kind]) || null;
+}
+function updateCheckinStatus(){
+  const statusEl = document.getElementById("checkinStatus");
+  const btn = document.getElementById("checkinBtn");
+  const next = nextUncheckedInFlight();
+  if(!next){
+    statusEl.textContent = "All flights checked in ✓";
+    statusEl.className = "checkin-status open";
+    btn.disabled = true;
+    btn.textContent = "Checked In";
+    return;
+  }
+  const depTime = flightDepDateTime(next.flight, next.date);
+  const now = new Date();
+  const hoursUntil = (depTime - now) / (1000*60*60);
+  const windowOpen = hoursUntil <= 24 && hoursUntil > -0.75; // opens 24h before, closes 45 min before
+  if(windowOpen){
+    statusEl.textContent = `Check-in is open for your ${next.kind} flight (${next.flight.legs[0].from} → ${next.flight.legs[next.flight.legs.length-1].to})`;
+    statusEl.className = "checkin-status open";
+    btn.disabled = false;
+    btn.textContent = `Check In — ${next.kind === 'departure' ? 'Departure' : 'Return'} Flight`;
+  } else if(hoursUntil > 24){
+    const opensAt = new Date(depTime.getTime() - 24*60*60*1000);
+    statusEl.textContent = `Check-in opens ${fmtLongDate(opensAt)} at ${opensAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})} (24 hrs before your ${next.kind} flight)`;
+    statusEl.className = "checkin-status locked";
+    btn.disabled = true;
+    btn.textContent = "Check In Now";
+  } else {
+    statusEl.textContent = `Check-in has closed for your ${next.kind} flight`;
+    statusEl.className = "checkin-status locked";
+    btn.disabled = true;
+    btn.textContent = "Check In Now";
+  }
+}
+document.getElementById("checkinBtn").addEventListener("click", ()=>{
+  const next = nextUncheckedInFlight();
+  if(!next) return;
+  bookingRecord.checkedIn[next.kind] = true;
+  renderCheckinPaxList();
+  updateCheckinStatus();
+});
+function renderCheckinPaxList(){
+  const wrap = document.getElementById("checkinPaxList");
+  const done = Object.keys(bookingRecord.checkedIn).filter(k=>bookingRecord.checkedIn[k]);
+  if(!done.length){ wrap.classList.remove("show"); wrap.innerHTML=""; return; }
+  wrap.classList.add("show");
+  wrap.innerHTML = done.map(kind=>{
+    const flight = kind==='departure' ? bookingRecord.departure : bookingRecord.return;
+    return `<div class="checkin-pax-row"><span><span class="material-symbols-outlined">check_circle</span>${kind==='departure'?'Departure':'Return'} — ${flight.legs[0].from} → ${flight.legs[flight.legs.length-1].to} checked in</span>
+      <button type="button" class="bpass-btn" onclick="generateBoardingPasses('${kind}')">Get Boarding Pass</button></div>`;
+  }).join("");
+}
+function seatForPax(kind, paxIdx, legIdx=0){
+  const legs = savedSeatAssignments[kind];
+  if(!legs || !legs[legIdx]) return "—";
+  return legs[legIdx][paxIdx] || "—";
+}
+function barcodeHTML(seed){
+  const rng = seededRandom(seed);
+  let html = "";
+  for(let i=0;i<48;i++){
+    const h = 10 + Math.floor(rng()*32);
+    const w = rng()>0.75 ? 3 : 2;
+    html += `<span style="height:${h}px;width:${w}px;"></span>`;
+  }
+  return html;
+}
+function generateBoardingPasses(kind){
+  const flight = kind==='departure' ? bookingRecord.departure : bookingRecord.return;
+  const dateStr = kind==='departure' ? bookingRecord.departDate : bookingRecord.returnDate;
+  const dt = flightDepDateTime(flight, dateStr);
+  const boardTime = new Date(dt.getTime() - 40*60000);
+  const gate = `${String.fromCharCode(65+Math.floor(Math.random()*6))}${2+Math.floor(Math.random()*30)}`;
+  const wrap = document.getElementById("bpassWrap");
+  const cardsHTML = bookingRecord.passengers.map((p, i)=>{
+    const seatId = seatForPax(kind, i, 0);
+    const seq = String(i+1).padStart(3,"0");
+    const pnr = bookingRecord.code;
+    return `
+    <div class="bpass-card">
+      <div class="bpass-top">
+        <div class="bpass-airline"><span class="material-symbols-outlined">flight</span>MINION AIRWAYS</div>
+        <div class="bpass-class">${bookingRecord.cls}</div>
+      </div>
+      <div class="bpass-route">
+        <div class="bpass-city"><div class="code">${flight.legs[0].from}</div><div class="name">${AIRPORTS[flight.legs[0].from]?.city||flight.legs[0].from}</div></div>
+        <div class="bpass-plane material-symbols-outlined">flight</div>
+        <div class="bpass-city"><div class="code">${flight.legs[flight.legs.length-1].to}</div><div class="name">${AIRPORTS[flight.legs[flight.legs.length-1].to]?.city||flight.legs[flight.legs.length-1].to}</div></div>
+      </div>
+      <div class="bpass-grid">
+        <div class="bg-item"><div class="lbl">Passenger</div><div class="val small">${p.first} ${p.last}</div></div>
+        <div class="bg-item"><div class="lbl">Flight</div><div class="val">${flight.legs[0].flightNo}</div></div>
+        <div class="bg-item"><div class="lbl">Seat</div><div class="val">${seatId}</div></div>
+        <div class="bg-item"><div class="lbl">Gate</div><div class="val">${gate}</div></div>
+        <div class="bg-item"><div class="lbl">Date</div><div class="val small">${fmtLongDate(dt)}</div></div>
+        <div class="bg-item"><div class="lbl">Boarding</div><div class="val small">${boardTime.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</div></div>
+        <div class="bg-item"><div class="lbl">Departs</div><div class="val small">${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</div></div>
+        <div class="bg-item"><div class="lbl">Group</div><div class="val small">${selectedUpgrades.priorityBoard>0 ? "1" : (2+Math.floor(i/2))}</div></div>
+      </div>
+      <div class="bpass-perf"></div>
+      <div class="bpass-stub">
+        <div class="stub-info"><div class="lbl">Seq ${seq}</div><div class="val">${flight.legs[0].from} → ${flight.legs[flight.legs.length-1].to}</div></div>
+        <div style="text-align:right;">
+          <div class="bpass-barcode">${barcodeHTML(`${pnr}|${flight.legs[0].flightNo}|${p.first}${p.last}|${i}`)}</div>
+          <div class="bpass-pnr">${pnr}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  wrap.innerHTML = cardsHTML + `<div class="bpass-download-row"><button type="button" class="bpass-download-btn" onclick="window.print()">Print / Save as PDF</button></div>`;
+  wrap.classList.add("show");
+  wrap.scrollIntoView({behavior:"smooth", block:"start"});
+}
+setInterval(()=>{ if(bookingRecord) updateCheckinStatus(); }, 30000);
 
 /* ---------- Bootstrap: restore booking from URL, if present ---------- */
 (function initFromURL(){

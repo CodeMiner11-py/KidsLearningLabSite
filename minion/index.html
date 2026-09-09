@@ -6,7 +6,7 @@
 <title>Minion Airways | Book Flights</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 <style>
   .material-symbols-outlined {
@@ -25,7 +25,7 @@
     -webkit-font-smoothing: antialiased;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Roboto', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+  body { font-family: 'Google Sans Flex', sans-serif; color: #1a1a2e; background: #f5f7fa; }
 
   /* Header */
   header {
@@ -85,10 +85,36 @@
     letter-spacing: 0.3px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Google Sans Flex', sans-serif;
     transition: background 0.15s ease;
   }
   .book-now-btn:hover { background: #ffe14d; }
+
+  /* Home search box */
+  .home-search-box {
+    background: #fff; max-width: 1000px; margin: -66px auto 0; border-radius: 14px;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.18); padding: 24px 28px; position: relative; z-index: 5; text-align: left;
+  }
+  .home-search-fields { display: grid; grid-template-columns: 1.1fr 1.1fr 0.9fr 0.9fr 0.9fr auto; gap: 14px; align-items: end; }
+  .hs-field label {
+    display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #6b7280; margin-bottom: 6px;
+  }
+  .hs-field input, .hs-field select {
+    width: 100%; padding: 11px 12px; border: 1px solid #d6dbe1; border-radius: 8px;
+    font-family: 'Google Sans Flex', sans-serif; font-size: 14px; color: #1a1a2e;
+  }
+  .hs-search-btn {
+    background: #0a2540; color: #fff; border: none; padding: 12px 22px; border-radius: 8px;
+    font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; height: 43px; white-space: nowrap;
+  }
+  .hs-search-btn:hover { background: #14395e; }
+  .hs-msg { font-size: 12.5px; color: #d1004b; margin-top: 12px; display: none; }
+  .hs-msg.show { display: block; }
+  @media (max-width: 900px) {
+    .home-search-fields { grid-template-columns: 1fr 1fr; }
+    .home-search-box { margin-top: -40px; }
+  }
 
   /* Perks strip */
   .perks {
@@ -216,6 +242,38 @@
   <p>Nonstop and connecting service to destinations across North America, Europe, Asia, and beyond.</p>
   <a href="booking.html" class="book-now-btn">BOOK NOW</a>
 </section>
+
+<div class="home-search-box">
+  <div class="home-search-fields">
+    <div class="hs-field">
+      <label>From</label>
+      <input type="text" id="hsFromInput" value="San Jose (SJC)" autocomplete="off">
+    </div>
+    <div class="hs-field">
+      <label>To</label>
+      <input type="text" id="hsToInput" placeholder="City or airport code" autocomplete="off">
+    </div>
+    <div class="hs-field">
+      <label>Depart</label>
+      <input type="date" id="hsDepartInput">
+    </div>
+    <div class="hs-field">
+      <label>Return</label>
+      <input type="date" id="hsReturnInput">
+    </div>
+    <div class="hs-field">
+      <label>Class</label>
+      <select id="hsClassInput">
+        <option>Economy</option>
+        <option>Good</option>
+        <option>Better</option>
+        <option>Greatest</option>
+      </select>
+    </div>
+    <button class="hs-search-btn" id="hsSearchBtn" type="button"><span class="material-symbols-outlined">search</span>Search</button>
+  </div>
+  <div class="hs-msg" id="hsMsg"></div>
+</div>
 
 <section class="deals">
   <div class="deals-head">
@@ -431,6 +489,51 @@ function renderDeals(){
   }).join("");
 }
 renderDeals();
+
+/* ---------- Home page flight search -> redirects to booking.html ---------- */
+function hsFindAirport(query){
+  if(!query) return null;
+  const q = query.trim().toLowerCase();
+  const codeMatch = q.match(/\(([a-z]{3})\)\s*$/i);
+  if(codeMatch && AIRPORTS[codeMatch[1].toUpperCase()]) return codeMatch[1].toUpperCase();
+  if(AIRPORTS[q.toUpperCase()]) return q.toUpperCase();
+  const byCity = Object.keys(AIRPORTS).find(code => AIRPORTS[code].city.toLowerCase() === q);
+  if(byCity) return byCity;
+  const partial = Object.keys(AIRPORTS).find(code => AIRPORTS[code].city.toLowerCase().includes(q) || AIRPORTS[code].name.toLowerCase().includes(q));
+  return partial || null;
+}
+document.getElementById("hsSearchBtn").addEventListener("click", ()=>{
+  const msg = document.getElementById("hsMsg");
+  const fromCode = hsFindAirport(document.getElementById("hsFromInput").value);
+  const toCode = hsFindAirport(document.getElementById("hsToInput").value);
+  const dateStr = document.getElementById("hsDepartInput").value;
+  const returnStr = document.getElementById("hsReturnInput").value;
+  const cls = document.getElementById("hsClassInput").value;
+  if(!fromCode || !toCode){
+    msg.textContent = "We couldn't match one of those airports. Try a city name or 3-letter code (e.g. SJC, London, LHR).";
+    msg.classList.add("show");
+    return;
+  }
+  if(fromCode === toCode){
+    msg.textContent = "Departure and arrival airports can't be the same.";
+    msg.classList.add("show");
+    return;
+  }
+  if(!dateStr){
+    msg.textContent = "Please choose a departure date.";
+    msg.classList.add("show");
+    return;
+  }
+  msg.classList.remove("show");
+  const params = new URLSearchParams();
+  params.set("dep", fromCode);
+  params.set("dest", toCode);
+  params.set("date", dateStr);
+  if(returnStr) params.set("ret", returnStr);
+  else params.set("noret", "1");
+  params.set("cls", cls);
+  window.location.href = `booking.html?${params.toString()}`;
+});
 </script>
 
 </body>
