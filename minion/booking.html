@@ -120,6 +120,13 @@
   }
   .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
   .modal-head h3 { font-size: 21px; font-weight: 900; color: #0a2540; }
+  /* MinionPay silly loading gag */
+  .mp-box { max-width: 380px; text-align: center; padding: 44px 30px; }
+  .mp-emoji { font-size: 54px; line-height: 1; margin-bottom: 14px; }
+  .mp-brand { font-size: 13px; font-weight: 900; color: #0a2540; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .mp-text { font-size: 15px; color: #4b5563; font-weight: 600; }
+  .mp-spinner { width: 54px; height: 54px; border: 6px solid #fff3c4; border-top-color: #ffd400; border-radius: 50%; margin: 0 auto 18px; animation: mpspin 0.9s linear infinite; }
+  @keyframes mpspin { to { transform: rotate(360deg); } }
   .modal-head p { color: #6b7280; font-size: 13.5px; margin-bottom: 18px; }
   .modal-close { background: none; border: none; font-size: 24px; line-height: 1; color: #9aa4b2; cursor: pointer; padding: 4px 8px; }
   .modal-close:hover { color: #0a2540; }
@@ -304,6 +311,9 @@
   .confirm-leg { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eef1f5; font-size: 13px; color: #4b5563; }
   .confirm-leg:last-child { border-bottom: none; }
   .confirm-leg b { color: #0a2540; }
+  .status-badge { display: inline-block; margin-left: 8px; padding: 2px 9px; border-radius: 12px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+  .status-badge.ontime { background: #e6f4ea; color: #2f8f5b; }
+  .status-badge.delayed { background: #fff0e0; color: #b8621b; }
   .checkin-box { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px; }
   .checkin-box h4 { font-size: 14px; color: #0a2540; margin-bottom: 6px; }
   .checkin-box p { font-size: 12.5px; color: #6b7280; margin-bottom: 14px; line-height: 1.55; }
@@ -505,8 +515,8 @@
     <ul>
       <li><a href="booking.html" class="active">Book</a></li>
       <li><a href="#">Check-in</a></li>
-      <li><a href="#">Flight Status</a></li>
-      <li><a href="#">My Trips</a></li>
+      <li><a href="flight-status.html">Flight Status</a></li>
+      <li><a href="my-trips.html">My Trips</a></li>
       <li><a href="#">Help</a></li>
     </ul>
   </nav>
@@ -744,6 +754,11 @@
     <div class="cs-row total"><span>Total</span><span id="checkoutTotal">$0</span></div>
     <button type="button" class="checkout-pay-btn" id="checkoutPayBtn">Complete Booking</button>
   </div>
+</div>
+
+<!-- ============ MinionPay (silly in-universe payment gag, not a real processor) ============ -->
+<div class="modal-overlay" id="minionPayOverlay">
+  <div class="modal-box mp-box" id="mpBox"></div>
 </div>
 
 <!-- ============ CONFIRMATION / CHECK-IN / BOARDING PASS ============ -->
@@ -1628,7 +1643,25 @@ const PAX_ICON = { adult:"person", child:"child_care", senior:"elderly" };
 // seatState holds one entry per leg being seated right now (1 for nonstop, 2 for a connection),
 // each with its own seat map, its own assignment of pax->seat, and which pax is "active".
 let seatState = null; // { legs:[{leg, seatMap, assigned:{paxIdx:seatId}}], paxQueue, activePax, stepAfter }
-let savedSeatAssignments = { departure: null, return: null }; // kind -> [ {paxIdx:seatId}, ... ] one entry per leg, captured when leaving that step
+let savedSeatAssignments = { departure: null, return: null }; // kind -> [ {requestedCls, seats:{paxIdx:{seatId,cabinCls}}} ] one entry per leg, captured when leaving that step
+const CABIN_ORDER = ["Economy","Good","Better","Greatest"];
+const CABIN_UPGRADE_FEE = { Economy:0, Good:80, Better:240, Greatest:480 }; // flat per-seat fee if you sit in a pricier cabin than you paid for
+function cabinFeeFor(cabinCls, requestedCls){
+  if(!cabinCls || !requestedCls) return 0;
+  const diff = CABIN_ORDER.indexOf(cabinCls) - CABIN_ORDER.indexOf(requestedCls);
+  return diff > 0 ? Math.max(0, CABIN_UPGRADE_FEE[cabinCls] - CABIN_UPGRADE_FEE[requestedCls]) : 0;
+}
+function seatUpsellTotal(){
+  let total = 0;
+  ["departure","return"].forEach(kind=>{
+    const legs = savedSeatAssignments[kind];
+    if(!legs) return;
+    legs.forEach(legRec=>{
+      Object.values(legRec.seats).forEach(s=> total += cabinFeeFor(s.cabinCls, legRec.requestedCls));
+    });
+  });
+  return total;
+}
 function legLabel(l){ return `${l.from} → ${l.to}`; }
 function cabinIcon(cls){ return {Economy:"event_seat",Good:"airline_seat_legroom_extra",Better:"airline_seat_flat",Greatest:"workspace_premium"}[cls] || "event_seat"; }
 function seatCountAssigned(){
@@ -1683,7 +1716,9 @@ function renderSeatUI(){
             else if(isSelected) cls = "selected";
             const disabled = seat.taken || (seat.held && !isSelected);
             const label = isSelected ? (seatState.paxQueue[assignedPaxIdx[0]].label.match(/\d+$/)?.[0] || "✓") : id;
-            return `<button type="button" class="seat-btn ${cls}" data-leg="${legIdx}" data-seat="${id}" ${disabled?"disabled":""} title="${id} · ${cabin.cls}${seat.held&&!isSelected?" · held by another traveler":""}">${label}</button>`;
+            const fee = cabinFeeFor(cabin.cls, requestedCls);
+            const feeTitle = fee>0 ? ` · +$${fee} upgrade` : "";
+            return `<button type="button" class="seat-btn ${cls}" data-leg="${legIdx}" data-seat="${id}" ${disabled?"disabled":""} title="${id} · ${cabin.cls}${seat.held&&!isSelected?" · held by another traveler":""}${feeTitle}">${label}</button>`;
           }).join("");
           return `<div class="seat-col-group">${seatsHTML}</div>`;
         }).join(`<div class="seat-aisle-gap"></div>`);
@@ -1691,7 +1726,7 @@ function renderSeatUI(){
       }
       return `
         <div class="cabin-block">
-          <div class="cabin-block-label"><span class="material-symbols-outlined">${cabinIcon(cabin.cls)}</span>${cabin.cls}${cabin.cls===requestedCls?" (your fare class)":""}</div>
+          <div class="cabin-block-label"><span class="material-symbols-outlined">${cabinIcon(cabin.cls)}</span>${cabin.cls}${cabin.cls===requestedCls?" (your fare class)":(cabinFeeFor(cabin.cls,requestedCls)>0?` (+$${cabinFeeFor(cabin.cls,requestedCls)} to upgrade)`:"")}</div>
           <div class="seat-grid-scroll">${rowsHTML.join("")}</div>
         </div>`;
     }
@@ -1847,7 +1882,15 @@ document.getElementById("seatBackBtn").addEventListener("click", ()=>{
 document.getElementById("seatContinueBtn").addEventListener("click", ()=>{
   if(seatCountAssigned() < seatCountNeeded()) return;
   // Persist this leg's seat assignments before seatState gets overwritten (e.g. by the return leg).
-  savedSeatAssignments[seatState.kind] = seatState.legs.map(l => ({ ...l.assigned }));
+  savedSeatAssignments[seatState.kind] = seatState.legs.map(l => {
+    const requestedCls = l.legClass || seatState.cls;
+    const seats = {};
+    Object.entries(l.assigned).forEach(([paxIdx,seatId])=>{
+      const cabin = l.seatMap.cabins.find(c=> c.seats.some(s=>s.id===seatId));
+      seats[paxIdx] = { seatId, cabinCls: cabin ? cabin.cls : requestedCls };
+    });
+    return { requestedCls, seats };
+  });
   if(seatState.kind === 'departure'){
     const hasReturn = !document.getElementById("noReturnCheck").checked && document.getElementById("returnInput").value;
     if(hasReturn && returnResults.length){
@@ -2276,6 +2319,7 @@ function fareTotal(){
   let total = 0;
   if(selectedDeparture) total += Math.round(selectedDeparture.price*mult*(payers||1));
   if(selectedReturn) total += Math.round(selectedReturn.price*mult*(payers||1));
+  total += seatUpsellTotal();
   return total;
 }
 function renderCheckoutPaxFields(){
@@ -2302,11 +2346,13 @@ function renderCheckoutSummary(){
   }
   summary.innerHTML = html;
   const lines = document.getElementById("checkoutPriceLines");
-  const fareLine = `<div class="cs-row"><span>Fare (${paxSummaryLabel()})</span><span>$${fareTotal()}</span></div>`;
+  const fareLine = `<div class="cs-row"><span>Fare (${paxSummaryLabel()})</span><span>$${fareTotal()-seatUpsellTotal()}</span></div>`;
+  const seatFee = seatUpsellTotal();
+  const seatFeeLine = seatFee>0 ? `<div class="cs-row"><span>Seat upgrade (fare class vs. seat chosen)</span><span>$${seatFee}</span></div>` : "";
   const upgLines = allUpgrades().filter(u=>selectedUpgrades[u.id]>0).map(u=>
     `<div class="cs-row"><span>${u.name} × ${selectedUpgrades[u.id]}</span><span>$${u.price*selectedUpgrades[u.id]}</span></div>`
   ).join("");
-  lines.innerHTML = fareLine + upgLines;
+  lines.innerHTML = fareLine + seatFeeLine + upgLines;
   document.getElementById("checkoutTotal").textContent = `$${fareTotal()+upgradesTotal()}`;
 }
 function goToStep6(scrollTo){
@@ -2339,6 +2385,39 @@ function genConfirmationCode(){
   let code = "";
   for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
   return code;
+}
+/* Silly in-universe "MinionPay" loading gag — purely cosmetic, no real payment processing,
+   no fake security/approval claims, and no pressure to stay on the screen. Just for laughs. */
+const MP_SCREENS = [
+  { emoji:"🍌", text:"Counting your bananas..." },
+  { emoji:"🍌💱", text:"Converting bananas to dollars..." },
+  { emoji:"🙈", text:"Bello! Double-checking the math..." },
+  { emoji:"🎉", text:"All set — thanks for flying Minion Airways!" }
+];
+function mpRenderSpinner(){
+  document.getElementById("mpBox").innerHTML = `<div class="mp-brand">MinionPay™</div><div class="mp-spinner"></div><div class="mp-text">Loading...</div>`;
+}
+function mpRenderScreen(i){
+  const s = MP_SCREENS[i];
+  document.getElementById("mpBox").innerHTML = `<div class="mp-brand">MinionPay™</div><div class="mp-emoji">${s.emoji}</div><div class="mp-text">${s.text}</div>`;
+}
+function runMinionPay(onDone){
+  const overlay = document.getElementById("minionPayOverlay");
+  overlay.classList.add("show");
+  let i = 0;
+  function step(){
+    mpRenderSpinner();
+    setTimeout(()=>{
+      mpRenderScreen(i);
+      i++;
+      if(i < MP_SCREENS.length){
+        setTimeout(step, 1200);
+      } else {
+        setTimeout(()=>{ overlay.classList.remove("show"); onDone(); }, 1200);
+      }
+    }, 1800);
+  }
+  step();
 }
 document.getElementById("checkoutPayBtn").addEventListener("click", ()=>{
   const err = document.getElementById("checkoutError");
@@ -2374,21 +2453,23 @@ document.getElementById("checkoutPayBtn").addEventListener("click", ()=>{
   if(!expiryOk || !cvcOk){ err.textContent = "Please enter a valid card expiry and CVC."; err.classList.add("show"); return; }
 
   const cls = document.getElementById("classInput").value;
-  bookingRecord = {
-    code: genConfirmationCode(),
-    email,
-    cls,
-    passengers,
-    departure: selectedDeparture,
-    return: selectedReturn,
-    upgrades: allUpgrades().filter(u=>selectedUpgrades[u.id]>0).map(u=>({name:u.name, qty:selectedUpgrades[u.id]})),
-    total: fareTotal()+upgradesTotal(),
-    departDate: document.getElementById("departInput").value,
-    returnDate: document.getElementById("returnInput").value,
-    checkedIn: {}
-  };
   document.getElementById("checkoutWrap").classList.remove("show");
-  showConfirmation();
+  runMinionPay(()=>{
+    bookingRecord = {
+      code: genConfirmationCode(),
+      email,
+      cls,
+      passengers,
+      departure: selectedDeparture,
+      return: selectedReturn,
+      upgrades: allUpgrades().filter(u=>selectedUpgrades[u.id]>0).map(u=>({name:u.name, qty:selectedUpgrades[u.id]})),
+      total: fareTotal()+upgradesTotal(),
+      departDate: document.getElementById("departInput").value,
+      returnDate: document.getElementById("returnInput").value,
+      checkedIn: {}
+    };
+    showConfirmation();
+  });
 });
 
 /* ================= CONFIRMATION / CHECK-IN / BOARDING PASS ================= */
@@ -2402,6 +2483,39 @@ function flightDepDateTime(flight, dateStr){
 function fmtLongDate(d){
   return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric", year:"numeric" });
 }
+// Deterministic per-flight status: seeded by confirmation code + flight number + date, so it
+// stays consistent every time it's looked up (25% chance of a delay, 15–150 min).
+function computeFlightStatus(seedKey){
+  const rng = seededRandom(`STATUS|${seedKey}`);
+  const delayed = rng() < 0.25;
+  if(!delayed) return { state:"On Time", delayMinutes:0 };
+  const delayMinutes = 15 + Math.floor(rng()*136);
+  return { state:"Delayed", delayMinutes };
+}
+function saveTripToMyTrips(){
+  let trips = [];
+  try{ trips = JSON.parse(localStorage.getItem("minionTrips")||"[]"); }catch(e){ trips = []; }
+  const legSummary = (flight, dateStr, kind)=>{
+    if(!flight) return null;
+    const status = computeFlightStatus(`${bookingRecord.code}|${flight.legs[0].flightNo}|${dateStr}`);
+    return {
+      kind, from: flight.legs[0].from, to: flight.legs[flight.legs.length-1].to,
+      flightNo: flight.legs[0].flightNo, date: dateStr, status
+    };
+  };
+  trips.push({
+    code: bookingRecord.code,
+    email: bookingRecord.email,
+    cls: bookingRecord.cls,
+    total: bookingRecord.total,
+    passengers: bookingRecord.passengers.map(p=>`${p.first} ${p.last}`),
+    legs: [
+      legSummary(bookingRecord.departure, bookingRecord.departDate, "departure"),
+      legSummary(bookingRecord.return, bookingRecord.returnDate, "return")
+    ].filter(Boolean)
+  });
+  localStorage.setItem("minionTrips", JSON.stringify(trips));
+}
 function showConfirmation(){
   document.getElementById("confirmEmail").textContent = bookingRecord.email;
   document.getElementById("confirmCode").textContent = bookingRecord.code;
@@ -2409,13 +2523,18 @@ function showConfirmation(){
   let html = "";
   if(bookingRecord.departure){
     const dt = flightDepDateTime(bookingRecord.departure, bookingRecord.departDate);
-    html += `<div class="confirm-leg"><span>Departure — <b>${bookingRecord.departure.legs[0].from} → ${bookingRecord.departure.legs[bookingRecord.departure.legs.length-1].to}</b></span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
+    const status = computeFlightStatus(`${bookingRecord.code}|${bookingRecord.departure.legs[0].flightNo}|${bookingRecord.departDate}`);
+    const badge = status.state==="Delayed" ? `<span class="status-badge delayed">Delayed ${status.delayMinutes} min</span>` : `<span class="status-badge ontime">On Time</span>`;
+    html += `<div class="confirm-leg"><span>Departure — <b>${bookingRecord.departure.legs[0].from} → ${bookingRecord.departure.legs[bookingRecord.departure.legs.length-1].to}</b> ${badge}</span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
   }
   if(bookingRecord.return){
     const dt = flightDepDateTime(bookingRecord.return, bookingRecord.returnDate);
-    html += `<div class="confirm-leg"><span>Return — <b>${bookingRecord.return.legs[0].from} → ${bookingRecord.return.legs[bookingRecord.return.legs.length-1].to}</b></span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
+    const status = computeFlightStatus(`${bookingRecord.code}|${bookingRecord.return.legs[0].flightNo}|${bookingRecord.returnDate}`);
+    const badge = status.state==="Delayed" ? `<span class="status-badge delayed">Delayed ${status.delayMinutes} min</span>` : `<span class="status-badge ontime">On Time</span>`;
+    html += `<div class="confirm-leg"><span>Return — <b>${bookingRecord.return.legs[0].from} → ${bookingRecord.return.legs[bookingRecord.return.legs.length-1].to}</b> ${badge}</span><span>${fmtLongDate(dt)}, ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span></div>`;
   }
   legsWrap.innerHTML = html;
+  saveTripToMyTrips();
   document.getElementById("confirmWrap").classList.add("show");
   document.getElementById("bpassWrap").classList.remove("show");
   document.getElementById("bpassWrap").innerHTML = "";
@@ -2485,7 +2604,8 @@ function renderCheckinPaxList(){
 function seatForPax(kind, paxIdx, legIdx=0){
   const legs = savedSeatAssignments[kind];
   if(!legs || !legs[legIdx]) return "—";
-  return legs[legIdx][paxIdx] || "—";
+  const rec = legs[legIdx].seats[paxIdx];
+  return rec ? rec.seatId : "—";
 }
 function barcodeHTML(seed){
   const rng = seededRandom(seed);

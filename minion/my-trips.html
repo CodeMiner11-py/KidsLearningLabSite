@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Trips | Minion Airways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Google Sans Flex', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+  button { font-family: 'Google Sans Flex', sans-serif; }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 22px;
+    line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block;
+    white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased;
+  }
+  header { background: #0a2540; display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; }
+  .logo img { height: 40px; display: block; }
+  nav ul { display: flex; list-style: none; gap: 32px; }
+  nav a { color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; }
+  nav a:hover, nav a.active { color: #ffd400; }
+  .header-btn { background: #ffd400; color: #0a2540; border: none; padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .page-hero { background: #0a2540; padding: 40px 40px 60px; text-align: center; }
+  .page-hero h1 { color: #fff; font-size: 30px; font-weight: 900; margin-bottom: 8px; }
+  .page-hero p { color: #cfe0f0; font-size: 15px; }
+  .wrap { max-width: 900px; margin: -36px auto 60px; padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+  .trip-card { background: #fff; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.14); padding: 22px 26px; }
+  .trip-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .trip-code { font-weight: 900; color: #0a2540; font-size: 16px; letter-spacing: 0.5px; }
+  .trip-cls { font-size: 12px; color: #6b7280; }
+  .trip-pax { font-size: 12.5px; color: #6b7280; margin-bottom: 14px; }
+  .trip-leg { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid #eef1f5; font-size: 13.5px; }
+  .trip-leg .route { font-weight: 700; color: #0a2540; }
+  .trip-leg .date { font-size: 12px; color: #6b7280; }
+  .status-pill { padding: 4px 12px; border-radius: 14px; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .status-pill.ontime { background: #e6f4ea; color: #2f8f5b; }
+  .status-pill.delayed { background: #fff0e0; color: #b8621b; }
+  .trip-actions { margin-top: 14px; display: flex; gap: 10px; }
+  .trip-actions a { text-decoration: none; font-size: 13px; font-weight: 700; color: #0a2540; border: 1.5px solid #d6dbe1; padding: 8px 16px; border-radius: 8px; }
+  .trip-actions a:hover { border-color: #ffd400; background: #fffdf3; }
+  .empty-wrap { background: #fff; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.14); padding: 50px 26px; text-align: center; color: #6b7280; }
+  .empty-wrap a { color: #0a2540; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><a href="index.html"><img src="logo.png" alt="Minion Airways"></a></div>
+  <nav>
+    <ul>
+      <li><a href="booking.html">Book</a></li>
+      <li><a href="my-trips.html" class="active">My Trips</a></li>
+      <li><a href="flight-status.html">Flight Status</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+  </nav>
+  <button class="header-btn">Sign In</button>
+</header>
+
+<section class="page-hero">
+  <h1>My trips</h1>
+  <p>Bookings made on this device, with live-ish flight status.</p>
+</section>
+
+<div class="wrap" id="tripsWrap"></div>
+
+<script>
+function loadTrips(){
+  try{ return JSON.parse(localStorage.getItem("minionTrips")||"[]"); }catch(e){ return []; }
+}
+function fmtDate(dateStr){
+  if(!dateStr) return "";
+  const d = new Date(`${dateStr}T00:00:00`);
+  return d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+}
+function render(){
+  const trips = loadTrips();
+  const wrap = document.getElementById("tripsWrap");
+  if(!trips.length){
+    wrap.innerHTML = `<div class="empty-wrap">No trips saved on this device yet.<br><a href="booking.html">Book a flight</a> to see it show up here.</div>`;
+    return;
+  }
+  wrap.innerHTML = trips.slice().reverse().map(t=>{
+    const legsHTML = t.legs.map(leg=>{
+      const pillClass = leg.status.state === "Delayed" ? "delayed" : "ontime";
+      const pillText = leg.status.state === "Delayed" ? `Delayed ${leg.status.delayMinutes} min` : "On Time";
+      return `<div class="trip-leg">
+        <div><div class="route">${leg.kind==='departure'?'Departure':'Return'} — ${leg.from} → ${leg.to}</div><div class="date">Flight ${leg.flightNo} · ${fmtDate(leg.date)}</div></div>
+        <span class="status-pill ${pillClass}">${pillText}</span>
+      </div>`;
+    }).join("");
+    return `<div class="trip-card">
+      <div class="trip-top"><span class="trip-code">Confirmation ${t.code}</span><span class="trip-cls">${t.cls} · $${t.total}</span></div>
+      <div class="trip-pax">${t.passengers.join(", ")}</div>
+      ${legsHTML}
+      <div class="trip-actions">
+        <a href="flight-status.html?code=${encodeURIComponent(t.code)}">View flight status</a>
+      </div>
+    </div>`;
+  }).join("");
+}
+render();
+</script>
+
+</body>
+</html>

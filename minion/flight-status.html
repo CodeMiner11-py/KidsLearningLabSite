@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flight Status | Minion Airways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Google Sans Flex', sans-serif; color: #1a1a2e; background: #f5f7fa; }
+  button, input, select { font-family: 'Google Sans Flex', sans-serif; }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 22px;
+    line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block;
+    white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased;
+  }
+  header { background: #0a2540; display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; }
+  .logo img { height: 40px; display: block; }
+  nav ul { display: flex; list-style: none; gap: 32px; }
+  nav a { color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; }
+  nav a:hover, nav a.active { color: #ffd400; }
+  .header-btn { background: #ffd400; color: #0a2540; border: none; padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .page-hero { background: #0a2540; padding: 40px 40px 60px; text-align: center; }
+  .page-hero h1 { color: #fff; font-size: 30px; font-weight: 900; margin-bottom: 8px; }
+  .page-hero p { color: #cfe0f0; font-size: 15px; }
+  .wrap { max-width: 760px; margin: -36px auto 60px; padding: 0 20px; }
+  .search-card { background: #fff; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.14); padding: 26px 28px; }
+  .search-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .search-row .field { flex: 1; min-width: 160px; }
+  .field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 6px; }
+  .field input { width: 100%; padding: 11px 12px; border: 1px solid #d6dbe1; border-radius: 8px; font-size: 14px; }
+  .go-btn { background: #0a2540; color: #fff; border: none; padding: 12px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; align-self: end; height: 43px; }
+  .go-btn:hover { background: #14395e; }
+  .err-msg { color: #d1004b; font-size: 12.5px; margin-top: 10px; display: none; }
+  .err-msg.show { display: block; }
+  .divider { text-align: center; color: #9aa4b2; font-size: 12px; margin: 22px 0 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .trip-pick-list { display: flex; flex-direction: column; gap: 10px; }
+  .trip-pick { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border: 1px solid #e1e5eb; border-radius: 10px; cursor: pointer; }
+  .trip-pick:hover { border-color: #ffd400; background: #fffdf3; }
+  .trip-pick .code { font-weight: 800; color: #0a2540; }
+  .trip-pick .sub { font-size: 12px; color: #6b7280; }
+  .empty-note { font-size: 13px; color: #9aa4b2; text-align: center; padding: 10px 0; }
+  .status-card { background: #fff; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.14); padding: 28px; margin-top: 22px; display: none; }
+  .status-card.show { display: block; }
+  .status-flight-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .status-flight-top .flightno { font-weight: 800; color: #0a2540; font-size: 15px; }
+  .status-pill { padding: 5px 14px; border-radius: 14px; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .status-pill.ontime { background: #e6f4ea; color: #2f8f5b; }
+  .status-pill.delayed { background: #fff0e0; color: #b8621b; }
+  .status-route { display: flex; align-items: center; justify-content: space-between; margin: 18px 0; }
+  .status-city .code { font-size: 26px; font-weight: 900; color: #0a2540; }
+  .status-city .name { font-size: 12px; color: #6b7280; }
+  .status-plane { color: #b8bfc9; font-size: 26px; }
+  .status-meta { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 16px; }
+  .status-meta .item { background: #f5f7fa; border-radius: 10px; padding: 12px 14px; }
+  .status-meta .lbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #9aa4b2; margin-bottom: 4px; }
+  .status-meta .val { font-size: 14px; font-weight: 700; color: #0a2540; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><a href="index.html"><img src="logo.png" alt="Minion Airways"></a></div>
+  <nav>
+    <ul>
+      <li><a href="booking.html">Book</a></li>
+      <li><a href="my-trips.html">My Trips</a></li>
+      <li><a href="flight-status.html" class="active">Flight Status</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+  </nav>
+  <button class="header-btn">Sign In</button>
+</header>
+
+<section class="page-hero">
+  <h1>Flight status</h1>
+  <p>Look up a flight by confirmation code, or pick one of your saved trips below.</p>
+</section>
+
+<div class="wrap">
+  <div class="search-card">
+    <div class="search-row">
+      <div class="field">
+        <label>Confirmation Code</label>
+        <input type="text" id="codeInput" placeholder="e.g. AB12CD" maxlength="6" style="text-transform:uppercase;">
+      </div>
+      <button type="button" class="go-btn" id="lookupBtn">Look Up</button>
+    </div>
+    <div class="err-msg" id="lookupErr"></div>
+
+    <div class="divider">or choose a saved trip</div>
+    <div class="trip-pick-list" id="tripPickList"></div>
+  </div>
+
+  <div class="status-card" id="statusCard"></div>
+</div>
+
+<script>
+function loadTrips(){
+  try{ return JSON.parse(localStorage.getItem("minionTrips")||"[]"); }catch(e){ return []; }
+}
+function fmtDate(dateStr){
+  if(!dateStr) return "";
+  const d = new Date(`${dateStr}T00:00:00`);
+  return d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+}
+function renderTripPickList(){
+  const trips = loadTrips();
+  const wrap = document.getElementById("tripPickList");
+  if(!trips.length){
+    wrap.innerHTML = `<div class="empty-note">No saved trips on this device yet — book a flight first.</div>`;
+    return;
+  }
+  wrap.innerHTML = trips.slice().reverse().map(t=>{
+    const leg = t.legs[0];
+    return `<div class="trip-pick" data-code="${t.code}">
+      <div><div class="code">${t.code}</div><div class="sub">${leg.from} → ${leg.to} · ${fmtDate(leg.date)}</div></div>
+      <span class="material-symbols-outlined">chevron_right</span>
+    </div>`;
+  }).join("");
+  wrap.querySelectorAll(".trip-pick").forEach(el=>{
+    el.addEventListener("click", ()=> showStatusFor(el.dataset.code));
+  });
+}
+function showStatusFor(code){
+  const trips = loadTrips();
+  const trip = trips.find(t=> t.code.toUpperCase() === code.toUpperCase());
+  const err = document.getElementById("lookupErr");
+  const card = document.getElementById("statusCard");
+  if(!trip){
+    err.textContent = "We couldn't find that confirmation code on this device.";
+    err.classList.add("show");
+    card.classList.remove("show");
+    return;
+  }
+  err.classList.remove("show");
+  card.innerHTML = trip.legs.map(leg=>{
+    const pillClass = leg.status.state === "Delayed" ? "delayed" : "ontime";
+    const pillText = leg.status.state === "Delayed" ? `Delayed ${leg.status.delayMinutes} min` : "On Time";
+    return `
+    <div class="status-flight-top">
+      <span class="flightno">Flight ${leg.flightNo} · ${leg.kind === 'departure' ? 'Departure' : 'Return'}</span>
+      <span class="status-pill ${pillClass}">${pillText}</span>
+    </div>
+    <div class="status-route">
+      <div class="status-city"><div class="code">${leg.from}</div><div class="name">Origin</div></div>
+      <span class="material-symbols-outlined status-plane">flight</span>
+      <div class="status-city"><div class="code">${leg.to}</div><div class="name">Destination</div></div>
+    </div>
+    <div class="status-meta">
+      <div class="item"><div class="lbl">Date</div><div class="val">${fmtDate(leg.date)}</div></div>
+      <div class="item"><div class="lbl">Confirmation</div><div class="val">${trip.code}</div></div>
+    </div>
+    <div style="height:18px;"></div>`;
+  }).join("");
+  card.classList.add("show");
+  card.scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.getElementById("lookupBtn").addEventListener("click", ()=>{
+  const code = document.getElementById("codeInput").value.trim();
+  if(!code){ const err=document.getElementById("lookupErr"); err.textContent="Enter a confirmation code."; err.classList.add("show"); return; }
+  showStatusFor(code);
+});
+document.getElementById("codeInput").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("lookupBtn").click(); });
+renderTripPickList();
+// Support deep-linking: flight-status.html?code=AB12CD
+(function(){
+  const params = new URLSearchParams(location.search);
+  const code = params.get("code");
+  if(code){ document.getElementById("codeInput").value = code.toUpperCase(); showStatusFor(code); }
+})();
+</script>
+
+</body>
+</html>
