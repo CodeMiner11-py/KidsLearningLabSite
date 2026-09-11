@@ -22,7 +22,7 @@
             color: #222;
         }
 
-        /* Main redirect confirmation page */
+        /* Confirmation page */
         #confirmation {
             min-height: 100vh;
             display: flex;
@@ -38,34 +38,27 @@
         }
 
         h1 {
-            font-size: 42px;
-            margin: 0 0 24px;
-            font-weight: 700;
+            font-size: 44px;
+            margin: 0 0 25px;
         }
 
         p {
-            font-size: 21px;
-            margin: 0 0 18px;
+            font-size: 22px;
+            margin: 0 0 20px;
         }
 
         #urlDisplay {
             display: block;
-            font-size: 19px;
+            font-size: 20px;
             color: #333;
             word-break: break-all;
-            margin: 0 auto 30px;
+            margin-bottom: 32px;
         }
 
-        /* Access button */
         #accessButton {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            min-width: 170px;
+            height: 54px;
 
-            min-width: 150px;
-            height: 50px;
-
-            padding: 0 22px;
             border: none;
             border-radius: 5px;
 
@@ -73,7 +66,7 @@
             color: white;
 
             font-family: Arial, sans-serif;
-            font-size: 18px;
+            font-size: 19px;
 
             cursor: pointer;
         }
@@ -82,13 +75,13 @@
             background: #555;
         }
 
-        /* Eight-dot old-style spinner */
+        /* Large flat spinner */
         #spinner {
             display: none;
-
             position: relative;
-            width: 52px;
-            height: 52px;
+
+            width: 76px;
+            height: 76px;
 
             margin: 0 auto;
         }
@@ -96,69 +89,112 @@
         .dot {
             position: absolute;
 
-            width: 9px;
-            height: 9px;
+            width: 13px;
+            height: 13px;
 
-            background: #d2d2d2;
+            left: 31.5px;
+            top: 31.5px;
+
             border-radius: 50%;
+            background: #d0d0d0;
 
-            left: 21.5px;
-            top: 21.5px;
-
-            animation: oldSpinner 1s linear infinite;
+            transform-origin: 6.5px 6.5px;
         }
 
         .dot:nth-child(1) {
-            transform: rotate(0deg) translateY(-20px);
-            animation-delay: 0s;
+            transform: rotate(0deg) translateY(-29px);
+            animation: dot1 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(2) {
-            transform: rotate(45deg) translateY(-20px);
-            animation-delay: -0.125s;
+            transform: rotate(45deg) translateY(-29px);
+            animation: dot2 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(3) {
-            transform: rotate(90deg) translateY(-20px);
-            animation-delay: -0.25s;
+            transform: rotate(90deg) translateY(-29px);
+            animation: dot3 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(4) {
-            transform: rotate(135deg) translateY(-20px);
-            animation-delay: -0.375s;
+            transform: rotate(135deg) translateY(-29px);
+            animation: dot4 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(5) {
-            transform: rotate(180deg) translateY(-20px);
-            animation-delay: -0.5s;
+            transform: rotate(180deg) translateY(-29px);
+            animation: dot5 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(6) {
-            transform: rotate(225deg) translateY(-20px);
-            animation-delay: -0.625s;
+            transform: rotate(225deg) translateY(-29px);
+            animation: dot6 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(7) {
-            transform: rotate(270deg) translateY(-20px);
-            animation-delay: -0.75s;
+            transform: rotate(270deg) translateY(-29px);
+            animation: dot7 1s steps(1, end) infinite;
         }
 
         .dot:nth-child(8) {
-            transform: rotate(315deg) translateY(-20px);
-            animation-delay: -0.875s;
+            transform: rotate(315deg) translateY(-29px);
+            animation: dot8 1s steps(1, end) infinite;
         }
 
-        @keyframes oldSpinner {
-            0%, 100% {
-                background: #d8d8d8;
-            }
+        /*
+            Each dot starts light gray.
+            One dot at a time becomes gray.
+            steps(1) keeps the transition completely instant.
+        */
 
-            50% {
-                background: #777;
-            }
+        @keyframes dot1 {
+            0% { background: #777; }
+            12.5%, 100% { background: #d0d0d0; }
         }
 
-        /* White redirecting page */
+        @keyframes dot2 {
+            0%, 12.5% { background: #d0d0d0; }
+            12.5% { background: #777; }
+            25%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot3 {
+            0%, 25% { background: #d0d0d0; }
+            25% { background: #777; }
+            37.5%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot4 {
+            0%, 37.5% { background: #d0d0d0; }
+            37.5% { background: #777; }
+            50%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot5 {
+            0%, 50% { background: #d0d0d0; }
+            50% { background: #777; }
+            62.5%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot6 {
+            0%, 62.5% { background: #d0d0d0; }
+            62.5% { background: #777; }
+            75%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot7 {
+            0%, 75% { background: #d0d0d0; }
+            75% { background: #777; }
+            87.5%, 100% { background: #d0d0d0; }
+        }
+
+        @keyframes dot8 {
+            0%, 87.5% { background: #d0d0d0; }
+            87.5% { background: #777; }
+            100% { background: #d0d0d0; }
+        }
+
+        /* White redirect page */
         #redirecting {
             display: none;
 
@@ -173,7 +209,7 @@
         }
 
         .redirect-message {
-            font-size: 21px;
+            font-size: 22px;
             color: #222;
         }
     </style>
@@ -208,13 +244,11 @@
         </div>
     </div>
 
-
     <div id="redirecting">
         <div class="redirect-message">
             Redirecting... do not leave this page
         </div>
     </div>
-
 
     <script>
         const params = new URLSearchParams(window.location.search);
@@ -237,25 +271,23 @@
 
             accessButton.addEventListener("click", () => {
 
-                /* Replace button with spinner */
+                // Replace the button with the spinner
                 accessButton.style.display = "none";
                 spinner.style.display = "block";
 
-                /*
-                 * Keep the spinner visible for a moment,
-                 * then switch to the white redirecting page.
-                 */
+                // Spinner stays for exactly 3 seconds
                 setTimeout(() => {
 
+                    // Switch to the completely white page
                     confirmation.style.display = "none";
                     redirecting.style.display = "flex";
 
-                    /* Redirect */
+                    // Then redirect
                     setTimeout(() => {
                         window.location.href = url;
                     }, 500);
 
-                }, 900);
+                }, 3000);
             });
         }
     </script>
