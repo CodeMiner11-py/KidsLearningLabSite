@@ -67,9 +67,7 @@
   .sq.in-check::before { content: ""; position: absolute; inset: 0; background: var(--check); }
   .sq .move-dot { position: absolute; width: 28%; height: 28%; border-radius: 50%; background: var(--dot); pointer-events: none; }
   .sq .capture-ring { position: absolute; inset: 6%; border-radius: 50%; border: 5px solid var(--dot); pointer-events: none; }
-  .piece { line-height: 1; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)); position: relative; z-index: 2; }
-  .piece.white { color: #fbfbfb; -webkit-text-stroke: 1px #2a2a2a; }
-  .piece.black { color: #1a1a1a; -webkit-text-stroke: 1px #dedede; }
+  .piece { width: 82%; height: 82%; pointer-events: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); position: relative; z-index: 2; }
   .panel { flex: 1 1 260px; max-width: 340px; display: flex; flex-direction: column; gap: 14px; }
   .card { background: var(--panel); border-radius: var(--radius); padding: 14px 16px; }
   .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin: 0 0 10px; font-weight: 700; }
@@ -99,8 +97,9 @@
   .promo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 10; }
   .promo-overlay.show { display: flex; }
   .promo-box { background: var(--panel); border-radius: 12px; padding: 14px; display: flex; gap: 8px; }
-  .promo-box button { width: 56px; height: 56px; font-size: 34px; border-radius: 8px; border: none; background: var(--panel-2); cursor: pointer; }
+  .promo-box button { width: 56px; height: 56px; padding: 6px; border-radius: 8px; border: none; background: var(--panel-2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .promo-box button:hover { background: #384056; }
+  .promo-box button .piece { width: 100%; height: 100%; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4)); }
   .engine-status { font-size: 12px; color: var(--text-dim); }
   .engine-status.ready { color: var(--accent-2); }
   .engine-status.error { color: var(--danger); }
@@ -249,7 +248,18 @@ const promoBox = document.getElementById('promoBox');
 const playWhiteBtn = document.getElementById('playWhiteBtn');
 const playBlackBtn = document.getElementById('playBlackBtn');
 
-const PIECE_GLYPHS = { w: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' }, b: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' } };
+const PIECE_FILES = {
+  w: { p: 'wP.svg', n: 'wN.svg', b: 'wB.svg', r: 'wR.svg', q: 'wQ.svg', k: 'wK.svg' },
+  b: { p: 'bP.svg', n: 'bN.svg', b: 'bB.svg', r: 'bR.svg', q: 'bQ.svg', k: 'bK.svg' },
+};
+function pieceImg(color, type) {
+  const img = document.createElement('img');
+  img.className = 'piece';
+  img.draggable = false;
+  img.alt = `${color === 'w' ? 'White' : 'Black'} ${type}`;
+  img.src = `./vendor/pieces/${PIECE_FILES[color][type]}`;
+  return img;
+}
 
 const engine = new EngineClient((status, msg) => {
   engineStatusEl.textContent = msg;
@@ -279,10 +289,7 @@ function renderBoard() {
       if (selectedSquare === id) sq.classList.add('selected');
       const piece = board[flipped ? 7 - rankIdx : rankIdx][flipped ? 7 - fileIdx : fileIdx];
       if (piece) {
-        const span = document.createElement('span');
-        span.className = 'piece ' + (piece.color === 'w' ? 'white' : 'black');
-        span.textContent = PIECE_GLYPHS[piece.color][piece.type];
-        sq.appendChild(span);
+        sq.appendChild(pieceImg(piece.color, piece.type));
       }
       if (legalTargets.includes(id)) {
         const marker = document.createElement('div');
@@ -356,7 +363,7 @@ function showPromotionPicker(from, to) {
   promoBox.innerHTML = '';
   ['q', 'r', 'b', 'n'].forEach((type) => {
     const btn = document.createElement('button');
-    btn.textContent = PIECE_GLYPHS[color][type];
+    btn.appendChild(pieceImg(color, type));
     btn.addEventListener('click', () => {
       promoOverlay.classList.remove('show');
       const result = game.move({ from, to, promotion: type });
@@ -387,22 +394,39 @@ async function maybeTriggerEngineMove() {
   if (game.turn() === humanColor) return;
   engineThinking = true; updateStatus();
   const settings = engineSettingsForElo(currentElo);
+  const moveStart = Date.now();
+  const MIN_ENGINE_DELAY_MS = 1000;
+
+  async function finishMove(applyFn) {
+    const elapsed = Date.now() - moveStart;
+    const remaining = MIN_ENGINE_DELAY_MS - elapsed;
+    if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
+    applyFn();
+  }
+
   if (settings.randomMoveChance > 0 && Math.random() < settings.randomMoveChance) {
     const legal = game.moves({ verbose: true });
     if (legal.length) {
       const pick = legal[Math.floor(Math.random() * legal.length)];
-      game.move({ from: pick.from, to: pick.to, promotion: pick.promotion || 'q' });
-      lastMove = { from: pick.from, to: pick.to };
-      engineThinking = false; afterMove(); return;
+      await finishMove(() => {
+        game.move({ from: pick.from, to: pick.to, promotion: pick.promotion || 'q' });
+        lastMove = { from: pick.from, to: pick.to };
+        engineThinking = false;
+        afterMove();
+      });
+      return;
     }
   }
   const uciMove = await engine.getBestMove(game.fen(), settings);
-  engineThinking = false;
-  if (!uciMove) { updateStatus(); return; }
+  if (!uciMove) { engineThinking = false; updateStatus(); return; }
   const from = uciMove.slice(0, 2), to = uciMove.slice(2, 4);
   const promotion = uciMove.length > 4 ? uciMove[4] : undefined;
-  const result = game.move({ from, to, promotion });
-  if (result) { lastMove = { from, to }; afterMove(); }
+  await finishMove(() => {
+    const result = game.move({ from, to, promotion });
+    engineThinking = false;
+    if (result) { lastMove = { from, to }; afterMove(); }
+    else { updateStatus(); }
+  });
 }
 
 function applyEloUI(elo) {
