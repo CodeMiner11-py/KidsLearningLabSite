@@ -103,6 +103,26 @@
   .engine-status { font-size: 12px; color: var(--text-dim); }
   .engine-status.ready { color: var(--accent-2); }
   .engine-status.error { color: var(--danger); }
+  .review-progress-wrap { display: none; margin-top: 10px; }
+  .review-progress-wrap.show { display: block; }
+  .review-progress-bar { height: 6px; border-radius: 3px; background: var(--panel-2); overflow: hidden; }
+  .review-progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.15s linear; }
+  .review-progress-label { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+  .accuracy-row { display: flex; gap: 10px; margin-top: 10px; }
+  .accuracy-box { flex: 1; background: var(--panel-2); border-radius: 10px; padding: 10px; text-align: center; }
+  .accuracy-box .side-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+  .accuracy-box .acc-value { font-size: 24px; font-weight: 800; margin-top: 2px; }
+  .accuracy-box.white .acc-value { color: #eef0f3; }
+  .accuracy-box.black .acc-value { color: var(--accent); }
+  .review-summary { display: none; }
+  .review-summary.show { display: block; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+  .tag.best { background: #2f7d3d; color: #d7ffe0; }
+  .tag.excellent { background: #3a7d55; color: #d7ffe0; }
+  .tag.good { background: #3a5f7d; color: #d7ecff; }
+  .tag.inaccuracy { background: #8a7a1f; color: #fff6cf; }
+  .tag.mistake { background: #9a5a1f; color: #ffe6cf; }
+  .tag.blunder { background: #9a2020; color: #ffdada; }
   footer { margin-top: 24px; font-size: 11px; color: var(--text-dim); text-align: center; max-width: 560px; }
   a { color: var(--accent); }
 </style>
@@ -150,6 +170,28 @@
       <div class="card">
         <h2>Moves</h2>
         <div id="moveLog"></div>
+      </div>
+      <div class="card">
+        <h2>Game Review</h2>
+        <div class="btn-row">
+          <button class="action secondary" id="reviewBtn">Review Game</button>
+        </div>
+        <div class="review-progress-wrap" id="reviewProgressWrap">
+          <div class="review-progress-bar"><div class="review-progress-fill" id="reviewProgressFill"></div></div>
+          <div class="review-progress-label" id="reviewProgressLabel">Analyzing…</div>
+        </div>
+        <div class="review-summary" id="reviewSummary">
+          <div class="accuracy-row">
+            <div class="accuracy-box white">
+              <div class="side-label">White accuracy</div>
+              <div class="acc-value" id="whiteAccVal">–</div>
+            </div>
+            <div class="accuracy-box black">
+              <div class="side-label">Black accuracy</div>
+              <div class="acc-value" id="blackAccVal">–</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -199,16 +241,27 @@ class EngineClient {
       this.onStatus('error', 'Engine failed to load (must be served over http/https).');
     };
     this._bestMoveResolve = null;
+    this._lastScore = null; // { type: 'cp'|'mate', value: number } from perspective of side to move
     this._send('uci');
   }
   _send(cmd) { this.worker.postMessage(cmd); }
   _handleMessage(line) {
     if (line === 'uciok') { this._send('isready'); }
     else if (line === 'readyok') { if (!this.ready) { this.ready = true; this.onStatus('ready', 'Engine ready.'); } }
+    else if (line.startsWith('info') && line.includes(' score ')) {
+      const m = line.match(/ score (cp|mate) (-?\d+)/);
+      if (m) this._lastScore = { type: m[1], value: parseInt(m[2], 10) };
+    }
     else if (line.startsWith('bestmove')) {
       const parts = line.split(' ');
       const mv = parts[1];
-      if (this._bestMoveResolve) { const resolve = this._bestMoveResolve; this._bestMoveResolve = null; resolve(mv === '(none)' ? null : mv); }
+      if (this._bestMoveResolve) {
+        const resolve = this._bestMoveResolve;
+        this._bestMoveResolve = null;
+        const score = this._lastScore;
+        this._lastScore = null;
+        resolve({ move: mv === '(none)' ? null : mv, score });
+      }
     }
   }
   configure(settings) {
@@ -217,13 +270,35 @@ class EngineClient {
     this._send(`setoption name Skill Level value ${settings.skillLevel}`);
   }
   newGame() { this._send('ucinewgame'); }
-  getBestMove(fen, settings) {
+  _search(fen, goCmd) {
     return new Promise((resolve) => {
       this._bestMoveResolve = resolve;
+      this._lastScore = null;
       this._send(`position fen ${fen}`);
-      if (settings.depth) { this._send(`go depth ${settings.depth} movetime ${settings.moveTimeMs}`); }
-      else { this._send(`go movetime ${settings.moveTimeMs}`); }
+      this._send(goCmd);
     });
+  }
+  async getBestMove(fen, settings) {
+    const goCmd = settings.depth ? `go depth ${settings.depth} movetime ${settings.moveTimeMs}` : `go movetime ${settings.moveTimeMs}`;
+    const result = await this._search(fen, goCmd);
+    return result.move;
+  }
+  // Full-strength positional analysis used by Game Review. Returns { move, cpWhite }
+  // where cpWhite is the evaluation in centipawns from White's perspective
+  // (mate scores are converted to large-magnitude centipawn equivalents).
+  async analyze(fen, movetimeMs = 400) {
+    const result = await this._search(fen, `go movetime ${movetimeMs}`);
+    const sideToMove = fen.trim().split(/\s+/)[1] || 'w';
+    let cpSideToMove = 0;
+    if (result.score) {
+      if (result.score.type === 'cp') cpSideToMove = result.score.value;
+      else { // mate score: convert to a large centipawn-equivalent, closer mates score higher magnitude
+        const n = result.score.value;
+        cpSideToMove = (n >= 0 ? 1 : -1) * (100000 - Math.min(99, Math.abs(n)) * 100);
+      }
+    }
+    const cpWhite = sideToMove === 'w' ? cpSideToMove : -cpSideToMove;
+    return { move: result.move, cpWhite };
   }
 }
 
@@ -235,6 +310,8 @@ let lastMove = null;
 let currentElo = 1200;
 let engineThinking = false;
 let gameOverMessage = null;
+let reviewing = false;
+let reviewResults = null; // array parallel to game.history(): { classification, accuracy } | undefined
 
 const boardEl = document.getElementById('board');
 const statusLine = document.getElementById('statusLine');
@@ -247,6 +324,13 @@ const promoOverlay = document.getElementById('promoOverlay');
 const promoBox = document.getElementById('promoBox');
 const playWhiteBtn = document.getElementById('playWhiteBtn');
 const playBlackBtn = document.getElementById('playBlackBtn');
+const reviewBtn = document.getElementById('reviewBtn');
+const reviewProgressWrap = document.getElementById('reviewProgressWrap');
+const reviewProgressFill = document.getElementById('reviewProgressFill');
+const reviewProgressLabel = document.getElementById('reviewProgressLabel');
+const reviewSummary = document.getElementById('reviewSummary');
+const whiteAccVal = document.getElementById('whiteAccVal');
+const blackAccVal = document.getElementById('blackAccVal');
 
 const PIECE_FILES = {
   w: { p: 'wP.svg', n: 'wN.svg', b: 'wB.svg', r: 'wR.svg', q: 'wQ.svg', k: 'wK.svg' },
@@ -313,16 +397,27 @@ function findKingSquare(color) {
   return null;
 }
 
+const TAG_LABELS = { best: 'Best', excellent: 'Excellent', good: 'Good', inaccuracy: 'Inaccuracy', mistake: 'Mistake', blunder: 'Blunder' };
+const TAG_SHORT = { best: '★', excellent: '✓', good: '', inaccuracy: '?!', mistake: '?', blunder: '??' };
+
 function renderMoveLog() {
   const history = game.history();
   let html = '';
   for (let i = 0; i < history.length; i += 2) {
     const num = i / 2 + 1;
     const white = history[i] || '', black = history[i + 1] || '';
-    html += `<div class="mv-pair"><span class="mv-num">${num}.</span><span class="mv">${white}</span><span class="mv">${black}</span></div>`;
+    const wTag = reviewResults && reviewResults[i] ? tagHtml(reviewResults[i]) : '';
+    const bTag = reviewResults && reviewResults[i + 1] ? tagHtml(reviewResults[i + 1]) : '';
+    html += `<div class="mv-pair"><span class="mv-num">${num}.</span><span class="mv">${white}${wTag}</span><span class="mv">${black}${bTag}</span></div>`;
   }
   moveLogEl.innerHTML = html;
   moveLogEl.scrollTop = moveLogEl.scrollHeight;
+}
+
+function tagHtml(result) {
+  const short = TAG_SHORT[result.classification];
+  const label = TAG_LABELS[result.classification];
+  return `<span class="tag ${result.classification}" title="${label}">${short || label}</span>`;
 }
 
 function updateStatus() {
@@ -335,7 +430,7 @@ function updateStatus() {
 }
 
 function onSquareClick(square) {
-  if (gameOverMessage || engineThinking) return;
+  if (gameOverMessage || engineThinking || reviewing) return;
   if (game.turn() !== humanColor) return;
   if (selectedSquare) {
     if (legalTargets.includes(square)) { attemptMove(selectedSquare, square); selectedSquare = null; legalTargets = []; renderBoard(); return; }
@@ -376,8 +471,17 @@ function showPromotionPicker(from, to) {
 
 function afterMove() {
   selectedSquare = null; legalTargets = [];
+  clearReviewResults();
   renderBoard(); renderMoveLog(); checkGameOver(); updateStatus();
   if (!gameOverMessage) maybeTriggerEngineMove();
+}
+
+function clearReviewResults() {
+  reviewResults = null;
+  reviewSummary.classList.remove('show');
+  reviewProgressWrap.classList.remove('show');
+  whiteAccVal.textContent = '–';
+  blackAccVal.textContent = '–';
 }
 
 function checkGameOver() {
@@ -436,7 +540,100 @@ function applyEloUI(elo) {
   if (engine.ready) engine.configure(engineSettingsForElo(elo));
 }
 
+// ---- Game Review ----
+// cp is always from White's perspective. Converts an evaluation to a 0-100
+// "win percentage" for White using the same logistic curve chess.com's
+// public accuracy write-up describes, so accuracy numbers feel familiar.
+function cpToWhiteWinPercent(cp) {
+  const clamped = Math.max(-1000, Math.min(1000, cp));
+  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * clamped)) - 1);
+}
+
+function moveAccuracy(winPercentBeforeForMover, winPercentAfterForMover) {
+  const drop = Math.max(0, winPercentBeforeForMover - winPercentAfterForMover);
+  const acc = 103.1668 * Math.exp(-0.04354 * drop) - 3.1669;
+  return Math.max(0, Math.min(100, acc));
+}
+
+function classifyMove({ cpLossForMover, isEngineTop }) {
+  if (isEngineTop || cpLossForMover <= 4) return 'best';
+  if (cpLossForMover <= 15) return 'excellent';
+  if (cpLossForMover <= 40) return 'good';
+  if (cpLossForMover <= 90) return 'inaccuracy';
+  if (cpLossForMover <= 200) return 'mistake';
+  return 'blunder';
+}
+
+async function runGameReview() {
+  if (reviewing || !engine.ready) return;
+  const history = game.history({ verbose: true });
+  if (!history.length) return;
+
+  reviewing = true;
+  reviewBtn.disabled = true;
+  reviewProgressWrap.classList.add('show');
+  reviewSummary.classList.remove('show');
+  reviewProgressFill.style.width = '0%';
+
+  // Full strength for objective analysis, restored afterwards.
+  engine.configure({ limitStrength: false, uciElo: 3190, skillLevel: 20 });
+
+  const replay = new Chess();
+  const fens = [replay.fen()];
+  for (const m of history) { replay.move(m.san); fens.push(replay.fen()); }
+
+  const evals = [];
+  const bestMoves = [];
+  const total = fens.length;
+  for (let i = 0; i < total; i++) {
+    reviewProgressLabel.textContent = `Analyzing position ${i + 1} of ${total}…`;
+    reviewProgressFill.style.width = `${Math.round(((i) / total) * 100)}%`;
+    const { move, cpWhite } = await engine.analyze(fens[i], 400);
+    evals.push(cpWhite);
+    bestMoves.push(move);
+  }
+  reviewProgressFill.style.width = '100%';
+
+  const results = [];
+  let whiteAccSum = 0, whiteAccCount = 0, blackAccSum = 0, blackAccCount = 0;
+  for (let i = 0; i < history.length; i++) {
+    const isWhite = i % 2 === 0;
+    const cpBeforeWhite = evals[i];
+    const cpAfterWhite = evals[i + 1];
+    const wpBeforeWhite = cpToWhiteWinPercent(cpBeforeWhite);
+    const wpAfterWhite = cpToWhiteWinPercent(cpAfterWhite);
+    const wpBeforeMover = isWhite ? wpBeforeWhite : 100 - wpBeforeWhite;
+    const wpAfterMover = isWhite ? wpAfterWhite : 100 - wpAfterWhite;
+    const cpBeforeMover = isWhite ? cpBeforeWhite : -cpBeforeWhite;
+    const cpAfterMover = isWhite ? cpAfterWhite : -cpAfterWhite;
+    const cpLossForMover = Math.max(0, cpBeforeMover - cpAfterMover);
+    const playedUci = history[i].from + history[i].to + (history[i].promotion || '');
+    const isEngineTop = bestMoves[i] === playedUci;
+    const classification = classifyMove({ cpLossForMover, isEngineTop });
+    const accuracy = moveAccuracy(wpBeforeMover, wpAfterMover);
+    results.push({ classification, accuracy });
+    if (isWhite) { whiteAccSum += accuracy; whiteAccCount++; }
+    else { blackAccSum += accuracy; blackAccCount++; }
+  }
+
+  reviewResults = results;
+  whiteAccVal.textContent = whiteAccCount ? (whiteAccSum / whiteAccCount).toFixed(1) + '%' : '–';
+  blackAccVal.textContent = blackAccCount ? (blackAccSum / blackAccCount).toFixed(1) + '%' : '–';
+  reviewSummary.classList.add('show');
+  reviewProgressWrap.classList.remove('show');
+
+  // Restore the opponent-strength settings for continued play.
+  engine.configure(engineSettingsForElo(currentElo));
+  reviewing = false;
+  reviewBtn.disabled = false;
+  renderMoveLog();
+}
+
+reviewBtn.addEventListener('click', runGameReview);
+
 eloSlider.addEventListener('input', () => applyEloUI(parseInt(eloSlider.value, 10)));
+
+
 document.querySelectorAll('.preset-btn').forEach((btn) => {
   btn.addEventListener('click', () => { const elo = parseInt(btn.dataset.elo, 10); eloSlider.value = String(elo); applyEloUI(elo); });
 });
@@ -444,15 +641,17 @@ document.querySelectorAll('.preset-btn').forEach((btn) => {
 function newGame() {
   game.reset();
   selectedSquare = null; legalTargets = []; lastMove = null; gameOverMessage = null; engineThinking = false;
+  clearReviewResults();
   if (engine.ready) engine.newGame();
   renderBoard(); renderMoveLog(); updateStatus(); maybeTriggerEngineMove();
 }
 
 document.getElementById('newGameBtn').addEventListener('click', newGame);
 document.getElementById('undoBtn').addEventListener('click', () => {
-  if (engineThinking) return;
+  if (engineThinking || reviewing) return;
   game.undo(); game.undo();
   lastMove = null; gameOverMessage = null; selectedSquare = null; legalTargets = [];
+  clearReviewResults();
   renderBoard(); renderMoveLog(); updateStatus();
 });
 document.getElementById('resignBtn').addEventListener('click', () => {
