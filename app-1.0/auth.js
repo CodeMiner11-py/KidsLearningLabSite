@@ -25,7 +25,13 @@ export async function resetPassword(email) {
 }
 
 // ---- Sign up ----
-export async function signUp(email, password) {
+// opts.sendVerification (default true) — the onboarding wizard (onboarding.js)
+// already runs its OWN pre-password email-code verification step before
+// ever calling signUp(), and marks emailVerified:true itself once the
+// account is created. Passing sendVerification:false there avoids sending
+// a second, redundant Firebase verification email on top of that.
+export async function signUp(email, password, opts = {}) {
+  const { sendVerification = true } = opts;
   const plugin = window.Capacitor?.Plugins?.FirebaseAuthentication;
 
   try {
@@ -43,7 +49,7 @@ export async function signUp(email, password) {
     }
 
     console.log("Web layer sign-up success:", result?.user?.email);
-    await sendEmailVerification(result.user);
+    if (sendVerification) await sendEmailVerification(result.user);
 
     return { success: true, user: result.user };
   } catch (error) {

@@ -5,6 +5,7 @@ import {
   indexedDBLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAJcn5sgkJbYiQHqfLE45viQ_X32CLUuVI",
@@ -12,6 +13,7 @@ const firebaseConfig = {
   projectId: "kids-learning-lab-ios-app",
   storageBucket: "kids-learning-lab-ios-app.firebasestorage.app",
   messagingSenderId: "608497010119",
+  databaseURL: "https://kids-learning-lab-ios-app-default-rtdb.firebaseio.com",
   appId: "1:608497010119:web:c1e1dfced30aa6f51f45e2"
 };
 
@@ -22,3 +24,4 @@ export const auth = window.Capacitor?.isNativePlatform?.()
   : getAuth(app);
 
 export const db = getFirestore(app);
+export const rtdb = getDatabase(app);

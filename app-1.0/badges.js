@@ -26,7 +26,7 @@
 
 import { db, auth } from './firebase.js';
 import {
-  doc, getDoc, setDoc, getDocs, collection
+  doc, getDoc, setDoc, getDocs, collection, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ============================================================
@@ -38,9 +38,19 @@ const CATEGORIES = {
   games: { label: 'Games', icon: 'sports_esports' },
   friends: { label: 'Friends', icon: 'group' },
   courses: { label: 'Courses', icon: 'auto_stories' },
+  courseComplete: { label: 'Courses Completed', icon: 'workspace_premium' },
   lessons: { label: 'Lessons', icon: 'school' },
+  unitComplete: { label: 'Units Completed', icon: 'task_alt' },
   account: { label: 'Account', icon: 'verified' },
 };
+
+// Mirrors learn.js's UNITS_PER_COURSE — badges.js is deliberately
+// self-contained (no import from learn.js), so this is kept in sync by hand.
+const UNITS_PER_COURSE = 10;
+
+// Amount of XP awarded every time a NEW badge is unlocked (repeat unlocks
+// of a repeatable badge count too, since each is still a fresh grant).
+const BADGE_XP_REWARD = 100;
 
 // ---- Streak badges: fixed early milestones, then every +100 days forever ----
 const STREAK_MILESTONES = [5, 7, 20, 30, 90, 100, 150, 200];
@@ -63,16 +73,82 @@ function streakBadgeName(days) {
   return `${days} Day Streak`;
 }
 function streakBadgeId(days) { return `streak_${days}`; }
+// Streak badges of 100+ days additionally grant a name tag — a
+// "[100+ DAYS]" / "[200+ DAYS]" / etc prefix shown next to the learner's
+// name, same slot as the [PREMIUM ⭐️] badge (see formatDisplayNameWithTag
+// below and PREMIUM_NAME_PREFIX in main.js). Below 100 days, badges are
+// still earned exactly as before, just without a tag.
+function hasNameTag(days) { return days >= 100; }
+function nameTagLabel(days) { return `[${days}+ DAYS]`; }
+
+// ---- Variable badge art (per the uploaded "7 DAYS" reference design) ----
+// Every other badge category still just shows one shared Material Symbols
+// glyph (a game controller, a book, etc — the icon genuinely doesn't vary
+// per milestone there). Streak badges are different: each milestone gets
+// its own little illustrated icon — a rounded-square badge with a flame
+// glyph and the day count baked in underneath, like the uploaded "7 DAYS"
+// reference. Built as inline SVG (no image assets needed) so it renders
+// crisply at any size and themes with the rest of the app's CSS vars.
+function streakBadgeArtSvg(days) {
+  const label = days >= 100 ? `${days}+ DAYS` : `${days} DAY${days === 1 ? '' : 'S'}`;
+  // Slightly bolder ring for the milestones that also carry a name tag, so
+  // the "this one's special" tier reads at a glance in the collection
+  // grid, not just in the description text.
+  const isTagTier = hasNameTag(days);
+  const ring = isTagTier ? '#F5B400' : 'var(--streak-orange, #FF8A2B)';
+  return `
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="streak-badge-art">
+      <rect x="4" y="4" width="92" height="92" rx="22" fill="var(--blue-pale, #EAF3FF)" stroke="${ring}" stroke-width="${isTagTier ? 4 : 2.5}"/>
+      <path d="M50 20c7 9 11 16 11 23a11 11 0 11-22 0c0-2 .8-4 2-6 1 2 3 3 4 2-1-4 0-8 3-13.5z"
+            fill="#FF6A1F" stroke="#FF4D00" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M46 32c3 4 4.5 7 4.5 9.5a4.5 4.5 0 11-9 0c0-1 .3-1.8.8-2.6.5 1 1.3 1.4 1.9 1-.4-1.8 0-4 1.8-7.9z"
+            fill="#FFB01F"/>
+      <text x="50" y="80" text-anchor="middle" font-size="15" font-weight="800" fill="#FFA028" font-family="var(--app-font, sans-serif)">${label}</text>
+    </svg>
+  `;
+}
+
 function streakBadgeDef(days) {
   return {
     id: streakBadgeId(days),
     name: streakBadgeName(days),
-    description: `Keep a learning streak going for ${days} day${days === 1 ? '' : 's'} in a row.`,
+    description: hasNameTag(days)
+      ? `Keep a learning streak going for ${days} days in a row. Earn a special name tag.`
+      : `Keep a learning streak going for ${days} day${days === 1 ? '' : 's'} in a row.`,
     icon: 'local_fire_department',
     category: 'streak',
     repeatable: false,
     threshold: days,
   };
+}
+
+// Given the public { badgeId: count } summary mirror (userProfiles/{uid}.badges),
+// returns the highest streak-nametag label this learner has earned, or null
+// if they haven't hit 100 days yet. Exported so main.js can slot it into
+// name rendering (own profile and friends' names alike) the same way it
+// already slots in the Premium prefix.
+export function highestStreakNameTag(badgesSummary) {
+  if (!badgesSummary) return null;
+  let best = 0;
+  for (const key of Object.keys(badgesSummary)) {
+    const m = /^streak_(\d+)$/.exec(key);
+    if (!m) continue;
+    const days = parseInt(m[1], 10);
+    if (days > best && hasNameTag(days)) best = days;
+  }
+  return best > 0 ? nameTagLabel(best) : null;
+}
+
+// Same as highestStreakNameTag, but reads the signed-in user's own
+// in-memory badgeData.earned (`{ [id]: { count, ... } }`) rather than a
+// friend's public `{ id: count }` summary — for the one place (Settings /
+// Change Name) that renders the current account's own tag without a
+// Firestore round-trip.
+export function myHighestStreakNameTag() {
+  if (!badgeData?.earned) return null;
+  const asSummary = {};
+  for (const id of Object.keys(badgeData.earned)) asSummary[id] = 1;
+  return highestStreakNameTag(asSummary);
 }
 
 // ---- Game badges — one entry per game. Add future games the same way. ----
@@ -90,6 +166,11 @@ const GAME_BADGE_DEFS = {
   voiceTrivia: {
     id: 'game_first_voice_trivia', name: 'First Voice Trivia Game',
     description: 'Complete your first Voice Trivia game.', icon: 'mic',
+    category: 'games', repeatable: false,
+  },
+  connectors: {
+    id: 'game_first_connectors', name: 'First Word Connectors Game',
+    description: 'Complete your first Word Connectors game.', icon: 'hub',
     category: 'games', repeatable: false,
   },
   // Future games (Seesaw, Meltdown, Duel, etc.) plug in here with the same
@@ -116,6 +197,41 @@ function courseBadgeDef(n) {
     id: `course_${n}`, name: COURSE_NAMES[n],
     description: `Create ${n} course${n === 1 ? '' : 's'}.`,
     icon: 'auto_stories', category: 'courses', repeatable: false, threshold: n,
+  };
+}
+
+// ---- Course-COMPLETION badges (finishing all units + the final course
+// review) — distinct from courseBadgeDef() above, which is about how many
+// courses a learner has CREATED. ----
+const COURSE_COMPLETE_MILESTONES = [1, 2, 3, 4, 5, 10, 15, 20];
+const COURSE_COMPLETE_NAMES = {
+  1: 'First Course Complete!', 2: 'Second Course Complete!', 3: 'Third Course Complete!',
+  4: 'Fourth Course Complete!', 5: 'Fifth Course Complete!', 10: '10th Course Complete!',
+  15: '15th Course Complete!', 20: '20th Course Complete!',
+};
+function courseCompleteBadgeDef(n) {
+  return {
+    id: `course_complete_${n}`, name: COURSE_COMPLETE_NAMES[n],
+    description: `Finish ${n} course${n === 1 ? '' : 's'} — every unit, lesson, and the final review.`,
+    icon: 'workspace_premium', category: 'courseComplete', repeatable: false, threshold: n,
+  };
+}
+
+// ---- Unit-completion badges (finishing every lesson in a unit plus its
+// unit review) ----
+const UNIT_COMPLETE_MILESTONES = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100, 200, 300];
+const UNIT_COMPLETE_NAMES = {
+  1: 'First Unit Complete', 2: 'Second Unit Complete', 3: 'Third Unit Complete',
+  4: 'Fourth Unit Complete', 5: 'Fifth Unit Complete', 10: '10th Unit Complete',
+  15: '15th Unit Complete', 20: '20th Unit Complete', 25: '25th Unit Complete',
+  50: '50th Unit Complete', 75: '75th Unit Complete', 100: '100th Unit Complete',
+  200: '200th Unit Complete', 300: '300th Unit Complete',
+};
+function unitCompleteBadgeDef(n) {
+  return {
+    id: `unit_complete_${n}`, name: UNIT_COMPLETE_NAMES[n],
+    description: `Finish ${n} unit${n === 1 ? '' : 's'} — every lesson plus the unit review.`,
+    icon: 'task_alt', category: 'unitComplete', repeatable: false, threshold: n,
   };
 }
 
@@ -147,11 +263,18 @@ let currentUid = null;
 let badgeData = null; // { earned: {}, lessonsCompletedCount: 0 }
 let pendingCelebrations = [];
 let celebrationShowing = false;
+// While paused, badges still get awarded/persisted/queued as normal — they
+// just don't pop the celebration overlay yet. Lets learn.js finish showing
+// the lesson-complete XP + streak overlays first, then resume so any badge
+// celebrations appear as a tertiary step afterward instead of jumping on
+// top of (and blocking) those overlays the instant a badge is earned.
+let celebrationsPaused = false;
+let onQueueDrainedCallback = null;
 
 // Cached last-known stats, updated whenever a check*Badges function is
 // called, purely so the collection page can render progress bars without
 // needing learn.js/main.js to hand us their live state directly.
-let lastStats = { streak: 0, lessons: 0, friends: 0, courses: 0, gamesDone: {} };
+let lastStats = { streak: 0, lessons: 0, friends: 0, courses: 0, unitsCompleted: 0, coursesCompleted: 0, gamesDone: {} };
 
 function escapeHtml(str) {
   return (str || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -171,13 +294,17 @@ export async function initBadgesForUser(uid) {
     badgeData = snap.data();
     if (!badgeData.earned || typeof badgeData.earned !== 'object') badgeData.earned = {};
     if (typeof badgeData.lessonsCompletedCount !== 'number') badgeData.lessonsCompletedCount = 0;
+    if (typeof badgeData.unitsCompletedCount !== 'number') badgeData.unitsCompletedCount = 0;
+    if (typeof badgeData.coursesCompletedCount !== 'number') badgeData.coursesCompletedCount = 0;
   } else {
-    badgeData = { earned: {}, lessonsCompletedCount: 0 };
+    badgeData = { earned: {}, lessonsCompletedCount: 0, unitsCompletedCount: 0, coursesCompletedCount: 0 };
     await setDoc(ref, badgeData);
   }
   lastStats.lessons = badgeData.lessonsCompletedCount || 0;
+  lastStats.unitsCompleted = badgeData.unitsCompletedCount || 0;
+  lastStats.coursesCompleted = badgeData.coursesCompletedCount || 0;
   renderProfileShelf();
-  await backfillLessonCountIfNeeded();
+  await backfillProgressCountsIfNeeded();
 }
 
 // Called from main.js whenever the signed-in account changes, mirroring
@@ -187,7 +314,9 @@ export function resetBadgesState() {
   badgeData = null;
   pendingCelebrations = [];
   celebrationShowing = false;
-  lastStats = { streak: 0, lessons: 0, friends: 0, courses: 0, gamesDone: {} };
+  celebrationsPaused = false;
+  onQueueDrainedCallback = null;
+  lastStats = { streak: 0, lessons: 0, friends: 0, courses: 0, unitsCompleted: 0, coursesCompleted: 0, gamesDone: {} };
   renderProfileShelf();
 }
 
@@ -199,25 +328,56 @@ async function persist() {
   await setDoc(doc(db, 'userProfiles', currentUid), { badges: summary }, { merge: true }).catch(() => {});
 }
 
-// Existing accounts predate per-lesson-completion counting — this walks
-// their already-completed lessons once (flagged so it never re-runs) so
-// lesson badges retroactively reflect real progress instead of starting at 0.
-async function backfillLessonCountIfNeeded() {
-  if (!badgeData || badgeData._backfilledLessons || !currentUid) return;
+// Existing accounts predate per-lesson-completion (and unit/course
+// completion) counting — this walks their existing course data once per
+// counter (each independently flagged so it never re-runs) so badges
+// retroactively reflect real progress instead of starting at 0.
+async function backfillProgressCountsIfNeeded() {
+  if (!badgeData || !currentUid) return;
+  const needsLessons = !badgeData._backfilledLessons;
+  const needsUnitsCourses = !badgeData._backfilledUnitsCourses;
+  if (!needsLessons && !needsUnitsCourses) return;
+
   try {
     const coursesSnap = await getDocs(collection(db, 'users', currentUid, 'learnCourses'));
-    let count = 0;
+    let lessonCount = 0;
+    let unitsCompleted = 0;
+    let coursesCompleted = 0;
+
     for (const c of coursesSnap.docs) {
-      const lessonsSnap = await getDocs(collection(db, 'users', currentUid, 'learnCourses', c.id, 'lessons'));
-      lessonsSnap.forEach((l) => { if (l.data()?.status === 'completed') count++; });
+      const data = c.data() || {};
+      if (needsUnitsCourses) {
+        const cui = typeof data.currentUnitIndex === 'number' ? data.currentUnitIndex : 0;
+        unitsCompleted += Math.min(cui, UNITS_PER_COURSE);
+        if (data.courseReviewCompleted) coursesCompleted += 1;
+      }
+      if (needsLessons) {
+        const lessonsSnap = await getDocs(collection(db, 'users', currentUid, 'learnCourses', c.id, 'lessons'));
+        lessonsSnap.forEach((l) => { if (l.data()?.status === 'completed') lessonCount++; });
+      }
     }
-    badgeData.lessonsCompletedCount = Math.max(badgeData.lessonsCompletedCount || 0, count);
-    badgeData._backfilledLessons = true;
-    lastStats.lessons = badgeData.lessonsCompletedCount;
+
+    if (needsLessons) {
+      badgeData.lessonsCompletedCount = Math.max(badgeData.lessonsCompletedCount || 0, lessonCount);
+      badgeData._backfilledLessons = true;
+      lastStats.lessons = badgeData.lessonsCompletedCount;
+    }
+    if (needsUnitsCourses) {
+      badgeData.unitsCompletedCount = Math.max(badgeData.unitsCompletedCount || 0, unitsCompleted);
+      badgeData.coursesCompletedCount = Math.max(badgeData.coursesCompletedCount || 0, coursesCompleted);
+      badgeData._backfilledUnitsCourses = true;
+      lastStats.unitsCompleted = badgeData.unitsCompletedCount;
+      lastStats.coursesCompleted = badgeData.coursesCompletedCount;
+    }
+
     await persist();
-    await awardAllLessonMilestonesUpTo(badgeData.lessonsCompletedCount);
+    if (needsLessons) await awardAllLessonMilestonesUpTo(badgeData.lessonsCompletedCount);
+    if (needsUnitsCourses) {
+      await awardAllUnitCompleteMilestonesUpTo(badgeData.unitsCompletedCount);
+      await awardAllCourseCompleteMilestonesUpTo(badgeData.coursesCompletedCount);
+    }
   } catch (err) {
-    console.error('Badge lesson backfill failed:', err);
+    console.error('Badge progress backfill failed:', err);
   }
 }
 
@@ -235,9 +395,22 @@ async function award(def) {
     badgeData.earned[def.id] = { count: 1, firstEarnedAt: now, lastEarnedAt: now };
   }
   await persist();
+  await awardBadgeXp();
   renderProfileShelf();
   queueCelebration(def);
   return def;
+}
+
+// Atomic increment on the same learnProfile doc learn.js's XP awards use,
+// so it can never race/clobber with a game or lesson XP write happening
+// around the same time (learn.js's own XP writes are atomic increments
+// too — see awardGameXp in learn.js).
+async function awardBadgeXp() {
+  if (!currentUid) return;
+  const profileRef = doc(db, 'users', currentUid, 'learnProfile', 'main');
+  await setDoc(profileRef, { xp: increment(BADGE_XP_REWARD) }, { merge: true })
+    .catch((err) => console.error('Badge XP award failed:', err));
+  await setDoc(doc(db, 'userProfiles', currentUid), { xp: increment(BADGE_XP_REWARD) }, { merge: true }).catch(() => {});
 }
 
 // ============================================================
@@ -262,6 +435,24 @@ async function awardAllLessonMilestonesUpTo(count) {
   }
 }
 
+async function awardAllUnitCompleteMilestonesUpTo(count) {
+  for (const n of UNIT_COMPLETE_MILESTONES) {
+    if (n <= count) {
+      const def = unitCompleteBadgeDef(n);
+      if (!isEarned(def.id)) await award(def);
+    }
+  }
+}
+
+async function awardAllCourseCompleteMilestonesUpTo(count) {
+  for (const n of COURSE_COMPLETE_MILESTONES) {
+    if (n <= count) {
+      const def = courseCompleteBadgeDef(n);
+      if (!isEarned(def.id)) await award(def);
+    }
+  }
+}
+
 // Call once per real (non-review) lesson completion.
 export async function checkLessonBadges() {
   if (!badgeData) return;
@@ -270,6 +461,32 @@ export async function checkLessonBadges() {
   const n = badgeData.lessonsCompletedCount;
   if (LESSON_MILESTONES.includes(n)) {
     await award(lessonBadgeDef(n));
+  } else {
+    await persist();
+  }
+}
+
+// Call once per unit finished (all its lessons plus its unit review).
+export async function checkUnitCompletionBadges() {
+  if (!badgeData) return;
+  badgeData.unitsCompletedCount = (badgeData.unitsCompletedCount || 0) + 1;
+  lastStats.unitsCompleted = badgeData.unitsCompletedCount;
+  const n = badgeData.unitsCompletedCount;
+  if (UNIT_COMPLETE_MILESTONES.includes(n)) {
+    await award(unitCompleteBadgeDef(n));
+  } else {
+    await persist();
+  }
+}
+
+// Call once per course finished (all 10 units plus the final course review).
+export async function checkCourseCompletionBadges() {
+  if (!badgeData) return;
+  badgeData.coursesCompletedCount = (badgeData.coursesCompletedCount || 0) + 1;
+  lastStats.coursesCompleted = badgeData.coursesCompletedCount;
+  const n = badgeData.coursesCompletedCount;
+  if (COURSE_COMPLETE_MILESTONES.includes(n)) {
+    await award(courseCompleteBadgeDef(n));
   } else {
     await persist();
   }
@@ -339,6 +556,8 @@ function injectStylesOnce() {
       font-size: 24px; position: relative;
     }
     .badge-shelf-icon .material-symbols-outlined { font-size: 24px; }
+    .streak-badge-art { width: 100%; height: 100%; display: block; }
+    .badge-shelf-icon-art, .badge-card-icon:has(.streak-badge-art) { padding: 0; overflow: hidden; }
     .badge-shelf-more {
       flex-shrink: 0; width: 52px; height: 52px; border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
@@ -390,18 +609,16 @@ function injectStylesOnce() {
     }
     .badge-card-progress-fill { height: 100%; background: var(--blue-main); border-radius: 4px; }
 
-    .badge-celeb-overlay {
-      position: fixed; inset: 0; z-index: 9600;
-      background: rgba(18, 59, 122, 0.55);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      display: none; align-items: center; justify-content: center; padding: 24px;
-    }
-    .badge-celeb-overlay.show { display: flex; }
-    .badge-celeb-card {
-      background: var(--white); border-radius: 24px; padding: 40px 32px 32px;
-      max-width: 380px; width: 100%; text-align: center;
-      box-shadow: 0 24px 70px rgba(18, 59, 122, 0.25);
-    }
+    /* Badge-unlock celebration is a full-screen overlay (same
+       kll-modal-overlay/lesson-summary-overlay pattern used by the
+       Lesson Complete and Streak Extended screens elsewhere in the app) —
+       not a floating centered dialog. These rules only style the
+       badge-specific pieces dropped inside that shared layout. */
+    /* It can be triggered while the Lesson Complete / Streak Extended
+       overlays are still in the DOM (mid-sequence), so it needs to sit
+       above those, not just above whatever was showing when it was
+       first created. */
+    #badgeCelebOverlay { z-index: 9600; }
     .badge-celeb-icon {
       width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 18px;
       background: linear-gradient(135deg, var(--blue-bright), var(--blue-main));
@@ -411,14 +628,17 @@ function injectStylesOnce() {
     .badge-celeb-eyebrow {
       font-weight: 800; font-size: 12px; color: var(--blue-main);
       text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px;
+      text-align: center;
     }
-    .badge-celeb-name { font-size: 20px; font-weight: 800; color: var(--blue-deep); margin: 0 0 8px; }
-    .badge-celeb-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 24px; }
-    .badge-celeb-btn {
-      width: 100%; background: var(--blue-main); color: var(--white); border: none;
-      border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px;
-      cursor: pointer; font-family: 'Google Sans', sans-serif;
+    .badge-celeb-name { font-size: 20px; font-weight: 800; color: var(--blue-deep); margin: 0 0 8px; text-align: center; }
+    .badge-celeb-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 24px; text-align: center; }
+    .badge-celeb-xp {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--blue-pale); color: var(--blue-main);
+      border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 13px;
+      margin: -8px 0 4px;
     }
+    .badge-celeb-xp .material-symbols-outlined { font-size: 16px; }
 
     .friend-badge-row {
       display: flex; align-items: center; gap: 12px; padding: 14px 4px;
@@ -443,16 +663,26 @@ let celebEls = null;
 function ensureCelebrationDom() {
   if (celebEls) return celebEls;
   injectStylesOnce();
+  // Reuses the same full-screen "lesson summary" overlay shell (defined
+  // globally in index.html's stylesheet, already used by the Lesson
+  // Complete and Streak Extended screens) instead of a centered floating
+  // card, so a badge unlock reads as its own celebration page rather than
+  // a modal popup.
   const overlay = document.createElement('div');
-  overlay.className = 'badge-celeb-overlay';
+  overlay.className = 'kll-modal-overlay lesson-summary-overlay';
   overlay.id = 'badgeCelebOverlay';
   overlay.innerHTML = `
-    <div class="badge-celeb-card">
-      <div class="badge-celeb-icon"><span class="material-symbols-outlined" id="badgeCelebIcon">military_tech</span></div>
-      <div class="badge-celeb-eyebrow">You earned a new badge!</div>
-      <h2 class="badge-celeb-name" id="badgeCelebName"></h2>
-      <p class="badge-celeb-desc" id="badgeCelebDesc"></p>
-      <button class="badge-celeb-btn" id="badgeCelebContinueBtn">Continue</button>
+    <div class="lesson-summary-container" id="badgeCelebContainer">
+      <div class="lesson-summary-body">
+        <div class="badge-celeb-icon"><span class="material-symbols-outlined" id="badgeCelebIcon">military_tech</span></div>
+        <div class="badge-celeb-eyebrow">You earned a new badge!</div>
+        <h2 class="badge-celeb-name" id="badgeCelebName"></h2>
+        <p class="badge-celeb-desc" id="badgeCelebDesc"></p>
+        <div class="badge-celeb-xp"><span class="material-symbols-outlined">bolt</span> +${BADGE_XP_REWARD} XP</div>
+      </div>
+      <div class="lesson-summary-footer">
+        <button class="lesson-action-btn" id="badgeCelebContinueBtn">Continue</button>
+      </div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -471,13 +701,44 @@ function queueCelebration(def) {
   processCelebrationQueue();
 }
 
+// Call to hold off showing any badge celebration overlay until
+// resumeCelebrations() is called — badges still get earned/persisted in the
+// meantime, they just wait to display.
+export function pauseCelebrations() {
+  celebrationsPaused = true;
+}
+
+// Unpauses and starts showing whatever celebrations piled up while paused.
+// If onAllDone is provided, it fires once the queue is fully drained (the
+// last celebration's Continue is tapped) — or immediately if there was
+// nothing queued at all.
+export function resumeCelebrations(onAllDone) {
+  celebrationsPaused = false;
+  if (onAllDone) {
+    if (celebrationShowing || pendingCelebrations.length) {
+      onQueueDrainedCallback = onAllDone;
+    } else {
+      onAllDone();
+      return;
+    }
+  }
+  processCelebrationQueue();
+}
+
 function processCelebrationQueue() {
-  if (celebrationShowing) return;
+  if (celebrationsPaused || celebrationShowing) return;
   const def = pendingCelebrations.shift();
-  if (!def) return;
+  if (!def) {
+    if (onQueueDrainedCallback) {
+      const cb = onQueueDrainedCallback;
+      onQueueDrainedCallback = null;
+      cb();
+    }
+    return;
+  }
   celebrationShowing = true;
   const els = ensureCelebrationDom();
-  els.icon.textContent = def.icon || 'military_tech';
+  els.icon.innerHTML = (def.category === 'streak' && def.threshold) ? streakBadgeArtSvg(def.threshold) : `<span class="material-symbols-outlined">${def.icon || 'military_tech'}</span>`;
   els.name.textContent = def.name;
   els.desc.textContent = def.description;
   els.overlay.classList.add('show');
@@ -505,6 +766,9 @@ function renderProfileShelf() {
     const shown = earnedIds.slice(0, 8);
     shelf.innerHTML = shown.map((id) => {
       const def = allBadgeDefsById()[id];
+      if (def?.category === 'streak' && def.threshold) {
+        return `<div class="badge-shelf-icon badge-shelf-icon-art">${streakBadgeArtSvg(def.threshold)}</div>`;
+      }
       const icon = def?.icon || 'military_tech';
       return `<div class="badge-shelf-icon"><span class="material-symbols-outlined">${icon}</span></div>`;
     }).join('') + (earnedIds.length > shown.length ? `<div class="badge-shelf-more">+${earnedIds.length - shown.length}</div>` : '');
@@ -529,7 +793,9 @@ function allBadgeDefsById() {
   for (const key of Object.keys(GAME_BADGE_DEFS)) { const d = GAME_BADGE_DEFS[key]; map[d.id] = { ...d, gameKey: key }; }
   for (const n of FRIEND_MILESTONES) { const d = friendBadgeDef(n); map[d.id] = d; }
   for (const n of COURSE_MILESTONES) { const d = courseBadgeDef(n); map[d.id] = d; }
+  for (const n of COURSE_COMPLETE_MILESTONES) { const d = courseCompleteBadgeDef(n); map[d.id] = d; }
   for (const n of LESSON_MILESTONES) { const d = lessonBadgeDef(n); map[d.id] = d; }
+  for (const n of UNIT_COMPLETE_MILESTONES) { const d = unitCompleteBadgeDef(n); map[d.id] = d; }
   map[ACCOUNT_BADGE.id] = ACCOUNT_BADGE;
   return map;
 }
@@ -546,7 +812,7 @@ function badgeCardHtml(def) {
   }
   return `
     <div class="badge-card ${earned ? '' : 'locked'}">
-      <div class="badge-card-icon"><span class="material-symbols-outlined">${def.icon}</span></div>
+      <div class="badge-card-icon">${(def.category === 'streak' && def.threshold) ? streakBadgeArtSvg(def.threshold) : `<span class="material-symbols-outlined">${def.icon}</span>`}</div>
       <div class="badge-card-name">${escapeHtml(def.name)}</div>
       <div class="badge-card-desc">${escapeHtml(def.description)}</div>
       ${metaHtml}
@@ -560,6 +826,8 @@ function progressHtml(def) {
   else if (def.category === 'lessons') current = lastStats.lessons;
   else if (def.category === 'friends') current = lastStats.friends;
   else if (def.category === 'courses') current = lastStats.courses;
+  else if (def.category === 'courseComplete') current = lastStats.coursesCompleted;
+  else if (def.category === 'unitComplete') current = lastStats.unitsCompleted;
   else if (def.category === 'games') {
     return `<div class="badge-card-meta">${lastStats.gamesDone[def.gameKey] ? 'Almost there!' : 'Not yet completed'}</div>`;
   } else if (def.category === 'account') {
@@ -580,7 +848,9 @@ function nextLockedByCategory(category) {
   if (category === 'streak') candidates = allKnownStreakMilestones(lastStats.streak).map(streakBadgeDef);
   else if (category === 'friends') candidates = FRIEND_MILESTONES.map(friendBadgeDef);
   else if (category === 'courses') candidates = COURSE_MILESTONES.map(courseBadgeDef);
+  else if (category === 'courseComplete') candidates = COURSE_COMPLETE_MILESTONES.map(courseCompleteBadgeDef);
   else if (category === 'lessons') candidates = LESSON_MILESTONES.map(lessonBadgeDef);
+  else if (category === 'unitComplete') candidates = UNIT_COMPLETE_MILESTONES.map(unitCompleteBadgeDef);
   for (const def of candidates) {
     if (!isEarned(def.id)) return def;
   }
@@ -599,7 +869,7 @@ function renderBadgesCollectionBody() {
         <span class="material-symbols-outlined" style="font-size:16px;">group</span> View Friends
       </button>
     </div>
-    <p class="badges-page-sub">Earn badges by building streaks, finishing lessons, playing games, adding friends, and creating courses.</p>
+    <p class="badges-page-sub">Earn badges by building streaks, finishing lessons and units, playing games, adding friends, and creating and completing courses. Every badge is worth +${BADGE_XP_REWARD} XP.</p>
   `;
 
   for (const catKey of Object.keys(CATEGORIES)) {
@@ -749,6 +1019,29 @@ function ensureFriendBadgesDetailDom() {
   return friendBadgesDetailEls;
 }
 
+// Renders a badge-map ({ badgeId: count }) into the same badge-grid markup
+// used everywhere else (own collection, friend detail page). Exported so
+// other screens (e.g. the friend profile page in main.js) can drop a
+// friend's badges inline without navigating through the badges page.
+export function renderBadgeGridHtml(badgeMap) {
+  injectStylesOnce(); // callers outside this module (e.g. friend profile page) won't have these classes yet
+  const ids = Object.keys(badgeMap || {});
+  if (!ids.length) return `<p class="badges-page-sub">No badges earned yet.</p>`;
+  const allDefs = allBadgeDefsById();
+  return `<div class="badges-grid">` + ids.map((id) => {
+    const def = allDefs[id] || { name: 'Badge', description: '', icon: 'military_tech' };
+    const count = badgeMap[id];
+    return `
+      <div class="badge-card">
+        <div class="badge-card-icon">${(def.category === 'streak' && def.threshold) ? streakBadgeArtSvg(def.threshold) : `<span class="material-symbols-outlined">${def.icon}</span>`}</div>
+        <div class="badge-card-name">${escapeHtml(def.name)}</div>
+        <div class="badge-card-desc">${escapeHtml(def.description)}</div>
+        ${count > 1 ? `<div class="badge-card-meta">×${count}</div>` : ''}
+      </div>
+    `;
+  }).join('') + `</div>`;
+}
+
 async function openFriendBadgesDetailPage(otherUid) {
   const els = ensureFriendBadgesDetailDom();
   els.body.innerHTML = `<p class="badges-page-sub">Loading…</p>`;
@@ -757,29 +1050,9 @@ async function openFriendBadgesDetailPage(otherUid) {
     const profSnap = await getDoc(doc(db, 'userProfiles', otherUid));
     const info = profSnap.exists() ? profSnap.data() : {};
     els.title.textContent = info.displayName ? `${info.displayName}'s Badges` : "Friend's Badges";
-    const badgeMap = info.badges || {};
-    const ids = Object.keys(badgeMap);
-    if (!ids.length) {
-      els.body.innerHTML = `<p class="badges-page-sub">No badges earned yet.</p>`;
-      return;
-    }
-    const allDefs = allBadgeDefsById();
-    els.body.innerHTML = `<div class="badges-grid">` + ids.map((id) => {
-      const def = allDefs[id] || { name: 'Badge', description: '', icon: 'military_tech' };
-      const count = badgeMap[id];
-      return `
-        <div class="badge-card">
-          <div class="badge-card-icon"><span class="material-symbols-outlined">${def.icon}</span></div>
-          <div class="badge-card-name">${escapeHtml(def.name)}</div>
-          <div class="badge-card-desc">${escapeHtml(def.description)}</div>
-          ${count > 1 ? `<div class="badge-card-meta">×${count}</div>` : ''}
-        </div>
-      `;
-    }).join('') + `</div>`;
+    els.body.innerHTML = renderBadgeGridHtml(info.badges || {});
   } catch (err) {
     console.error('Failed to load friend badge detail:', err);
     els.body.innerHTML = `<p class="badges-page-sub">Could not load this friend's badges.</p>`;
   }
 }
-
-

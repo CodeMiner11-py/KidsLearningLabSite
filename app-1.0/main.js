@@ -1,20 +1,119 @@
 import { signIn, signUp, resetPassword, logout } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth, db } from './firebase.js';
+import { auth, db, rtdb } from './firebase.js';
 import {
-  doc, getDoc, setDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, updateDoc
+  doc, getDoc, setDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, updateDoc, writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  ref as rtdbRef, get as rtdbGet, set as rtdbSet
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getMessaging, getToken, onMessage, isSupported as isMessagingSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 import { updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // ---- Elements: auth screen ----
 import {updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { resetLearnState, ensureLearnInitialized } from './learn.js';
+import { resetLearnState, ensureLearnInitialized, joinGameByCode, getLearnStreakSnapshot, getWeakSpotCount, openComboLesson, openReviewPage, getWeeklyReviewData } from './learn.js';
 import { notifyUser } from './notifications.js';
-import { initBadgesForUser, resetBadgesState, checkAccountBadge, checkFriendBadges } from './badges.js';
+import { initBadgesForUser, resetBadgesState, checkAccountBadge, checkFriendBadges, renderBadgeGridHtml } from './badges.js';
+import { initFirstTimeOverlaysForUser, resetFirstTimeOverlaysState, maybeShowOverlay, hasSeenOverlay } from './firstTimeOverlays.js';
+import { initPremiumForCurrentUser, resetPremiumState, isPremium, onPremiumChange, PREMIUM_LIMITS, limits } from './premium.js';
+import { initShopStateForCurrentUser, resetShopState, onShopStateChange } from './shop.js';
+import { startHomeMirrorForCurrentUser, stopHomeMirror } from './homeMirror.js';
+import { initTutorialForUser, resetTutorialState, maybeRunAppTour } from './tutorial.js';
+import { openXpShop } from './shopUI.js';
+import { openPaywall } from './paywall.js';
+import { renderJoinQr, scanJoinCode } from './multiplayer.js';
+import { identifyScannedCode } from './qrRouting.js';
+import { sendFriendRequestToUid } from './friends.js';
 
 const authScreen = document.getElementById('auth-screen');
 const appShell = document.getElementById('app-shell');
+
+// ---- One-time startup video (first login on this device) ----
+// Plays once ever per device (any account), then fades into the app shell.
+// Locked: no controls, no pause/seek/fast-forward, no fullscreen/PiP escape.
+const STARTUP_VIDEO_SEEN_KEY = 'kll_startup_video_seen';
+const startupVideoOverlay = document.getElementById('startupVideoOverlay');
+const startupVideo = document.getElementById('startupVideo');
+let startupVideoLockedTime = 0;
+let isStartupVideoShowing = false; // explicit flag — don't infer visibility from style.display
+
+function shouldPlayStartupVideo() {
+  try {
+    return !localStorage.getItem(STARTUP_VIDEO_SEEN_KEY);
+  } catch {
+    return false; // if storage is unavailable for some reason, fail open (don't block login)
+  }
+}
+
+function finishStartupVideo() {
+  if (!startupVideoOverlay || !startupVideo) return;
+  isStartupVideoShowing = false;
+  startupVideoOverlay.style.opacity = '0';
+  setTimeout(() => {
+    startupVideoOverlay.style.display = 'none';
+    startupVideo.pause();
+    startupVideo.removeAttribute('src');
+    startupVideo.load(); // release the decoded video from memory once it's done
+  }, 650); // slightly longer than the CSS opacity transition so it fully fades first
+}
+
+function playStartupVideo() {
+  if (!startupVideoOverlay || !startupVideo) return;
+
+  try {
+    localStorage.setItem(STARTUP_VIDEO_SEEN_KEY, '1');
+  } catch {
+    // ignore — worst case it plays again on this device, which is harmless
+  }
+
+  isStartupVideoShowing = true;
+  startupVideoOverlay.style.display = 'flex';
+  startupVideoOverlay.style.opacity = '1';
+  startupVideo.currentTime = 0;
+  startupVideoLockedTime = 0;
+
+  startupVideo.play().catch(() => {
+    // Autoplay-with-sound blocked by the platform — retry muted so the
+    // intro still runs rather than silently never starting.
+    startupVideo.muted = true;
+    startupVideo.play().catch(() => finishStartupVideo()); // still blocked — skip straight in
+  });
+}
+
+if (startupVideo) {
+  startupVideo.addEventListener('ended', finishStartupVideo);
+
+  // Keep track of the last legitimate playback position so any attempt to
+  // seek (scrub, keyboard, programmatic) can be snapped straight back.
+  startupVideo.addEventListener('timeupdate', () => {
+    startupVideoLockedTime = startupVideo.currentTime;
+  });
+  startupVideo.addEventListener('seeking', () => {
+    if (Math.abs(startupVideo.currentTime - startupVideoLockedTime) > 0.35) {
+      startupVideo.currentTime = startupVideoLockedTime;
+    }
+  });
+
+  // If anything manages to pause it before it's actually finished, resume
+  // immediately — the only way this video stops is by playing to the end.
+  startupVideo.addEventListener('pause', () => {
+    if (isStartupVideoShowing && !startupVideo.ended) {
+      startupVideo.play().catch(() => {});
+    }
+  });
+
+  startupVideo.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Block keyboard shortcuts that could pause/seek/fullscreen it (space,
+  // arrows, "f", "k", etc.) while the overlay is showing.
+  document.addEventListener('keydown', (e) => {
+    if (isStartupVideoShowing) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+}
 
 const tabSignIn = document.getElementById('tab-signin');
 const tabSignUp = document.getElementById('tab-signup');
@@ -28,21 +127,493 @@ const passwordInput = document.getElementById('password');
 
 const Haptics = window.Capacitor?.Plugins?.Haptics;
 
+// ---- Haptics settings (Profile > Set Up Haptics) ----
+// Haptics default to on, at HEAVY intensity, matching the app's original
+// hardcoded behavior — existing users see no change until they open the
+// haptics modal and adjust it themselves.
+const HAPTICS_ENABLED_KEY = 'kll_haptics_enabled';
+const HAPTICS_INTENSITY_KEY = 'kll_haptics_intensity';
+
+function getHapticsEnabled() {
+  const stored = localStorage.getItem(HAPTICS_ENABLED_KEY);
+  return stored === null ? true : stored === '1';
+}
+function setHapticsEnabled(enabled) {
+  localStorage.setItem(HAPTICS_ENABLED_KEY, enabled ? '1' : '0');
+}
+function getHapticsIntensity() {
+  return localStorage.getItem(HAPTICS_INTENSITY_KEY) || 'HEAVY';
+}
+function setHapticsIntensity(intensity) {
+  localStorage.setItem(HAPTICS_INTENSITY_KEY, intensity);
+}
+
+// ---- Dark Mode (Profile > Additional Settings) ----
+// Applied immediately below (before the splash screen even hides) so the
+// app never flashes the default light theme before switching over.
+// (The font switcher that used to live alongside this was removed — the
+// app font is just SF Pro Display now, set directly in index.html's :root
+// via --app-font, no runtime switching needed.)
+const DARK_MODE_KEY = 'kll_dark_mode';
+
+function getDarkModeEnabled() {
+  try { return localStorage.getItem(DARK_MODE_KEY) === '1'; } catch { return false; }
+}
+function applyDarkMode(enabled) {
+  document.body.classList.toggle('dark-mode', enabled);
+}
+function setDarkModeEnabled(enabled) {
+  try { localStorage.setItem(DARK_MODE_KEY, enabled ? '1' : '0'); } catch {}
+  applyDarkMode(enabled);
+}
+applyDarkMode(getDarkModeEnabled());
+
 const splashScreen = document.getElementById('splash-screen');
+const fontWaitModal = document.getElementById('fontWaitModal');
+
+// ---- Splash/loading text as cached images (avoids a fallback-font flash) ----
+// The very first time the app ever runs, "Loading app…" and "Loading Kids
+// Learning Lab..." must render as real DOM text before SF Pro Display has
+// necessarily finished loading, so that first run can briefly show the
+// system fallback font. Once fonts are confirmed loaded (document.fonts.ready),
+// we render both strings to an offscreen canvas in SF Pro Display, snapshot
+// them as PNG data-URLs, and cache those in localStorage. Every subsequent
+// launch swaps the real text out for the cached image immediately — no font
+// dependency at all, so there's nothing left to flash.
+const SPLASH_TEXT_CACHE_KEY = 'kll_splash_text_images_v1';
+
+function paintSplashTextToCanvas(text, color) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const fontSize = 14;
+  const dpr = window.devicePixelRatio || 1;
+  ctx.font = `600 ${fontSize}px "SF Pro Display", sans-serif`;
+  const width = Math.ceil(ctx.measureText(text).width) + 4;
+  const height = Math.ceil(fontSize * 1.4);
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.font = `600 ${fontSize}px "SF Pro Display", sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText(text, 2, height / 2);
+  return canvas.toDataURL('image/png');
+}
+
+function applyCachedSplashTextImages() {
+  let cache = null;
+  try { cache = JSON.parse(localStorage.getItem(SPLASH_TEXT_CACHE_KEY) || 'null'); } catch {}
+  if (!cache) return false;
+
+  const splashImg = document.getElementById('splashTextImg');
+  const splashLabel = document.getElementById('splashTextLabel');
+  const fontWaitImg = document.getElementById('fontWaitTextImg');
+  const fontWaitLabel = document.getElementById('fontWaitTextLabel');
+
+  if (cache.loadingApp && splashImg) {
+    splashImg.src = cache.loadingApp;
+    splashImg.style.display = 'block';
+    if (splashLabel) splashLabel.style.display = 'none';
+  }
+  if (cache.loadingKll && fontWaitImg) {
+    fontWaitImg.src = cache.loadingKll;
+    fontWaitImg.style.display = 'block';
+    if (fontWaitLabel) fontWaitLabel.style.display = 'none';
+  }
+  return !!(cache.loadingApp && cache.loadingKll);
+}
+
+function generateAndCacheSplashTextImages() {
+  // ink-soft, matching .splash-text's CSS color — kept as a literal here since
+  // canvas can't read a CSS var directly.
+  const inkSoft = getComputedStyle(document.documentElement).getPropertyValue('--ink-soft').trim() || '#6B7A99';
+  try {
+    const cache = {
+      loadingApp: paintSplashTextToCanvas('Loading app…', inkSoft),
+      loadingKll: paintSplashTextToCanvas('Loading Kids Learning Lab...', inkSoft),
+    };
+    localStorage.setItem(SPLASH_TEXT_CACHE_KEY, JSON.stringify(cache));
+    applyCachedSplashTextImages();
+  } catch (err) {
+    // Cache write failed (storage full/unavailable) — plain text labels stay
+    // visible, which is a safe fallback, just not a cached one.
+    console.error('[splashTextCache] failed to generate/cache:', err.message);
+  }
+}
+
+// Try the cache immediately (covers every run after the first). If nothing
+// is cached yet, this is the first-ever load — fall through to plain text
+// for now, and generate the cache in the background once fonts are ready.
+const hadFullSplashTextCache = applyCachedSplashTextImages();
+if (!hadFullSplashTextCache && document.fonts) {
+  document.fonts.ready.then(generateAndCacheSplashTextImages);
+}
+
+// The 3s splash always plays out in full first. Once it ends, if the app's
+// custom fonts (SF Pro Display/Text, self-hosted as .otf — see the
+// @font-face rules at the top of index.html) haven't finished loading yet,
+// swap to an uncancellable "Loading Kids Learning Lab..." modal instead of
+// letting the splash disappear onto unstyled/fallback-font content. That
+// modal has no close button and no backdrop dismiss — it hides itself the
+// instant document.fonts.ready resolves, however long that takes.
 setTimeout(() => {
-  splashScreen.style.display = 'none';
+  if (document.fonts && document.fonts.status !== 'loaded') {
+    fontWaitModal.classList.add('show');
+    document.fonts.ready.then(() => {
+      fontWaitModal.classList.remove('show');
+      splashScreen.style.display = 'none';
+      maybeRunRobotCheck();
+    });
+  } else {
+    splashScreen.style.display = 'none';
+    maybeRunRobotCheck();
+  }
 }, 3000);
 
+// ============================================================
+// SECURITY: random "robot" (slider) verification — ~5% of app opens
+// ============================================================
+const robotVerifyModalOverlay = document.getElementById('robotVerifyModalOverlay');
+const robotSliderTrack = document.getElementById('robotSliderTrack');
+const robotSliderHandle = document.getElementById('robotSliderHandle');
+const robotSliderFill = document.getElementById('robotSliderFill');
+const robotSliderLabel = document.getElementById('robotSliderLabel');
+const robotLoadingWrap = document.getElementById('robotLoadingWrap');
+const robotLoadingFill = document.getElementById('robotLoadingFill');
+
+function runRobotSlider(onComplete) {
+  if (!robotVerifyModalOverlay || !robotSliderTrack || !robotSliderHandle) { onComplete(); return; }
+
+  let maxX = 0;
+  let currentX = 0;
+  let dragOffset = 0;
+  let dragging = false;
+  let completed = false;
+
+  function computeMax() {
+    maxX = Math.max(0, robotSliderTrack.clientWidth - robotSliderHandle.offsetWidth - 6);
+  }
+  function applyX(x) {
+    currentX = Math.max(0, Math.min(maxX, x));
+    robotSliderHandle.style.transform = `translateX(${currentX}px)`;
+    robotSliderFill.style.width = `${currentX + robotSliderHandle.offsetWidth}px`;
+    robotSliderLabel.style.opacity = String(Math.max(0, 1 - currentX / (maxX || 1)));
+  }
+  function resetSlider() {
+    computeMax();
+    applyX(0);
+  }
+  function startLoadingSequence() {
+    completed = true;
+    robotSliderTrack.style.pointerEvents = 'none';
+    robotLoadingWrap.style.display = 'block';
+    robotLoadingFill.style.transition = 'none';
+    robotLoadingFill.style.width = '0%';
+    requestAnimationFrame(() => {
+      robotLoadingFill.style.transition = 'width 3s linear';
+      robotLoadingFill.style.width = '100%';
+    });
+    setTimeout(() => {
+      robotVerifyModalOverlay.classList.remove('show');
+      cleanup();
+      onComplete();
+    }, 3050);
+  }
+  function onDown(e) {
+    if (completed) return;
+    dragging = true;
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    dragOffset = clientX - currentX;
+    robotSliderHandle.setPointerCapture?.(e.pointerId);
+  }
+  function onMove(e) {
+    if (!dragging || completed) return;
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    applyX(clientX - dragOffset);
+  }
+  function onUp() {
+    if (!dragging || completed) return;
+    dragging = false;
+    if (currentX >= maxX - 2) {
+      startLoadingSequence();
+    } else {
+      applyX(0);
+    }
+  }
+  function cleanup() {
+    robotSliderHandle.removeEventListener('pointerdown', onDown);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+  }
+
+  robotSliderHandle.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+
+  robotSliderTrack.style.pointerEvents = '';
+  robotLoadingWrap.style.display = 'none';
+  resetSlider();
+  robotVerifyModalOverlay.classList.add('show');
+}
+
+function maybeRunRobotCheck() {
+  return new Promise((resolve) => {
+    if (Math.random() < 0.05) {
+      runRobotSlider(resolve);
+    } else {
+      resolve();
+    }
+  });
+}
+
+
+// ============================================================
+// SECURITY: login-rate security check (>25 sign-ins/hour)
+// ============================================================
+const LOGIN_RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const LOGIN_RATE_LIMIT = 100000; // more sign-ins than this within the window triggers a security check
+const LOGIN_ATTEMPTS_KEY = 'kll_login_attempts';
+
+// Rolling window of successful sign-in timestamps on this device, used to
+// detect an unusually high rate of sign-ins to a single account.
+function recordLoginAttempt() {
+  let attempts = [];
+  try { attempts = JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || '[]'); } catch { attempts = []; }
+  const now = Date.now();
+  attempts = attempts.filter((t) => now - t < LOGIN_RATE_WINDOW_MS);
+  attempts.push(now);
+  try { localStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(attempts)); } catch {}
+  return attempts.length;
+}
 
 document.addEventListener('pointerdown', (e) => {
-  if (e.target.closest('button, .tab, .nav-btn')) {
+  if (e.target.closest('button, .tab, .nav-btn') && getHapticsEnabled()) {
 
-    Haptics?.impact({ style: 'HEAVY' });
+    Haptics?.impact({ style: getHapticsIntensity() });
 
   }
 });
 
+document.getElementById("quitAppBtn")?.addEventListener("click", () => {
+  window.location.reload();
+});
 
+// ---- Haptics settings modal (Profile page, below Badges) ----
+const hapticsSetupBtn = document.getElementById('hapticsSetupBtn');
+const hapticsModalOverlay = document.getElementById('hapticsModalOverlay');
+const hapticsOnOffSwitch = document.getElementById('hapticsOnOffSwitch');
+const hapticsIntensityWrap = document.getElementById('hapticsIntensityWrap');
+const hapticsIntensityBtns = document.querySelectorAll('.haptics-intensity-btn');
+const hapticsModalDoneBtn = document.getElementById('hapticsModalDoneBtn');
+
+function renderHapticsModal() {
+  const enabled = getHapticsEnabled();
+  const intensity = getHapticsIntensity();
+  hapticsOnOffSwitch?.classList.toggle('on', enabled);
+  hapticsOnOffSwitch?.setAttribute('aria-checked', String(enabled));
+  hapticsIntensityWrap?.classList.toggle('hidden', !enabled);
+  hapticsIntensityBtns.forEach((b) => {
+    b.classList.toggle('active', b.dataset.intensity === intensity);
+  });
+}
+
+hapticsSetupBtn?.addEventListener('click', () => {
+  renderHapticsModal();
+  hapticsModalOverlay?.classList.add('show');
+});
+
+hapticsOnOffSwitch?.addEventListener('click', () => {
+  setHapticsEnabled(!getHapticsEnabled());
+  renderHapticsModal();
+});
+
+hapticsIntensityBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    setHapticsIntensity(btn.dataset.intensity);
+    renderHapticsModal();
+  });
+});
+
+hapticsModalDoneBtn?.addEventListener('click', () => {
+  hapticsModalOverlay?.classList.remove('show');
+});
+
+hapticsModalOverlay?.addEventListener('click', (e) => {
+  if (e.target === hapticsModalOverlay) hapticsModalOverlay.classList.remove('show');
+});
+
+// ---- Dark Mode switch (Profile page, below Set Up Haptics) ----
+const darkModeSwitch = document.getElementById('darkModeSwitch');
+
+function renderDarkModeSwitch() {
+  const enabled = getDarkModeEnabled();
+  darkModeSwitch?.classList.toggle('on', enabled);
+  darkModeSwitch?.setAttribute('aria-checked', String(enabled));
+}
+renderDarkModeSwitch();
+
+darkModeSwitch?.addEventListener('click', () => {
+  setDarkModeEnabled(!getDarkModeEnabled());
+  renderDarkModeSwitch();
+});
+
+// ---- Diagrams: SVG/Pexels toggle (Profile page, below Reload App) ----
+// Beta feature flag, OFF by default — when off, learn.js skips rendering
+// any lesson diagram (Pexels photo, template SVG, or raw SVG fallback)
+// regardless of what the worker returned for that part.
+const DIAGRAMS_ENABLED_KEY = 'kll_diagrams_enabled';
+const diagramsToggleSwitch = document.getElementById('diagramsToggleSwitch');
+
+function getDiagramsEnabled() {
+  // Default ON — an unset value (new install, or a device that's never
+  // touched the toggle) reads as enabled. Only an explicit '0' turns it off.
+  try { return localStorage.getItem(DIAGRAMS_ENABLED_KEY) !== '0'; } catch { return true; }
+}
+function setDiagramsEnabled(enabled) {
+  try { localStorage.setItem(DIAGRAMS_ENABLED_KEY, enabled ? '1' : '0'); } catch {}
+}
+function renderDiagramsToggleSwitch() {
+  const enabled = getDiagramsEnabled();
+  diagramsToggleSwitch?.classList.toggle('on', enabled);
+  diagramsToggleSwitch?.setAttribute('aria-checked', String(enabled));
+}
+renderDiagramsToggleSwitch();
+
+diagramsToggleSwitch?.addEventListener('click', () => {
+  setDiagramsEnabled(!getDiagramsEnabled());
+  renderDiagramsToggleSwitch();
+});
+
+// ---- Adaptive Difficulty toggle (Profile page, below Diagrams) ----
+// ON by default (unlike the diagrams beta flag above) — a missing/unset
+// localStorage value reads as enabled. Reads the score of the last lesson
+// completed in the active course (see learn.js's finishLesson()) and shifts
+// the NEXT lesson's difficulty up/down/steady accordingly. Turning it off
+// asks for confirmation, since it's a genuinely useful feature most
+// learners benefit from keeping on.
+const ADAPTIVE_DIFFICULTY_ENABLED_KEY = 'kll_adaptive_difficulty_enabled';
+const adaptiveDifficultyToggleSwitch = document.getElementById('adaptiveDifficultyToggleSwitch');
+
+function getAdaptiveDifficultyEnabled() {
+  try {
+    const stored = localStorage.getItem(ADAPTIVE_DIFFICULTY_ENABLED_KEY);
+    return stored === null ? true : stored === '1';
+  } catch { return true; }
+}
+function setAdaptiveDifficultyEnabled(enabled) {
+  try { localStorage.setItem(ADAPTIVE_DIFFICULTY_ENABLED_KEY, enabled ? '1' : '0'); } catch {}
+}
+function renderAdaptiveDifficultyToggleSwitch() {
+  const enabled = getAdaptiveDifficultyEnabled();
+  adaptiveDifficultyToggleSwitch?.classList.toggle('on', enabled);
+  adaptiveDifficultyToggleSwitch?.setAttribute('aria-checked', String(enabled));
+}
+renderAdaptiveDifficultyToggleSwitch();
+
+const adaptiveDifficultyOffModalOverlay = document.getElementById('adaptiveDifficultyOffModalOverlay');
+const adaptiveDifficultyOffCancelBtn = document.getElementById('adaptiveDifficultyOffCancelBtn');
+const adaptiveDifficultyOffConfirmBtn = document.getElementById('adaptiveDifficultyOffConfirmBtn');
+
+adaptiveDifficultyToggleSwitch?.addEventListener('click', () => {
+  const currentlyEnabled = getAdaptiveDifficultyEnabled();
+  if (currentlyEnabled) {
+    if (!adaptiveDifficultyOffModalOverlay) return; // no modal in DOM — fail safe, don't turn it off silently
+    adaptiveDifficultyOffModalOverlay.classList.add('show');
+    return;
+  }
+  setAdaptiveDifficultyEnabled(true);
+  renderAdaptiveDifficultyToggleSwitch();
+});
+
+adaptiveDifficultyOffCancelBtn?.addEventListener('click', () => {
+  adaptiveDifficultyOffModalOverlay.classList.remove('show');
+});
+
+adaptiveDifficultyOffConfirmBtn?.addEventListener('click', () => {
+  setAdaptiveDifficultyEnabled(false);
+  renderAdaptiveDifficultyToggleSwitch();
+  adaptiveDifficultyOffModalOverlay.classList.remove('show');
+});
+
+// ---- Review Lessons toggle (Profile page, below Adaptive Difficulty) ----
+// ON by default. Off: hides the Review Page entry points (Home button +
+// course-header button, see learn.js's updateReviewWrongAnswersBtn/
+// openReviewPage) and stops the end-of-lesson AI weak/strong-spot
+// generation entirely.
+const REVIEW_LESSONS_ENABLED_KEY = 'kll_review_lessons_enabled';
+const reviewLessonsToggleSwitch = document.getElementById('reviewLessonsToggleSwitch');
+
+function getReviewLessonsToggleEnabled() {
+  try {
+    const stored = localStorage.getItem(REVIEW_LESSONS_ENABLED_KEY);
+    return stored === null ? true : stored === '1';
+  } catch { return true; }
+}
+function setReviewLessonsToggleEnabled(enabled) {
+  try { localStorage.setItem(REVIEW_LESSONS_ENABLED_KEY, enabled ? '1' : '0'); } catch {}
+}
+function renderReviewLessonsToggleSwitch() {
+  const enabled = getReviewLessonsToggleEnabled();
+  reviewLessonsToggleSwitch?.classList.toggle('on', enabled);
+  reviewLessonsToggleSwitch?.setAttribute('aria-checked', String(enabled));
+  const reviewBtn = document.getElementById('homeReviewPageBtn');
+  if (reviewBtn) reviewBtn.style.display = enabled ? '' : 'none';
+}
+renderReviewLessonsToggleSwitch();
+
+reviewLessonsToggleSwitch?.addEventListener('click', () => {
+  setReviewLessonsToggleEnabled(!getReviewLessonsToggleEnabled());
+  renderReviewLessonsToggleSwitch();
+});
+
+// ---- Turn Off Premium Features (Profile > Additional Settings) ----
+// A self-service downgrade for THIS account only — sets premium:false on
+// its own Firestore doc, same field the RevenueCat purchase flow sets to
+// true. It never touches the actual App Store purchase/entitlement, so
+// nothing is refunded or lost — Restore Purchases brings it right back.
+// Only shown at all when the signed-in account is currently premium (see
+// the onPremiumChange listener below), since there's nothing to turn off
+// otherwise.
+const turnOffPremiumRow = document.getElementById('turnOffPremiumRow');
+const turnOffPremiumBtn = document.getElementById('turnOffPremiumBtn');
+const turnOffPremiumModalOverlay = document.getElementById('turnOffPremiumModalOverlay');
+const turnOffPremiumCancelBtn = document.getElementById('turnOffPremiumCancelBtn');
+const turnOffPremiumConfirmBtn = document.getElementById('turnOffPremiumConfirmBtn');
+
+onPremiumChange((premium) => {
+  if (turnOffPremiumRow) turnOffPremiumRow.style.display = premium ? '' : 'none';
+});
+
+turnOffPremiumBtn?.addEventListener('click', () => {
+  if (!turnOffPremiumModalOverlay) return; // no modal in DOM — fail safe, don't turn it off silently
+  turnOffPremiumModalOverlay.classList.add('show');
+});
+
+turnOffPremiumCancelBtn?.addEventListener('click', () => {
+  turnOffPremiumModalOverlay.classList.remove('show');
+});
+
+turnOffPremiumConfirmBtn?.addEventListener('click', async () => {
+  const u = auth.currentUser;
+  if (!u) return;
+  turnOffPremiumConfirmBtn.disabled = true;
+  turnOffPremiumConfirmBtn.textContent = 'Turning off…';
+  try {
+    await setDoc(doc(db, 'users', u.uid, 'learnProfile', 'main'), { premium: false }, { merge: true });
+    // Same reasoning as the purchase-success reload in paywall.js: premium
+    // state gates a lot of already-mounted logic (daily limits, the AI
+    // Assistant FAB, course-slot math, RevenueCat's own cached
+    // entitlement check) that's far simpler to let re-initialize fresh
+    // than to try to live-patch back down.
+    window.location.reload();
+  } catch (err) {
+    console.error('Failed to turn off premium:', err);
+    turnOffPremiumConfirmBtn.disabled = false;
+    turnOffPremiumConfirmBtn.textContent = 'Turn Off Premium';
+    turnOffPremiumModalOverlay.classList.remove('show');
+  }
+});
 
 // ---- Profile page ----
 const settingsAvatar = document.getElementById('settingsAvatar');
@@ -54,6 +625,8 @@ const settingsResetPwBtn = document.getElementById('settingsResetPwBtn');
 const settingsDeleteBtn = document.getElementById('settingsDeleteBtn');
 
 const profileXpCount = document.getElementById('profileXpCount');
+const profileXpRowBtn = document.getElementById('profileXpRowBtn');
+profileXpRowBtn?.addEventListener('click', () => openXpShop());
 const profileChangeNameBtn = document.getElementById('profileChangeNameBtn');
 const profileAvatarBtn = document.getElementById('profileAvatarBtn');
 const profileFriendsBtn = document.getElementById('profileFriendsBtn');
@@ -95,7 +668,7 @@ deleteAccountConfirmBtn.addEventListener('click', async () => {
     // onAuthStateChanged handles the screen swap back to auth
   } catch (err) {
     deleteAccountError.textContent = err.code === 'auth/requires-recent-login'
-      ? 'Please sign out and sign back in, then try deleting your account again.'
+      ? 'For your security, please log out and log in again to confirm deletion.'
       : (err.message || 'Could not delete account.');
   } finally {
     deleteAccountConfirmBtn.disabled = false;
@@ -110,14 +683,94 @@ deleteAccountConfirmBtn.addEventListener('click', async () => {
 function updateSettingsUI(user) {
   if (!user) return;
   const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Learner');
-  settingsName.textContent = name;
+  settingsName.textContent = formatDisplayName(name, isPremium());
   settingsEmail.textContent = user.email || '';
-  renderAvatarInto(settingsAvatar, currentAvatar);
+  renderAvatarInto(settingsAvatar, currentAvatar); // show cached avatar immediately, no flash of the placeholder
+  loadAvatarForCurrentUser(); // then always re-fetch the latest from Firestore
   syncPublicProfileDocs(user);
   loadXpTotal();
 }
 
+// ---- "Go Premium" entry points (one card per page) ----
+// All share the .go-premium-entry class, so one listener + one visibility
+// toggle covers every instance, wherever it lives in the DOM. The fixed
+// corner pill (#goPremiumPill) is NOT one of these — see below — it never
+// hides, it just changes what tapping it does once premium is active.
+document.querySelectorAll('.go-premium-entry').forEach((btn) => {
+  btn.addEventListener('click', () => openPaywall());
+});
+onPremiumChange((premium) => {
+  document.querySelectorAll('.go-premium-entry').forEach((el) => {
+    el.classList.toggle('is-hidden', premium);
+    el.style.display = premium ? 'none' : '';
+  });
+});
+
+// ---- "Go Premium" corner pill ----
+// Free members: blue pill, tapping it opens the paywall (same as the
+// go-premium-entry cards). Premium members: instead of disappearing, the
+// pill switches to a gold "you're premium" look and tapping it opens a
+// read-only benefits summary — see premiumBenefitsModalOverlay.
+const goPremiumPill = document.getElementById('goPremiumPill');
+const premiumBenefitsModalOverlay = document.getElementById('premiumBenefitsModalOverlay');
+const premiumBenefitsList = document.getElementById('premiumBenefitsList');
+const premiumBenefitsDoneBtn = document.getElementById('premiumBenefitsDoneBtn');
+const premiumBenefitsExitBtn = document.getElementById('premiumBenefitsExitBtn');
+
+const PREMIUM_BENEFIT_ITEMS = [
+  { icon: 'library_books', label: `Up to ${PREMIUM_LIMITS.premium.maxCourses} courses at once` },
+  { icon: 'local_fire_department', label: '4 Streak Pass slots' },
+  { icon: 'auto_awesome', label: 'AI Assistant' },
+  { icon: 'psychology', label: 'Explain My Answer' },
+  { icon: 'history_edu', label: 'Review Page' },
+  { icon: 'auto_fix_high', label: 'Combo Lessons' },
+];
+
+function renderPremiumBenefitsModal() {
+  if (!premiumBenefitsList) return;
+  premiumBenefitsList.innerHTML = PREMIUM_BENEFIT_ITEMS.map((item) => `
+    <div class="premium-benefit-item">
+      <span class="material-symbols-outlined">${item.icon}</span>
+      <span class="premium-benefit-item-text">${escapeHtmlMain(item.label)}</span>
+    </div>
+  `).join('');
+}
+
+goPremiumPill?.addEventListener('click', () => {
+  if (isPremium()) {
+    renderPremiumBenefitsModal();
+    premiumBenefitsModalOverlay?.classList.add('show');
+  } else {
+    openPaywall();
+  }
+});
+
+premiumBenefitsDoneBtn?.addEventListener('click', () => {
+  premiumBenefitsModalOverlay?.classList.remove('show');
+});
+
+premiumBenefitsExitBtn?.addEventListener('click', () => {
+  premiumBenefitsModalOverlay?.classList.remove('show');
+});
+
+// No backdrop-tap-to-close here — this is now a full-page overlay (same
+// shell as Learning Games/Friends/the paywall), not a floating card on a
+// dimmed backdrop, so there's no backdrop to tap. Closes only via the
+// topbar X or the Done button above.
+
+onPremiumChange((premium) => {
+  if (!goPremiumPill) return;
+  goPremiumPill.classList.toggle('is-gold', premium);
+  // Same icon/label either way — the gold gradient (is-gold) is what signals
+  // membership; only the aria-label and click behavior change.
+  goPremiumPill.setAttribute('aria-label', premium ? 'View your Premium benefits' : 'Go Premium');
+});
+
 settingsSignOutBtn.addEventListener('click', async () => {
+  // Cache this account's email (no password) for the "last used account"
+  // quick sign-in box, while auth.currentUser is still populated —
+  // logout() below clears the session.
+  saveLastUsedAccount();
   await logout();
 });
 
@@ -174,12 +827,42 @@ forgotBtn.addEventListener('click', async () => {
 // ---- Email verification + username setup ----
 const RESEND_WORKER_URL = 'https://emailworkerkidslearninglabanyhtmlnonspecific.nameless-cherry-998c.workers.dev/send';
 const USERNAME_ALLOWED = /^[a-zA-Z0-9 ]+$/;
+// Blocks names that impersonate the [PREMIUM ⭐️] badge prefix or otherwise
+// claim premium/pro status that isn't theirs — "pro" as a whole word so
+// legitimate names like "Prosper" or "Prometheus" still work.
+const RESERVED_NAME_PATTERN = /premium|\bpro\b/i;
+const PREMIUM_NAME_PREFIX = '[PREMIUM ⭐️] ';
+
+// Applies the premium badge prefix at render time only — the stored
+// displayName itself is always just the plain name the person chose (and
+// can never itself contain the prefix, see RESERVED_NAME_PATTERN above).
+// That way the badge disappears immediately/automatically if premium ever
+// lapses, with nothing to clean up in Firestore.
+function formatDisplayName(name, premium) {
+  const clean = name || 'Learner';
+  return premium ? `${PREMIUM_NAME_PREFIX}${clean}` : clean;
+}
+
+// Current user's own display name, formatted the same way it would appear
+// to a friend (premium prefix included) — used wherever we need to pass an
+// already-formatted "from" name into the DOM-free friends.js helpers.
+function myFormattedDisplayName() {
+  const u = auth.currentUser;
+  return formatDisplayName(u?.displayName || (u?.email ? u.email.split('@')[0] : 'Someone'), isPremium());
+}
 
 let verifyCode = null;
 let verifyExpiry = null;
 let verifyTimerInterval = null;
 let verifyEmail = null;
 let verificationInProgress = false;
+// True for the entire span the first-run onboarding wizard is on screen —
+// including the moment signUp() inside it fires onAuthStateChanged with a
+// real user. Same purpose as verificationInProgress above: keeps that
+// listener from yanking the screen to the app shell / username modal out
+// from under wizard Steps 7-9, which is still showing even though a real
+// account now exists.
+let onboardingInProgress = false;
 
 const verifyModalOverlay = document.getElementById('verifyModalOverlay');
 const verifyCodeInput = document.getElementById('verifyCodeInput');
@@ -447,6 +1130,165 @@ verifyResendBtn.addEventListener('click', async () => {
   }
 });
 
+/* ═══════════════════════════════════════════════
+   SECURITY: TOO-MANY-LOGINS CHECK (>25 sign-ins/hour)
+   2 steps — confirm password, then an emailed code — reusing the
+   same pattern as the Change Password flow above.
+═══════════════════════════════════════════════ */
+const secCheckModal1 = document.getElementById('secCheckModal1');
+const secCheckModal2 = document.getElementById('secCheckModal2');
+const secCheckPassword = document.getElementById('secCheckPassword');
+const secCheckError1 = document.getElementById('secCheckError1');
+const secCheckBtn1 = document.getElementById('secCheckBtn1');
+const secCheckCancel1 = document.getElementById('secCheckCancel1');
+const secCheckEmailDisplay = document.getElementById('secCheckEmailDisplay');
+const secCheckSendCodeBtn = document.getElementById('secCheckSendCodeBtn');
+const secCheckVerifyCodeBtn = document.getElementById('secCheckVerifyCodeBtn');
+const secCheckCodeInput = document.getElementById('secCheckCodeInput');
+const secCheckError2 = document.getElementById('secCheckError2');
+const secCheckCancel2 = document.getElementById('secCheckCancel2');
+
+function runSecurityCheck(user) {
+  return new Promise((resolve) => {
+    if (!secCheckModal1 || !secCheckModal2) { resolve(true); return; }
+
+    let secCode = null;
+    let secCodeExpiry = null;
+    let resolved = false;
+
+    function cleanupListeners() {
+      secCheckBtn1.removeEventListener('click', onBtn1);
+      secCheckCancel1.removeEventListener('click', onCancel);
+      secCheckSendCodeBtn.removeEventListener('click', onSendCode);
+      secCheckVerifyCodeBtn.removeEventListener('click', onVerifyCode);
+      secCheckCancel2.removeEventListener('click', onCancel);
+    }
+
+    function finish(ok) {
+      if (resolved) return;
+      resolved = true;
+      secCheckModal1.classList.remove('show');
+      secCheckModal2.classList.remove('show');
+      cleanupListeners();
+      resolve(ok);
+    }
+
+    async function onBtn1() {
+      const pw = secCheckPassword.value;
+      secCheckError1.textContent = '';
+      if (!pw) { secCheckError1.textContent = 'Please enter your password.'; return; }
+      secCheckBtn1.disabled = true;
+      secCheckBtn1.textContent = 'Checking…';
+      try {
+        await signInWithEmailAndPassword(auth, user.email, pw);
+        secCheckModal1.classList.remove('show');
+        secCheckEmailDisplay.textContent = user.email || '';
+        secCheckCodeInput.value = '';
+        secCheckCodeInput.style.display = 'none';
+        secCheckVerifyCodeBtn.style.display = 'none';
+        secCheckSendCodeBtn.style.display = 'block';
+        secCheckSendCodeBtn.disabled = false;
+        secCheckSendCodeBtn.textContent = 'Send Code to Email';
+        secCheckError2.textContent = '';
+        secCheckModal2.classList.add('show');
+      } catch {
+        secCheckError1.textContent = 'Incorrect password. Please try again.';
+      } finally {
+        secCheckBtn1.disabled = false;
+        secCheckBtn1.textContent = 'Confirm Password';
+      }
+    }
+
+    async function onSendCode() {
+      secCheckSendCodeBtn.disabled = true;
+      secCheckSendCodeBtn.textContent = 'Sending…';
+      secCode = generateCode();
+      secCodeExpiry = Date.now() + 10 * 60 * 1000;
+      const html = `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:40px 32px;background:#F5FAFF;border-radius:18px;border:1.5px solid #DCE7F5">
+          <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" style="width:48px;height:48px;border-radius:14px;display:block;margin:0 auto 20px">
+          <h2 style="text-align:center;color:#14213D;margin-bottom:8px">Security check code</h2>
+          <p style="text-align:center;color:#5B6B85;font-size:14px;line-height:1.6;margin-bottom:28px">We noticed a lot of sign-ins to your account. Enter this code to confirm it's really you. It expires in 10 minutes.</p>
+          <div style="background:#fff;border:1.5px solid #DCE7F5;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px">
+            <span style="font-size:2.5rem;font-weight:900;letter-spacing:.25em;color:#1E6FE0">${secCode}</span>
+          </div>
+          <p style="text-align:center;color:#5B6B85;font-size:12px">If you didn't request this, ignore this email.</p>
+        </div>`;
+      try {
+        await fetch(RESEND_WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: user.email, subject: 'Your Kids Learning Lab security code', html })
+        });
+        secCheckSendCodeBtn.style.display = 'none';
+        secCheckCodeInput.style.display = 'block';
+        secCheckVerifyCodeBtn.style.display = 'block';
+        setTimeout(() => secCheckCodeInput.focus(), 80);
+      } catch {
+        secCheckError2.textContent = 'Could not send code. Please try again.';
+        secCheckSendCodeBtn.disabled = false;
+        secCheckSendCodeBtn.textContent = 'Send Code to Email';
+      }
+    }
+
+    function onVerifyCode() {
+      const entered = secCheckCodeInput.value.trim();
+      secCheckError2.textContent = '';
+      if (!entered || entered.length < 6) { secCheckError2.textContent = 'Enter the 6-digit code.'; return; }
+      if (!secCode || Date.now() > secCodeExpiry) { secCheckError2.textContent = 'Code expired. Please resend.'; return; }
+      if (entered !== secCode) {
+        secCheckError2.textContent = 'Incorrect code. Try again.';
+        secCheckCodeInput.value = '';
+        return;
+      }
+      finish(true);
+    }
+
+    function onCancel() { finish(false); }
+
+    secCheckPassword.value = '';
+    secCheckError1.textContent = '';
+    secCheckBtn1.disabled = false;
+    secCheckBtn1.textContent = 'Confirm Password';
+    secCheckModal1.classList.add('show');
+    setTimeout(() => secCheckPassword.focus(), 80);
+
+    secCheckBtn1.addEventListener('click', onBtn1);
+    secCheckCancel1.addEventListener('click', onCancel);
+    secCheckSendCodeBtn.addEventListener('click', onSendCode);
+    secCheckVerifyCodeBtn.addEventListener('click', onVerifyCode);
+    secCheckCancel2.addEventListener('click', onCancel);
+  });
+}
+
+// Runs after a successful password sign-in (not signup): checks the
+// login-rate limit before letting the app reveal itself, then records
+// this login.
+async function handlePostSignInChecks() {
+  const user = auth.currentUser;
+  if (!user) { verificationInProgress = false; return; }
+
+  const attemptCount = recordLoginAttempt();
+  if (attemptCount > LOGIN_RATE_LIMIT) {
+    const ok = await runSecurityCheck(user);
+    if (!ok) {
+      verificationInProgress = false;
+      await logout();
+      showMessage('Sign-in cancelled.', 'error');
+      return;
+    }
+  }
+
+  try {
+    await setDoc(doc(db, 'userProfiles', user.uid), { lastLoginAt: Date.now() }, { merge: true });
+  } catch {
+    // non-fatal — worst case the stale-login check re-triggers next time
+  }
+
+  verificationInProgress = false;
+  await proceedAfterAuth(user);
+}
+
 function showUsernameModal(isChange = false) {
   usernameInput.value = isChange ? (auth.currentUser?.displayName || '') : '';
   usernameError.textContent = '';
@@ -464,11 +1306,14 @@ usernameSubmitBtn.addEventListener('click', async () => {
   const isChange = usernameModalOverlay.dataset.mode === 'change';
   if (!val || val.length < 2) { usernameError.textContent = 'Username must be at least 2 characters.'; return; }
   if (!USERNAME_ALLOWED.test(val)) { usernameError.textContent = 'Only letters, numbers, and spaces allowed.'; return; }
+  if (RESERVED_NAME_PATTERN.test(val)) { usernameError.textContent = "That name isn't available."; return; }
   usernameSubmitBtn.disabled = true;
   usernameSubmitBtn.textContent = isChange ? 'Saving…' : 'Saving…';
   try {
     await updateProfile(auth.currentUser, { displayName: val });
-    await setDoc(doc(db, 'userProfiles', auth.currentUser.uid), { usernameSet: true, displayName: val }, { merge: true });
+    const profileUpdate = { usernameSet: true, displayName: val };
+    if (!isChange) profileUpdate.lastLoginAt = Date.now(); // first-ever login for a brand-new account
+    await setDoc(doc(db, 'userProfiles', auth.currentUser.uid), profileUpdate, { merge: true });
     usernameModalOverlay.classList.remove('show');
     if (!isChange) {
       authScreen.style.display = 'none';
@@ -495,7 +1340,15 @@ form.addEventListener('submit', async (e) => {
 
   if (mode === 'signup') {
     verificationInProgress = true;
+    // Show the "Creating your account…" full-pager right away — since it's
+    // a first-time overlay (see firstTimeOverlays.js), everyone only ever
+    // sees it once, but that once is always their real first sign-up, never
+    // a pre-existing account. The auto-advance timer runs in parallel with
+    // the actual signUp() call rather than blocking on it, so it never
+    // makes account creation feel slower than it already is.
+    const overlayPromise = maybeShowOverlay('accountCreating', { vars: { email } });
     const result = await signUp(email, password);
+    await overlayPromise;
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create Account';
     if (!result.success) {
@@ -505,17 +1358,59 @@ form.addEventListener('submit', async (e) => {
     }
     await showVerifyModal(email);
   } else {
+    verificationInProgress = true; // hold the app reveal until our security checks below pass
     const result = await signIn(email, password);
     submitBtn.disabled = false;
     submitBtn.textContent = 'Sign In';
-    if (!result.success) showMessage(result.error, 'error');
+    if (!result.success) {
+      verificationInProgress = false;
+      showMessage(result.error, 'error');
+      return;
+    }
+    await handlePostSignInChecks();
   }
 });
 
 // ---- Auth state -> screen swap ----
 let lastAuthUid = null; // tracks whose data is currently loaded, so we can
                          // clear stale in-memory state when the account changes
-onAuthStateChanged(auth, async (user) => {
+
+// Reveals the app shell for an already-authenticated user. Called both from
+// onAuthStateChanged (e.g. an already-signed-in user reopening the app)
+// and directly from handlePostSignInChecks after a fresh sign-in clears
+// its security checks.
+async function proceedAfterAuth(user) {
+  try {
+    const profileSnap = await getDoc(doc(db, 'userProfiles', user.uid));
+    if (!profileSnap.exists() || !profileSnap.data()?.usernameSet) {
+      authScreen.style.display = 'none';
+      appShell.style.display = 'none';
+      showUsernameModal();
+      return;
+    }
+  } catch {
+    // fail open
+  }
+
+  authScreen.style.display = 'none';
+  appShell.style.display = 'flex';
+  if (shouldPlayStartupVideo()) playStartupVideo(); // overlay sits above appShell, fades out into it
+  updateSettingsUI(user);   // ← make sure this line is here
+  await initBadgesForUser(user.uid);
+  await initFirstTimeOverlaysForUser(user.uid);
+  await initTutorialForUser(user.uid);
+  checkAccountBadge(true); // usernameSet (checked above) implies email verification + username both done
+  startXpListener(user);
+  startNotifBell(user);
+  initPushForCurrentUser(); // ask for push permission on first app open, not just on first bell tap
+  initPremiumForCurrentUser(); // configures RevenueCat + starts the Firestore premium listener
+  initShopStateForCurrentUser(); // starts the shared XP Shop fields listener (unlocked colors/emoji, streak passes, etc)
+  startHomeMirrorForCurrentUser(); // starts the Firestore→RTDB background mirror loadHomeData() reads from
+  refreshHome();
+  maybeRunAppTour(); // no-op if already seen; needs refreshHome()'s stat row/shop banner to already be visible
+}
+
+async function handleAuthStateChange(user) {
   if (user?.uid !== lastAuthUid) {
     // Different account (or signed out) — wipe any cached data from the
     // previous account before loading/showing the new one. This includes
@@ -525,43 +1420,41 @@ onAuthStateChanged(auth, async (user) => {
     // account's picture until the app is fully restarted.
     resetLearnState();
     resetBadgesState();
+    resetFirstTimeOverlaysState();
+    resetTutorialState();
+    resetPremiumState();
+    resetShopState();
+    stopHomeMirror();
     stopXpListener();
     stopNotifBell();
     document.querySelectorAll('.kll-modal-overlay.show').forEach((el) => el.classList.remove('show'));
     currentAvatar = null;
     renderAvatarInto(settingsAvatar, null);
+    welcomeBackCheckedThisSession = false;
     lastAuthUid = user?.uid || null;
   }
 
   if (user) {
-    if (verificationInProgress) return;
-
-    try {
-      const profileSnap = await getDoc(doc(db, 'userProfiles', user.uid));
-      if (!profileSnap.exists() || !profileSnap.data()?.usernameSet) {
-        authScreen.style.display = 'none';
-        appShell.style.display = 'none';
-        showUsernameModal();
-        return;
-      }
-    } catch {
-      // fail open
-    }
-
-    authScreen.style.display = 'none';
-    appShell.style.display = 'flex';
-    updateSettingsUI(user);   // ← make sure this line is here
-    await initBadgesForUser(user.uid);
-    checkAccountBadge(true); // usernameSet (checked above) implies email verification + username both done
-    startXpListener(user);
-    startNotifBell(user);
-    initPushForCurrentUser(); // ask for push permission on first app open, not just on first bell tap
-    refreshHome();
+    if (verificationInProgress || onboardingInProgress) return; // a security-check or onboarding flow is in progress — it will reveal the app itself when ready
+    await proceedAfterAuth(user);
   } else {
+    if (onboardingInProgress) return; // wizard owns the screen for a signed-out first-time device — don't show the plain auth screen underneath it
     authScreen.style.display = 'flex';
     appShell.style.display = 'none';
+    loadLastUsedAccount();
   }
-});
+}
+onAuthStateChanged(auth, handleAuthStateChange);
+
+// ---- First-run onboarding wizard: DISCONNECTED ----
+// onboarding.js is no longer called from here. onboardingInProgress stays
+// permanently false, so every code path that checks it (the
+// onAuthStateChanged callback above, proceedAfterAuth) behaves exactly as
+// if onboarding never existed — a signed-out device just sees the normal
+// auth-screen sign-in/sign-up form, same as before onboarding.js was ever
+// wired in. onboarding.js itself and its markup in index.html are left in
+// place untouched (nothing to break by leaving them), just no longer
+// reachable from anywhere.
 
 // ---- Bottom nav ----
 const navButtons = document.querySelectorAll('.nav-btn');
@@ -577,79 +1470,254 @@ function updateNotifBellVisibility(target) {
   if (notifBellBtnEl) notifBellBtnEl.style.display = NOTIF_BELL_PAGES.has(target) ? 'flex' : 'none';
 }
 
-navButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    navButtons.forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
+// Left-to-right order the pages appear in the navbar. A page to the right
+// of the current one (higher index) slides in from the right as it becomes
+// active, and vice versa — matching how swiping between tabs usually feels.
+const PAGE_ORDER = ['listen', 'learn', 'home', 'review', 'settings'];
+const PAGE_TRANSITION_MS = 340; // matches the .page transform transition duration in CSS
+let isPageTransitioning = false;
 
-    const target = btn.dataset.page;
+function switchPage(target) {
+  const current = document.querySelector('.nav-btn.active')?.dataset.page;
+  if (!current || current === target || isPageTransitioning) return;
+
+  navButtons.forEach((b) => b.classList.toggle('active', b.dataset.page === target));
+
+  const oldPageEl = document.getElementById(`page-${current}`);
+  const newPageEl = document.getElementById(`page-${target}`);
+
+  // Fallback to the old instant swap if either page element is missing —
+  // keeps navigation working even if a page id ever gets renamed.
+  if (!oldPageEl || !newPageEl) {
     pages.forEach((p) => {
       p.style.display = p.id === `page-${target}` ? 'flex' : 'none';
     });
     updateNotifBellVisibility(target);
-
     if (target === 'home') refreshHome();
-  });
+    if (target === 'review') window.renderReviewPage?.();
+    return;
+  }
+
+  const oldIdx = PAGE_ORDER.indexOf(current);
+  const newIdx = PAGE_ORDER.indexOf(target);
+  const enterFromRight = newIdx > oldIdx; // target sits to the right of current in the navbar
+
+  isPageTransitioning = true;
+
+  // Place the incoming page off-screen on the correct side with transitions
+  // disabled, so the very first frame doesn't animate from wherever it was
+  // last left sitting.
+  newPageEl.style.transition = 'none';
+  newPageEl.style.display = 'flex';
+  newPageEl.style.transform = `translateX(${enterFromRight ? '100%' : '-100%'})`;
+  newPageEl.style.opacity = '0';
+
+  // Force a reflow so the browser commits that starting position before we
+  // flip both pages toward their animated end states below.
+  void newPageEl.offsetWidth;
+  newPageEl.style.transition = '';
+
+  oldPageEl.style.transform = `translateX(${enterFromRight ? '-100%' : '100%'})`;
+  oldPageEl.style.opacity = '0';
+  newPageEl.style.transform = 'translateX(0)';
+  newPageEl.style.opacity = '1';
+
+  setTimeout(() => {
+    oldPageEl.style.display = 'none';
+    oldPageEl.style.transition = 'none';
+    oldPageEl.style.transform = 'translateX(0)';
+    oldPageEl.style.opacity = '1';
+    void oldPageEl.offsetWidth;
+    oldPageEl.style.transition = '';
+    isPageTransitioning = false;
+  }, PAGE_TRANSITION_MS);
+
+  updateNotifBellVisibility(target);
+  if (target === 'home') refreshHome();
+  if (target === 'review') window.renderReviewPage?.();
+}
+
+navButtons.forEach((btn) => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
 });
 
 // Set correct initial visibility for whichever nav button is active on
 // first load (currently "home", where the bell should be hidden).
 updateNotifBellVisibility(document.querySelector('.nav-btn.active')?.dataset.page);
 
-// ---- Settings: sign out (temporary, until settings page is built out) ----
-const signOutBtn = document.getElementById('signout-btn');
-if (signOutBtn) {
-  signOutBtn.addEventListener('click', async () => {
-    await logout();
-  });
-}
 // ============================================================
-// HOME PAGE — greeting + randomized, colorful widget grid
+// LAST USED ACCOUNT — quick sign-in box shown above the email field on
+// the auth screen, populated from whichever account most recently signed
+// out. Stores only the email (never a password) in localStorage.
+// ============================================================
+const LAST_USED_ACCOUNT_KEY = 'kll_last_used_account';
+const lastUsedAccountCard = document.getElementById('lastUsedAccountCard');
+const lastUsedAccountEmail = document.getElementById('lastUsedAccountEmail');
+const quickSigninOverlay = document.getElementById('quickSigninModalOverlay');
+const quickSigninEmailEl = document.getElementById('quickSigninEmail');
+const quickSigninPasswordInput = document.getElementById('quickSigninPasswordInput');
+const quickSigninError = document.getElementById('quickSigninError');
+const quickSigninSubmitBtn = document.getElementById('quickSigninSubmitBtn');
+const quickSigninSwitchBtn = document.getElementById('quickSigninSwitchBtn');
+
+function saveLastUsedAccount() {
+  const email = auth.currentUser?.email;
+  if (!email) return;
+  try {
+    localStorage.setItem(LAST_USED_ACCOUNT_KEY, JSON.stringify({ email }));
+  } catch { /* localStorage unavailable — quick sign-in box just won't show next time */ }
+}
+
+function clearLastUsedAccount() {
+  try { localStorage.removeItem(LAST_USED_ACCOUNT_KEY); } catch {}
+  lastUsedAccountCard?.classList.remove('show');
+}
+
+function loadLastUsedAccount() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(LAST_USED_ACCOUNT_KEY) || 'null'); } catch {}
+  if (!saved || !saved.email || !lastUsedAccountCard) { lastUsedAccountCard?.classList.remove('show'); return; }
+
+  lastUsedAccountEmail.textContent = saved.email;
+  lastUsedAccountCard.classList.add('show');
+}
+
+lastUsedAccountCard?.addEventListener('click', () => {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(LAST_USED_ACCOUNT_KEY) || 'null'); } catch {}
+  if (!saved || !saved.email) return;
+
+  quickSigninEmailEl.textContent = saved.email;
+  quickSigninPasswordInput.value = '';
+  quickSigninError.textContent = '';
+  quickSigninOverlay._email = saved.email;
+  quickSigninOverlay.classList.add('show');
+  setTimeout(() => quickSigninPasswordInput.focus(), 300);
+});
+
+quickSigninSwitchBtn?.addEventListener('click', () => {
+  quickSigninOverlay.classList.remove('show');
+  clearLastUsedAccount();
+});
+
+async function submitQuickSignin() {
+  const email = quickSigninOverlay._email;
+  const pw = quickSigninPasswordInput.value;
+  if (!email || !pw) {
+    quickSigninError.textContent = 'Enter your password.';
+    return;
+  }
+  quickSigninSubmitBtn.disabled = true;
+  quickSigninSubmitBtn.textContent = 'Signing In…';
+  quickSigninError.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+    quickSigninOverlay.classList.remove('show');
+    // onAuthStateChanged handles the screen swap into the app shell
+  } catch (err) {
+    quickSigninError.textContent = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'
+      ? 'Incorrect password.'
+      : (err.message || 'Could not sign in.');
+  } finally {
+    quickSigninSubmitBtn.disabled = false;
+    quickSigninSubmitBtn.textContent = 'Sign In';
+  }
+}
+
+quickSigninSubmitBtn?.addEventListener('click', submitQuickSignin);
+quickSigninPasswordInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitQuickSignin();
+});
+
+loadLastUsedAccount();
+// ============================================================
+// HOME PAGE 2.0 — fixed-role sections (hero / stats / notifications /
+// games) instead of a randomized packed widget grid. Each section owns
+// its own layout strategy for "however many items exist today", so no
+// combination of optional items can leave a gap the way the old dense
+// grid could.
 // ============================================================
 const homeGreeting = document.getElementById('homeGreeting');
-const homeWidgetsEl = document.getElementById('homeWidgets');
+const homeLoadingEl = document.getElementById('homeLoading');
+const homeSkeletonEl = document.getElementById('homeSkeleton');
+const homeHeroEl = document.getElementById('homeHero');
+const homeHeroLabelEl = document.getElementById('homeHeroLabel');
+const homeHeroTitleEl = document.getElementById('homeHeroTitle');
+const homeHeroSubEl = document.getElementById('homeHeroSub');
+const homeHeroProgressTrackEl = document.getElementById('homeHeroProgressTrack');
+const homeHeroProgressFillEl = document.getElementById('homeHeroProgressFill');
+const homeUsageBannerEl = document.getElementById('homeUsageBanner');
+const homeStatsRowEl = document.getElementById('homeStatsRow');
+const homeStatStreakEl = document.getElementById('homeStatStreak');
+const homeStatStreakNumEl = document.getElementById('homeStatStreakNum');
+const homeStatStreakLabelEl = document.getElementById('homeStatStreakLabel');
+const homeStatXpNumEl = document.getElementById('homeStatXpNum');
+const homeStatXpEl = document.getElementById('homeStatXp');
+const homeStatFriendsEl = document.getElementById('homeStatFriends');
+const homeStatFriendsNumEl = document.getElementById('homeStatFriendsNum');
+const homeStatReviewEl = document.getElementById('homeStatReview');
+const homeStatReviewNumEl = document.getElementById('homeStatReviewNum');
+const homeStatReviewLabelEl = document.getElementById('homeStatReviewLabel');
+const homeXpShopBannerEl = document.getElementById('homeXpShopBanner');
+const homeNotifSectionEl = document.getElementById('homeNotifSection');
+const homeNotifListEl = document.getElementById('homeNotifList');
+const homeGamesSectionEl = document.getElementById('homeGamesSection');
+const homeGamesRowEl = document.getElementById('homeGamesRow');
+const homeEditProfileBtn = document.getElementById('homeEditProfileBtn');
+const homeReviewPageBtn = document.getElementById('homeReviewPageBtn');
+
+homeEditProfileBtn?.addEventListener('click', () => document.querySelector('.nav-btn[data-page="settings"]')?.click());
+// Review Page itself is free to open — the Premium gate lives inside it,
+// on the individual Full Weak Spot Review / Full Personalized Review / Daily
+// Lesson actions (openReviewPage() no-ops if Review Lessons are toggled off).
+homeReviewPageBtn?.addEventListener('click', async () => { await ensureLearnInitialized(); openReviewPage(); });
+homeStatXpEl?.addEventListener('click', () => openXpShop());
+homeXpShopBannerEl?.addEventListener('click', () => openXpShop());
 
 let homeLoadToken = 0; // bumped on every refresh so a slow, stale fetch can't clobber a newer render
 
-// Every playable game, with the exact card ID to trigger from Games so a
-// widget tap can jump straight into one instead of the games list.
+// Every playable game (plus Join Game), with the exact card/button ID to
+// trigger from the Learning Games page so a tap can jump straight into one
+// instead of opening the games list first. All 9 always show, in the same
+// order as the Learning Games page.
 const HOME_GAME_LIST = [
-  { name: 'Trivia', desc: 'Quick-fire questions about anything', cardId: 'gameCardTrivia' },
-  { name: 'Maze', desc: 'Navigate a maze, answer questions to keep moving', cardId: 'gameCardMaze' },
-  { name: 'Seesaw', desc: '2 players, pass the phone — answer before time runs out', cardId: 'gameCardSeesaw' },
-  { name: 'Meltdown', desc: 'Solo speed round — answer fast before you melt', cardId: 'gameCardMeltdown' },
-  { name: 'Who Can Answer First?', desc: '2 players, same question — fastest correct tap wins', cardId: 'gameCardDuel' },
+  { name: 'Join Game', desc: "Enter a friend's code to play together", cardId: 'joinGameEntryBtn', color: 'blue' },
+  { name: 'Trivia', desc: 'Quick-fire questions about anything', cardId: 'gameCardTrivia', color: 'blue' },
+  { name: 'Voice Trivia', desc: 'Say your answer out loud — the app listens', cardId: 'gameCardVoiceTrivia', color: 'cyan' },
+  { name: 'Maze', desc: 'Navigate a maze, answer questions to keep moving', cardId: 'gameCardMaze', color: 'teal' },
+  { name: 'Seesaw', desc: '2 players, pass the phone — answer before time runs out', cardId: 'gameCardSeesaw', color: 'amber' },
+  { name: 'Meltdown', desc: 'Solo speed round — answer fast before you melt', cardId: 'gameCardMeltdown', color: 'purple' },
+  { name: 'Word Grid', desc: 'Guess the secret 5-letter word in 6 tries', cardId: 'gameCardWordGrid', color: 'green' },
+  { name: 'Who Can Answer First?', desc: '2 players, same question — fastest correct tap wins', cardId: 'gameCardDuel', color: 'pink' },
+  { name: 'Word Connectors', desc: 'Find groups of 4 across all your courses', cardId: 'gameCardConnectors', color: 'rose' },
 ];
-
-// Color pairs (gradient start/end) — one fixed identity per widget "slot"
-// so the grid stays visually consistent between refreshes, iOS-widget style.
-const HOME_COLORS = {
-  streak: ['#FF8A2B', '#FF6A1F'],
-  course: ['#FFCB3D', '#FFB020'],
-  game: ['#5FCB58', '#3DAE45'],
-  wrong: ['#FF6B7A', '#F0435A'],
-  episode: ['#29C2D8', '#1AA0C2'],
-  friends: ['#9B6BFF', '#7C4DE0'],
-  shared: ['#FF6FA8', '#E8508C'],
-  profile: ['#6C7CE0', '#4F5BC7'],
-};
-
-// Non-emoji icon for each widget "slot" — streak uses the streak.png image
-// file (sits next to index.html, not in an assets folder); everything else
-// uses the same Material Symbols font already used across the rest of the
-// app, so nothing on Home renders as an emoji character.
-const HOME_ICONS = {
-  course: 'celebration',
-  wrong: 'history_edu',
-  episode: 'podcasts',
-  friends: 'group_add',
-  shared: 'card_giftcard',
-  profile: 'edit',
-};
 
 function todayStrHome() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// ---- Home-data cache (instant paint on login) ----
+// Purely a "show something immediately" cache, not a source of truth —
+// every refreshHome() still runs the real loadHomeData() fetch and
+// overwrites both the render and this cache with fresh results right
+// after. Keyed per-uid so switching accounts on one device can't flash
+// the previous account's Home data.
+function homeDataCacheKey(uidStr) {
+  return `kll_home_data_${uidStr}`;
+}
+function getCachedHomeData(uidStr) {
+  try {
+    const raw = localStorage.getItem(homeDataCacheKey(uidStr));
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+function setCachedHomeData(uidStr, data) {
+  try {
+    localStorage.setItem(homeDataCacheKey(uidStr), JSON.stringify(data));
+  } catch (err) {
+    console.warn('Could not cache Home data:', err);
+  }
 }
 
 // Jumps to the Learn tab exactly like tapping the nav button would (page
@@ -660,67 +1728,242 @@ function goToLearnTab() {
 
 async function refreshHome() {
   const u = auth.currentUser;
-  if (!u || !homeWidgetsEl) return;
+  if (!u || !homeHeroEl) return;
   const token = ++homeLoadToken;
 
   const name = u.displayName || (u.email ? u.email.split('@')[0] : 'Learner');
   if (homeGreeting) homeGreeting.textContent = `Welcome, ${name}!`;
 
+  // Paint immediately from whatever Home data was last cached for this
+  // account, so the screen isn't blank/skeleton on every login while the
+  // real Firestore reads in loadHomeData() are still in flight. This is
+  // deliberately just a first paint, not a replacement for the real fetch
+  // below — it can be a session or more stale (course progress, streak,
+  // XP, friend requests may have changed since), so the real data below
+  // still always runs and overwrites it once it resolves.
+  const cachedHome = getCachedHomeData(u.uid);
+  if (cachedHome) renderHome(cachedHome);
+
   const data = await loadHomeData(u.uid);
   if (token !== homeLoadToken) return; // a newer refresh already started
-  renderHomeWidgets(buildHomeWidgets(data));
+  renderHome(data);
+  setCachedHomeData(u.uid, data);
+  maybeShowWelcomeBackOverlay(u);
+  maybeShowWeeklyReviewOverlay(u);
 }
 
-// Pulls everything Home's widgets might need directly from Firestore (and,
-// for the latest episode, from the Listen tab's own already-rendered DOM),
-// independent of whether the learner has opened Learn/Listen/Friends yet.
+document.addEventListener('kll:refreshHome', () => refreshHome());
+
+// ---- Welcome Back full-pager (20+ days since last app open) ----
+// Reads/writes the same lastLoginAt written in handlePostSignInChecks on
+// every sign-in, so this needs no new Firestore field — "20+ days since
+// you last opened the app" is exactly what that timestamp already tracks.
+// Runs once per Home refresh cycle at most (see the module-scoped guard),
+// since refreshHome() can fire more than once in a session.
+let welcomeBackCheckedThisSession = false;
+async function maybeShowWelcomeBackOverlay(u) {
+  if (welcomeBackCheckedThisSession) return;
+  welcomeBackCheckedThisSession = true;
+  try {
+    const snap = await getDoc(doc(db, 'userProfiles', u.uid));
+    const lastLoginAt = snap.exists() ? snap.data()?.lastLoginAt : null;
+    if (!lastLoginAt) return;
+    const days = Math.floor((Date.now() - lastLoginAt) / 86400000);
+    if (days >= 20) {
+      await maybeShowOverlay('welcomeBack', { vars: { days: String(days) } });
+    }
+  } catch (err) {
+    console.error('Welcome Back overlay check failed:', err);
+  }
+}
+
+// ---- Weekly Review full-pager (Premium only) ----
+// Shows once per calendar week, the first time the app is opened that
+// week — same "session guard + userProfiles doc" shape as
+// maybeShowWelcomeBackOverlay above, just keyed off a week number instead
+// of a day gap. Deliberately its own lightweight overlay (see
+// #weeklyReviewOverlay in index.html) rather than routed through
+// firstTimeOverlays.js, since this isn't a one-time "first time you saw
+// this feature" beat — it's meant to recur every week, forever.
+let weeklyReviewCheckedThisSession = false;
+function isoWeekKey(d) {
+  // Sunday-based week bucket ("YYYY-Wnn" of the days-since-epoch // 7) —
+  // doesn't need to match the ISO calendar standard exactly, just needs to
+  // change once a week and be cheap to compute/compare.
+  const days = Math.floor(d.getTime() / 86400000);
+  return String(Math.floor(days / 7));
+}
+async function maybeShowWeeklyReviewOverlay(u) {
+  if (weeklyReviewCheckedThisSession) return;
+  weeklyReviewCheckedThisSession = true;
+  if (!isPremium()) return; // Premium-only feature — free users never see this
+  try {
+    const profileRef = doc(db, 'userProfiles', u.uid);
+    const snap = await getDoc(profileRef);
+    const lastShownWeek = snap.exists() ? snap.data()?.lastWeeklyReviewWeek : null;
+    const thisWeek = isoWeekKey(new Date());
+    if (lastShownWeek === thisWeek) return; // already seen this week
+
+    const data = await getWeeklyReviewData();
+    renderWeeklyReviewOverlay(data);
+    await setDoc(profileRef, { lastWeeklyReviewWeek: thisWeek, lastWeeklyReview: data }, { merge: true });
+  } catch (err) {
+    console.error('Weekly Review overlay check failed:', err);
+  }
+}
+
+const weeklyReviewOverlay = document.getElementById('weeklyReviewOverlay');
+const weeklyReviewRecapEl = document.getElementById('weeklyReviewRecap');
+const weeklyReviewXpEl = document.getElementById('weeklyReviewXp');
+const weeklyReviewStreakEl = document.getElementById('weeklyReviewStreak');
+const weeklyReviewCoursesEl = document.getElementById('weeklyReviewCourses');
+const weeklyReviewToughestEl = document.getElementById('weeklyReviewToughest');
+const weeklyReviewCloseBtn = document.getElementById('weeklyReviewCloseBtn');
+const weeklyReviewComboBtn = document.getElementById('weeklyReviewComboBtn');
+
+function renderWeeklyReviewOverlay(data) {
+  if (!weeklyReviewOverlay) {
+    console.warn('Weekly Review markup missing from index.html (#weeklyReviewOverlay).');
+    return;
+  }
+  if (weeklyReviewRecapEl) {
+    // AI-generated recap sentence when the textonlygroqfast call succeeded;
+    // otherwise a plain templated fallback so the overlay never shows blank.
+    weeklyReviewRecapEl.textContent = data.recap || (data.totalMistakes > 0
+      ? `Great effort this week! You've earned ${data.xp} XP across ${data.courseCount} course${data.courseCount === 1 ? '' : 's'} — keep it up!`
+      : `Great effort this week! You've earned ${data.xp} XP and you're all caught up — keep it up!`);
+  }
+  if (weeklyReviewXpEl) weeklyReviewXpEl.textContent = String(data.xp);
+  if (weeklyReviewStreakEl) weeklyReviewStreakEl.textContent = String(data.streak);
+  if (weeklyReviewCoursesEl) weeklyReviewCoursesEl.textContent = String(data.courseCount);
+  if (weeklyReviewToughestEl) {
+    weeklyReviewToughestEl.textContent = data.toughestCourse
+      ? `Toughest course: ${data.toughestCourse.title} (${data.toughestCourse.count} to review)`
+      : "You're all caught up — no mistakes waiting anywhere!";
+  }
+  // Only worth pointing at Combo Lesson if there's actually more than one
+  // course AND something to review — otherwise it'd just paywall-loop into
+  // "nothing to combo yet."
+  if (weeklyReviewComboBtn) {
+    weeklyReviewComboBtn.style.display = (data.courseCount >= 2 && data.totalMistakes > 0) ? '' : 'none';
+  }
+  weeklyReviewOverlay.classList.add('show');
+}
+weeklyReviewCloseBtn?.addEventListener('click', () => weeklyReviewOverlay.classList.remove('show'));
+weeklyReviewComboBtn?.addEventListener('click', async () => {
+  weeklyReviewOverlay.classList.remove('show');
+  await ensureLearnInitialized();
+  goToLearnTab();
+  openComboLesson();
+});
+
+// ---- Settings: "See Last Week's Recap" button ----
+// Premium-only, same as the auto overlay. Two cases:
+//   - Account is 7+ days old and already has a stored recap → just show
+//     that exact stored recap again, no regeneration.
+//   - Brand-new account (under 7 days old) with nothing stored yet →
+//     generate one now for however many days they've actually been
+//     around, then store it AS THIS WEEK'S recap (so it also satisfies
+//     the normal once-a-week auto-overlay and doesn't generate twice).
+const settingsWeeklyRecapBtn = document.getElementById('settingsWeeklyRecapBtn');
+settingsWeeklyRecapBtn?.addEventListener('click', async () => {
+  const u = auth.currentUser;
+  if (!u) return;
+  if (!isPremium()) {
+    openPaywall({ reason: 'Weekly Review is a Premium feature — a short AI recap of your progress.' });
+    return;
+  }
+  try {
+    const profileRef = doc(db, 'userProfiles', u.uid);
+    const snap = await getDoc(profileRef);
+    const profileData = snap.exists() ? snap.data() : {};
+
+    if (profileData.lastWeeklyReview) {
+      renderWeeklyReviewOverlay(profileData.lastWeeklyReview);
+      return;
+    }
+
+    // Nothing generated yet — figure out how many days old the account is
+    // from Firebase Auth's own creation timestamp (no app-side signup date
+    // is tracked separately, so this is the one source of truth for it).
+    const createdAtMs = u.metadata?.creationTime ? new Date(u.metadata.creationTime).getTime() : Date.now();
+    const daysActive = Math.max(1, Math.floor((Date.now() - createdAtMs) / 86400000));
+
+    await ensureLearnInitialized();
+    const data = await getWeeklyReviewData(daysActive < 7 ? daysActive : undefined);
+    renderWeeklyReviewOverlay(data);
+    // Stored "as if it were 7 days ago" per spec — i.e. as this week's
+    // recap, so the normal auto-overlay logic (isoWeekKey comparison)
+    // treats it as already satisfied and won't immediately fire again on
+    // the very next Home refresh.
+    await setDoc(profileRef, { lastWeeklyReviewWeek: isoWeekKey(new Date()), lastWeeklyReview: data }, { merge: true });
+  } catch (err) {
+    console.error('See Last Week\'s Recap failed:', err);
+  }
+});
+
+
+// (see homeMirror.js) instead of hitting Firestore directly — the mirror's
+// listeners keep homeData/{uid}/... current in the background for as long
+// as the user is signed in, so this is normally a single fast RTDB read
+// instead of 4 separate Firestore reads/queries. Falls back to the direct
+// Firestore reads below only if the mirror path is empty (e.g. the very
+// first Home load right after sign-in, before the mirror's listeners have
+// delivered their first snapshot yet) — Firestore itself never stops being
+// the source of truth, this is purely which one loadHomeData() reads from.
 async function loadHomeData(uidStr) {
-  const [learnProfileSnap, coursesSnap, friendsSnap, sharedSnap] = await Promise.all([
-    getDoc(doc(db, 'users', uidStr, 'learnProfile', 'main')).catch(() => null),
-    getDocs(query(collection(db, 'users', uidStr, 'learnCourses'), orderBy('lastOpenedAt', 'desc'), limit(1))).catch(() => null),
-    getDocs(collection(db, 'users', uidStr, 'friends')).catch(() => null),
-    getDocs(query(collection(db, 'users', uidStr, 'sharedCourses'), where('status', '==', 'pending'))).catch(() => null),
-  ]);
+  await ensureLearnInitialized(); // see comment on the old Promise.all below — same reason, unchanged
 
-  const learnProfile = learnProfileSnap?.exists()
-    ? learnProfileSnap.data()
-    : { streak: 0, xp: 0, lastLessonDate: null, missedDaysInRow: 0 };
-
-  // Same "more than 2 full days since last lesson -> streak's actually 0"
-  // decay Learn applies, computed read-only here just for messaging.
-  let effectiveStreak = learnProfile.streak || 0;
-  let missedDaysInRow = 0;
-  if (learnProfile.lastLessonDate) {
-    const last = new Date(learnProfile.lastLessonDate + 'T00:00:00');
-    const today = new Date(todayStrHome() + 'T00:00:00');
-    const daysSince = Math.round((today - last) / 86400000);
-    missedDaysInRow = Math.max(0, daysSince - 1);
-    if (missedDaysInRow > 2) effectiveStreak = 0;
-  }
-  const doneToday = learnProfile.lastLessonDate === todayStrHome();
-
-  const activeCourse = coursesSnap && !coursesSnap.empty
-    ? { id: coursesSnap.docs[0].id, ...coursesSnap.docs[0].data() }
-    : null;
-
-  let wrongCount = 0;
-  if (activeCourse) {
-    const wrongSnap = await getDocs(collection(db, 'users', uidStr, 'learnCourses', activeCourse.id, 'wrongAnswers')).catch(() => null);
-    wrongCount = wrongSnap ? wrongSnap.size : 0;
+  let mirrored = null;
+  try {
+    const snap = await rtdbGet(rtdbRef(rtdb, `homeData/${uidStr}`));
+    mirrored = snap.exists() ? snap.val() : null;
+  } catch (err) {
+    console.warn('loadHomeData: RTDB mirror read failed, falling back to Firestore:', err);
   }
 
-  let friendReqCount = 0;
-  if (friendsSnap) {
-    friendsSnap.forEach((d) => {
-      const fd = d.data();
-      if (fd.status === 'pending' && fd.direction === 'received') friendReqCount++;
-    });
+  const learnProfile = mirrored?.learnProfile || { xp: 0 };
+  const activeCourse = mirrored?.activeCourse !== undefined ? mirrored.activeCourse : await loadActiveCourseFromFirestore(uidStr);
+  const wrongCount = mirrored?.wrongCount !== undefined ? mirrored.wrongCount
+    : (activeCourse ? await loadWrongCountFromFirestore(uidStr, activeCourse.id) : 0);
+  const friendReqCount = mirrored?.friendReqCount !== undefined ? mirrored.friendReqCount : 0;
+  const friendsCount = mirrored?.friendsCount !== undefined ? mirrored.friendsCount : 0;
+  const sharedCourseCount = mirrored?.sharedCourseCount !== undefined ? mirrored.sharedCourseCount : 0;
+
+  // Mirror wasn't populated at all yet (fresh sign-in, listeners haven't
+  // delivered a first snapshot) — do the original direct Firestore reads
+  // for friends/sharedCourses too, rather than silently showing 0s.
+  let finalFriendReqCount = friendReqCount, finalFriendsCount = friendsCount, finalSharedCourseCount = sharedCourseCount;
+  if (!mirrored) {
+    const [friendsSnap, sharedSnap] = await Promise.all([
+      getDocs(collection(db, 'users', uidStr, 'friends')).catch(() => null),
+      getDocs(query(collection(db, 'users', uidStr, 'sharedCourses'), where('status', '==', 'pending'))).catch(() => null),
+    ]);
+    finalFriendReqCount = 0; finalFriendsCount = 0;
+    if (friendsSnap) {
+      friendsSnap.forEach((d) => {
+        const fd = d.data();
+        if (fd.status === 'pending' && fd.direction === 'received') finalFriendReqCount++;
+        if (fd.status === 'accepted') finalFriendsCount++;
+      });
+    }
+    finalSharedCourseCount = sharedSnap ? sharedSnap.size : 0;
   }
 
-  const sharedCourseCount = sharedSnap ? sharedSnap.size : 0;
+  // Read straight from learn.js's own in-memory state — the exact same
+  // numbers driving Learn's top-left streak counter — instead of
+  // recomputing a second, cruder decay here that could disagree with it
+  // (e.g. this used to ignore Streak Passes entirely). Unchanged from
+  // before — streak is computed, not fetched, so it was never part of the
+  // Firestore-vs-RTDB question.
+  const { streak: effectiveStreak, missedDaysInRow, lastLessonDate } = getLearnStreakSnapshot();
+  const doneToday = lastLessonDate === todayStrHome();
+
+  const xp = learnProfile.xp || 0;
 
   // Latest episode: read straight off the Listen tab's own DOM once it's
   // rendered its list — avoids duplicating player.js's fetch/parse logic.
+  // Unchanged — this was never a Firestore/RTDB read to begin with.
   let latestEpisode = null;
   const firstCard = document.querySelector('#listenEpisodeList .episode-card');
   if (firstCard) {
@@ -728,13 +1971,26 @@ async function loadHomeData(uidStr) {
       title: firstCard.querySelector('.episode-card-title')?.textContent?.trim() || null,
     };
   } else {
-    // Episodes usually aren't loaded yet the first time Home renders (right
-    // after sign-in) — watch for them and re-render Home once, if the
-    // learner is still sitting on the Home tab when they show up.
     watchForLatestEpisode();
   }
 
-  return { learnProfile, effectiveStreak, missedDaysInRow, doneToday, activeCourse, wrongCount, friendReqCount, sharedCourseCount, latestEpisode };
+  return {
+    learnProfile, effectiveStreak, missedDaysInRow, doneToday, activeCourse, wrongCount, xp,
+    friendReqCount: finalFriendReqCount, friendsCount: finalFriendsCount, sharedCourseCount: finalSharedCourseCount,
+    latestEpisode,
+  };
+}
+
+// Fallback path used only when the RTDB mirror hasn't populated activeCourse yet.
+async function loadActiveCourseFromFirestore(uidStr) {
+  const coursesSnap = await getDocs(query(collection(db, 'users', uidStr, 'learnCourses'), orderBy('lastOpenedAt', 'desc'), limit(1))).catch(() => null);
+  return coursesSnap && !coursesSnap.empty ? { id: coursesSnap.docs[0].id, ...coursesSnap.docs[0].data() } : null;
+}
+
+// Fallback path used only when the RTDB mirror hasn't populated wrongCount yet.
+async function loadWrongCountFromFirestore(uidStr, courseId) {
+  const wrongSnap = await getDocs(collection(db, 'users', uidStr, 'learnCourses', courseId, 'wrongAnswers')).catch(() => null);
+  return wrongSnap ? wrongSnap.size : 0;
 }
 
 let episodeWatcherStarted = false;
@@ -752,216 +2008,213 @@ function watchForLatestEpisode() {
   observer.observe(list, { childList: true });
 }
 
-// Builds the pool of eligible widgets from fetched data — each one carries
-// its own "why am I showing this" calculation, so the copy always reflects
-// the learner's actual state, plus the size/color/template it should
-// render as (small/wide/tall/large/banner — iOS-widget style).
-function buildHomeWidgets(data) {
-  const { effectiveStreak, missedDaysInRow, doneToday, activeCourse, wrongCount, friendReqCount, sharedCourseCount, latestEpisode } = data;
-  const widgets = [];
+// Renders every section of Home from the fetched data. Each section decides
+// for itself how to handle "however many items exist today" — the hero is
+// always exactly one, stats is always a fixed 1-or-2-cell row, notifications
+// is a plain list that grows/shrinks with zero layout math, and games is a
+// horizontally-scrolling row. Nothing here has to be pre-sized against
+// whatever else happens to be on the page, so there's no combination of
+// present/absent optional items that leaves an empty gap.
+function renderHome(data) {
+  if (homeLoadingEl) homeLoadingEl.style.display = 'none';
+  if (homeSkeletonEl) homeSkeletonEl.style.display = 'none';
+  renderHomeHero(data);
+  renderHomeStats(data);
+  renderHomeUsageBanner();
+  renderHomeNotifications(data);
+  renderHomeGames();
+}
 
-  // ---- Streak — small "stat" widget: big number + flame ----
-  const [streakA, streakB] = HOME_COLORS.streak;
-  if (effectiveStreak === 0) {
-    widgets.push({
-      key: 'streak', size: 'sm', template: 'stat', colors: [streakA, streakB],
-      num: '0', label: 'start today',
-      onClick: goToLearnTab,
-    });
-  } else {
-    widgets.push({
-      key: 'streak', size: 'sm', template: 'stat', colors: [streakA, streakB],
-      num: String(effectiveStreak),
-      label: doneToday ? 'day streak, done!' : (missedDaysInRow >= 1 ? 'day streak — don\'t lose it!' : 'day streak'),
-      onClick: doneToday
-        ? async () => { await ensureLearnInitialized(); goToLearnTab(); document.getElementById('learnStreakBtn')?.click(); }
-        : goToLearnTab,
-    });
-  }
+// ---- Usage banner: free-tier "Games left / Lessons left" (from today's
+// local usage counts), or a "Unlimited unlocked" callout for Premium.
+// Re-run on every premium-status change too, not just on home renders,
+// since purchasing/restoring can flip isPremium() without necessarily
+// re-running renderHome() right away. ----
+function renderHomeUsageBanner() {
+  if (!homeUsageBannerEl) return;
 
-  // ---- Edit profile — tiny "icon" widget, exactly 1 row tall so it
-  // slots into the gap the grid otherwise leaves under the streak card
-  // (2 rows) when it lands beside the taller game card (3 rows) ----
-  const [profA, profB] = HOME_COLORS.profile;
-  widgets.push({
-    key: 'editProfile', size: 'xs', template: 'icon', colors: [profA, profB], icon: HOME_ICONS.profile,
-    label: 'Edit your profile',
-    onClick: () => document.querySelector('.nav-btn[data-page="settings"]')?.click(),
-  });
+  // Lesson/game gating no longer exists — everyone gets unlimited Games &
+  // Lessons, free or Premium, so there's nothing left to count down. Keep
+  // a lightweight banner rather than removing it outright since it's a
+  // nice, cheap "you have everything" reassurance on Home.
+  homeUsageBannerEl.style.display = 'flex';
+  homeUsageBannerEl.className = isPremium() ? 'home-usage-banner c-premium' : 'home-usage-banner c-free';
+  homeUsageBannerEl.innerHTML = `
+    <span class="material-symbols-outlined">bolt</span>
+    <span>Unlimited Games &amp; Lessons!</span>
+  `;
 
-  // ---- Continue course / start one / review / complete — wide "info" ----
-  const [courseA, courseB] = HOME_COLORS.course;
+  document.getElementById('homeGoPremiumBtn')?.classList.toggle('is-premium-member', isPremium());
+  homeReviewPageBtn?.classList.toggle('is-premium-member', isPremium());
+}
+
+onPremiumChange(() => renderHomeUsageBanner());
+
+// ---- Hero: continue course / start one / review / complete — the single
+// dominant card, always exactly one, so it never competes for prominence
+// with anything else on the page. ----
+// Lightens (positive percent) or darkens (negative percent) a hex color by
+// mixing it toward white/black. Used to turn a course's single accent color
+// into the two-tone gradient the hero card is styled with.
+function shadeHexColor(hex, percent) {
+  const num = parseInt(hex.slice(1), 16);
+  const amt = Math.round(2.55 * percent);
+  const r = Math.max(0, Math.min(255, ((num >> 16) & 0xff) + amt));
+  const g = Math.max(0, Math.min(255, ((num >> 8) & 0xff) + amt));
+  const b = Math.max(0, Math.min(255, (num & 0xff) + amt));
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+}
+
+function renderHomeHero(data) {
+  const { activeCourse } = data;
+  if (!homeHeroEl) return;
+  homeHeroEl.style.display = '';
+  homeHeroEl.onclick = goToLearnTab;
+  homeHeroProgressTrackEl.style.display = 'none';
+
+  // Theme the card to the active course's color (falls back to the default
+  // blue gradient via CSS when there's no course, or no color on it).
+  homeHeroEl.style.background = activeCourse?.color
+    ? `linear-gradient(135deg, ${shadeHexColor(activeCourse.color, 12)}, ${shadeHexColor(activeCourse.color, -12)})`
+    : '';
+
   if (!activeCourse) {
-    widgets.push({
-      key: 'course', size: 'wide', template: 'info', colors: [courseA, courseB],
-      label: 'Start Learning', big: 'New Course', sub: 'Type anything you want to learn',
-      onClick: goToLearnTab,
-    });
+    homeHeroLabelEl.textContent = 'Start learning';
+    homeHeroTitleEl.textContent = 'New course';
+    homeHeroSubEl.textContent = 'Type anything you want to learn';
+    return;
+  }
+
+  const unitIndex = activeCourse.currentUnitIndex || 0;
+  const courseDone = unitIndex >= 10;
+  if (activeCourse.status === 'generating' && !courseDone) {
+    homeHeroLabelEl.textContent = 'Preparing your lesson…';
+    homeHeroTitleEl.textContent = activeCourse.title;
+    homeHeroSubEl.textContent = 'Check back in a moment';
+  } else if (courseDone && activeCourse.courseReviewCompleted) {
+    homeHeroLabelEl.textContent = 'Course complete!';
+    homeHeroTitleEl.textContent = activeCourse.title;
+    homeHeroSubEl.textContent = 'Ready for something new?';
+  } else if (courseDone) {
+    homeHeroLabelEl.textContent = 'Final review ready';
+    homeHeroTitleEl.textContent = activeCourse.title;
+    homeHeroSubEl.textContent = '15 questions on the whole course';
   } else {
-    const courseDone = (activeCourse.currentUnitIndex || 0) >= 10;
-    if (activeCourse.status === 'generating' && !courseDone) {
-      widgets.push({
-        key: 'course', size: 'wide', template: 'info', colors: [courseA, courseB],
-        label: 'Preparing your lesson…', big: activeCourse.title, sub: 'Check back in a moment',
-        onClick: goToLearnTab,
-      });
-    } else if (courseDone && activeCourse.courseReviewCompleted) {
-      widgets.push({
-        key: 'course', size: 'wide', template: 'info', colors: [courseA, courseB],
-        label: 'Course complete!', big: activeCourse.title, sub: 'Ready for something new?',
-        onClick: goToLearnTab,
-      });
-    } else if (courseDone) {
-      widgets.push({
-        key: 'course', size: 'wide', template: 'info', colors: [courseA, courseB],
-        label: 'Final Review Ready', big: activeCourse.title, sub: '15 questions on the whole course',
-        onClick: goToLearnTab,
-      });
-    } else {
-      widgets.push({
-        key: 'course', size: 'wide', template: 'info', colors: [courseA, courseB],
-        label: 'Continue where you left off', big: activeCourse.title,
-        sub: `Unit ${(activeCourse.currentUnitIndex || 0) + 1}, Lesson ${(activeCourse.currentLessonIndex || 0) + 1}`,
-        onClick: goToLearnTab,
-      });
-    }
+    homeHeroLabelEl.textContent = 'Continue where you left off';
+    homeHeroTitleEl.textContent = activeCourse.title;
+    homeHeroSubEl.textContent = `Unit ${unitIndex + 1}, lesson ${(activeCourse.currentLessonIndex || 0) + 1}`;
+    homeHeroProgressTrackEl.style.display = '';
+    homeHeroProgressFillEl.style.width = `${Math.min(100, Math.round((unitIndex / 10) * 100))}%`;
   }
+}
 
-  // ---- Wrong answers — full-width "banner" ----
-  if (wrongCount > 0) {
-    const [wrongA, wrongB] = HOME_COLORS.wrong;
-    widgets.push({
-      key: 'wrong', size: 'banner', template: 'banner', colors: [wrongA, wrongB], icon: HOME_ICONS.wrong,
-      big: `${wrongCount} Wrong Answer${wrongCount === 1 ? '' : 's'}`,
-      onClick: async () => { await ensureLearnInitialized(); goToLearnTab(); },
-    });
+// ---- Stats: a fixed 2x2 grid — streak, XP, friends, review — always the
+// same four cells so there's no variable count to pack. Review swaps to a
+// positive green "all caught up" state at 0 instead of hiding, so the grid
+// shape never changes. ----
+function renderHomeStats(data) {
+  const { effectiveStreak, missedDaysInRow, doneToday, xp, friendsCount } = data;
+  if (!homeStatsRowEl) return;
+  homeStatsRowEl.style.display = '';
+  if (homeXpShopBannerEl) homeXpShopBannerEl.style.display = '';
+
+  homeStatStreakNumEl.textContent = String(effectiveStreak);
+  homeStatStreakLabelEl.textContent = effectiveStreak === 0
+    ? 'Start today'
+    : (doneToday ? 'Day streak, done!' : (missedDaysInRow >= 1 ? "Don't lose it!" : 'Day streak'));
+  homeStatStreakEl.onclick = (effectiveStreak > 0 && doneToday)
+    ? async () => { await ensureLearnInitialized(); goToLearnTab(); document.getElementById('learnStreakBtn')?.click(); }
+    : goToLearnTab;
+
+  homeStatXpNumEl.textContent = String(xp);
+
+  homeStatFriendsNumEl.textContent = String(friendsCount);
+  homeStatFriendsEl.onclick = () => profileFriendsBtn?.click();
+
+  // Weak-spot count read straight from learn.js's own in-memory state
+  // (kept live by maybeGenerateReviewSpots()) rather than the RTDB
+  // mirror's wrongCount, which now only feeds Daily Lesson's mistake-mix,
+  // not this stat card.
+  const weakSpotCount = getWeakSpotCount();
+  homeStatReviewEl.classList.remove('c-error', 'c-green');
+  if (weakSpotCount > 0) {
+    homeStatReviewEl.classList.add('c-error');
+    homeStatReviewNumEl.textContent = String(weakSpotCount);
+    homeStatReviewLabelEl.textContent = 'Weak Spots to Review';
+    homeStatReviewEl.onclick = async () => { await ensureLearnInitialized(); goToLearnTab(); openReviewPage(); };
+  } else {
+    homeStatReviewEl.classList.add('c-green');
+    homeStatReviewNumEl.textContent = '0';
+    homeStatReviewLabelEl.textContent = 'All caught up!';
+    homeStatReviewEl.onclick = goToLearnTab;
   }
+}
 
-  // ---- Play a new game — tall "info", one specific game picked at random ----
-  const pickedGame = HOME_GAME_LIST[Math.floor(Math.random() * HOME_GAME_LIST.length)];
-  const [gameA, gameB] = HOME_COLORS.game;
-  widgets.push({
-    key: 'game', size: 'tall', template: 'info', colors: [gameA, gameB],
-    label: 'Play a new game', big: pickedGame.name, sub: pickedGame.desc,
-    onClick: async () => { await ensureLearnInitialized(); document.getElementById(pickedGame.cardId)?.click(); },
-  });
+// ---- Notifications: a plain vertical list — friend requests, shared
+// courses, latest episode. 0 items hides the section, N items is just N
+// rows; the list absorbs the count instead of a grid trying to. ----
+function renderHomeNotifications(data) {
+  const { friendReqCount, sharedCourseCount, latestEpisode } = data;
+  if (!homeNotifListEl) return;
+  homeNotifListEl.innerHTML = '';
 
-  // ---- Latest episode — full-width "banner" ----
-  const [epA, epB] = HOME_COLORS.episode;
-  widgets.push({
-    key: 'episode', size: 'banner', template: 'banner', colors: [epA, epB], icon: HOME_ICONS.episode,
-    big: latestEpisode?.title ? latestEpisode.title : 'Catch up on the podcast',
-    onClick: () => document.querySelector('.nav-btn[data-page="listen"]')?.click(),
-  });
-
-  // ---- Friend requests — full-width "banner" ----
+  const items = [];
   if (friendReqCount > 0) {
-    const [frA, frB] = HOME_COLORS.friends;
-    widgets.push({
-      key: 'friends', size: 'banner', template: 'banner', colors: [frA, frB], icon: HOME_ICONS.friends,
-      big: `${friendReqCount} Friend Request${friendReqCount === 1 ? '' : 's'}`,
+    items.push({
+      icon: 'group_add', color: 'purple',
+      text: `${friendReqCount} friend request${friendReqCount === 1 ? '' : 's'}`,
       onClick: () => profileFriendsBtn?.click(),
     });
   }
-
-  // ---- Shared courses — full-width "banner" ----
   if (sharedCourseCount > 0) {
-    const [shA, shB] = HOME_COLORS.shared;
-    widgets.push({
-      key: 'shared', size: 'banner', template: 'banner', colors: [shA, shB], icon: HOME_ICONS.shared,
-      big: `${sharedCourseCount} Course${sharedCourseCount === 1 ? '' : 's'} Shared With You`,
+    items.push({
+      icon: 'card_giftcard', color: 'pink',
+      text: `${sharedCourseCount} course${sharedCourseCount === 1 ? '' : 's'} shared with you`,
       onClick: async () => { await ensureLearnInitialized(); goToLearnTab(); },
     });
   }
+  items.push({
+    icon: 'podcasts', color: 'teal',
+    text: latestEpisode?.title ? latestEpisode.title : 'Catch up on the podcast',
+    onClick: () => document.querySelector('.nav-btn[data-page="listen"]')?.click(),
+  });
 
-  return widgets;
+  homeNotifSectionEl.style.display = items.length ? '' : 'none';
+  items.forEach((item) => {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = `home-notif-row c-${item.color}`;
+    row.innerHTML = `
+      <span class="material-symbols-outlined home-notif-icon">${item.icon}</span>
+      <div class="home-notif-text">${escapeHtmlMain(item.text)}</div>
+      <span class="material-symbols-outlined home-notif-chevron">chevron_right</span>
+    `;
+    row.addEventListener('click', item.onClick);
+    homeNotifListEl.appendChild(row);
+  });
 }
 
-// Fisher–Yates shuffle.
-function shuffleHomeWidgets(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+// ---- Games: a horizontally-scrolling row showing every Learning Games
+// entry (Join Game plus all 8 games), so nothing is left undiscoverable
+// behind the Games page. Each card just re-triggers the same button the
+// Learning Games page itself uses, so behavior never drifts out of sync.
+function renderHomeGames() {
+  if (!homeGamesRowEl) return;
+  homeGamesRowEl.innerHTML = '';
 
-// Every possible widget "slot" — shuffled once into a stable order the
-// moment Home first renders after an app load/reload, then reused for every
-// later refresh (opening the tab again, data changing, etc.) so the layout
-// doesn't reshuffle itself just from navigating back to Home. A fresh
-// shuffle only happens again after the app itself is reloaded.
-const HOME_WIDGET_KEYS = ['streak', 'course', 'wrong', 'game', 'episode', 'friends', 'shared', 'editProfile'];
-let homeWidgetOrder = null;
-function getHomeWidgetOrder() {
-  if (!homeWidgetOrder) homeWidgetOrder = shuffleHomeWidgets(HOME_WIDGET_KEYS);
-  return homeWidgetOrder;
-}
-
-const HOME_SIZE_CLASS = { xs: 'hw-xs', sm: 'hw-sm', wide: 'hw-wide', tall: 'hw-tall', large: 'hw-large', banner: 'hw-banner' };
-
-function renderHomeWidgets(widgets) {
-  if (!homeWidgetsEl) return;
-  homeWidgetsEl.innerHTML = '';
-  const order = getHomeWidgetOrder();
-  const sorted = [...widgets].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
-
-  sorted.forEach((w) => {
+  homeGamesSectionEl.style.display = HOME_GAME_LIST.length ? '' : 'none';
+  HOME_GAME_LIST.forEach((game) => {
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = `home-widget type-${w.template} ${HOME_SIZE_CLASS[w.size] || 'hw-wide'}`;
-    card.style.background = `linear-gradient(135deg, ${w.colors[0]}, ${w.colors[1]})`;
-
-    if (w.template === 'stat') {
-      card.innerHTML = `
-        <div class="hw-stat-num">${escapeHtmlMain(w.num)}<img src="./streak.png" class="hw-stat-icon" alt="" /></div>
-        <div class="hw-stat-label">${escapeHtmlMain(w.label)}</div>
-      `;
-    } else if (w.template === 'banner') {
-      card.innerHTML = `
-        ${w.icon ? `<span class="material-symbols-outlined hw-banner-icon">${w.icon}</span>` : ''}
-        <div class="hw-big">${escapeHtmlMain(w.big)}</div>
-      `;
-    } else if (w.template === 'icon') {
-      card.innerHTML = `
-        <span class="material-symbols-outlined hw-icon-symbol">${w.icon}</span>
-        <div class="hw-icon-label">${escapeHtmlMain(w.label)}</div>
-      `;
-    } else {
-      card.innerHTML = `
-        <div class="hw-label">${escapeHtmlMain(w.label)}</div>
-        <div class="hw-big">${escapeHtmlMain(w.big)}</div>
-        ${w.sub ? `<div class="hw-sub">${escapeHtmlMain(w.sub)}</div>` : ''}
-      `;
-    }
-    card.addEventListener('click', () => w.onClick && w.onClick());
-    homeWidgetsEl.appendChild(card);
-  });
-
-  fitHomeGrid();
-}
-
-// Sizes the grid's row height on the fly so the whole widget grid — however
-// many widgets happen to be showing — always exactly fills the space below
-// the greeting with no leftover empty area and no overflow/scrolling.
-function fitHomeGrid() {
-  if (!homeWidgetsEl) return;
-  requestAnimationFrame(() => {
-    const available = homeWidgetsEl.clientHeight;
-    if (!available) return;
-
-    const rowsTemplate = getComputedStyle(homeWidgetsEl).gridTemplateRows;
-    const rowCount = rowsTemplate.split(' ').filter(Boolean).length;
-    if (!rowCount) return;
-
-    const gap = 14; // matches .home-widgets-grid's gap
-    const rowHeight = (available - gap * (rowCount - 1)) / rowCount;
-    homeWidgetsEl.style.setProperty('--hw-row', `${Math.max(44, rowHeight)}px`);
+    card.className = `home-game-card c-${game.color}`;
+    card.innerHTML = `
+      <div class="home-game-title">${escapeHtmlMain(game.name)}</div>
+      <div class="home-game-sub">${escapeHtmlMain(game.desc)}</div>
+    `;
+    card.addEventListener('click', async () => { await ensureLearnInitialized(); document.getElementById(game.cardId)?.click(); });
+    homeGamesRowEl.appendChild(card);
   });
 }
-
-window.addEventListener('resize', () => fitHomeGrid());
 
 // ============================================================
 // ============================================================
@@ -1007,40 +2260,64 @@ const avatarCancelBtn = document.getElementById('avatarCancelBtn');
 let avatarSelectedEmoji = []; // up to 2 emoji strings, in pick order
 let avatarSelectedColor = AVATAR_COLOR_CHOICES[0];
 
-// Build the emoji grid buttons once.
-AVATAR_EMOJI_CHOICES.forEach((emoji) => {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'avatar-emoji-btn';
-  btn.textContent = emoji;
-  btn.dataset.emoji = emoji;
-  btn.addEventListener('click', () => {
-    const idx = avatarSelectedEmoji.indexOf(emoji);
-    if (idx !== -1) {
-      avatarSelectedEmoji.splice(idx, 1);
-    } else {
-      if (avatarSelectedEmoji.length >= 2) avatarSelectedEmoji.shift(); // drop oldest pick
-      avatarSelectedEmoji.push(emoji);
-    }
-    avatarError.textContent = '';
-    refreshAvatarModalUI();
-  });
-  avatarEmojiGrid.appendChild(btn);
-});
+// Rebuilds the emoji/color grids from the 30/15 defaults PLUS whatever
+// this account has unlocked from the XP Shop — called once at startup and
+// again any time onShopStateChange fires with a different unlocked list,
+// so a purchase made from the shop shows up here without needing to
+// reopen the picker.
+let _lastRenderedUnlockedEmoji = [];
+let _lastRenderedUnlockedColors = [];
+function rebuildAvatarPickerGrids(state) {
+  const emojiChoices = [...AVATAR_EMOJI_CHOICES, ...(state.unlockedEmoji || [])];
+  const colorChoices = [...AVATAR_COLOR_CHOICES, ...(state.unlockedColors || [])];
+  if (
+    emojiChoices.length === avatarEmojiGrid.childElementCount
+    && colorChoices.length === avatarColorGrid.childElementCount
+    && (state.unlockedEmoji || []).join('') === _lastRenderedUnlockedEmoji.join('')
+    && (state.unlockedColors || []).join('') === _lastRenderedUnlockedColors.join('')
+  ) return; // nothing new to add — skip the rebuild
 
-// Build the color swatch buttons once.
-AVATAR_COLOR_CHOICES.forEach((color) => {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'avatar-color-swatch';
-  btn.style.background = color;
-  btn.dataset.color = color;
-  btn.addEventListener('click', () => {
-    avatarSelectedColor = color;
-    refreshAvatarModalUI();
+  _lastRenderedUnlockedEmoji = state.unlockedEmoji || [];
+  _lastRenderedUnlockedColors = state.unlockedColors || [];
+
+  avatarEmojiGrid.innerHTML = '';
+  emojiChoices.forEach((emoji) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-emoji-btn';
+    btn.textContent = emoji;
+    btn.dataset.emoji = emoji;
+    btn.addEventListener('click', () => {
+      const idx = avatarSelectedEmoji.indexOf(emoji);
+      if (idx !== -1) {
+        avatarSelectedEmoji.splice(idx, 1);
+      } else {
+        if (avatarSelectedEmoji.length >= 2) avatarSelectedEmoji.shift(); // drop oldest pick
+        avatarSelectedEmoji.push(emoji);
+      }
+      avatarError.textContent = '';
+      refreshAvatarModalUI();
+    });
+    avatarEmojiGrid.appendChild(btn);
   });
-  avatarColorGrid.appendChild(btn);
-});
+
+  avatarColorGrid.innerHTML = '';
+  colorChoices.forEach((color) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-color-swatch';
+    btn.style.background = color;
+    btn.dataset.color = color;
+    btn.addEventListener('click', () => {
+      avatarSelectedColor = color;
+      refreshAvatarModalUI();
+    });
+    avatarColorGrid.appendChild(btn);
+  });
+
+  refreshAvatarModalUI();
+}
+onShopStateChange(rebuildAvatarPickerGrids);
 
 function refreshAvatarModalUI() {
   avatarEmojiGrid.querySelectorAll('.avatar-emoji-btn').forEach((btn) => {
@@ -1061,6 +2338,7 @@ profileAvatarBtn.addEventListener('click', () => {
   avatarSelectedColor = currentAvatar?.color || AVATAR_COLOR_CHOICES[0];
   refreshAvatarModalUI();
   avatarModalOverlay.classList.add('show');
+  maybeShowOverlay('avatarCustomizeWelcome');
 });
 avatarCancelBtn.addEventListener('click', () => avatarModalOverlay.classList.remove('show'));
 
@@ -1076,10 +2354,7 @@ avatarSaveBtn.addEventListener('click', async () => {
     const u = auth.currentUser;
     if (!u) throw new Error('Not signed in');
     const avatar = { emoji: avatarSelectedEmoji.join(''), color: avatarSelectedColor };
-    await setDoc(doc(db, 'userProfiles', u.uid), {
-      avatarEmoji: avatar.emoji,
-      avatarColor: avatar.color,
-    }, { merge: true });
+    await rtdbSet(rtdbRef(rtdb, `avatars/${u.uid}`), avatar);
     currentAvatar = avatar;
     renderAvatarInto(settingsAvatar, currentAvatar);
     avatarModalOverlay.classList.remove('show');
@@ -1105,11 +2380,21 @@ async function syncPublicProfileDocs(user) {
     await setDoc(doc(db, 'userProfiles', user.uid), {
       displayName: user.displayName || '',
       email: user.email || '',
+      premium: isPremium(),
     }, { merge: true });
   } catch (err) {
     console.error('Failed to sync public profile docs:', err);
   }
 }
+// Keep it in sync going forward too, not just at the moments
+// syncPublicProfileDocs() happens to get called from.
+onPremiumChange((premium) => {
+  const u = auth.currentUser;
+  if (!u) return;
+  setDoc(doc(db, 'userProfiles', u.uid), { premium }, { merge: true }).catch((err) => {
+    console.error('Failed to sync premium flag to public profile:', err);
+  });
+});
 
 async function loadXpTotal() {
   const u = auth.currentUser;
@@ -1118,16 +2403,36 @@ async function loadXpTotal() {
     const snap = await getDoc(doc(db, 'users', u.uid, 'learnProfile', 'main'));
     const xp = snap.exists() ? (snap.data().xp || 0) : 0;
     profileXpCount.textContent = xp;
-    // also pull the saved avatar, if any, now that we know it exists. Always
-    // set (or clear) currentAvatar here — if we only set it when an avatar
-    // exists, switching to an account with no avatar would keep showing the
-    // previous account's avatar.
-    const profSnap = await getDoc(doc(db, 'userProfiles', u.uid));
-    const profData = profSnap.exists() ? profSnap.data() : {};
-    currentAvatar = profData.avatarEmoji ? { emoji: profData.avatarEmoji, color: profData.avatarColor } : null;
-    renderAvatarInto(settingsAvatar, currentAvatar);
   } catch (err) {
     console.error('Failed to load XP total:', err);
+  }
+}
+
+// A monotonically increasing token so that if this gets called again (e.g.
+// the learner mashes the Settings button, or switches accounts) before an
+// earlier call's Firestore read has resolved, the earlier call's result —
+// which could be stale or for the wrong account — can recognize it's no
+// longer the latest request and skip updating the DOM.
+let avatarLoadToken = 0;
+
+// Always re-fetches the avatar from RTDB rather than trusting the
+// in-memory `currentAvatar` cache, so every time the Settings/Profile page
+// is opened it reflects what's actually saved — previously this was only
+// ever refreshed as a side effect of loadXpTotal(), so a slow or failed
+// read (or an out-of-order response from an earlier call) could leave the
+// picture blank or stale.
+async function loadAvatarForCurrentUser() {
+  const u = auth.currentUser;
+  if (!u) return;
+  const myToken = ++avatarLoadToken;
+  try {
+    const avatarSnap = await rtdbGet(rtdbRef(rtdb, `avatars/${u.uid}`));
+    if (myToken !== avatarLoadToken) return; // a newer call has since started — don't clobber its result
+    const avatarData = avatarSnap.exists() ? avatarSnap.val() : null;
+    currentAvatar = avatarData && avatarData.emoji ? { emoji: avatarData.emoji, color: avatarData.color } : null;
+    renderAvatarInto(settingsAvatar, currentAvatar);
+  } catch (err) {
+    console.error('Failed to load avatar:', err);
   }
 }
 
@@ -1183,12 +2488,14 @@ const NOTIF_ICONS = {
 
 let unsubscribeNotifs = null;
 let pushInitDone = false;
+let latestNotifs = []; // mirrors the last onSnapshot payload, so opening the panel knows what to mark read
 
 function startNotifBell(user) {
   stopNotifBell();
   const q = query(collection(db, 'users', user.uid, 'notifications'), orderBy('createdAt', 'desc'), limit(30));
   unsubscribeNotifs = onSnapshot(q, (snap) => {
     const notifs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    latestNotifs = notifs;
     renderNotifBadge(notifs);
     renderNotifPanel(notifs);
   }, (err) => console.error('Notifications listener failed:', err));
@@ -1197,6 +2504,7 @@ function stopNotifBell() {
   if (unsubscribeNotifs) { unsubscribeNotifs(); unsubscribeNotifs = null; }
   notifBellBadge.style.display = 'none';
   notifPanelList.innerHTML = '';
+  latestNotifs = [];
   pushInitDone = false;
 }
 
@@ -1248,6 +2556,28 @@ async function onNotifRowTap(n) {
   await routeForNotifType(n.type);
 }
 
+// Marks every currently-unread notification as read in one batched write —
+// called whenever the panel is opened, so the bell badge count actually
+// clears instead of staying stuck at whatever it first showed (it
+// previously only ever cleared per-notification, via onNotifRowTap above,
+// which meant notifications the person never individually tapped kept
+// counting forever).
+async function markAllNotifsRead() {
+  const u = auth.currentUser;
+  if (!u) return;
+  const unread = latestNotifs.filter((n) => !n.read);
+  if (!unread.length) return;
+  try {
+    const batch = writeBatch(db);
+    unread.forEach((n) => {
+      batch.update(doc(db, 'users', u.uid, 'notifications', n.id), { read: true });
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error('Failed to mark notifications read:', err);
+  }
+}
+
 // Shared "go to the right screen" logic for a notification type. Used both
 // when tapping an in-app bell row (onNotifRowTap above) and when tapping a
 // native OS push notification on Capacitor (see notificationActionPerformed
@@ -1273,6 +2603,7 @@ async function routeForNotifType(type) {
 notifBellBtn.addEventListener('click', () => {
   notifPanelOverlay.classList.add('show');
   initPushForCurrentUser(); // lazy: only asks for permission once the person shows interest
+  markAllNotifsRead();
 });
 notifPanelExitBtn.addEventListener('click', () => notifPanelOverlay.classList.remove('show'));
 
@@ -1407,6 +2738,12 @@ const friendsMyEmail = document.getElementById('friendsMyEmail');
 const friendsMyXp = document.getElementById('friendsMyXp');
 const friendsMyStreak = document.getElementById('friendsMyStreak');
 const addFriendOpenBtn = document.getElementById('addFriendOpenBtn');
+const myQrOpenBtn = document.getElementById('myQrOpenBtn');
+const scanAddFriendBtn = document.getElementById('scanAddFriendBtn');
+const myQrModalOverlay = document.getElementById('myQrModalOverlay');
+const myQrCanvas = document.getElementById('myQrCanvas');
+const myQrCloseBtn = document.getElementById('myQrCloseBtn');
+const myQrCourseDetectedEl = document.getElementById('myQrCourseDetected');
 const blockOpenBtn = document.getElementById('blockOpenBtn');
 const friendRequestsSection = document.getElementById('friendRequestsSection');
 const friendRequestsList = document.getElementById('friendRequestsList');
@@ -1436,6 +2773,7 @@ const friendProfileEmail = document.getElementById('friendProfileEmail');
 const friendProfileXp = document.getElementById('friendProfileXp');
 const friendProfileStreak = document.getElementById('friendProfileStreak');
 const friendProfileRemoveBtn = document.getElementById('friendProfileRemoveBtn');
+const friendProfileBadges = document.getElementById('friendProfileBadges');
 const friendProfileFriendsEmpty = document.getElementById('friendProfileFriendsEmpty');
 const friendProfileFriendsList = document.getElementById('friendProfileFriendsList');
 
@@ -1444,6 +2782,7 @@ let openFriendProfileUid = null; // whoever's profile is currently open in the f
 profileFriendsBtn.addEventListener('click', () => {
   friendsPageOverlay.classList.add('show');
   loadFriendsPage();
+  maybeShowOverlay('addFriendsWelcome');
 });
 friendsExitBtn.addEventListener('click', () => friendsPageOverlay.classList.remove('show'));
 
@@ -1453,8 +2792,14 @@ async function loadFriendsPage() {
 
   // ---- My own summary header ----
   renderAvatarInto(friendsMyAvatar, currentAvatar);
-  friendsMyName.textContent = u.displayName || (u.email ? u.email.split('@')[0] : 'Learner');
+  friendsMyName.textContent = formatDisplayName(u.displayName || (u.email ? u.email.split('@')[0] : 'Learner'), isPremium());
   friendsMyEmail.textContent = u.email || '';
+
+  // Kicked off in parallel, not awaited before it starts — this is what
+  // gets the cached/skeleton friend rows painting instantly instead of
+  // sitting behind this header's own Firestore round-trip first.
+  const friendsPromise = loadFriendsAndRequests();
+
   try {
     const learnSnap = await getDoc(doc(db, 'users', u.uid, 'learnProfile', 'main'));
     const data = learnSnap.exists() ? learnSnap.data() : {};
@@ -1462,7 +2807,58 @@ async function loadFriendsPage() {
     friendsMyStreak.textContent = data.streak || 0;
   } catch { /* leave as-is on failure */ }
 
-  await loadFriendsAndRequests();
+  await friendsPromise;
+}
+
+// ---- Friends list cache (instant render while the real Firestore read
+// happens in the background — see loadFriendsAndRequests below) ----
+// Keyed per-uid so switching accounts on the same device can't bleed one
+// person's cached friends into another's list, even for a flash of a frame.
+const FRIENDS_CACHE_PREFIX = 'kll_friends_cache_';
+function friendsCacheKey(uid) { return `${FRIENDS_CACHE_PREFIX}${uid}`; }
+function readFriendsCache(uid) {
+  try {
+    const raw = localStorage.getItem(friendsCacheKey(uid));
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) ? parsed : null;
+  } catch { return null; }
+}
+function writeFriendsCache(uid, entries) {
+  try { localStorage.setItem(friendsCacheKey(uid), JSON.stringify(entries)); } catch { /* best-effort only */ }
+}
+
+// Builds one accepted-friend row. Pulled out of loadFriendsAndRequests so
+// the exact same markup/handlers back both the instant cached render and
+// the real render once the background fetch resolves.
+function buildFriendRow(uid, info) {
+  const row = document.createElement('div');
+  row.className = 'friend-row';
+  row.innerHTML = `
+    ${miniAvatarHtml(info)}
+    <button type="button" class="friend-row-tap" data-uid="${uid}">
+      <div class="friend-row-name">${escapeHtmlMain(formatDisplayName(info.displayName || info.email || 'Learner', !!info.premium))}</div>
+      <div class="friend-row-sub">${info.xp || 0} XP · ${info.streak || 0} day streak</div>
+    </button>
+    <button type="button" class="friend-row-btn" data-uid="${uid}">Remove Friend</button>
+  `;
+  row.querySelector('.friend-row-tap').addEventListener('click', () => openFriendProfile(uid));
+  row.querySelector('.friend-row-btn').addEventListener('click', () => removeFriend(uid, false));
+  return row;
+}
+
+// Skeleton placeholder rows shown only when there's no cache yet to render
+// instantly (e.g. this device's very first time opening Friends).
+function renderFriendsSkeleton(count = 3) {
+  friendsListEmpty.style.display = 'none';
+  friendsList.innerHTML = Array.from({ length: count }).map(() => `
+    <div class="friend-row friend-row-skeleton">
+      <div class="skeleton-block skeleton-avatar"></div>
+      <div class="friend-row-tap" style="cursor:default;">
+        <div class="skeleton-block skeleton-line-name"></div>
+        <div class="skeleton-block skeleton-line-sub"></div>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function loadFriendsAndRequests() {
@@ -1470,10 +2866,20 @@ async function loadFriendsAndRequests() {
   if (!u) return;
   friendRequestsList.innerHTML = '';
   sentRequestsList.innerHTML = '';
-  friendsList.innerHTML = '';
   friendRequestsSection.style.display = 'none';
   sentRequestsSection.style.display = 'none';
-  friendsListEmpty.style.display = 'none';
+
+  // Instant paint from cache (if we have any) so the friends list never
+  // shows blank while the real Firestore round-trip below is in flight;
+  // falls back to skeleton rows only when there's nothing cached yet.
+  const cachedFriends = readFriendsCache(u.uid);
+  if (cachedFriends && cachedFriends.length) {
+    friendsListEmpty.style.display = 'none';
+    friendsList.innerHTML = '';
+    cachedFriends.forEach(({ uid, info }) => friendsList.appendChild(buildFriendRow(uid, info)));
+  } else {
+    renderFriendsSkeleton();
+  }
 
   let snap;
   try {
@@ -1502,7 +2908,7 @@ async function loadFriendsAndRequests() {
       row.innerHTML = `
         ${miniAvatarHtml(info)}
         <div class="friend-row-tap" style="cursor:default;">
-          <div class="friend-row-name">${escapeHtmlMain(info.displayName || info.email || 'Learner')}</div>
+          <div class="friend-row-name">${escapeHtmlMain(formatDisplayName(info.displayName || info.email || 'Learner', !!info.premium))}</div>
           <div class="friend-row-sub">${escapeHtmlMain(info.email || '')}</div>
         </div>
         <div class="friend-row-btns">
@@ -1526,7 +2932,7 @@ async function loadFriendsAndRequests() {
       row.innerHTML = `
         ${miniAvatarHtml(info)}
         <div class="friend-row-tap" style="cursor:default;">
-          <div class="friend-row-name">${escapeHtmlMain(info.displayName || info.email || 'Learner')}</div>
+          <div class="friend-row-name">${escapeHtmlMain(formatDisplayName(info.displayName || info.email || 'Learner', !!info.premium))}</div>
           <div class="friend-row-sub">${escapeHtmlMain(info.email || '')}</div>
         </div>
         <div class="friend-row-btns">
@@ -1542,24 +2948,18 @@ async function loadFriendsAndRequests() {
   checkFriendBadges(accepted.length);
 
   if (!accepted.length) {
+    friendsList.innerHTML = '';
     friendsListEmpty.style.display = '';
+    writeFriendsCache(u.uid, []);
   } else {
+    friendsList.innerHTML = ''; // replace cache/skeleton now that live data is ready
+    const freshCacheEntries = [];
     for (const friend of accepted) {
       const info = await fetchMiniProfile(friend.uid);
-      const row = document.createElement('div');
-      row.className = 'friend-row';
-      row.innerHTML = `
-        ${miniAvatarHtml(info)}
-        <button type="button" class="friend-row-tap" data-uid="${friend.uid}">
-          <div class="friend-row-name">${escapeHtmlMain(info.displayName || info.email || 'Learner')}</div>
-          <div class="friend-row-sub">${info.xp || 0} XP · ${info.streak || 0} day streak</div>
-        </button>
-        <button type="button" class="friend-row-btn" data-uid="${friend.uid}">Remove Friend</button>
-      `;
-      row.querySelector('.friend-row-tap').addEventListener('click', () => openFriendProfile(friend.uid));
-      row.querySelector('.friend-row-btn').addEventListener('click', () => removeFriend(friend.uid, false));
-      friendsList.appendChild(row);
+      freshCacheEntries.push({ uid: friend.uid, info });
+      friendsList.appendChild(buildFriendRow(friend.uid, info));
     }
+    writeFriendsCache(u.uid, freshCacheEntries);
   }
 }
 
@@ -1568,15 +2968,27 @@ async function loadFriendsAndRequests() {
 // pending *incoming* request the sender's profile isn't readable yet, so we
 // fall back to userDirectory (email only) in that case.
 async function fetchMiniProfile(otherUid) {
+  let info = null;
   try {
     const snap = await getDoc(doc(db, 'userProfiles', otherUid));
-    if (snap.exists()) return snap.data();
+    if (snap.exists()) info = snap.data();
   } catch { /* likely not-yet-accepted — fall through */ }
+  if (!info) {
+    try {
+      const dirSnap = await getDoc(doc(db, 'userDirectory', otherUid));
+      if (dirSnap.exists()) info = { email: dirSnap.data().email };
+    } catch { /* ignore */ }
+  }
+  if (!info) return {};
   try {
-    const dirSnap = await getDoc(doc(db, 'userDirectory', otherUid));
-    if (dirSnap.exists()) return { email: dirSnap.data().email };
-  } catch { /* ignore */ }
-  return {};
+    const avatarSnap = await rtdbGet(rtdbRef(rtdb, `avatars/${otherUid}`));
+    if (avatarSnap.exists()) {
+      const avatarData = avatarSnap.val();
+      info.avatarEmoji = avatarData.emoji;
+      info.avatarColor = avatarData.color;
+    }
+  } catch { /* not readable / no avatar set — leave unset */ }
+  return info;
 }
 
 function escapeHtmlMain(str) {
@@ -1621,33 +3033,7 @@ addFriendSendBtn.addEventListener('click', async () => {
       return;
     }
     const otherUid = results.docs[0].id;
-
-    // If they already sent *us* a request, accept it instead of creating a
-    // duplicate reverse request.
-    const existingReverse = await getDoc(doc(db, 'users', u.uid, 'friends', otherUid));
-    if (existingReverse.exists() && existingReverse.data().status === 'pending' && existingReverse.data().direction === 'received') {
-      await respondToFriendRequest(otherUid, true);
-      addFriendModalOverlay.classList.remove('show');
-      return;
-    }
-    if (existingReverse.exists() && existingReverse.data().status === 'accepted') {
-      addFriendError.textContent = "You're already friends!";
-      return;
-    }
-
-    await setDoc(doc(db, 'users', u.uid, 'friends', otherUid), {
-      status: 'pending', direction: 'sent', createdAt: Date.now(),
-    });
-    await setDoc(doc(db, 'users', otherUid, 'friends', u.uid), {
-      status: 'pending', direction: 'received', createdAt: Date.now(),
-    });
-    notifyUser(otherUid, {
-      type: 'friend_request',
-      title: 'New friend request',
-      body: `${u.displayName || (u.email ? u.email.split('@')[0] : 'Someone')} wants to be friends`,
-      data: { fromUid: u.uid },
-    });
-
+    await sendFriendRequestToUid(otherUid, { fromDisplayName: myFormattedDisplayName() });
     addFriendModalOverlay.classList.remove('show');
     await loadFriendsAndRequests();
   } catch (err) {
@@ -1656,6 +3042,140 @@ addFriendSendBtn.addEventListener('click', async () => {
   } finally {
     addFriendSendBtn.disabled = false;
     addFriendSendBtn.textContent = 'Send Request';
+  }
+});
+
+// ---- My QR Code — shows this account's uid as a scannable code, so a
+// friend can add you (or share a course to you, see learn.js) without
+// either of you typing an email. Plain uid payload, same non-URL pattern
+// multiplayer.js already uses for game codes: nothing for the system
+// Camera app to open, so it only means anything inside Kids Learning Lab's
+// own scanner. ----
+// While this modal is open, someone else may scan the code on screen at
+// any moment — either to add as a friend, or (from Learn's Share Course
+// screen) to send a course. Poll every 2s so both show up live instead of
+// requiring the learner to back out and reopen Friends to see them.
+let myQrPollTimer = null;
+let myQrKnownSharedCourseCount = null; // baseline captured when the modal opens
+
+async function pendingSharedCourseCount() {
+  const u = auth.currentUser;
+  if (!u) return 0;
+  try {
+    const snap = await getDocs(query(collection(db, 'users', u.uid, 'sharedCourses'), where('status', '==', 'pending')));
+    return snap.size;
+  } catch {
+    return myQrKnownSharedCourseCount ?? 0; // leave the count as-is on a transient read failure
+  }
+}
+
+function stopMyQrPolling() {
+  if (myQrPollTimer) clearInterval(myQrPollTimer);
+  myQrPollTimer = null;
+}
+
+myQrOpenBtn?.addEventListener('click', async () => {
+  const u = auth.currentUser;
+  if (!u || !myQrCanvas) return;
+  renderJoinQr(myQrCanvas, u.uid).catch((err) => console.error('Could not render QR code:', err));
+  myQrModalOverlay.classList.add('show');
+
+  myQrKnownSharedCourseCount = await pendingSharedCourseCount();
+  stopMyQrPolling();
+  myQrPollTimer = setInterval(async () => {
+    if (!myQrModalOverlay.classList.contains('show')) { stopMyQrPolling(); return; }
+    loadFriendsAndRequests();
+
+    const count = await pendingSharedCourseCount();
+    if (myQrKnownSharedCourseCount != null && count > myQrKnownSharedCourseCount) {
+      myQrKnownSharedCourseCount = count;
+      stopMyQrPolling();
+      showCourseDetectedThenOpenLearn();
+    } else {
+      myQrKnownSharedCourseCount = count;
+    }
+  }, 2000);
+});
+myQrCloseBtn?.addEventListener('click', () => {
+  myQrModalOverlay.classList.remove('show');
+  stopMyQrPolling();
+});
+
+// Small "aesthetic" beat once a shared course is detected in the background:
+// a brief status line + fake progress bar, then hop straight to Learn where
+// the shared-course banner (see learn.js) picks it up for real.
+function showCourseDetectedThenOpenLearn() {
+  if (myQrCourseDetectedEl) {
+    myQrCourseDetectedEl.style.display = '';
+    const fill = myQrCourseDetectedEl.querySelector('.my-qr-detect-fill');
+    if (fill) {
+      fill.style.transition = 'none';
+      fill.style.width = '0%';
+      requestAnimationFrame(() => {
+        fill.style.transition = 'width 3s linear';
+        fill.style.width = '100%';
+      });
+    }
+  }
+  setTimeout(async () => {
+    if (myQrCourseDetectedEl) myQrCourseDetectedEl.style.display = 'none';
+    myQrModalOverlay.classList.remove('show');
+    friendsPageOverlay.classList.remove('show');
+    await ensureLearnInitialized();
+    goToLearnTab();
+  }, 3000);
+}
+
+// ---- Scan to Add Friend — camera scans a friend's "My QR Code" (their raw
+// uid) and runs it through the exact same request logic as the email flow.
+// Routed through identifyScannedCode() rather than assumed to be a person
+// code — if this actually turns out to be a game join code (scanned by
+// mistake, or just handed the wrong QR), it opens that game instead. Uid
+// payloads are mixed-case, so this MUST scan with preserveCase: true —
+// unlike the 4-char game codes, uppercasing would break the lookup. ----
+scanAddFriendBtn?.addEventListener('click', async () => {
+  scanAddFriendBtn.disabled = true;
+  try {
+    const scanned = await scanJoinCode({
+      statusText: "Point the camera at your friend's QR code",
+      preserveCase: true,
+    });
+    if (!scanned) return; // user canceled
+
+    await maybeShowOverlay('qrProcessing');
+    const result = await identifyScannedCode(scanned);
+
+    if (result.type === 'game') {
+      // Not a friend code — a live game session code. Jump into it.
+      friendsPageOverlay.classList.remove('show');
+      try {
+        await joinGameByCode(result.code);
+      } catch (err) {
+        friendsPageOverlay.classList.add('show');
+        addFriendEmailInput.value = '';
+        addFriendError.textContent = err.message || "Couldn't join that game.";
+        addFriendModalOverlay.classList.add('show');
+      }
+      return;
+    }
+
+    if (result.type === 'unknown') {
+      addFriendEmailInput.value = '';
+      addFriendError.textContent = "That code wasn't recognized.";
+      addFriendModalOverlay.classList.add('show');
+      return;
+    }
+
+    await sendFriendRequestToUid(result.uid, { fromDisplayName: myFormattedDisplayName() });
+    await loadFriendsAndRequests();
+  } catch (err) {
+    // Surface the error in the Add Friend modal (open it if it wasn't
+    // already) so the person sees why the scan didn't work.
+    addFriendEmailInput.value = '';
+    addFriendError.textContent = err.message || 'Could not read that code.';
+    addFriendModalOverlay.classList.add('show');
+  } finally {
+    scanAddFriendBtn.disabled = false;
   }
 });
 
@@ -1669,7 +3189,7 @@ async function respondToFriendRequest(otherUid, accept) {
       notifyUser(otherUid, {
         type: 'friend_accepted',
         title: 'Friend request accepted',
-        body: `${u.displayName || (u.email ? u.email.split('@')[0] : 'Someone')} accepted your friend request`,
+        body: `${formatDisplayName(u.displayName || (u.email ? u.email.split('@')[0] : 'Someone'), isPremium())} accepted your friend request`,
         data: { fromUid: u.uid },
       });
     } else {
@@ -1760,6 +3280,7 @@ async function openFriendProfile(otherUid) {
   friendProfileXp.textContent = '0';
   friendProfileStreak.textContent = '0';
   friendProfileRemoveBtn.style.display = 'none';
+  friendProfileBadges.innerHTML = `<p class="badges-page-sub">Loading…</p>`;
   friendProfileFriendsList.innerHTML = '';
   friendProfileFriendsEmpty.style.display = 'none';
   friendProfilePageOverlay.classList.add('show');
@@ -1768,15 +3289,25 @@ async function openFriendProfile(otherUid) {
     const snap = await getDoc(doc(db, 'userProfiles', otherUid));
     if (snap.exists()) {
       const info = snap.data();
-      friendProfileTitle.textContent = info.displayName || 'Friend';
-      friendProfileName.textContent = info.displayName || info.email || 'Learner';
+      friendProfileTitle.textContent = formatDisplayName(info.displayName || 'Friend', !!info.premium);
+      friendProfileName.textContent = formatDisplayName(info.displayName || info.email || 'Learner', !!info.premium);
       friendProfileEmail.textContent = info.email || '';
       friendProfileXp.textContent = info.xp || 0;
       friendProfileStreak.textContent = info.streak || 0;
-      if (info.avatarEmoji) renderAvatarInto(friendProfileAvatar, { emoji: info.avatarEmoji, color: info.avatarColor });
+      try {
+        const avatarSnap = await rtdbGet(rtdbRef(rtdb, `avatars/${otherUid}`));
+        if (avatarSnap.exists()) {
+          const avatarData = avatarSnap.val();
+          renderAvatarInto(friendProfileAvatar, { emoji: avatarData.emoji, color: avatarData.color });
+        }
+      } catch { /* not readable / no avatar set — leave placeholder */ }
+      friendProfileBadges.innerHTML = renderBadgeGridHtml(info.badges || {});
+    } else {
+      friendProfileBadges.innerHTML = `<p class="badges-page-sub">No badges earned yet.</p>`;
     }
   } catch (err) {
     console.error('Failed to load friend profile:', err);
+    friendProfileBadges.innerHTML = `<p class="badges-page-sub">Could not load badges right now.</p>`;
   }
 
   // Only show "Remove Friend" if we're actually accepted friends with them
@@ -1808,7 +3339,7 @@ async function openFriendProfile(otherUid) {
         row.innerHTML = `
           ${miniAvatarHtml(info)}
           <button type="button" class="friend-row-tap" data-uid="${friend.uid}">
-            <div class="friend-row-name">${escapeHtmlMain(info.displayName || info.email || 'Learner')}</div>
+            <div class="friend-row-name">${escapeHtmlMain(formatDisplayName(info.displayName || info.email || 'Learner', !!info.premium))}</div>
             <div class="friend-row-sub">${info.xp || 0} XP · ${info.streak || 0} day streak</div>
           </button>
         `;
@@ -1826,4 +3357,8 @@ async function openFriendProfile(otherUid) {
 friendProfileExitBtn.addEventListener('click', () => friendProfilePageOverlay.classList.remove('show'));
 friendProfileRemoveBtn.addEventListener('click', () => {
   if (openFriendProfileUid) removeFriend(openFriendProfileUid, true);
+});
+
+document.getElementById('homeGamesViewAllBtn')?.addEventListener('click', () => {
+  document.getElementById('gamesPageOverlay').classList.add('show');
 });

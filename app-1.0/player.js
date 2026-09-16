@@ -1,4 +1,5 @@
 // player.js — Kids Learning Lab podcast player
+import { openCreateCourseModalWithTopic, generateTriviaFromTopic } from './learn.js';
 
 const FEED_WORKER_URL = 'https://getrssfeed.nameless-cherry-998c.workers.dev/';
 const CACHE_KEY = 'kll_podcast_feed_cache_v1';
@@ -23,6 +24,9 @@ const episodeModalMeta = document.getElementById('episodeModalMeta');
 const episodeModalPlayBtn = document.getElementById('episodeModalPlayBtn');
 const episodeModalPlayIcon = document.getElementById('episodeModalPlayIcon');
 const episodeModalDescription = document.getElementById('episodeModalDescription');
+const episodeModalShowMoreBtn = document.getElementById('episodeModalShowMoreBtn');
+const episodeModalCreateCourseBtn = document.getElementById('episodeModalCreateCourseBtn');
+const episodeModalGenerateTriviaBtn = document.getElementById('episodeModalGenerateTriviaBtn');
 const playerCurrentTime = document.getElementById('playerCurrentTime');
 const playerDuration = document.getElementById('playerDuration');
 const playerSeekBar = document.getElementById('playerSeekBar');
@@ -141,7 +145,7 @@ function renderEpisodeList() {
   listenStatus.style.display = 'none';
 
   listenEpisodeList.innerHTML = episodes.map((ep, i) => `
-    <div class="episode-card${i === currentIndex ? ' playing' : ''}" data-index="${i}">
+    <div class="episode-card${i === currentIndex ? ' playing' : ''}${isBonusEpisode(ep.title) ? ' bonus' : ''}" data-index="${i}">
       <img src="${escapeAttr(ep.image)}" alt="">
       <div class="episode-card-info">
         <div class="episode-card-title">${escapeHtml(ep.title)}</div>
@@ -158,6 +162,15 @@ function renderEpisodeList() {
       openEpisodeDetail(Number(card.dataset.index));
     });
   });
+}
+
+// True for episodes whose title starts with "(BONUS)" (any case, allowing
+// for leading whitespace) — these get a smaller, differently-colored card
+// in the Listen list (see .episode-card.bonus in index.html) so bonus
+// content visually reads as a lighter-weight extra rather than a regular
+// numbered episode.
+function isBonusEpisode(title) {
+  return /^\s*\(bonus\)/i.test(title || '');
 }
 
 function formatDate(pubDate) {
@@ -185,6 +198,13 @@ function openEpisodeDetail(index) {
   episodeModalTitle.textContent = ep.title;
   episodeModalMeta.textContent = `${formatDate(ep.pubDate)} · ${ep.duration || ''}`;
   episodeModalDescription.innerHTML = ep.description || '';
+
+  // Start clamped to 2 lines; only show the "Show more" button if the
+  // description actually overflows that clamp.
+  episodeModalDescription.classList.add('clamped');
+  episodeModalShowMoreBtn.textContent = 'Show more description';
+  episodeModalShowMoreBtn.style.display =
+    episodeModalDescription.scrollHeight > episodeModalDescription.clientHeight + 1 ? 'block' : 'none';
 
   updateEpisodeModalControls();
   episodeModalOverlay.classList.add('show');
@@ -221,6 +241,45 @@ function updateEpisodeModalControls() {
 episodeModalCloseBtn.addEventListener('click', closeEpisodeDetail);
 episodeModalOverlay.addEventListener('click', (e) => {
   if (e.target === episodeModalOverlay) closeEpisodeDetail();
+});
+
+episodeModalShowMoreBtn.addEventListener('click', () => {
+  const expanded = !episodeModalDescription.classList.contains('clamped');
+  if (expanded) {
+    episodeModalDescription.classList.add('clamped');
+    episodeModalShowMoreBtn.textContent = 'Show more description';
+  } else {
+    episodeModalDescription.classList.remove('clamped');
+    episodeModalShowMoreBtn.textContent = 'Show less';
+  }
+});
+
+episodeModalCreateCourseBtn.addEventListener('click', async () => {
+  const ep = episodes[detailIndex];
+  if (!ep) return;
+  closeEpisodeDetail();
+  await openCreateCourseModalWithTopic(ep.title);
+});
+
+// ---- Generate Trivia — jumps straight into a 20-question trivia set on
+// this episode's title, skipping the Trivia Choose modal entirely. Stays on
+// the episode modal (button shows a "Generating…" state) until the set is
+// ready, then closes the episode modal right as the trivia view opens. ----
+episodeModalGenerateTriviaBtn.addEventListener('click', async () => {
+  const ep = episodes[detailIndex];
+  if (!ep) return;
+  const btn = episodeModalGenerateTriviaBtn;
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined">quiz</span> Generating trivia…';
+
+  await generateTriviaFromTopic(ep.title, {
+    onStart: () => closeEpisodeDetail(),
+    onError: (message) => { alert(message); },
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = originalHtml;
 });
 
 episodeModalPlayBtn.addEventListener('click', () => {

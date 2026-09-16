@@ -14,9 +14,15 @@
     --ink: #14213D;
     --ink-soft: #5B6B85;
     --white: #FFFFFF;
+
+    --simon-red: #FF5A5F;
+    --simon-yellow: #FFC93C;
+    --simon-green: #4CD97B;
+    --simon-blue: #4FA6FF;
+    --coral: #FF5A5F;
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
   html, body {
     margin: 0; padding: 0; height: 100%;
@@ -39,6 +45,7 @@
     position: absolute;
     border-radius: 50%;
     z-index: 0;
+    pointer-events: none;
   }
   .blob-1 {
     width: 340px; height: 340px;
@@ -60,7 +67,7 @@
     max-width: 380px;
     background: var(--white);
     border-radius: 28px;
-    padding: 44px 32px 36px;
+    padding: 44px 32px 32px;
     box-shadow: 0 20px 60px rgba(18, 59, 122, 0.14);
     text-align: center;
   }
@@ -88,7 +95,7 @@
     font-size: 13.5px;
     color: var(--ink-soft);
     line-height: 1.6;
-    margin: 0 0 28px;
+    margin: 0 0 24px;
   }
 
   .retry-btn {
@@ -112,6 +119,28 @@
   .retry-btn:active { transform: scale(0.98); }
   .retry-btn svg { width: 16px; height: 16px; }
 
+  .launcher-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--blue-pale);
+    background: var(--white);
+    color: var(--blue-deep);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+  .launcher-btn:hover { background: var(--blue-pale); border-color: #DCE7F5; }
+  .launcher-btn:active { transform: scale(0.98); }
+  .launcher-btn svg { width: 16px; height: 16px; }
+
   .mark {
     width: 8px; height: 8px;
     margin: 26px auto 0;
@@ -119,8 +148,235 @@
     background: var(--blue-bright);
     opacity: 0.5;
   }
+
+  /* ---------- Games overlay ---------- */
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(18, 59, 122, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .overlay-panel {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: 28px;
+    padding: 24px 22px 26px;
+    box-shadow: 0 20px 60px rgba(18, 59, 122, 0.25);
+    text-align: center;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.18s ease;
+  }
+  .overlay.open .overlay-panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .overlay-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--blue-pale);
+    color: var(--blue-deep);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .overlay-close:active { transform: scale(0.92); }
+
+  .games-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--blue-deep);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--blue-pale);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tab-btn.tab-active {
+    background: var(--white);
+    color: var(--blue-deep);
+    box-shadow: 0 2px 8px rgba(18, 59, 122, 0.12);
+  }
+
+  .game-panel { display: none; }
+  .game-panel.active { display: block; }
+
+  .play-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: var(--blue-deep);
+    color: var(--white);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  .play-btn:active { transform: scale(0.98); }
+
+  .game-message {
+    min-height: 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue-main);
+    margin-top: 10px;
+  }
+
+  /* Simon */
+  .simon-board {
+    width: 224px;
+    height: 224px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+  }
+  .pad {
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.12s ease, transform 0.08s ease, filter 0.12s ease;
+    filter: saturate(0.85);
+  }
+  .pad:active { transform: scale(0.96); }
+  .pad-0 { background: var(--simon-red); }
+  .pad-1 { background: var(--simon-yellow); }
+  .pad-2 { background: var(--simon-green); }
+  .pad-3 { background: var(--simon-blue); }
+  .pad.lit {
+    opacity: 1;
+    filter: saturate(1.3) brightness(1.08);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.05) inset, 0 0 22px rgba(30,111,224,0.35);
+  }
+  .pad.disabled { cursor: default; }
+
+  .simon-info {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 16px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .simon-info span { color: var(--blue-deep); font-weight: 800; }
+
+  /* Tic Tac Toe */
+  .difficulty-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .diff-btn {
+    flex: 1;
+    border: 1.5px solid var(--blue-pale);
+    background: var(--white);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 7px 4px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .diff-btn.diff-active {
+    background: var(--blue-deep);
+    color: var(--white);
+    border-color: var(--blue-deep);
+  }
+
+  .ttt-board {
+    width: 234px;
+    height: 234px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .cell {
+    background: var(--blue-pale);
+    border: none;
+    border-radius: 14px;
+    font-size: 30px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue-deep);
+    transition: background 0.12s ease, transform 0.08s ease;
+  }
+  .cell:active { transform: scale(0.96); }
+  .cell.x { color: var(--blue-main); }
+  .cell.o { color: var(--coral); }
+  .cell:disabled { cursor: default; }
+
+  .ttt-status {
+    margin-top: 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--blue-deep);
+    min-height: 18px;
+  }
+  .ttt-score {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
 </style>
-  <script src="popup-guard.js" defer></script>
 </head>
 <body>
   <div class="blob blob-1"></div>
@@ -146,13 +402,410 @@
       </svg>
       Try Again
     </button>
+    <button class="launcher-btn" id="open-games">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#123B7A" stroke-width="2"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="#123B7A" stroke-width="2"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="#123B7A" stroke-width="2"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="#123B7A" stroke-width="2"/>
+      </svg>
+      Play Games While You Wait
+    </button>
     <div class="mark"></div>
+  </div>
+
+  <div class="overlay" id="games-overlay">
+    <div class="overlay-panel">
+      <button class="overlay-close" id="close-games" aria-label="Close">&times;</button>
+      <div class="games-title">Play While You Wait</div>
+      <div class="tabs">
+        <button class="tab-btn tab-active" id="tab-simon" data-game="simon">Color Memory</button>
+        <button class="tab-btn" id="tab-ttt" data-game="ttt">Tic-Tac-Toe</button>
+      </div>
+
+      <!-- Simon / color memory game -->
+      <div class="game-panel active" id="game-simon">
+        <div class="simon-board" id="simon-board">
+          <button class="pad pad-0 disabled" data-idx="0"></button>
+          <button class="pad pad-1 disabled" data-idx="1"></button>
+          <button class="pad pad-2 disabled" data-idx="2"></button>
+          <button class="pad pad-3 disabled" data-idx="3"></button>
+        </div>
+        <div class="simon-info">
+          <div>Score <span id="simon-score">0</span></div>
+          <div>Best <span id="simon-best">0</span></div>
+        </div>
+        <button class="play-btn" id="simon-start">Start Game</button>
+        <div class="game-message" id="simon-message"></div>
+      </div>
+
+      <!-- Tic tac toe -->
+      <div class="game-panel" id="game-ttt">
+        <div class="difficulty-row">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn diff-active" data-diff="medium">Medium</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+        </div>
+        <div class="ttt-board" id="ttt-board"></div>
+        <div class="ttt-status" id="ttt-status">Your turn — you're X</div>
+        <div class="ttt-score" id="ttt-score">Wins 0 · Losses 0 · Draws 0</div>
+        <button class="play-btn" id="ttt-reset">New Game</button>
+      </div>
+    </div>
   </div>
 
   <script>
     window.addEventListener('online', () => {
       location.href = './index.html';
     });
+
+    // ---------------- Overlay open/close ----------------
+    (function () {
+      var overlay = document.getElementById('games-overlay');
+      var openBtn = document.getElementById('open-games');
+      var closeBtn = document.getElementById('close-games');
+
+      function open() { overlay.classList.add('open'); }
+      function close() { overlay.classList.remove('open'); }
+
+      openBtn.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) close();
+      });
+    })();
+
+    // ---------------- Tabs ----------------
+    (function () {
+      var tabs = document.querySelectorAll('.tab-btn');
+      var panels = { simon: document.getElementById('game-simon'), ttt: document.getElementById('game-ttt') };
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          tabs.forEach(function (b) { b.classList.remove('tab-active'); });
+          btn.classList.add('tab-active');
+          Object.keys(panels).forEach(function (key) {
+            panels[key].classList.toggle('active', key === btn.dataset.game);
+          });
+        });
+      });
+    })();
+
+    // ---------------- Simon / Color Memory ----------------
+    (function () {
+      var BEST_KEY = 'kll_offline_simon_best';
+      var pads = Array.prototype.slice.call(document.querySelectorAll('.pad'));
+      var scoreEl = document.getElementById('simon-score');
+      var bestEl = document.getElementById('simon-best');
+      var msgEl = document.getElementById('simon-message');
+      var startBtn = document.getElementById('simon-start');
+
+      var sequence = [];
+      var playerStep = 0;
+      var acceptingInput = false;
+      var busy = false;
+
+      function getBest() {
+        var v = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+        return isNaN(v) ? 0 : v;
+      }
+      bestEl.textContent = getBest();
+
+      function setPadsEnabled(enabled) {
+        pads.forEach(function (p) { p.classList.toggle('disabled', !enabled); });
+      }
+
+      function flash(idx, ms) {
+        return new Promise(function (resolve) {
+          var pad = pads[idx];
+          pad.classList.add('lit');
+          setTimeout(function () {
+            pad.classList.remove('lit');
+            setTimeout(resolve, 120);
+          }, ms || 380);
+        });
+      }
+
+      async function playSequence() {
+        acceptingInput = false;
+        setPadsEnabled(false);
+        busy = true;
+        await new Promise(function (r) { setTimeout(r, 500); });
+        for (var i = 0; i < sequence.length; i++) {
+          await flash(sequence[i]);
+        }
+        busy = false;
+        acceptingInput = true;
+        setPadsEnabled(true);
+      }
+
+      function nextRound() {
+        sequence.push(Math.floor(Math.random() * 4));
+        playerStep = 0;
+        scoreEl.textContent = sequence.length - 1;
+        msgEl.textContent = '';
+        playSequence();
+      }
+
+      function gameOver() {
+        acceptingInput = false;
+        setPadsEnabled(false);
+        var finalScore = sequence.length - 1;
+        var best = getBest();
+        if (finalScore > best) {
+          best = finalScore;
+          localStorage.setItem(BEST_KEY, String(best));
+        }
+        bestEl.textContent = best;
+        msgEl.textContent = 'Game over! Score: ' + finalScore;
+        startBtn.textContent = 'Play Again';
+        startBtn.style.display = 'block';
+      }
+
+      pads.forEach(function (pad) {
+        pad.addEventListener('click', function () {
+          if (!acceptingInput || busy) return;
+          var idx = parseInt(pad.dataset.idx, 10);
+          if (idx === sequence[playerStep]) {
+            flash(idx, 200);
+            playerStep++;
+            if (playerStep === sequence.length) {
+              acceptingInput = false;
+              setPadsEnabled(false);
+              setTimeout(nextRound, 700);
+            }
+          } else {
+            gameOver();
+          }
+        });
+      });
+
+      startBtn.addEventListener('click', function () {
+        sequence = [];
+        playerStep = 0;
+        msgEl.textContent = '';
+        startBtn.style.display = 'none';
+        nextRound();
+      });
+    })();
+
+    // ---------------- Tic Tac Toe ----------------
+    (function () {
+      var WIN_KEY = 'kll_offline_ttt_wins';
+      var LOSS_KEY = 'kll_offline_ttt_losses';
+      var DRAW_KEY = 'kll_offline_ttt_draws';
+      var LINES = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+
+      var boardEl = document.getElementById('ttt-board');
+      var statusEl = document.getElementById('ttt-status');
+      var scoreEl = document.getElementById('ttt-score');
+      var resetBtn = document.getElementById('ttt-reset');
+      var diffBtns = Array.prototype.slice.call(document.querySelectorAll('.diff-btn'));
+
+      var board = Array(9).fill(null);
+      var over = false;
+      var difficulty = 'medium';
+
+      diffBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          difficulty = btn.dataset.diff;
+          diffBtns.forEach(function (b) { b.classList.remove('diff-active'); });
+          btn.classList.add('diff-active');
+          newGame();
+        });
+      });
+
+      function getCount(key) {
+        var v = parseInt(localStorage.getItem(key) || '0', 10);
+        return isNaN(v) ? 0 : v;
+      }
+      function bumpCount(key) {
+        localStorage.setItem(key, String(getCount(key) + 1));
+      }
+      function renderScore() {
+        scoreEl.textContent = 'Wins ' + getCount(WIN_KEY) + ' · Losses ' + getCount(LOSS_KEY) + ' · Draws ' + getCount(DRAW_KEY);
+      }
+
+      function buildBoard() {
+        boardEl.innerHTML = '';
+        for (var i = 0; i < 9; i++) {
+          var cell = document.createElement('button');
+          cell.className = 'cell';
+          cell.dataset.idx = i;
+          cell.addEventListener('click', onCellClick);
+          boardEl.appendChild(cell);
+        }
+      }
+
+      function render() {
+        var cells = boardEl.children;
+        for (var i = 0; i < 9; i++) {
+          var v = board[i];
+          cells[i].textContent = v || '';
+          cells[i].classList.remove('x', 'o');
+          if (v === 'X') cells[i].classList.add('x');
+          if (v === 'O') cells[i].classList.add('o');
+          cells[i].disabled = !!v || over;
+        }
+      }
+
+      function openCells(b) {
+        var out = [];
+        for (var i = 0; i < 9; i++) if (b[i] === null) out.push(i);
+        return out;
+      }
+
+      function checkResult(b) {
+        for (var i = 0; i < LINES.length; i++) {
+          var line = LINES[i];
+          var a = b[line[0]], c = b[line[1]], d = b[line[2]];
+          if (a && a === c && c === d) return a;
+        }
+        if (b.every(function (v) { return v; })) return 'draw';
+        return null;
+      }
+
+      function findWinningMove(b, sym) {
+        for (var i = 0; i < LINES.length; i++) {
+          var line = LINES[i];
+          var vals = [b[line[0]], b[line[1]], b[line[2]]];
+          var symCount = vals.filter(function (v) { return v === sym; }).length;
+          if (symCount === 2 && vals.includes(null)) {
+            return line[vals.indexOf(null)];
+          }
+        }
+        return null;
+      }
+
+      // Medium: win > block > center > corner > random
+      function mediumMove(b) {
+        var idx = findWinningMove(b, 'O');
+        if (idx === null) idx = findWinningMove(b, 'X');
+        if (idx === null && b[4] === null) idx = 4;
+        if (idx === null) {
+          var corners = [0, 2, 6, 8].filter(function (i) { return b[i] === null; });
+          if (corners.length) idx = corners[Math.floor(Math.random() * corners.length)];
+        }
+        if (idx === null) {
+          var open = openCells(b);
+          idx = open[Math.floor(Math.random() * open.length)];
+        }
+        return idx;
+      }
+
+      // Easy: fully random
+      function easyMove(b) {
+        var open = openCells(b);
+        return open[Math.floor(Math.random() * open.length)];
+      }
+
+      // Hard: minimax, perfect play — never loses
+      function minimax(b, isMaximizing) {
+        var result = checkResult(b);
+        if (result === 'O') return 1;
+        if (result === 'X') return -1;
+        if (result === 'draw') return 0;
+
+        var open = openCells(b);
+        if (isMaximizing) {
+          var best = -Infinity;
+          for (var i = 0; i < open.length; i++) {
+            b[open[i]] = 'O';
+            best = Math.max(best, minimax(b, false));
+            b[open[i]] = null;
+          }
+          return best;
+        } else {
+          var worst = Infinity;
+          for (var j = 0; j < open.length; j++) {
+            b[open[j]] = 'X';
+            worst = Math.min(worst, minimax(b, true));
+            b[open[j]] = null;
+          }
+          return worst;
+        }
+      }
+
+      function hardMove(b) {
+        var open = openCells(b);
+        // First move: minimax on an empty board is slow-ish and always picks a
+        // corner/center anyway, so shortcut it for a snappy response.
+        if (open.length === 9) return 4;
+
+        var bestScore = -Infinity;
+        var move = open[0];
+        for (var i = 0; i < open.length; i++) {
+          b[open[i]] = 'O';
+          var score = minimax(b, false);
+          b[open[i]] = null;
+          if (score > bestScore) {
+            bestScore = score;
+            move = open[i];
+          }
+        }
+        return move;
+      }
+
+      function computerMove() {
+        var idx;
+        if (difficulty === 'easy') idx = easyMove(board);
+        else if (difficulty === 'hard') idx = hardMove(board);
+        else idx = mediumMove(board);
+        board[idx] = 'O';
+      }
+
+      function finish(result) {
+        over = true;
+        if (result === 'X') {
+          statusEl.textContent = 'You win! 🎉';
+          bumpCount(WIN_KEY);
+        } else if (result === 'O') {
+          statusEl.textContent = 'Computer wins';
+          bumpCount(LOSS_KEY);
+        } else {
+          statusEl.textContent = "It's a draw";
+          bumpCount(DRAW_KEY);
+        }
+        renderScore();
+        render();
+      }
+
+      function onCellClick(e) {
+        if (over) return;
+        var idx = parseInt(e.currentTarget.dataset.idx, 10);
+        if (board[idx]) return;
+
+        board[idx] = 'X';
+        var result = checkResult(board);
+        if (result) { finish(result); return; }
+
+        render();
+        statusEl.textContent = "Computer's turn…";
+
+        setTimeout(function () {
+          computerMove();
+          var result2 = checkResult(board);
+          if (result2) { finish(result2); return; }
+          render();
+          statusEl.textContent = 'Your turn — you\'re X';
+        }, 380);
+      }
+
+      function newGame() {
+        board = Array(9).fill(null);
+        over = false;
+        statusEl.textContent = "Your turn — you're X";
+        buildBoard();
+        render();
+      }
+
+      resetBtn.addEventListener('click', newGame);
+      renderScore();
+      newGame();
+    })();
   </script>
 </body>
 </html>
