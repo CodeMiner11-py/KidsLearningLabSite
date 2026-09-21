@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Resume Maker 1.0</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); --bg: #ffffff; --fg: #000000; --link: #0000ee; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html, body { background: #ffffff !important; color: #000000 !important; margin: 8px; }
+a { color: var(--link); }
+input, textarea, select { max-width: 100%; background: #ffffff; color: #000000; }
+table, td, th { color: #000000; }
+* { font-family: "Times New Roman"; }
+.wide { overflow-x: auto; }
+@media print { .noprint { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+<center>
+<h1>Resume Maker 1.0</h1>
+<p><i>Fill in the blanks. Press the button. Get a plain resume.</i></p>
+</center>
+<hr>
+
+<p>
+<b>Instructions:</b> Fill out the sections below. Every section is optional except your name.
+Use the <b>[Add]</b> buttons to add more jobs, schools, custom fields, or whole custom sections.
+In any description box, put <b>one item per line</b> and each line becomes a bullet.
+</p>
+
+<p>
+<input type="button" value="Load Sample Data" onclick="loadSample()">
+<input type="button" value="Clear Everything" onclick="clearAll()">
+</p>
+<hr>
+
+<h3>Section 1. Personal Information</h3>
+<div class="wide">
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Full Name *</td><td><input type="text" id="name" size="35"></td></tr>
+<tr><td>Street Address</td><td><input type="text" id="address" size="35"></td></tr>
+<tr><td>City, State, Zip</td><td><input type="text" id="csz" size="35"></td></tr>
+<tr><td>Phone</td><td><input type="text" id="phone" size="35"></td></tr>
+<tr><td>E-mail</td><td><input type="text" id="email" size="35"></td></tr>
+<tr><td>Web Site</td><td><input type="text" id="web" size="35"></td></tr>
+<tr><td>Photo</td><td><input type="file" accept="image/*" id="photo" onchange="loadPhoto(this)">
+<input type="button" value="Remove Photo" onclick="removePhoto()"><br>
+<span id="photostatus"></span><br>
+<img id="photopreview" src="" alt="" style="display:none;max-width:120px;max-height:150px;margin-top:4px;border:1px solid #000;"></td></tr>
+</table>
+</div>
+
+<p><b>Custom Fields</b> (example: Field Name = "LinkedIn", Value = "linkedin.com/in/you")</p>
+<div class="wide">
+<table border="1" cellpadding="4" cellspacing="0" id="cf">
+<tr><th>Field Name</th><th>Value</th><th>&nbsp;</th></tr>
+</table>
+</div>
+<p><input type="button" value="[Add] Custom Field" onclick="addField()"></p>
+<hr>
+
+<h3>Section 2. Objective / Summary</h3>
+<textarea id="objective" rows="4" cols="60"></textarea>
+<hr>
+
+<h3>Section 3. Work Experience</h3>
+<div id="jobs"></div>
+<p><input type="button" value="[Add] Position" onclick="addJob()"></p>
+<hr>
+
+<h3>Section 4. Education</h3>
+<div id="schools"></div>
+<p><input type="button" value="[Add] School" onclick="addSchool()"></p>
+<hr>
+
+<h3>Section 5. Skills</h3>
+<p>Separate with commas or put one per line.</p>
+<textarea id="skills" rows="4" cols="60"></textarea>
+<hr>
+
+<h3>Section 6. Custom Sections</h3>
+<p>Add anything else: Certifications, Awards, Volunteer Work, Languages, References...</p>
+<div id="sections"></div>
+<p><input type="button" value="[Add] Custom Section" onclick="addSection()"></p>
+<hr>
+
+<h3>Section 7. Choose a Font</h3>
+<p>Type the name of any font from Google Fonts (example: Roboto, Merriweather, Courier Prime, Playfair Display).</p>
+<table cellpadding="8" cellspacing="0"><tr>
+<td valign="top">
+<input type="text" id="fontname" size="25" value="Times New Roman" oninput="previewFont()">
+<input type="button" value="Apply to Resume" onclick="applyFont()">
+<br><b><span id="fontstatus"></span></b>
+</td>
+<td valign="top" style="border:1px solid #000;">
+<div id="fontpreview" style="font-size:22px;padding:6px;min-width:220px;">This is your font</div>
+</td>
+</tr></table>
+<hr>
+
+<h3>Section 8. Generate</h3>
+<p>
+<input type="button" value="Generate Resume" onclick="generate()">
+<b><span id="status"></span></b>
+</p>
+<hr>
+</div>
+
+<div id="output" style="display:none">
+<div id="resume"></div>
+<div class="noprint">
+<hr>
+<p>
+<input type="button" value="Print Resume" onclick="doPrint()">
+<input type="button" value="Download as PDF" onclick="downloadPDF()">
+<input type="button" value="Copy Plain Text" onclick="copyText()">
+<input type="button" value="Back to Form" onclick="backToForm()">
+<b><span id="status2"></span></b>
+</p>
+<p>Plain text version (select all and copy if the buttons do not work):</p>
+<textarea id="plain" rows="18" cols="70" readonly></textarea>
+<hr>
+</div>
+</div>
+
+<script>
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function val(root, n) {
+  var e = root.querySelector('[name="' + n + '"]');
+  return e ? e.value.trim() : "";
+}
+function lines(s) {
+  return String(s || "").split("\n").map(function (l) { return l.replace(/^\s*[-*\u2022]\s*/, "").trim(); }).filter(Boolean);
+}
+
+/* ---------- dynamic rows ---------- */
+function removeEntry(btn) {
+  var e = btn.closest(".entry");
+  if (e) e.remove();
+  renumber();
+}
+function renumber() {
+  ["jobs", "schools", "sections"].forEach(function (id) {
+    var nums = $(id).querySelectorAll(".num");
+    for (var i = 0; i < nums.length; i++) nums[i].textContent = i + 1;
+  });
+}
+
+function addField(v) {
+  v = v || {};
+  var tr = document.createElement("tr");
+  tr.className = "entry";
+  tr.innerHTML =
+    '<td><input type="text" name="label" size="18" value="' + esc(v.label) + '"></td>' +
+    '<td><input type="text" name="value" size="30" value="' + esc(v.value) + '"></td>' +
+    '<td><input type="button" value="[Remove]" onclick="removeEntry(this)"></td>';
+  $("cf").appendChild(tr);
+}
+
+function addJob(v) {
+  v = v || {};
+  var d = document.createElement("div");
+  d.className = "entry wide";
+  d.innerHTML =
+    '<p><b>Position #<span class="num"></span></b></p>' +
+    '<table border="1" cellpadding="4" cellspacing="0">' +
+    '<tr><td>Job Title</td><td><input type="text" name="title" size="35" value="' + esc(v.title) + '"></td></tr>' +
+    '<tr><td>Employer</td><td><input type="text" name="org" size="35" value="' + esc(v.org) + '"></td></tr>' +
+    '<tr><td>Location</td><td><input type="text" name="loc" size="35" value="' + esc(v.loc) + '"></td></tr>' +
+    '<tr><td>Dates</td><td><input type="text" name="dates" size="35" value="' + esc(v.dates) + '"></td></tr>' +
+    '<tr><td valign="top">Duties<br><small>(one per line)</small></td><td><textarea name="desc" rows="4" cols="45">' + esc(v.desc) + '</textarea></td></tr>' +
+    '</table>' +
+    '<p><input type="button" value="[Remove] This Position" onclick="removeEntry(this)"></p>';
+  $("jobs").appendChild(d);
+  renumber();
+}
+
+function addSchool(v) {
+  v = v || {};
+  var d = document.createElement("div");
+  d.className = "entry wide";
+  d.innerHTML =
+    '<p><b>School #<span class="num"></span></b></p>' +
+    '<table border="1" cellpadding="4" cellspacing="0">' +
+    '<tr><td>School</td><td><input type="text" name="org" size="35" value="' + esc(v.org) + '"></td></tr>' +
+    '<tr><td>Degree / Program</td><td><input type="text" name="title" size="35" value="' + esc(v.title) + '"></td></tr>' +
+    '<tr><td>Location</td><td><input type="text" name="loc" size="35" value="' + esc(v.loc) + '"></td></tr>' +
+    '<tr><td>Dates</td><td><input type="text" name="dates" size="35" value="' + esc(v.dates) + '"></td></tr>' +
+    '<tr><td valign="top">Details<br><small>(one per line)</small></td><td><textarea name="desc" rows="3" cols="45">' + esc(v.desc) + '</textarea></td></tr>' +
+    '</table>' +
+    '<p><input type="button" value="[Remove] This School" onclick="removeEntry(this)"></p>';
+  $("schools").appendChild(d);
+  renumber();
+}
+
+function addSection(v) {
+  v = v || {};
+  var d = document.createElement("div");
+  d.className = "entry wide";
+  d.innerHTML =
+    '<p><b>Custom Section #<span class="num"></span></b></p>' +
+    '<table border="1" cellpadding="4" cellspacing="0">' +
+    '<tr><td>Section Title</td><td><input type="text" name="title" size="35" value="' + esc(v.title) + '"></td></tr>' +
+    '<tr><td>Format</td><td><select name="fmt">' +
+      '<option value="bullets"' + (v.fmt === "para" ? "" : " selected") + '>Bullet list (one per line)</option>' +
+      '<option value="para"' + (v.fmt === "para" ? " selected" : "") + '>Paragraph</option>' +
+    '</select></td></tr>' +
+    '<tr><td valign="top">Contents</td><td><textarea name="desc" rows="4" cols="45">' + esc(v.desc) + '</textarea></td></tr>' +
+    '</table>' +
+    '<p><input type="button" value="[Remove] This Section" onclick="removeEntry(this)"></p>';
+  $("sections").appendChild(d);
+  renumber();
+}
+
+function clearAll() {
+  ["name", "address", "csz", "phone", "email", "web", "objective", "skills"].forEach(function (id) { $(id).value = ""; });
+  removePhoto();
+  $("jobs").innerHTML = "";
+  $("schools").innerHTML = "";
+  $("sections").innerHTML = "";
+  var rows = $("cf").querySelectorAll(".entry");
+  for (var i = 0; i < rows.length; i++) rows[i].remove();
+  $("status").textContent = "";
+}
+
+function loadSample() {
+  clearAll();
+  $("name").value = "John Q. Public";
+  $("address").value = "123 Main Street";
+  $("csz").value = "Springfield, IL 62701";
+  $("phone").value = "(217) 555-0142";
+  $("email").value = "jqpublic@example.com";
+  addField({ label: "Pager", value: "(217) 555-0199" });
+  $("objective").value = "Dependable, detail-oriented office professional seeking a full-time administrative position.";
+  addJob({ title: "Office Manager", org: "Springfield Family Medicine", loc: "Springfield, IL", dates: "1994 - Present",
+    desc: "Schedule appointments for four physicians\nMaintain patient records and insurance filings\nTrain and supervise two front-desk staff" });
+  addJob({ title: "Receptionist", org: "Prairie Dental Group", loc: "Springfield, IL", dates: "1991 - 1994",
+    desc: "Answered multi-line phone system\nProcessed billing and appointment reminders" });
+  addSchool({ org: "Lincoln Community College", title: "A.A.S., Office Administration", loc: "Springfield, IL", dates: "1989 - 1991", desc: "" });
+  $("skills").value = "Typing 75 WPM, Microsoft Word, Excel, Medical billing, Filing";
+  addSection({ title: "Certifications", fmt: "bullets", desc: "CPR Certified\nNotary Public, State of Illinois" });
+}
+
+/* ---------- collect ---------- */
+function collect() {
+  var d = {
+    name: $("name").value.trim(),
+    address: $("address").value.trim(),
+    csz: $("csz").value.trim(),
+    phone: $("phone").value.trim(),
+    email: $("email").value.trim(),
+    web: $("web").value.trim(),
+    photo: photoData,
+    custom: [], objective: $("objective").value.trim(),
+    jobs: [], schools: [], skills: [], sections: []
+  };
+  var rows = $("cf").querySelectorAll(".entry");
+  for (var i = 0; i < rows.length; i++) {
+    var l = val(rows[i], "label"), v = val(rows[i], "value");
+    if (l || v) d.custom.push({ label: l, value: v });
+  }
+  function grab(id, arr) {
+    var es = $(id).querySelectorAll(".entry");
+    for (var i = 0; i < es.length; i++) {
+      var o = { title: val(es[i], "title"), org: val(es[i], "org"), loc: val(es[i], "loc"), dates: val(es[i], "dates"), desc: val(es[i], "desc"), fmt: val(es[i], "fmt") };
+      if (o.title || o.org || o.loc || o.dates || o.desc) arr.push(o);
+    }
+  }
+  grab("jobs", d.jobs);
+  grab("schools", d.schools);
+  grab("sections", d.sections);
+  d.skills = $("skills").value.split(/[\n,]/).map(function (s) { return s.trim(); }).filter(Boolean);
+  return d;
+}
+
+/* ---------- render ---------- */
+function contactBits(d) {
+  var bits = [];
+  if (d.phone) bits.push(d.phone);
+  if (d.email) bits.push(d.email);
+  if (d.web) bits.push(d.web);
+  d.custom.forEach(function (c) { bits.push(c.label && c.value ? c.label + ": " + c.value : (c.label || c.value)); });
+  return bits;
+}
+
+function entryHTML(o) {
+  var left = [];
+  if (o.title) left.push("<b>" + esc(o.title) + "</b>");
+  var org = [o.org, o.loc].filter(Boolean).join(", ");
+  if (org) left.push(esc(org));
+  var h = '<table width="100%" cellpadding="0" cellspacing="0"><tr><td>' + left.join(" - ") + '</td><td align="right"><i>' + esc(o.dates) + "</i></td></tr></table>";
+  var ls = lines(o.desc);
+  if (ls.length) h += "<ul>" + ls.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("") + "</ul>";
+  else h += "<br>";
+  return h;
+}
+
+function buildHTML(d) {
+  var head = '<h1 align="center">' + esc(d.name) + "</h1>";
+  var addr = [d.address, d.csz].filter(Boolean);
+  var cb = contactBits(d);
+  if (addr.length || cb.length) {
+    head += '<p align="center">';
+    if (addr.length) head += esc(addr.join(", ")) + (cb.length ? "<br>" : "");
+    if (cb.length) head += cb.map(esc).join(" | ");
+    head += "</p>";
+  }
+  var h;
+  if (d.photo) {
+    h = '<table width="100%" cellpadding="0" cellspacing="0"><tr>' +
+      '<td valign="top" width="120"><img src="' + d.photo + '" alt="" style="max-width:110px;max-height:140px;border:1px solid #000;"></td>' +
+      '<td valign="top">' + head + '</td>' +
+      '</tr></table>';
+  } else {
+    h = head;
+  }
+  function sec(title) { return "<h3>" + esc(title.toUpperCase()) + "</h3><hr>"; }
+  if (d.objective) h += sec("Objective") + "<p>" + esc(d.objective).replace(/\n/g, "<br>") + "</p>";
+  if (d.jobs.length) h += sec("Work Experience") + d.jobs.map(entryHTML).join("");
+  if (d.schools.length) h += sec("Education") + d.schools.map(entryHTML).join("");
+  if (d.skills.length) h += sec("Skills") + "<p>" + d.skills.map(esc).join(", ") + "</p>";
+  d.sections.forEach(function (s) {
+    if (!s.title && !s.desc) return;
+    h += sec(s.title || "Additional Information");
+    if (s.fmt === "para") h += "<p>" + esc(s.desc).replace(/\n/g, "<br>") + "</p>";
+    else h += "<ul>" + lines(s.desc).map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("") + "</ul>";
+  });
+  return h;
+}
+
+function buildText(d) {
+  var t = [];
+  function sec(title) { var u = title.toUpperCase(); t.push(""); t.push(u); t.push(new Array(u.length + 1).join("-")); }
+  t.push(d.name.toUpperCase());
+  var addr = [d.address, d.csz].filter(Boolean);
+  if (addr.length) t.push(addr.join(", "));
+  var cb = contactBits(d);
+  if (cb.length) t.push(cb.join(" | "));
+  function entryText(o) {
+    var a = [o.title, [o.org, o.loc].filter(Boolean).join(", ")].filter(Boolean).join(" - ");
+    if (o.dates) a += (a ? "  (" : "(") + o.dates + ")";
+    if (a) t.push(a);
+    lines(o.desc).forEach(function (l) { t.push("  * " + l); });
+    t.push("");
+  }
+  if (d.objective) { sec("Objective"); t.push(d.objective); }
+  if (d.jobs.length) { sec("Work Experience"); d.jobs.forEach(entryText); }
+  if (d.schools.length) { sec("Education"); d.schools.forEach(entryText); }
+  if (d.skills.length) { sec("Skills"); t.push(d.skills.join(", ")); }
+  d.sections.forEach(function (s) {
+    if (!s.title && !s.desc) return;
+    sec(s.title || "Additional Information");
+    if (s.fmt === "para") t.push(s.desc);
+    else lines(s.desc).forEach(function (l) { t.push("  * " + l); });
+  });
+  return t.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
+}
+
+/* ---------- photo ---------- */
+var photoData = "";
+function loadPhoto(input) {
+  var f = input.files && input.files[0];
+  if (!f) return;
+  if (!f.type.match(/^image\//)) {
+    $("photostatus").textContent = "Please choose an image file.";
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    photoData = e.target.result;
+    $("photopreview").src = photoData;
+    $("photopreview").style.display = "inline";
+    $("photostatus").textContent = "Loaded: " + f.name;
+  };
+  reader.onerror = function () { $("photostatus").textContent = "Could not read that file."; };
+  reader.readAsDataURL(f);
+}
+function removePhoto() {
+  photoData = "";
+  $("photo").value = "";
+  $("photopreview").src = "";
+  $("photopreview").style.display = "none";
+  $("photostatus").textContent = "";
+}
+
+/* ---------- font picker ---------- */
+var currentFontLink = null;
+var loadedFontLinks = {};
+var fontDebounce = null;
+
+function ensureFontLoaded(name, cb) {
+  if (loadedFontLinks[name]) { cb(true); return; }
+  var family = name.trim().replace(/\s+/g, "+");
+  var url = "https://fonts.googleapis.com/css2?family=" + family + ":wght@400;700&display=swap";
+  var link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = url;
+  link.onload = function () { loadedFontLinks[name] = link; cb(true); };
+  link.onerror = function () { link.remove(); cb(false); };
+  document.head.appendChild(link);
+}
+
+function previewFont() {
+  clearTimeout(fontDebounce);
+  var name = $("fontname").value.trim();
+  var pv = $("fontpreview");
+  if (!name) { pv.textContent = "This is your font"; pv.style.fontFamily = ""; return; }
+  fontDebounce = setTimeout(function () {
+    ensureFontLoaded(name, function (ok) {
+      if ($("fontname").value.trim() !== name) return; /* stale */
+      pv.style.fontFamily = '"' + name + '", serif';
+      pv.textContent = "This is your font";
+      $("fontstatus").textContent = ok ? "" : "  Could not find that font on Google Fonts.";
+    });
+  }, 350);
+}
+
+function applyFont(name) {
+  name = (name || $("fontname").value || "").trim();
+  if (!name) return;
+  $("fontname").value = name;
+  ensureFontLoaded(name, function (ok) {
+    if (!ok) { $("fontstatus").textContent = "  Could not load that font. Try another name."; return; }
+    document.documentElement.style.setProperty("--resume-font", '"' + name + '", Arial, sans-serif');
+    var r = $("resume");
+    if (r) r.style.fontFamily = "var(--resume-font)";
+    $("fontstatus").textContent = "  Applied: " + name;
+  });
+}
+
+/* ---------- PDF download ---------- */
+async function downloadPDF() {
+  var st = $("status2");
+  st.textContent = "  Preparing PDF...";
+  try {
+    var el = $("resume");
+    var canvas = await html2canvas(el, { scale: 2, backgroundColor: "#ffffff" });
+    var imgData = canvas.toDataURL("image/png");
+    var jsPDFCtor = window.jspdf.jsPDF;
+    var pageW = 612, pageH = 792; /* letter, points */
+    var pdf = new jsPDFCtor({ unit: "pt", format: "letter" });
+    var imgW = pageW - 72; /* 0.5in margins */
+    var imgH = (canvas.height * imgW) / canvas.width;
+    var y = 36;
+    if (imgH <= pageH - 72) {
+      pdf.addImage(imgData, "PNG", 36, y, imgW, imgH);
+    } else {
+      /* slice into multiple pages */
+      var pageContentH = pageH - 72;
+      var totalPages = Math.ceil(imgH / pageContentH);
+      var sliceCanvas = document.createElement("canvas");
+      var ctx = sliceCanvas.getContext("2d");
+      var pxPerPt = canvas.width / imgW;
+      var sliceHpx = pageContentH * pxPerPt;
+      sliceCanvas.width = canvas.width;
+      for (var p = 0; p < totalPages; p++) {
+        var sy = p * sliceHpx;
+        var thisH = Math.min(sliceHpx, canvas.height - sy);
+        sliceCanvas.height = thisH;
+        ctx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        ctx.drawImage(canvas, 0, sy, canvas.width, thisH, 0, 0, canvas.width, thisH);
+        var sliceImg = sliceCanvas.toDataURL("image/png");
+        if (p > 0) pdf.addPage();
+        pdf.addImage(sliceImg, "PNG", 36, 36, imgW, thisH / pxPerPt);
+      }
+    }
+    var blob = pdf.output("blob");
+    var name = ($("name") && $("name").value.trim()) || "resume";
+    var fname = name.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") + "_Resume.pdf";
+    var downloads = (window.claude && window.claude.use) ? await window.claude.use("downloads") : null;
+    if (downloads) {
+      try {
+        await downloads.save({ filename: fname, data: blob });
+        st.textContent = "  PDF saved.";
+      } catch (e) {
+        st.textContent = "  Could not save PDF (" + (e && e.code ? e.code : "error") + "). Try Print instead.";
+      }
+    } else {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      st.textContent = "  PDF downloaded.";
+    }
+  } catch (err) {
+    st.textContent = "  Could not build PDF. Try Print instead.";
+  }
+}
+
+/* ---------- actions ---------- */
+function generate() {
+  var d = collect();
+  if (!d.name) {
+    $("status").textContent = "  <-- Please enter your name in Section 1.";
+    $("name").focus();
+    return;
+  }
+  $("status").textContent = "";
+  $("resume").innerHTML = buildHTML(d);
+  applyFont($("fontname").value);
+  $("plain").value = buildText(d);
+  $("status2").textContent = "";
+  $("output").style.display = "block";
+  var ed = document.querySelectorAll("body > .noprint");
+  for (var i = 0; i < ed.length; i++) if (ed[i].querySelector("#name")) ed[i].style.display = "none";
+  window.scrollTo(0, 0);
+}
+
+function backToForm() {
+  $("output").style.display = "none";
+  var ed = document.querySelectorAll("body > .noprint");
+  for (var i = 0; i < ed.length; i++) ed[i].style.display = "";
+  window.scrollTo(0, 0);
+}
+
+function doPrint() {
+  try { window.print(); } catch (e) { $("status2").textContent = "  Printing is not available here. Copy the plain text below instead."; }
+}
+
+function copyText() {
+  var ta = $("plain");
+  ta.focus(); ta.select();
+  var ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  if (!ok && navigator.clipboard) {
+    navigator.clipboard.writeText(ta.value).then(
+      function () { $("status2").textContent = "  Copied."; },
+      function () { $("status2").textContent = "  Text selected. Press Ctrl+C to copy."; }
+    );
+    return;
+  }
+  $("status2").textContent = ok ? "  Copied." : "  Text selected. Press Ctrl+C to copy.";
+}
+
+/* start with one blank job and school */
+addJob();
+addSchool();
+previewFont();
+</script>
+</body>
+</html>
