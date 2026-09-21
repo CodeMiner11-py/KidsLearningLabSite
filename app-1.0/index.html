@@ -10,28 +10,28 @@
 <style>
   @font-face {
     font-family: 'SF Pro Display';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Regular.otf') format('opentype');
+    src: url('fonts/SFProDisplay/Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Display';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Italic.otf') format('opentype');
+    src: url('fonts/SFProDisplay/Italic.otf') format('opentype');
     font-weight: 400;
     font-style: italic;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Display';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/Bold.otf') format('opentype');
+    src: url('fonts/SFProDisplay/Bold.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Display';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/BoldItalic.otf') format('opentype');
+    src: url('fonts/SFProDisplay/BoldItalic.otf') format('opentype');
     font-weight: 700;
     font-style: italic;
     font-display: swap;
@@ -41,28 +41,28 @@
      rule below) use the 'SF Pro Display' family above instead. */
   @font-face {
     font-family: 'SF Pro Text';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Regular.otf') format('opentype');
+    src: url('fonts/SFProDisplay/TEXT-Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Text';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Italic.otf') format('opentype');
+    src: url('fonts/SFProDisplay/TEXT-Italic.otf') format('opentype');
     font-weight: 400;
     font-style: italic;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Text';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-Bold.otf') format('opentype');
+    src: url('fonts/SFProDisplay/TEXT-Bold.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'SF Pro Text';
-    src: url('https://kidslearninglab.com/APPLEFONT/SFProDisplay/TEXT-BoldItalic.otf') format('opentype');
+    src: url('fonts/SFProDisplay/TEXT-BoldItalic.otf') format('opentype');
     font-weight: 700;
     font-style: italic;
     font-display: swap;
@@ -918,6 +918,43 @@
 }
 .mini-player-btn .material-symbols-outlined { font-size: 22px; }
 
+/* ---------- LESSON GENERATION BAR (same look as the mini player) ---------- */
+.lesson-gen-bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border-top: 1px solid var(--border-soft);
+  padding: 8px 12px;
+}
+.lesson-gen-bar.show { display: flex; }
+.lesson-gen-bar-icon {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(47, 174, 102, 0.16);
+  color: #2FAE66;
+}
+.lesson-gen-bar-icon .material-symbols-outlined { font-size: 22px; }
+.lesson-gen-bar-info { min-width: 0; flex: 1; }
+.lesson-gen-bar-title {
+  font-size: 12.5px; font-weight: 700; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lesson-gen-bar-sub { font-size: 10.5px; color: var(--ink-soft); }
+.lesson-gen-bar-track {
+  height: 4px; border-radius: 2px;
+  background: var(--border-soft);
+  margin-top: 5px; overflow: hidden;
+}
+.lesson-gen-bar-fill {
+  height: 100%; width: 0%;
+  background: #2FAE66;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
 /* ---------- SPLASH SCREEN ---------- */
 #splash-screen {
   position: fixed;
@@ -1368,7 +1405,8 @@
   #cpModal1,
   #cpModal2,
   #cpModal3,
-  #deleteCourseModalOverlay {
+  #deleteCourseModalOverlay,
+  #chessResignConfirmOverlay {
     z-index: 9500;
   }
   .kll-modal {
@@ -1455,6 +1493,9 @@
   }
   .kll-modal-btn-pink:hover { background: #DB2777; }
   .kll-modal-btn-pink:disabled { background: #F5B3D3; cursor: not-allowed; }
+  #chessLessonsBtn { background: #9C6B43; }
+  #chessLessonsBtn:hover { background: #85582F; }
+  #chessLessonsBtn:disabled { background: #D9C0A5; }
 
   /* ---------- DIAGRAM FEEDBACK (learn.js) ---------- */
   .lesson-diagram-feedback-btn {
@@ -1661,6 +1702,7 @@
   .meltdown-view-overlay,
   .connectors-view-overlay,
   .onboarding-overlay,
+  .chess-view-overlay,
   .paywall-overlay {
     opacity: 1;
     transform: translateX(100%);
@@ -1677,6 +1719,7 @@
   .meltdown-view-overlay.show,
   .connectors-view-overlay.show,
   .onboarding-overlay.show,
+  .chess-view-overlay.show,
   .paywall-overlay.show {
     transform: translateX(0);
     transition: transform .34s cubic-bezier(.22, .9, .32, 1);
@@ -1995,6 +2038,19 @@
   .share-course-header-btn .material-symbols-outlined { font-size: 16px; }
   .share-course-header-btn:hover { filter: brightness(0.96); }
 
+  .lesson-gen-header-btn {
+    margin: 10px auto 0; display: flex; width: fit-content; align-items: center; gap: 6px;
+    background: var(--cc); color: var(--white); border: none; border-radius: 999px;
+    padding: 9px 18px; font-family: inherit; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; transition: background 0.15s ease;
+  }
+  .lesson-gen-header-btn .material-symbols-outlined { font-size: 16px; }
+  .lesson-gen-header-btn:hover { filter: brightness(0.92); }
+
+  .lesson-gen-modal-sub { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 18px; }
+  .lesson-gen-option { background: #2FAE66; }
+  .lesson-gen-option:hover { background: #27995A; }
+
   /* ---- Incoming shared-course banner (top of Learn page) ---- */
   .learn-shared-banner { padding: 16px 20px 0; }
   .learn-shared-banner-label {
@@ -2206,6 +2262,15 @@
   /* ---- Lesson start modal ---- */
   .lesson-start-title { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
   .lesson-start-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 20px; }
+  /* Stands in for the Start button until the lesson title has been generated. */
+  .lesson-start-spinner {
+    display: none; align-items: center; justify-content: center;
+    height: 48px; margin-bottom: 10px;
+  }
+  .lesson-start-spinner.show { display: flex; }
+  .lesson-start-spinner .material-symbols-outlined {
+    font-size: 30px; color: var(--blue-main); animation: idkQuizSpin 1s linear infinite;
+  }
 
   /* ---- Full-screen lesson view ---- */
   .lesson-view-overlay { background: var(--white); backdrop-filter: none; padding: 0; }
@@ -2280,23 +2345,181 @@
     background: var(--blue-mist); border: 1.5px solid var(--border-soft); border-radius: 10px; overflow: hidden;
   }
 
-  /* Chess */
-  .diagram-chess-wrap { display: flex; align-items: flex-start; gap: 4px; max-width: 260px; margin: 0 auto; }
-  .diagram-chess-ranks { display: flex; flex-direction: column; flex-shrink: 0; }
-  .diagram-chess-ranks span { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--ink-soft); width: 12px; }
-  .diagram-chess-board-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .diagram-chess-board { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); aspect-ratio: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 2px var(--border-soft); }
-  .diagram-chess-sq { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-  .diagram-chess-sq.light { background: #F0D9B5; }
-  .diagram-chess-sq.dark { background: #B58863; }
-  .diagram-chess-sq.hi::after { content: ''; position: absolute; inset: 0; background: #F6F669; opacity: .55; }
-  .diagram-chess-piece { position: relative; z-index: 1; font-size: clamp(14px, 4.8vw, 24px); line-height: 1; }
-  .diagram-chess-piece-w { color: #FDFDFD; -webkit-text-stroke: .6px #333; }
-  .diagram-chess-piece-b { color: #1A1A1A; -webkit-text-stroke: .6px #000; }
-  .diagram-chess-arrow { position: absolute; height: 4px; background: #5A9E3C; opacity: .85; transform-origin: left center; border-radius: 2px; z-index: 2; }
-  .diagram-chess-arrow::after { content: ''; position: absolute; right: -1px; top: 50%; width: 0; height: 0; border-left: 8px solid #5A9E3C; border-top: 5px solid transparent; border-bottom: 5px solid transparent; transform: translateY(-50%); }
-  .diagram-chess-files { display: flex; margin-top: 2px; }
-  .diagram-chess-files span { flex: 1; text-align: center; font-size: 9px; font-weight: 700; color: var(--ink-soft); }
+  /* Chess (static diagram — rebuilt) */
+  .chess-diagram-wrap { width: 100%; max-width: 320px; margin: 0 auto; }
+  .chess-diagram { display: block; width: 100%; height: auto; border-radius: 6px; box-shadow: 0 0 0 2px var(--border-soft); }
+  .chess-diagram-label { font: 700 3.4px -apple-system, system-ui, sans-serif; fill: var(--ink-soft); user-select: none; }
+
+  /* Learn / Play sub-tabs (chess courses) */
+  .learn-subtabs { display: flex; background: var(--blue-pale); border-radius: 14px; padding: 4px; margin: 0 0 18px; }
+  .learn-subtab { flex: 1; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-soft); padding: 10px 0; border-radius: 10px; cursor: pointer; transition: background .18s ease, color .18s ease; }
+  .learn-subtab.active { background: var(--white); color: var(--blue-main); box-shadow: 0 2px 8px rgba(18, 59, 122, 0.1); }
+
+  /* ---- Chess: shared board/card tokens, scoped so they don't leak into
+     the rest of the app's design system. ---- */
+  .chess-settings-panel, .chess-view-overlay {
+    --c-raised: var(--blue-pale);
+    --c-raised-hover: var(--border-soft);
+    --c-on-raised-active: var(--white);
+    --c-light-sq: #f0d9b5;
+    --c-dark-sq: #b58863;
+    --c-highlight: rgba(255, 235, 59, 0.55);
+    --c-last-move: rgba(155, 199, 0, 0.45);
+    --c-check: rgba(220, 40, 40, 0.55);
+    --c-dot: rgba(0, 0, 0, 0.18);
+  }
+  body.dark-mode .chess-settings-panel, body.dark-mode .chess-view-overlay {
+    --c-raised: #242424;
+    --c-raised-hover: #303030;
+    --c-on-raised-active: #3A3A3A;
+  }
+
+  .chess-card { background: var(--white); border: 1.5px solid var(--border-soft); border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(18, 59, 122, 0.08); margin-bottom: 12px; }
+  .chess-card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin: 0 0 10px; font-weight: 700; }
+
+  .chess-elo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .chess-elo-value { font-size: 24px; font-weight: 800; color: var(--blue-main); min-width: 64px; font-family: var(--app-font-display), var(--app-font); }
+  .chess-settings-panel input[type="range"], .chess-view-overlay input[type="range"] { flex: 1; accent-color: var(--blue-main); height: 4px; }
+  .chess-elo-label { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .chess-elo-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chess-preset-btn { background: var(--c-raised); border: 1.5px solid transparent; color: var(--blue-main); padding: 6px 11px; border-radius: 999px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .chess-preset-btn:hover { border-color: var(--blue-main); background: var(--c-raised-hover); }
+
+  .chess-side-toggle { display: flex; gap: 4px; background: var(--c-raised); border-radius: 12px; padding: 4px; }
+  .chess-side-toggle button { flex: 1; padding: 9px 6px; border-radius: 9px; border: none; background: transparent; color: var(--ink-soft); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .chess-side-toggle button.active { background: var(--c-on-raised-active); color: var(--blue-main); box-shadow: 0 2px 8px rgba(18, 59, 122, 0.1); }
+
+  .chess-start-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; background: var(--blue-main); color: #fff; margin-top: 4px; }
+  .chess-start-btn:hover { background: var(--blue-deep); }
+  .chess-resume-note { font-size: 12.5px; color: var(--ink-soft); text-align: center; margin-top: 8px; }
+  .chess-settings-panel button:disabled, .chess-settings-panel input:disabled { opacity: .45; pointer-events: none; }
+
+  /* ---- Chess: full-page game overlay ---- */
+  .chess-view-overlay { background: var(--blue-mist); backdrop-filter: none; padding: 0; }
+  .chess-view-container { height: 100%; width: 100%; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; box-sizing: border-box; }
+  .chess-view-topbar { display: flex; align-items: center; gap: 10px; padding: calc(14px + env(safe-area-inset-top)) 18px 10px; }
+  .chess-view-title { font-size: 15px; font-weight: 800; color: var(--blue-deep); flex: 1; }
+  .chess-timer-badge, .chess-material-badge {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700;
+    background: var(--c-raised); color: var(--ink); border-radius: 999px; padding: 6px 12px;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .chess-material-badge.ahead { color: var(--green-deep); }
+  .chess-material-badge.behind { color: var(--error); }
+  .chess-resign-btn { background: var(--error); color: #fff; border: none; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .chess-resign-btn:hover { background: #B8324A; }
+  .chess-resign-btn:disabled { opacity: .5; cursor: default; }
+  .chess-view-body { flex: 1; overflow-y: auto; padding: 4px 18px calc(28px + env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+
+  .chess-board-wrap { position: relative; flex: 0 0 auto; }
+  .chess-board-col { flex: 0 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Review-mode stepper: arrows on either side of the current-move label,
+     same width as the board. Hidden except while reviewing a finished game. */
+  .chess-review-nav { display: none; align-items: center; gap: 6px; width: min(92vw, 560px); }
+  .chess-review-nav.show { display: flex; }
+  .chess-nav-btn {
+    flex: 0 0 auto; width: 44px; height: 44px; padding: 0; border-radius: 12px;
+    border: 1.5px solid var(--border-soft); background: var(--white); color: var(--blue-main);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .chess-nav-btn:hover:not(:disabled) { background: var(--c-raised); }
+  .chess-nav-btn.step { width: 56px; background: var(--blue-main); border-color: transparent; color: #fff; }
+  .chess-nav-btn.step:hover:not(:disabled) { background: var(--blue-deep); }
+  .chess-nav-btn:disabled { opacity: .35; cursor: default; }
+  .chess-nav-btn .material-symbols-outlined { font-size: 26px; }
+  .chess-nav-label { flex: 1; min-width: 0; text-align: center; font-size: 14px; font-weight: 700; color: var(--ink); }
+  #chessMoveLog .chess-mv[data-ply] { cursor: pointer; border-radius: 6px; padding: 0 4px; margin: 0 -4px; }
+  #chessMoveLog .chess-mv.current { background: var(--c-raised); color: var(--blue-main); font-weight: 700; }
+  #chessBoard {
+    display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+    width: min(92vw, 560px); height: min(92vw, 560px);
+    border-radius: 12px; overflow: hidden;
+    border: 1.5px solid var(--border-soft);
+    box-shadow: 0 2px 10px rgba(18, 59, 122, 0.08);
+    touch-action: none; user-select: none;
+  }
+  .chess-sq { position: relative; display: flex; align-items: center; justify-content: center; font-size: min(8.5vw, 46px); cursor: pointer; }
+  .chess-sq.light { background: var(--c-light-sq); }
+  .chess-sq.dark { background: var(--c-dark-sq); }
+  .chess-sq.selected::before { content: ""; position: absolute; inset: 0; background: var(--c-highlight); }
+  .chess-sq.last-move::before { content: ""; position: absolute; inset: 0; background: var(--c-last-move); }
+  .chess-sq.in-check::before { content: ""; position: absolute; inset: 0; background: var(--c-check); }
+  .chess-sq .chess-move-dot { position: absolute; width: 28%; height: 28%; border-radius: 50%; background: var(--c-dot); pointer-events: none; }
+  .chess-sq .chess-capture-ring { position: absolute; inset: 6%; border-radius: 50%; border: 5px solid var(--c-dot); pointer-events: none; }
+  .chess-piece-img { width: 82%; height: 82%; pointer-events: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); position: relative; z-index: 2; }
+
+  .chess-panel { flex: 1 1 260px; max-width: 340px; display: flex; flex-direction: column; }
+  .chess-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button.chess-action { flex: 1; padding: 12px; border-radius: 12px; border: none; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; background: var(--blue-main); color: #fff; }
+  button.chess-action:hover { background: var(--blue-deep); }
+  button.chess-action.secondary { background: var(--white); color: var(--blue-main); border: 1.5px solid var(--border-soft); }
+  button.chess-action.secondary:hover { background: var(--c-raised); }
+  button.chess-action:disabled { opacity: .5; cursor: default; }
+
+  .chess-status-line { font-size: 14px; font-weight: 700; min-height: 20px; color: var(--ink); }
+  .chess-status-line.thinking { color: var(--ink-soft); }
+  .chess-status-line.you { color: var(--green); }
+  .chess-status-line.over { color: var(--error); }
+  .chess-engine-status { font-size: 12px; color: var(--ink-soft); }
+  .chess-engine-status.ready { color: var(--green); }
+  .chess-engine-status.error { color: var(--error); }
+
+  #chessMoveLog { max-height: 180px; overflow-y: auto; font-size: 13px; line-height: 1.7; font-variant-numeric: tabular-nums; color: var(--ink); }
+  #chessMoveLog .chess-mv-pair { display: flex; gap: 6px; }
+  #chessMoveLog .chess-mv-num { color: var(--ink-soft); width: 26px; flex-shrink: 0; }
+  #chessMoveLog .chess-mv { flex: 1; }
+
+  .chess-promo-overlay { position: absolute; inset: 0; background: rgba(20, 33, 61, 0.55); display: none; align-items: center; justify-content: center; z-index: 10; border-radius: 12px; }
+  .chess-promo-overlay.show { display: flex; }
+  .chess-promo-box { background: var(--white); border: 1.5px solid var(--border-soft); border-radius: 14px; padding: 12px; display: flex; gap: 8px; }
+  .chess-promo-box button { width: 56px; height: 56px; padding: 6px; border-radius: 10px; border: none; background: var(--c-raised); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .chess-promo-box button:hover { background: var(--c-raised-hover); }
+  .chess-promo-box button .chess-piece-img { width: 100%; height: 100%; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4)); }
+
+  .chess-review-progress-wrap { display: none; margin-top: 10px; }
+  .chess-review-progress-wrap.show { display: block; }
+  .chess-review-progress-bar { height: 6px; border-radius: 3px; background: var(--c-raised); overflow: hidden; }
+  .chess-review-progress-fill { height: 100%; width: 0%; background: var(--blue-main); transition: width .15s linear; }
+  .chess-review-progress-label { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  .chess-accuracy-row { display: flex; gap: 10px; margin-top: 10px; }
+  .chess-accuracy-box { flex: 1; background: var(--c-raised); border-radius: 12px; padding: 10px; text-align: center; }
+  .chess-accuracy-box .chess-side-label { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+  .chess-accuracy-box .chess-acc-value { font-size: 24px; font-weight: 800; margin-top: 2px; font-family: var(--app-font-display), var(--app-font); }
+  .chess-accuracy-box.white .chess-acc-value { color: var(--ink); }
+  .chess-accuracy-box.black .chess-acc-value { color: var(--blue-main); }
+  .chess-review-summary { display: none; }
+  .chess-review-summary.show { display: block; }
+
+  .chess-tag { display: inline-block; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+  .chess-tag.best { background: #2f7d3d; color: #d7ffe0; }
+  .chess-tag.excellent { background: #3a7d55; color: #d7ffe0; }
+  .chess-tag.good { background: #3a5f7d; color: #d7ecff; }
+  .chess-tag.inaccuracy { background: #8a7a1f; color: #fff6cf; }
+  .chess-tag.mistake { background: #9a5a1f; color: #ffe6cf; }
+  .chess-tag.blunder { background: #9a2020; color: #ffdada; }
+
+
+  /* ---- Chess: post-game summary (reuses .lesson-summary-* shell) ---- */
+  #chessSummaryContainer .lesson-summary-footer { display: flex; gap: 10px; }
+  #chessSummaryContainer .lesson-action-btn { width: auto; flex: 1; }
+  #chessSummaryReviewBtn { background: var(--blue-main); color: #fff; }
+
+  /* ---- Chess: Game History list (Play tab) ---- */
+  .chess-history-list { display: flex; flex-direction: column; gap: 8px; }
+  .chess-history-list.locked { opacity: .5; pointer-events: none; }
+  .chess-history-empty { font-size: 13px; color: var(--ink-soft); padding: 2px 0; }
+  .chess-history-row { display: flex; align-items: center; gap: 12px; width: 100%; background: var(--c-raised); border: 1.5px solid transparent; border-radius: 12px; padding: 10px 12px; font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+  .chess-history-row:hover { border-color: var(--blue-main); background: var(--c-raised-hover); }
+  .chess-history-icon { font-size: 24px; flex-shrink: 0; }
+  .chess-history-icon.win { color: var(--green); }
+  .chess-history-icon.loss { color: var(--error); }
+  .chess-history-icon.draw, .chess-history-icon.resign { color: var(--ink-soft); }
+  .chess-history-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .chess-history-title { font-size: 14px; font-weight: 700; }
+  .chess-history-sub { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .chess-history-acc { font-size: 13px; font-weight: 800; color: var(--blue-main); }
+  .chess-history-chev { color: var(--ink-soft); font-size: 20px; }
 
   /* Graph */
   .diagram-graph-wrap { width: 100%; max-width: 260px; margin: 0 auto; }
@@ -3696,6 +3919,49 @@
     margin: 0 auto 18px;
   }
   .security-icon-wrap .material-symbols-outlined { font-size: 26px; color: var(--streak-orange); }
+
+/* ---------- Forced update alert (uncancellable) ---------- */
+#kllForceUpdate {
+  --fu-bg: rgba(242, 242, 247, 0.78);
+  --fu-text: #000;
+  --fu-sep: rgba(60, 60, 67, 0.29);
+  --fu-blue: #007aff;
+  --fu-press: rgba(60, 60, 67, 0.12);
+  position: fixed; inset: 0; z-index: 2147483647;
+  display: grid; place-items: center; padding: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+body.dark-mode #kllForceUpdate {
+  --fu-bg: rgba(44, 44, 46, 0.78);
+  --fu-text: #fff;
+  --fu-sep: rgba(84, 84, 88, 0.65);
+  --fu-blue: #0a84ff;
+  --fu-press: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.5);
+}
+#kllForceUpdate .fu-alert {
+  width: 270px; max-width: 100%;
+  border-radius: 14px; overflow: hidden; text-align: center;
+  background: var(--fu-bg); color: var(--fu-text);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  backdrop-filter: saturate(180%) blur(30px);
+  animation: kllFuPop 0.3s cubic-bezier(0.2, 1.1, 0.3, 1);
+}
+@keyframes kllFuPop { from { transform: scale(1.12); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#kllForceUpdate .fu-body { padding: 19px 16px 17px; }
+#kllForceUpdate .fu-title { margin: 0 0 3px; font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.41px; }
+#kllForceUpdate .fu-msg { margin: 0; font-size: 13px; line-height: 16px; letter-spacing: -0.08px; }
+#kllForceUpdate .fu-actions { border-top: 0.5px solid var(--fu-sep); }
+#kllForceUpdate .fu-btn {
+  display: block; width: 100%; appearance: none; border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.41px;
+  color: var(--fu-blue); padding: 11px 8px;
+}
+#kllForceUpdate .fu-btn:active { background: var(--fu-press); }
+@media (prefers-reduced-motion: reduce) { #kllForceUpdate .fu-alert { animation: none; } }
 </style>
 </head>
 <body>
@@ -3983,8 +4249,18 @@
             <span class="material-symbols-outlined">ios_share</span>
             <span>Share Course</span>
           </button>
+          <button id="lessonGenBtn" class="lesson-gen-header-btn" style="display:none;">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <span>Generate Lessons in Background</span>
+          </button>
         </div>
 
+        <div class="learn-subtabs" id="learnSubtabs" style="display:none;">
+          <button type="button" class="learn-subtab active" id="learnSubtabLearn" data-subtab="learn">Learn</button>
+          <button type="button" class="learn-subtab" id="learnSubtabPlay" data-subtab="play">Play</button>
+        </div>
+
+        <div id="learnPaneLearn">
         <div id="learnCourseDescription" class="learn-course-description"></div>
         <div id="learnUnitsList" class="learn-units-list"></div>
 
@@ -4002,6 +4278,44 @@
           <div id="learnCourseReviewTitle" class="learn-course-review-title"></div>
           <div id="learnCourseReviewSub" class="learn-course-review-sub"></div>
           <button id="learnCourseReviewBtn" class="learn-primary-btn" style="display:none;"></button>
+        </div>
+        </div><!-- /#learnPaneLearn -->
+
+        <div id="learnPanePlay" style="display:none;">
+          <div class="chess-settings-panel">
+            <div class="chess-card">
+              <h2>Opponent Strength</h2>
+              <div class="chess-elo-row">
+                <span class="chess-elo-value" id="chessEloValue">1200</span>
+                <input type="range" id="chessEloSlider" min="0" max="4000" step="10" value="1200">
+              </div>
+              <div class="chess-elo-label" id="chessEloLabel">Casual club player</div>
+              <div class="chess-elo-presets">
+                <button type="button" class="chess-preset-btn" data-elo="200">Beginner (200)</button>
+                <button type="button" class="chess-preset-btn" data-elo="800">Novice (800)</button>
+                <button type="button" class="chess-preset-btn" data-elo="1200">Club (1200)</button>
+                <button type="button" class="chess-preset-btn" data-elo="1600">Strong club (1600)</button>
+                <button type="button" class="chess-preset-btn" data-elo="2000">Expert (2000)</button>
+                <button type="button" class="chess-preset-btn" data-elo="2600">Master (2600)</button>
+                <button type="button" class="chess-preset-btn" data-elo="3200">Super-GM (3200)</button>
+                <button type="button" class="chess-preset-btn" data-elo="4000">Max engine (4000)</button>
+              </div>
+            </div>
+            <div class="chess-card">
+              <h2>Play As</h2>
+              <div class="chess-side-toggle">
+                <button type="button" id="chessPlayWhiteBtn" class="active">White</button>
+                <button type="button" id="chessPlayBlackBtn">Black</button>
+              </div>
+            </div>
+            <button type="button" class="chess-start-btn" id="chessStartBtn">Start Game</button>
+            <div class="chess-resume-note" id="chessResumeNote" style="display:none;">You have a game in progress — Start Game will resume it.</div>
+            <div class="chess-engine-status" id="chessEngineStatus" style="text-align:center;margin-top:10px;">Tap Start Game to load the engine.</div>
+            <div class="chess-card" id="chessHistoryCard" style="margin-top:16px;">
+              <h2>Game History</h2>
+              <div class="chess-history-list" id="chessHistoryList"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -4228,6 +4542,23 @@
         </div>
       </div>
     </div>
+    </div>
+
+    <div class="lesson-gen-bar" id="lessonGenBar">
+      <div class="lesson-gen-bar-icon">
+        <span class="material-symbols-outlined" id="lessonGenBarIcon">auto_stories</span>
+      </div>
+      <div class="lesson-gen-bar-info">
+        <div class="lesson-gen-bar-title" id="lessonGenBarTitle">Generating Lessons</div>
+        <div class="lesson-gen-bar-sub" id="lessonGenBarSub">0 out of 0 Lessons Generated</div>
+        <div class="lesson-gen-bar-track"><div class="lesson-gen-bar-fill" id="lessonGenBarFill"></div></div>
+      </div>
+      <button class="mini-player-btn" id="lessonGenBarToggle" aria-label="Pause or resume">
+        <span class="material-symbols-outlined" id="lessonGenBarToggleIcon">pause</span>
+      </button>
+      <button class="mini-player-btn" id="lessonGenBarClose" aria-label="Stop">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
 
     <div class="mini-player" id="miniPlayer">
@@ -4638,6 +4969,7 @@
       <input type="text" id="createCourseInput" class="kll-text-input" maxlength="80" placeholder="e.g. Ancient Rome, guitar chords, chess openings...">
       <div class="kll-modal-error" id="createCourseError"></div>
       <button class="kll-modal-btn" id="createCourseSubmitBtn">Create Course</button>
+      <button class="kll-modal-btn-pink" id="chessLessonsBtn">Chess Lessons (NEW)</button>
       <button class="kll-modal-btn-pink" id="idkWhatToLearnBtn">I don't know what to learn</button>
       <button class="kll-modal-btn-secondary" id="createCourseCancelBtn">Cancel</button>
     </div>
@@ -4663,11 +4995,27 @@
     </div>
   </div>
 
+  <!-- ============ LEARN: GENERATE LESSONS MODAL ============ -->
+  <div class="kll-modal-overlay" id="lessonGenModalOverlay">
+    <div class="kll-modal">
+      <h2>Generate Lessons</h2>
+      <p class="lesson-gen-modal-sub" id="lessonGenModalSub">Get lessons ready ahead of time so they open instantly. Generation runs while the app is open.</p>
+      <button class="kll-modal-btn lesson-gen-option" id="lessonGenOptUnit" style="display:none;"></button>
+      <button class="kll-modal-btn lesson-gen-option" id="lessonGenOptTwoUnits" style="display:none;"></button>
+      <button class="kll-modal-btn lesson-gen-option" id="lessonGenOptCourse" style="display:none;"></button>
+      <button class="kll-modal-btn-secondary" id="lessonGenModalCancelBtn">Cancel</button>
+    </div>
+  </div>
+
   <!-- ============ LEARN: LESSON START MODAL ============ -->
   <div class="kll-modal-overlay" id="lessonStartModalOverlay">
     <div class="kll-modal">
       <div class="lesson-start-title" id="lessonStartTitle"></div>
       <div class="lesson-start-sub" id="lessonStartSub"></div>
+      <div class="lesson-start-spinner" id="lessonStartSpinner" role="status" aria-label="Loading lesson title">
+        <span class="material-symbols-outlined">progress_activity</span>
+      </div>
+      <button class="kll-modal-btn" id="lessonStartRetryBtn" style="display:none;">Try again</button>
       <button class="kll-modal-btn" id="lessonStartBtn">
         <span class="lesson-start-btn-fill"></span>
         <span class="lesson-start-btn-label">Start</span>
@@ -6234,14 +6582,1155 @@
     </div>
   </div>
 
+  <!-- ============ LEARN / CHESS: live game (full-page overlay) ============ -->
+  <div class="kll-modal-overlay chess-view-overlay" id="chessViewOverlay">
+    <div class="chess-view-container">
+      <div class="chess-view-topbar">
+        <button type="button" id="chessExitBtn" class="games-exit-btn"><span class="material-symbols-outlined">close</span></button>
+        <div class="chess-view-title">Chess</div>
+        <div class="chess-timer-badge" id="chessTimerBadge">0:00</div>
+        <div class="chess-material-badge" id="chessMaterialBadge">Even</div>
+        <button type="button" class="chess-resign-btn" id="chessOverlayResignBtn">Resign</button>
+      </div>
+      <div class="chess-view-body">
+        <div class="chess-board-col">
+          <div class="chess-board-wrap">
+            <div id="chessBoard"></div>
+            <div class="chess-promo-overlay" id="chessPromoOverlay"><div class="chess-promo-box" id="chessPromoBox"></div></div>
+          </div>
+          <div class="chess-review-nav" id="chessReviewNav">
+            <button type="button" class="chess-nav-btn" id="chessReviewFirstBtn" aria-label="First move"><span class="material-symbols-outlined">first_page</span></button>
+            <button type="button" class="chess-nav-btn step" id="chessReviewPrevBtn" aria-label="Previous move"><span class="material-symbols-outlined">chevron_left</span></button>
+            <div class="chess-nav-label" id="chessReviewNavLabel">Start position</div>
+            <button type="button" class="chess-nav-btn step" id="chessReviewNextBtn" aria-label="Next move"><span class="material-symbols-outlined">chevron_right</span></button>
+            <button type="button" class="chess-nav-btn" id="chessReviewLastBtn" aria-label="Last move"><span class="material-symbols-outlined">last_page</span></button>
+          </div>
+        </div>
+        <div class="chess-panel">
+          <div class="chess-card">
+            <h2>Game</h2>
+            <div class="chess-status-line" id="chessStatusLine">Loading engine…</div>
+          </div>
+          <div class="chess-card">
+            <h2>Moves</h2>
+            <div id="chessMoveLog"></div>
+          </div>
+          <div class="chess-card" id="chessReviewCard" style="display:none;">
+            <h2>Game Review</h2>
+            <div class="chess-review-progress-wrap" id="chessReviewProgressWrap">
+              <div class="chess-review-progress-bar"><div class="chess-review-progress-fill" id="chessReviewProgressFill"></div></div>
+              <div class="chess-review-progress-label" id="chessReviewProgressLabel">Analyzing…</div>
+            </div>
+            <div class="chess-review-summary" id="chessReviewSummary">
+              <div class="chess-accuracy-row">
+                <div class="chess-accuracy-box white">
+                  <div class="chess-side-label">White accuracy</div>
+                  <div class="chess-acc-value" id="chessWhiteAccVal">–</div>
+                </div>
+                <div class="chess-accuracy-box black">
+                  <div class="chess-side-label">Black accuracy</div>
+                  <div class="chess-acc-value" id="chessBlackAccVal">–</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN / CHESS: post-game summary (XP + streak) ============ -->
+  <div class="kll-modal-overlay lesson-summary-overlay" id="chessSummaryModalOverlay">
+    <div class="lesson-summary-container" id="chessSummaryContainer">
+      <div class="lesson-summary-body">
+        <div class="lesson-summary-icon material-symbols-outlined" id="chessSummaryIcon">emoji_events</div>
+        <h2 id="chessSummaryTitle">You won!</h2>
+        <div id="chessSummaryXp" class="lesson-summary-xp">
+          <span class="material-symbols-outlined">bolt</span> <span id="chessSummaryXpCount">0</span> XP earned
+        </div>
+        <div id="chessSummaryStreak" class="lesson-summary-streak" style="display:none">
+          <img src="streak.png" class="lesson-summary-streak-icon" alt="">
+          <div class="lesson-summary-streak-label">Streak extended!</div>
+          <div class="lesson-summary-streak-count" id="chessSummaryStreakCount">0</div>
+        </div>
+      </div>
+      <div class="lesson-summary-footer">
+        <button type="button" class="lesson-action-btn" id="chessSummaryReviewBtn">Game Review</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN / CHESS: confirm resign (X / Resign) ============ -->
+  <div class="kll-modal-overlay" id="chessResignConfirmOverlay">
+    <div class="kll-modal">
+      <div style="width:56px;height:56px;border-radius:50%;background:#FDEDEF;border:2px solid #F5C6CC;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+        <span class="material-symbols-outlined" style="font-size:26px;color:var(--error)">flag</span>
+      </div>
+      <h2>Resign this game?</h2>
+      <p>Leaving the game counts as a resignation and you'll lose.</p>
+      <button type="button" class="kll-modal-btn" id="chessResignConfirmBtn" style="background:var(--error)">Resign</button>
+      <button type="button" class="kll-modal-btn-secondary" id="chessResignCancelBtn">Keep Playing</button>
+    </div>
+  </div>
+
   <script type="module" src="./animations.js"></script>
   <script type="module" src="./player.js"></script>
   <script type="module" src="./learn.js"></script>
+  <script type="module">
+    // ============ LEARN / CHESS: Play vs Stockfish ============
+    // Formerly a standalone page (play/chess.html) loaded in an iframe from
+    // the Learn > Play sub-tab. Now lives directly in index.html: the
+    // Play sub-tab only holds the settings (opponent strength, side), and
+    // Start Game opens the actual board in #chessViewOverlay, a full-page
+    // overlay (same slide-in pattern as Friends/Learning Games/etc). Paths
+    // to ./play/vendor/... are relative to THIS document now, not to
+    // play/chess.html, since that file no longer exists.
+    import { Chess } from './play/vendor/chess.mjs';
+    import { awardGameXp, bumpStreak, getLearnStreakSnapshot, getLearnUid } from './learn.js';
+
+    function engineSettingsForElo(elo) {
+      if (elo < 1320) {
+        const t = elo / 1320;
+        const randomMoveChance = Math.max(0, 0.85 * (1 - t) ** 1.4);
+        return { limitStrength: false, uciElo: 1320, skillLevel: 0, depth: elo < 400 ? 1 : elo < 800 ? 3 : 5, moveTimeMs: 50, randomMoveChance };
+      }
+      if (elo <= 3190) {
+        return { limitStrength: true, uciElo: Math.round(elo), skillLevel: 20, depth: null, moveTimeMs: 700, randomMoveChance: 0 };
+      }
+      const extra = Math.min(1, (elo - 3190) / (4000 - 3190));
+      return { limitStrength: false, uciElo: 3190, skillLevel: 20, depth: null, moveTimeMs: Math.round(900 + extra * 1600), randomMoveChance: 0 };
+    }
+
+    function eloDescription(elo) {
+      if (elo < 400) return "Learning the rules — expect random-looking moves and free pieces.";
+      if (elo < 800) return "Beginner — frequent blunders, simple tactics will work.";
+      if (elo < 1200) return "Novice — knows basic tactics but misses a lot.";
+      if (elo < 1600) return "Casual club player.";
+      if (elo < 2000) return "Strong club player — solid tactics and openings.";
+      if (elo < 2400) return "Expert / candidate master level.";
+      if (elo < 2700) return "National master to International Master strength.";
+      if (elo < 3200) return "Grandmaster / super-GM strength.";
+      return "Effectively max engine strength — no human or engine plays reliably stronger.";
+    }
+
+    class EngineClient {
+      constructor(onStatus) {
+        this.onStatus = onStatus;
+        this.ready = false;
+        this.worker = new Worker('./play/vendor/stockfish.js');
+        this.worker.onmessage = (e) => this._handleMessage(String(e.data));
+        this.worker.onerror = (e) => {
+          console.error('Stockfish worker error:', e);
+          this.onStatus('error', 'Engine failed to load (must be served over http/https).');
+        };
+        this._bestMoveResolve = null;
+        this._lastScore = null;
+        this._send('uci');
+      }
+      _send(cmd) { this.worker.postMessage(cmd); }
+      _handleMessage(line) {
+        if (line === 'uciok') { this._send('isready'); }
+        else if (line === 'readyok') { if (!this.ready) { this.ready = true; this.onStatus('ready', 'Engine ready.'); } }
+        else if (line.startsWith('info') && line.includes(' score ')) {
+          const m = line.match(/ score (cp|mate) (-?\d+)/);
+          if (m) this._lastScore = { type: m[1], value: parseInt(m[2], 10) };
+        }
+        else if (line.startsWith('bestmove')) {
+          const parts = line.split(' ');
+          const mv = parts[1];
+          if (this._bestMoveResolve) {
+            const resolve = this._bestMoveResolve;
+            this._bestMoveResolve = null;
+            const score = this._lastScore;
+            this._lastScore = null;
+            resolve({ move: mv === '(none)' ? null : mv, score });
+          }
+        }
+      }
+      configure(settings) {
+        this._send(`setoption name UCI_LimitStrength value ${settings.limitStrength}`);
+        this._send(`setoption name UCI_Elo value ${settings.uciElo}`);
+        this._send(`setoption name Skill Level value ${settings.skillLevel}`);
+      }
+      newGame() { this._send('ucinewgame'); }
+      _search(fen, goCmd) {
+        return new Promise((resolve) => {
+          this._bestMoveResolve = resolve;
+          this._lastScore = null;
+          this._send(`position fen ${fen}`);
+          this._send(goCmd);
+        });
+      }
+      async getBestMove(fen, settings) {
+        const goCmd = settings.depth ? `go depth ${settings.depth} movetime ${settings.moveTimeMs}` : `go movetime ${settings.moveTimeMs}`;
+        const result = await this._search(fen, goCmd);
+        return result.move;
+      }
+      async analyze(fen, movetimeMs = 400) {
+        const result = await this._search(fen, `go movetime ${movetimeMs}`);
+        const sideToMove = fen.trim().split(/\s+/)[1] || 'w';
+        let cpSideToMove = 0;
+        if (result.score) {
+          if (result.score.type === 'cp') cpSideToMove = result.score.value;
+          else {
+            const n = result.score.value;
+            cpSideToMove = (n >= 0 ? 1 : -1) * (100000 - Math.min(99, Math.abs(n)) * 100);
+          }
+        }
+        const cpWhite = sideToMove === 'w' ? cpSideToMove : -cpSideToMove;
+        return { move: result.move, cpWhite };
+      }
+    }
+
+    // ---- XP awarded per game outcome (kids-learning-lab-wide convention:
+    // shared awardGameXp()/bumpStreak() from learn.js, same as Maze/Duel/etc) ----
+    const CHESS_XP = { win: 50, loss: 35, resign: 5, draw: 40 };
+
+    const game = new Chess();
+    // Review mode (finished game, opened from the summary screen): the board shows
+    // viewGame, loaded to whichever position the arrows are on, instead of `game`.
+    const viewGame = new Chess();
+    let reviewMode = false;
+    let reviewPly = 0;      // 0 = start position, N = after the Nth half-move
+    let reviewFens = [];    // FEN for every ply
+    let reviewMoves = [];   // { from, to, san } per ply (index 0 = null)
+    let engine = null; // created lazily — no Stockfish worker until the Play tab is opened
+    let humanColor = 'w';
+    let selectedSquare = null;
+    let legalTargets = [];
+    let lastMove = null;
+    let currentElo = 1200;
+    let engineThinking = false;
+    let gameOverMessage = null;
+    let gameOutcome = null; // 'win' | 'loss' | 'draw' | 'resign' | null
+    let gameStarted = false; // a game has been started this session (may be mid-play or finished)
+    let gameEndHandled = false; // guards awardGameXp/bumpStreak from firing twice for one game
+    let gameSession = 0; // bumped on every new game/reset so a late engine reply can't land on the wrong game
+    let reviewing = false;
+    let reviewAbort = false; // set when the overlay is closed mid-review so the analysis loop stops
+    let reviewResults = null;
+
+    let chessElapsedMs = 0;
+    let chessTimerHandle = null;
+    let chessTimerLastTick = null;
+
+    const boardEl = document.getElementById('chessBoard');
+    const statusLine = document.getElementById('chessStatusLine');
+    const moveLogEl = document.getElementById('chessMoveLog');
+    const eloSlider = document.getElementById('chessEloSlider');
+    const eloValueEl = document.getElementById('chessEloValue');
+    const eloLabelEl = document.getElementById('chessEloLabel');
+    const promoOverlay = document.getElementById('chessPromoOverlay');
+    const promoBox = document.getElementById('chessPromoBox');
+    const playWhiteBtn = document.getElementById('chessPlayWhiteBtn');
+    const playBlackBtn = document.getElementById('chessPlayBlackBtn');
+    const reviewCard = document.getElementById('chessReviewCard');
+    const reviewNav = document.getElementById('chessReviewNav');
+    const reviewNavLabel = document.getElementById('chessReviewNavLabel');
+    const reviewFirstBtn = document.getElementById('chessReviewFirstBtn');
+    const reviewPrevBtn = document.getElementById('chessReviewPrevBtn');
+    const reviewNextBtn = document.getElementById('chessReviewNextBtn');
+    const reviewLastBtn = document.getElementById('chessReviewLastBtn');
+    const resignConfirmOverlay = document.getElementById('chessResignConfirmOverlay');
+    const resignConfirmBtn = document.getElementById('chessResignConfirmBtn');
+    const resignCancelBtn = document.getElementById('chessResignCancelBtn');
+    const reviewProgressWrap = document.getElementById('chessReviewProgressWrap');
+    const reviewProgressFill = document.getElementById('chessReviewProgressFill');
+    const reviewProgressLabel = document.getElementById('chessReviewProgressLabel');
+    const reviewSummary = document.getElementById('chessReviewSummary');
+    const whiteAccVal = document.getElementById('chessWhiteAccVal');
+    const blackAccVal = document.getElementById('chessBlackAccVal');
+    const engineStatusEl = document.getElementById('chessEngineStatus');
+    const startBtn = document.getElementById('chessStartBtn');
+    const resumeNote = document.getElementById('chessResumeNote');
+    const chessViewOverlay = document.getElementById('chessViewOverlay');
+    const exitBtn = document.getElementById('chessExitBtn');
+    const overlayResignBtn = document.getElementById('chessOverlayResignBtn');
+    const timerBadge = document.getElementById('chessTimerBadge');
+    const materialBadge = document.getElementById('chessMaterialBadge');
+    const summaryOverlay = document.getElementById('chessSummaryModalOverlay');
+    const summaryIcon = document.getElementById('chessSummaryIcon');
+    const summaryTitle = document.getElementById('chessSummaryTitle');
+    const summaryXpCount = document.getElementById('chessSummaryXpCount');
+    const summaryStreak = document.getElementById('chessSummaryStreak');
+    const summaryStreakCount = document.getElementById('chessSummaryStreakCount');
+    const summaryReviewBtn = document.getElementById('chessSummaryReviewBtn');
+
+
+    // ---- Local Game History (per account, saved in localStorage) ----
+    // One record per finished game: the move list (SAN) plus outcome/settings, and
+    // the engine review (per-move tags + accuracies) once it has been computed, so
+    // a past game can be stepped through again without re-analysing it.
+    const CHESS_HISTORY_MAX = 50;
+    let activeHistoryId = null;        // history record the board is showing / was just saved as
+    let historyColorBackup = null;     // Play-tab colour, restored when a past game's view closes
+    let reviewPendingOnEngine = false; // a past game was opened before the engine finished loading
+    const historyListEl = document.getElementById('chessHistoryList');
+
+    function chessHistoryKey() { return `kll_chess_history_${getLearnUid() || 'guest'}`; }
+    function loadChessHistory() {
+      try {
+        const list = JSON.parse(localStorage.getItem(chessHistoryKey()) || '[]');
+        return Array.isArray(list) ? list : [];
+      } catch { return []; }
+    }
+    function saveChessHistory(list) {
+      try { localStorage.setItem(chessHistoryKey(), JSON.stringify(list.slice(0, CHESS_HISTORY_MAX))); } catch {}
+    }
+    function saveFinishedGameToHistory(xp) {
+      const sans = game.history();
+      if (!sans.length) return; // resigned before a single move — nothing to review
+      const rec = {
+        id: `g${Date.now()}`,
+        playedAt: new Date().toISOString(),
+        outcome: gameOutcome,
+        message: gameOverMessage,
+        humanColor,
+        elo: currentElo,
+        xp,
+        durationMs: chessElapsedMs,
+        sans,
+        review: null,
+      };
+      activeHistoryId = rec.id;
+      saveChessHistory([rec, ...loadChessHistory()]);
+    }
+    function saveReviewToHistory(id, results, whiteAcc, blackAcc) {
+      if (!id) return;
+      const list = loadChessHistory();
+      const rec = list.find((r) => r.id === id);
+      if (!rec) return;
+      rec.review = {
+        results: results.map((r) => ({ classification: r.classification, accuracy: Math.round(r.accuracy * 10) / 10 })),
+        whiteAcc, blackAcc,
+      };
+      saveChessHistory(list);
+    }
+    function renderChessHistory() {
+      if (!historyListEl) return;
+      const list = loadChessHistory();
+      if (!list.length) { historyListEl.innerHTML = '<div class="chess-history-empty">No games yet — finished games show up here.</div>'; return; }
+      const thisYear = new Date().getFullYear();
+      const NAMES = { win: 'Won', loss: 'Lost', draw: 'Draw', resign: 'Resigned' };
+      const ICONS = { win: 'emoji_events', loss: 'sentiment_dissatisfied', draw: 'handshake', resign: 'flag' };
+      historyListEl.innerHTML = list.map((rec) => {
+        const d = new Date(rec.playedAt);
+        const date = d.toLocaleDateString(undefined, d.getFullYear() === thisYear ? { month: 'short', day: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' });
+        const moves = Math.ceil(rec.sans.length / 2);
+        const side = rec.humanColor === 'w' ? 'White' : 'Black';
+        const myAcc = rec.review ? (rec.humanColor === 'w' ? rec.review.whiteAcc : rec.review.blackAcc) : null;
+        const out = NAMES[rec.outcome] ? rec.outcome : 'draw';
+        return `<button type="button" class="chess-history-row" data-history-id="${rec.id}">
+          <span class="material-symbols-outlined chess-history-icon ${out}">${ICONS[out]}</span>
+          <span class="chess-history-body">
+            <span class="chess-history-title">${NAMES[out]} as ${side}</span>
+            <span class="chess-history-sub">vs ${rec.elo} · ${moves} move${moves === 1 ? '' : 's'} · ${date}</span>
+          </span>
+          ${myAcc != null ? `<span class="chess-history-acc">${myAcc.toFixed(0)}%</span>` : ''}
+          <span class="material-symbols-outlined chess-history-chev">chevron_right</span>
+        </button>`;
+      }).join('');
+    }
+
+    // Load a saved game into the board and open it straight in Game Review.
+    function openHistoryGame(id) {
+      if (reviewing || (gameStarted && !gameOverMessage)) return;
+      const rec = loadChessHistory().find((r) => r.id === id);
+      if (!rec) return;
+      initEngineIfNeeded();
+      gameSession++;
+      promoOverlay.classList.remove('show');
+      reviewMode = false;
+      if (historyColorBackup === null) historyColorBackup = humanColor;
+      humanColor = rec.humanColor;
+      game.reset();
+      for (const san of rec.sans) game.move(san);
+      selectedSquare = null; legalTargets = []; lastMove = null; engineThinking = false;
+      gameOverMessage = rec.message || 'Game over.';
+      gameOutcome = rec.outcome;
+      gameEndHandled = true;
+      activeHistoryId = rec.id;
+      chessElapsedMs = rec.durationMs || 0; renderChessTimer();
+      clearReviewResults();
+      overlayResignBtn.disabled = true;
+      updateStatus();
+      if (rec.review) {
+        reviewResults = rec.review.results;
+        reviewCard.style.display = '';
+        reviewProgressWrap.classList.remove('show');
+        whiteAccVal.textContent = rec.review.whiteAcc != null ? rec.review.whiteAcc.toFixed(1) + '%' : '–';
+        blackAccVal.textContent = rec.review.blackAcc != null ? rec.review.blackAcc.toFixed(1) + '%' : '–';
+        reviewSummary.classList.add('show');
+      }
+      enterReviewMode();
+      openChessOverlay();
+      if (!rec.review) {
+        if (engine && engine.ready) runGameReview();
+        else { // engine still loading — the ready callback starts the analysis
+          reviewPendingOnEngine = true;
+          reviewCard.style.display = '';
+          reviewProgressWrap.classList.add('show');
+          reviewProgressFill.style.width = '0%';
+          reviewProgressLabel.textContent = 'Starting engine…';
+        }
+      }
+    }
+
+    // ---- Move feedback: sound + haptic on every piece movement (yours and the engine's) ----
+    const moveSound = new Audio('./play/move.mp3');
+    moveSound.preload = 'auto';
+    function playMoveSound() {
+      try { moveSound.currentTime = 0; moveSound.play().catch(() => {}); } catch {}
+    }
+    // Follows the Haptics settings modal (on/off + LIGHT/MEDIUM/HEAVY). Chess squares are
+    // re-rendered <div>s, so the app-wide button-tap haptics never fire for them.
+    function readHapticSettings() {
+      let enabled = true, style = 'MEDIUM';
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!/haptic/i.test(k)) continue;
+          let v = localStorage.getItem(k);
+          try { const j = JSON.parse(v); if (j && typeof j === 'object') { if (j.enabled === false) enabled = false; if (j.intensity) v = j.intensity; else continue; } else v = String(j); } catch {}
+          v = String(v).replace(/^"|"$/g, '');
+          if (/^(LIGHT|MEDIUM|HEAVY)$/i.test(v)) style = v.toUpperCase();
+          else if (/enable|_on$|toggle/i.test(k) && /^(0|false|off)$/i.test(v)) enabled = false;
+        }
+      } catch {}
+      return { enabled, style };
+    }
+    function chessHaptic() {
+      const { enabled, style } = readHapticSettings();
+      if (!enabled) return;
+      const plugin = window.Capacitor?.Plugins?.Haptics;
+      if (plugin?.impact) { plugin.impact({ style }).catch(() => {}); return; }
+      try { navigator.vibrate?.(style === 'LIGHT' ? 8 : style === 'HEAVY' ? 25 : 15); } catch {}
+    }
+    function playMoveFeedback() { playMoveSound(); chessHaptic(); }
+
+    const PIECE_FILES = {
+      w: { p: 'wP.svg', n: 'wN.svg', b: 'wB.svg', r: 'wR.svg', q: 'wQ.svg', k: 'wK.svg' },
+      b: { p: 'bP.svg', n: 'bN.svg', b: 'bB.svg', r: 'bR.svg', q: 'bQ.svg', k: 'bK.svg' },
+    };
+    function pieceImg(color, type) {
+      const img = document.createElement('img');
+      img.className = 'chess-piece-img';
+      img.draggable = false;
+      img.alt = `${color === 'w' ? 'White' : 'Black'} ${type}`;
+      img.src = `./play/vendor/pieces/${PIECE_FILES[color][type]}`;
+      return img;
+    }
+
+    function initEngineIfNeeded() {
+      if (engine) return;
+      engineStatusEl.textContent = 'Starting engine…';
+      engine = new EngineClient((status, msg) => {
+        engineStatusEl.textContent = msg;
+        engineStatusEl.className = 'chess-engine-status ' + (status === 'ready' ? 'ready' : status === 'error' ? 'error' : '');
+        if (status === 'ready') {
+          engine.configure(engineSettingsForElo(currentElo));
+          engine.newGame();
+          updateStatus();
+          maybeTriggerEngineMove();
+          if (reviewPendingOnEngine) { reviewPendingOnEngine = false; if (reviewMode) runGameReview(); }
+        } else if (status === 'error' && reviewPendingOnEngine) {
+          reviewPendingOnEngine = false;
+          reviewProgressLabel.textContent = msg;
+        }
+      });
+    }
+
+    function squareId(fileIdx, rankIdx, flipped) {
+      const file = flipped ? 7 - fileIdx : fileIdx;
+      const rank = flipped ? rankIdx : 7 - rankIdx;
+      return 'abcdefgh'[file] + (rank + 1);
+    }
+
+    // ---- Piece glide: slide the moved piece from its old square to its new one ----
+    // renderBoard() rebuilds every square, so a move is queued here and applied at the end
+    // of the render (re-applied, time-synced, if a second render lands mid-glide).
+    const GLIDE_MS = 220;
+    let glide = null; // { mv: {from,to,san}, reverse, t }
+    function queueGlide(mv, reverse = false) { glide = mv ? { mv, reverse, t: performance.now() } : null; }
+    function glidePiece(startSq, endSq, elapsed) {
+      const startEl = boardEl.querySelector(`[data-square="${startSq}"]`);
+      const endEl = boardEl.querySelector(`[data-square="${endSq}"]`);
+      const img = endEl && endEl.querySelector('.chess-piece-img');
+      if (!startEl || !img) return;
+      const a = startEl.getBoundingClientRect(), b = endEl.getBoundingClientRect();
+      img.style.zIndex = '5'; // above every other piece while it travels
+      const anim = img.animate(
+        [{ transform: `translate(${a.left - b.left}px, ${a.top - b.top}px)` }, { transform: 'translate(0, 0)' }],
+        { duration: GLIDE_MS, delay: -elapsed, easing: 'cubic-bezier(.2, .8, .3, 1)', fill: 'backwards' }
+      );
+      anim.onfinish = anim.oncancel = () => { img.style.zIndex = ''; };
+    }
+    function applyGlide() {
+      if (!glide) return;
+      const elapsed = performance.now() - glide.t;
+      if (elapsed >= GLIDE_MS) { glide = null; return; }
+      if (!boardEl.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { glide = null; return; }
+      const { mv, reverse } = glide;
+      const pairs = [[mv.from, mv.to]];
+      const san = mv.san || '';
+      if (san.startsWith('O-O')) { // castling: the rook glides too
+        const rank = mv.from[1];
+        pairs.push(san.startsWith('O-O-O') ? ['a' + rank, 'd' + rank] : ['h' + rank, 'f' + rank]);
+      }
+      // forward: piece now sits on `to`, came from `from`; reverse (stepping back): the opposite
+      for (const [f, t] of pairs) { if (reverse) glidePiece(t, f, elapsed); else glidePiece(f, t, elapsed); }
+    }
+
+    function renderBoard() {
+      const flipped = humanColor === 'b';
+      boardEl.innerHTML = '';
+      const src = reviewMode ? viewGame : game;
+      const shownLastMove = reviewMode ? reviewMoves[reviewPly] : lastMove;
+      const board = src.board();
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const fileIdx = col, rankIdx = row;
+          const id = squareId(fileIdx, rankIdx, flipped);
+          const isLight = (id.charCodeAt(0) - 97 + parseInt(id[1], 10)) % 2 === 1;
+          const sq = document.createElement('div');
+          sq.className = 'chess-sq ' + (isLight ? 'light' : 'dark');
+          sq.dataset.square = id;
+          if (shownLastMove && (id === shownLastMove.from || id === shownLastMove.to)) sq.classList.add('last-move');
+          if (selectedSquare === id) sq.classList.add('selected');
+          const piece = board[flipped ? 7 - rankIdx : rankIdx][flipped ? 7 - fileIdx : fileIdx];
+          if (piece) sq.appendChild(pieceImg(piece.color, piece.type));
+          if (legalTargets.includes(id)) {
+            const marker = document.createElement('div');
+            marker.className = piece ? 'chess-capture-ring' : 'chess-move-dot';
+            sq.appendChild(marker);
+          }
+          sq.addEventListener('click', () => onSquareClick(id));
+          boardEl.appendChild(sq);
+        }
+      }
+      if (src.inCheck()) {
+        const kingColor = src.turn();
+        const kingSquare = findKingSquare(kingColor, src);
+        if (kingSquare) { const el = boardEl.querySelector(`[data-square="${kingSquare}"]`); if (el) el.classList.add('in-check'); }
+      }
+      applyGlide();
+    }
+
+    function findKingSquare(color, src = game) {
+      const board = src.board();
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = board[r][c]; if (p && p.type === 'k' && p.color === color) return 'abcdefgh'[c] + (8 - r); }
+      return null;
+    }
+
+    const TAG_LABELS = { best: 'Best', excellent: 'Excellent', good: 'Good', inaccuracy: 'Inaccuracy', mistake: 'Mistake', blunder: 'Blunder' };
+    const TAG_SHORT = { best: '★', excellent: '✓', good: '', inaccuracy: '?!', mistake: '?', blunder: '??' };
+
+    function renderMoveLog() {
+      const history = game.history();
+      let html = '';
+      for (let i = 0; i < history.length; i += 2) {
+        const num = i / 2 + 1;
+        const white = history[i] || '', black = history[i + 1] || '';
+        const wTag = reviewResults && reviewResults[i] ? tagHtml(reviewResults[i]) : '';
+        const bTag = reviewResults && reviewResults[i + 1] ? tagHtml(reviewResults[i + 1]) : '';
+        const cls = (ply) => 'chess-mv' + (reviewMode && reviewPly === ply ? ' current' : '');
+        html += `<div class="chess-mv-pair"><span class="chess-mv-num">${num}.</span><span class="${cls(i + 1)}" data-ply="${i + 1}">${white}${wTag}</span><span class="${cls(i + 2)}"${black ? ` data-ply="${i + 2}"` : ''}>${black}${bTag}</span></div>`;
+      }
+      moveLogEl.innerHTML = html;
+      const cur = reviewMode ? moveLogEl.querySelector('.current') : null;
+      if (cur) {
+        const top = cur.getBoundingClientRect().top - moveLogEl.getBoundingClientRect().top + moveLogEl.scrollTop;
+        moveLogEl.scrollTop = top - moveLogEl.clientHeight / 2;
+      } else {
+        moveLogEl.scrollTop = reviewMode ? 0 : moveLogEl.scrollHeight;
+      }
+    }
+
+    function tagHtml(result) {
+      const short = TAG_SHORT[result.classification];
+      const label = TAG_LABELS[result.classification];
+      return `<span class="chess-tag ${result.classification}" title="${label}">${short || label}</span>`;
+    }
+
+    function updateStatus() {
+      if (gameOverMessage) { statusLine.textContent = gameOverMessage; statusLine.className = 'chess-status-line over'; return; }
+      if (!engine || !engine.ready) { statusLine.textContent = 'Loading engine…'; statusLine.className = 'chess-status-line thinking'; return; }
+      const turnIsHuman = game.turn() === humanColor;
+      if (engineThinking) { statusLine.textContent = 'Engine is thinking…'; statusLine.className = 'chess-status-line thinking'; }
+      else if (turnIsHuman) { statusLine.textContent = 'Your move.'; statusLine.className = 'chess-status-line you'; }
+      else { statusLine.textContent = 'Waiting for engine…'; statusLine.className = 'chess-status-line thinking'; }
+    }
+
+    // ---- Material badge ("how many points ahead/behind" in the topbar) ----
+    const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+    function computeMaterialDiff() {
+      const board = (reviewMode ? viewGame : game).board();
+      let w = 0, b = 0;
+      for (const row of board) for (const sq of row) { if (!sq) continue; if (sq.color === 'w') w += PIECE_VALUES[sq.type]; else b += PIECE_VALUES[sq.type]; }
+      return humanColor === 'w' ? w - b : b - w;
+    }
+    function updateMaterialBadge() {
+      const diff = computeMaterialDiff();
+      materialBadge.textContent = diff === 0 ? 'Even' : (diff > 0 ? `+${diff}` : `${diff}`);
+      materialBadge.className = 'chess-material-badge' + (diff > 0 ? ' ahead' : diff < 0 ? ' behind' : '');
+    }
+
+    // ---- Elapsed-time badge ----
+    function renderChessTimer() {
+      const totalSec = Math.floor(chessElapsedMs / 1000);
+      const m = Math.floor(totalSec / 60), s = totalSec % 60;
+      timerBadge.textContent = `${m}:${String(s).padStart(2, '0')}`;
+    }
+    function startChessTimer() {
+      chessTimerLastTick = Date.now();
+      if (chessTimerHandle) clearInterval(chessTimerHandle);
+      chessTimerHandle = setInterval(() => {
+        const now = Date.now();
+        chessElapsedMs += now - chessTimerLastTick;
+        chessTimerLastTick = now;
+        renderChessTimer();
+      }, 1000);
+    }
+    function stopChessTimer() {
+      if (chessTimerHandle) { clearInterval(chessTimerHandle); chessTimerHandle = null; }
+    }
+
+    function onSquareClick(square) {
+      if (gameOverMessage || engineThinking || reviewing || reviewMode) return;
+      if (game.turn() !== humanColor) return;
+      if (selectedSquare) {
+        if (legalTargets.includes(square)) { attemptMove(selectedSquare, square); selectedSquare = null; legalTargets = []; renderBoard(); return; }
+        const piece = game.get(square);
+        if (piece && piece.color === humanColor) { selectedSquare = square; legalTargets = game.moves({ square, verbose: true }).map((m) => m.to); }
+        else { selectedSquare = null; legalTargets = []; }
+        renderBoard();
+        return;
+      }
+      const piece = game.get(square);
+      if (piece && piece.color === humanColor) { selectedSquare = square; legalTargets = game.moves({ square, verbose: true }).map((m) => m.to); renderBoard(); }
+    }
+
+    function attemptMove(from, to) {
+      const moves = game.moves({ square: from, verbose: true });
+      const match = moves.find((m) => m.to === to);
+      if (!match) return;
+      if (match.flags.includes('p')) { showPromotionPicker(from, to); return; }
+      const result = game.move({ from, to });
+      if (result) { lastMove = { from, to }; afterMove(); }
+    }
+
+    function showPromotionPicker(from, to) {
+      const color = humanColor;
+      promoBox.innerHTML = '';
+      ['q', 'r', 'b', 'n'].forEach((type) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.appendChild(pieceImg(color, type));
+        btn.addEventListener('click', () => {
+          promoOverlay.classList.remove('show');
+          const result = game.move({ from, to, promotion: type });
+          if (result) { lastMove = { from, to }; afterMove(); }
+        });
+        promoBox.appendChild(btn);
+      });
+      promoOverlay.classList.add('show');
+    }
+
+    function afterMove() {
+      playMoveFeedback();
+      const played = game.history({ verbose: true });
+      queueGlide(played[played.length - 1]);
+      selectedSquare = null; legalTargets = [];
+      clearReviewResults();
+      renderBoard(); renderMoveLog(); checkGameOver(); updateStatus(); updateMaterialBadge();
+      if (gameOverMessage) { maybeFinishChessGame(); }
+      else { maybeTriggerEngineMove(); }
+    }
+
+    function clearReviewResults() {
+      reviewResults = null;
+      reviewCard.style.display = 'none';
+      reviewSummary.classList.remove('show');
+      reviewProgressWrap.classList.remove('show');
+      whiteAccVal.textContent = '–';
+      blackAccVal.textContent = '–';
+    }
+
+    function checkGameOver() {
+      if (game.isCheckmate()) {
+        const winnerColor = game.turn() === 'w' ? 'b' : 'w'; // side to move is checkmated, so the OTHER side won
+        gameOverMessage = `Checkmate — ${winnerColor === 'w' ? 'White' : 'Black'} wins.`;
+        gameOutcome = winnerColor === humanColor ? 'win' : 'loss';
+      }
+      else if (game.isStalemate()) { gameOverMessage = 'Draw by stalemate.'; gameOutcome = 'draw'; }
+      else if (game.isThreefoldRepetition()) { gameOverMessage = 'Draw by threefold repetition.'; gameOutcome = 'draw'; }
+      else if (game.isInsufficientMaterial()) { gameOverMessage = 'Draw — insufficient material.'; gameOutcome = 'draw'; }
+      else if (game.isDraw()) { gameOverMessage = 'Draw (50-move rule).'; gameOutcome = 'draw'; }
+      else { gameOverMessage = null; gameOutcome = null; }
+    }
+
+    async function maybeTriggerEngineMove() {
+      if (!engine || !engine.ready || gameOverMessage) return;
+      if (game.turn() === humanColor) return;
+      engineThinking = true; updateStatus();
+      const session = gameSession;
+      const settings = engineSettingsForElo(currentElo);
+      const moveStart = Date.now();
+      const MIN_ENGINE_DELAY_MS = 1000;
+
+      async function finishMove(applyFn) {
+        const elapsed = Date.now() - moveStart;
+        const remaining = MIN_ENGINE_DELAY_MS - elapsed;
+        if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
+        // Resigned, or a different game started, while the engine was thinking:
+        // drop its move instead of playing it (and wiping the game-over state).
+        if (session !== gameSession || gameOverMessage) { if (session === gameSession) engineThinking = false; updateStatus(); return; }
+        applyFn();
+      }
+
+      if (settings.randomMoveChance > 0 && Math.random() < settings.randomMoveChance) {
+        const legal = game.moves({ verbose: true });
+        if (legal.length) {
+          const pick = legal[Math.floor(Math.random() * legal.length)];
+          await finishMove(() => {
+            game.move({ from: pick.from, to: pick.to, promotion: pick.promotion || 'q' });
+            lastMove = { from: pick.from, to: pick.to };
+            engineThinking = false;
+            afterMove();
+          });
+          return;
+        }
+      }
+      const uciMove = await engine.getBestMove(game.fen(), settings);
+      if (!uciMove) { engineThinking = false; updateStatus(); return; }
+      const from = uciMove.slice(0, 2), to = uciMove.slice(2, 4);
+      const promotion = uciMove.length > 4 ? uciMove[4] : undefined;
+      await finishMove(() => {
+        const result = game.move({ from, to, promotion });
+        engineThinking = false;
+        if (result) { lastMove = { from, to }; afterMove(); }
+        else { updateStatus(); }
+      });
+    }
+
+    function applyEloUI(elo) {
+      currentElo = elo;
+      eloValueEl.textContent = String(elo);
+      eloLabelEl.textContent = eloDescription(elo);
+      if (engine?.ready) engine.configure(engineSettingsForElo(elo));
+    }
+
+    // ---- Game Review ----
+    function cpToWhiteWinPercent(cp) {
+      const clamped = Math.max(-1000, Math.min(1000, cp));
+      return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * clamped)) - 1);
+    }
+    function moveAccuracy(winPercentBeforeForMover, winPercentAfterForMover) {
+      const drop = Math.max(0, winPercentBeforeForMover - winPercentAfterForMover);
+      const acc = 103.1668 * Math.exp(-0.04354 * drop) - 3.1669;
+      return Math.max(0, Math.min(100, acc));
+    }
+    function classifyMove({ cpLossForMover, isEngineTop }) {
+      if (isEngineTop || cpLossForMover <= 4) return 'best';
+      if (cpLossForMover <= 15) return 'excellent';
+      if (cpLossForMover <= 40) return 'good';
+      if (cpLossForMover <= 90) return 'inaccuracy';
+      if (cpLossForMover <= 200) return 'mistake';
+      return 'blunder';
+    }
+
+    async function runGameReview() {
+      if (!engine || reviewing || !engine.ready) return;
+      const history = game.history({ verbose: true });
+      if (!history.length) return;
+      const reviewHistoryId = activeHistoryId;
+
+      reviewing = true;
+      reviewAbort = false;
+      reviewCard.style.display = '';
+      reviewProgressWrap.classList.add('show');
+      reviewSummary.classList.remove('show');
+      reviewProgressFill.style.width = '0%';
+
+      engine.configure({ limitStrength: false, uciElo: 3190, skillLevel: 20 });
+
+      const replay = new Chess();
+      const fens = [replay.fen()];
+      for (const m of history) { replay.move(m.san); fens.push(replay.fen()); }
+
+      const evals = [];
+      const bestMoves = [];
+      const total = fens.length;
+      for (let i = 0; i < total; i++) {
+        reviewProgressLabel.textContent = `Analyzing position ${i + 1} of ${total}…`;
+        reviewProgressFill.style.width = `${Math.round(((i) / total) * 100)}%`;
+        const { move, cpWhite } = await engine.analyze(fens[i], 400);
+        if (reviewAbort) break;
+        evals.push(cpWhite);
+        bestMoves.push(move);
+      }
+      if (reviewAbort) { // overlay was closed (or account reset) mid-analysis
+        engine.configure(engineSettingsForElo(currentElo));
+        reviewing = false; reviewAbort = false;
+        reviewCard.style.display = 'none';
+        reviewProgressWrap.classList.remove('show');
+        return;
+      }
+      reviewProgressFill.style.width = '100%';
+
+      const results = [];
+      let whiteAccSum = 0, whiteAccCount = 0, blackAccSum = 0, blackAccCount = 0;
+      for (let i = 0; i < history.length; i++) {
+        const isWhite = i % 2 === 0;
+        const cpBeforeWhite = evals[i];
+        const cpAfterWhite = evals[i + 1];
+        const wpBeforeWhite = cpToWhiteWinPercent(cpBeforeWhite);
+        const wpAfterWhite = cpToWhiteWinPercent(cpAfterWhite);
+        const wpBeforeMover = isWhite ? wpBeforeWhite : 100 - wpBeforeWhite;
+        const wpAfterMover = isWhite ? wpAfterWhite : 100 - wpAfterWhite;
+        const cpBeforeMover = isWhite ? cpBeforeWhite : -cpBeforeWhite;
+        const cpAfterMover = isWhite ? cpAfterWhite : -cpAfterWhite;
+        const cpLossForMover = Math.max(0, cpBeforeMover - cpAfterMover);
+        const playedUci = history[i].from + history[i].to + (history[i].promotion || '');
+        const isEngineTop = bestMoves[i] === playedUci;
+        const classification = classifyMove({ cpLossForMover, isEngineTop });
+        const accuracy = moveAccuracy(wpBeforeMover, wpAfterMover);
+        results.push({ classification, accuracy });
+        if (isWhite) { whiteAccSum += accuracy; whiteAccCount++; }
+        else { blackAccSum += accuracy; blackAccCount++; }
+      }
+
+      reviewResults = results;
+      const whiteAcc = whiteAccCount ? Math.round((whiteAccSum / whiteAccCount) * 10) / 10 : null;
+      const blackAcc = blackAccCount ? Math.round((blackAccSum / blackAccCount) * 10) / 10 : null;
+      whiteAccVal.textContent = whiteAcc != null ? whiteAcc.toFixed(1) + '%' : '–';
+      blackAccVal.textContent = blackAcc != null ? blackAcc.toFixed(1) + '%' : '–';
+      saveReviewToHistory(reviewHistoryId, results, whiteAcc, blackAcc);
+      reviewSummary.classList.add('show');
+      reviewProgressWrap.classList.remove('show');
+
+      engine.configure(engineSettingsForElo(currentElo));
+      reviewing = false;
+      renderMoveLog();
+      updateReviewNav();
+    }
+
+    // ---- New game / settings ----
+    function newGame() {
+      gameSession++;
+      game.reset();
+      glide = null;
+      activeHistoryId = null;
+      reviewMode = false; updateReviewNav();
+      promoOverlay.classList.remove('show');
+      selectedSquare = null; legalTargets = []; lastMove = null; gameOverMessage = null; gameOutcome = null; engineThinking = false; gameEndHandled = false;
+      chessElapsedMs = 0; renderChessTimer();
+      clearReviewResults();
+      if (engine?.ready) engine.newGame();
+      renderBoard(); renderMoveLog(); updateStatus(); updateMaterialBadge();
+      overlayResignBtn.disabled = false;
+      maybeTriggerEngineMove();
+    }
+
+    function updateChessSettingsUI() {
+      const inProgress = gameStarted && !gameOverMessage;
+      startBtn.textContent = inProgress ? 'Resume Game' : 'Start Game';
+      resumeNote.style.display = inProgress ? 'block' : 'none';
+      eloSlider.disabled = inProgress;
+      playWhiteBtn.disabled = inProgress;
+      playBlackBtn.disabled = inProgress;
+      document.querySelectorAll('.chess-preset-btn').forEach((b) => { b.disabled = inProgress; });
+      historyListEl.classList.toggle('locked', inProgress);
+      renderChessHistory();
+    }
+
+    // ---- Review mode: step through the finished game with the arrows ----
+    function updateReviewNav() {
+      reviewNav.classList.toggle('show', reviewMode);
+      if (!reviewMode) return;
+      const last = reviewFens.length - 1;
+      reviewFirstBtn.disabled = reviewPrevBtn.disabled = reviewPly === 0;
+      reviewNextBtn.disabled = reviewLastBtn.disabled = reviewPly === last;
+      if (reviewPly === 0) { reviewNavLabel.textContent = 'Start position'; return; }
+      const mv = reviewMoves[reviewPly];
+      reviewNavLabel.textContent = `${Math.ceil(reviewPly / 2)}${reviewPly % 2 ? '.' : '…'} ${mv.san}`;
+      const r = reviewResults && reviewResults[reviewPly - 1];
+      if (r) { // classification is only known once the analysis has finished
+        const t = document.createElement('span');
+        t.className = `chess-tag ${r.classification}`;
+        t.textContent = TAG_LABELS[r.classification];
+        reviewNavLabel.appendChild(t);
+      }
+    }
+    function setReviewPly(n, animate = false) {
+      if (!reviewMode) return;
+      const prev = reviewPly;
+      reviewPly = Math.max(0, Math.min(reviewFens.length - 1, n));
+      viewGame.load(reviewFens[reviewPly]);
+      if (animate && Math.abs(reviewPly - prev) === 1) queueGlide(reviewMoves[Math.max(prev, reviewPly)], reviewPly < prev);
+      else glide = null;
+      renderBoard(); renderMoveLog(); updateMaterialBadge(); updateReviewNav();
+    }
+    function enterReviewMode() {
+      const hist = game.history({ verbose: true });
+      const replay = new Chess();
+      reviewFens = [replay.fen()];
+      reviewMoves = [null];
+      for (const m of hist) { replay.move(m.san); reviewFens.push(replay.fen()); reviewMoves.push({ from: m.from, to: m.to, san: m.san }); }
+      reviewMode = true;
+      setReviewPly(hist.length); // open on the final position
+    }
+    function exitReviewMode() {
+      if (!reviewMode) return;
+      reviewMode = false;
+      updateReviewNav(); renderBoard(); renderMoveLog(); updateMaterialBadge();
+    }
+
+    // ---- Full-page overlay open/close ----
+    function openChessOverlay() {
+      chessViewOverlay.classList.add('show');
+      updateMaterialBadge();
+      overlayResignBtn.disabled = !!gameOverMessage;
+      if (!gameOverMessage) startChessTimer(); else renderChessTimer();
+    }
+    function closeChessOverlay() {
+      chessViewOverlay.classList.remove('show');
+      resignConfirmOverlay.classList.remove('show');
+      exitReviewMode();
+      stopChessTimer();
+      reviewPendingOnEngine = false;
+      if (historyColorBackup !== null) { humanColor = historyColorBackup; historyColorBackup = null; }
+    }
+
+    // ---- Game end -> award XP, maybe extend streak, show summary ----
+    async function maybeFinishChessGame() {
+      if (gameEndHandled) return;
+      gameEndHandled = true;
+      stopChessTimer();
+      const xp = CHESS_XP[gameOutcome] || 0;
+      saveFinishedGameToHistory(xp);
+      await awardGameXp(xp);
+      const streakExtended = await bumpStreak();
+      showChessSummary(xp, streakExtended);
+    }
+
+    function showChessSummary(xp, streakExtended) {
+      const titles = { win: 'You won! 🎉', loss: 'Good game — you lost.', draw: "It's a draw.", resign: 'You resigned.' };
+      const icons = { win: 'emoji_events', loss: 'sentiment_dissatisfied', draw: 'handshake', resign: 'flag' };
+      summaryTitle.textContent = titles[gameOutcome] || 'Game over';
+      summaryIcon.textContent = icons[gameOutcome] || 'flag';
+      summaryXpCount.textContent = xp;
+      if (streakExtended) {
+        summaryStreak.style.display = 'block';
+        summaryStreakCount.textContent = getLearnStreakSnapshot().streak;
+      } else {
+        summaryStreak.style.display = 'none';
+      }
+      closeChessOverlay();
+      summaryOverlay.classList.add('show');
+    }
+
+    // ---- Wiring ----
+    eloSlider.addEventListener('input', () => applyEloUI(parseInt(eloSlider.value, 10)));
+    document.querySelectorAll('.chess-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => { const elo = parseInt(btn.dataset.elo, 10); eloSlider.value = String(elo); applyEloUI(elo); });
+    });
+    playWhiteBtn.addEventListener('click', () => { humanColor = 'w'; playWhiteBtn.classList.add('active'); playBlackBtn.classList.remove('active'); });
+    playBlackBtn.addEventListener('click', () => { humanColor = 'b'; playBlackBtn.classList.add('active'); playWhiteBtn.classList.remove('active'); });
+
+    startBtn.addEventListener('click', () => {
+      if (reviewing) return; // an aborted review's last engine call is still finishing (<0.5s)
+      initEngineIfNeeded();
+      if (gameStarted && !gameOverMessage) { openChessOverlay(); return; }
+      gameStarted = true;
+      newGame();
+      openChessOverlay();
+    });
+
+    // X and Resign both ask first; confirming resigns (loss + summary screen).
+    // Once the game is already over (e.g. reviewing after the summary), X just closes.
+    function askResign() {
+      if (gameOverMessage) return;
+      resignConfirmOverlay.classList.add('show');
+    }
+    function resignGame() {
+      resignConfirmOverlay.classList.remove('show');
+      if (gameOverMessage) return; // game ended (e.g. checkmate) while the dialog was open
+      promoOverlay.classList.remove('show');
+      selectedSquare = null; legalTargets = [];
+      gameOverMessage = `You resigned — ${humanColor === 'w' ? 'Black' : 'White'} wins.`;
+      gameOutcome = 'resign';
+      overlayResignBtn.disabled = true;
+      renderBoard();
+      updateStatus();
+      setTimeout(maybeFinishChessGame, 600);
+    }
+
+    exitBtn.addEventListener('click', () => {
+      if (!gameOverMessage) { askResign(); return; }
+      if (reviewing) reviewAbort = true;
+      closeChessOverlay();
+      gameStarted = false;
+      updateChessSettingsUI();
+    });
+    overlayResignBtn.addEventListener('click', askResign);
+
+    reviewFirstBtn.addEventListener('click', () => setReviewPly(0));
+    reviewPrevBtn.addEventListener('click', () => setReviewPly(reviewPly - 1, true));
+    reviewNextBtn.addEventListener('click', () => setReviewPly(reviewPly + 1, true));
+    reviewLastBtn.addEventListener('click', () => setReviewPly(reviewFens.length - 1));
+    moveLogEl.addEventListener('click', (e) => {
+      if (!reviewMode) return;
+      const el = e.target.closest('[data-ply]');
+      if (el) setReviewPly(parseInt(el.dataset.ply, 10));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!reviewMode || !chessViewOverlay.classList.contains('show')) return;
+      if (e.key === 'ArrowLeft') setReviewPly(reviewPly - 1, true);
+      else if (e.key === 'ArrowRight') setReviewPly(reviewPly + 1, true);
+      else if (e.key === 'Home') setReviewPly(0);
+      else if (e.key === 'End') setReviewPly(reviewFens.length - 1);
+      else return;
+      e.preventDefault();
+    });
+    resignConfirmBtn.addEventListener('click', resignGame);
+    resignCancelBtn.addEventListener('click', () => resignConfirmOverlay.classList.remove('show'));
+
+    historyListEl.addEventListener('click', (e) => {
+      const row = e.target.closest('[data-history-id]');
+      if (row) openHistoryGame(row.dataset.historyId);
+    });
+
+    summaryReviewBtn.addEventListener('click', () => {
+      summaryOverlay.classList.remove('show');
+      enterReviewMode();
+      openChessOverlay();
+      runGameReview();
+    });
+
+    // Account switch / sign-out (learn.js resetLearnState fires this): drop the
+    // in-progress game so the next account can't resume the previous one's game.
+    window.addEventListener('kll:learn-reset', () => {
+      gameSession++;
+      stopChessTimer();
+      game.reset();
+      reviewMode = false; updateReviewNav();
+      selectedSquare = null; legalTargets = []; lastMove = null;
+      gameOverMessage = null; gameOutcome = null; engineThinking = false;
+      gameStarted = false; gameEndHandled = false;
+      activeHistoryId = null; reviewPendingOnEngine = false;
+      if (historyColorBackup !== null) { humanColor = historyColorBackup; historyColorBackup = null; }
+      if (reviewing) reviewAbort = true; // the analysis loop cleans itself up and clears `reviewing`
+      chessElapsedMs = 0;
+      promoOverlay.classList.remove('show');
+      chessViewOverlay.classList.remove('show');
+      summaryOverlay.classList.remove('show');
+      resignConfirmOverlay.classList.remove('show');
+      clearReviewResults();
+      renderChessTimer(); renderBoard(); renderMoveLog(); updateStatus(); updateMaterialBadge();
+      updateChessSettingsUI();
+    });
+
+    // Preload the engine and refresh the settings UI as soon as the Play
+    // sub-tab is opened, so it's warm by the time Start Game is tapped.
+    document.getElementById('learnSubtabPlay')?.addEventListener('click', () => {
+      initEngineIfNeeded();
+      updateChessSettingsUI();
+    });
+
+    applyEloUI(currentElo);
+    renderBoard();
+    renderMoveLog();
+    updateStatus();
+    updateMaterialBadge();
+    renderChessTimer();
+    renderChessHistory();
+  </script>
   <script>
     if (!navigator.onLine) {
       window.location.href = "./404.html";
     }
     </script>
+
+  <script>
+    /* ---------- Forced update check ----------
+       Worker returns the latest version as plain text. If it is higher than
+       the installed app version (from @capacitor/app), an uncancellable alert
+       blocks the app until the user updates.
+       Fails open: network/plugin/parse errors never lock the app. */
+    (function () {
+      var VERSION_URL = "https://versioncheck.nameless-cherry-998c.workers.dev/";
+      var STORE_URL = "https://apps.apple.com/us/app/id6795386180";
+
+      function parse(v) {
+        return String(v).trim().split(".").map(function (n) { return parseInt(n, 10) || 0; });
+      }
+      function isHigher(a, b) { // is a > b
+        var x = parse(a), y = parse(b), len = Math.max(x.length, y.length);
+        for (var i = 0; i < len; i++) {
+          var d = (x[i] || 0) - (y[i] || 0);
+          if (d !== 0) return d > 0;
+        }
+        return false;
+      }
+
+      function lock() {
+        if (document.getElementById("kllForceUpdate")) return;
+        var el = document.createElement("div");
+        el.id = "kllForceUpdate";
+        el.setAttribute("role", "alertdialog");
+        el.setAttribute("aria-modal", "true");
+        el.setAttribute("aria-labelledby", "kllFuTitle");
+        el.setAttribute("aria-describedby", "kllFuMsg");
+        el.innerHTML =
+          '<div class="fu-alert">' +
+            '<div class="fu-body">' +
+              '<h2 class="fu-title" id="kllFuTitle">Update Required</h2>' +
+              '<p class="fu-msg" id="kllFuMsg">A new version of Kids Learning Lab is available. Update to keep learning.</p>' +
+            '</div>' +
+            '<div class="fu-actions"><button type="button" class="fu-btn" id="kllFuBtn">Update</button></div>' +
+          '</div>';
+        // Everything behind the alert is unreachable by tap, keyboard, or screen reader.
+        Array.prototype.forEach.call(document.body.children, function (c) {
+          if (c.tagName !== "SCRIPT") c.setAttribute("inert", "");
+        });
+        document.body.appendChild(el);
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+        document.getElementById("kllFuBtn").addEventListener("click", function () {
+          window.location.href = STORE_URL;
+        });
+        document.getElementById("kllFuBtn").focus();
+        // No dismiss path: swallow Escape and outside taps.
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") e.preventDefault(); }, true);
+        el.addEventListener("click", function (e) { e.stopPropagation(); });
+      }
+
+      // Installed version via the Capacitor App plugin (App.getInfo().version).
+      function getInstalledVersion() {
+        var cap = window.Capacitor;
+        var App = cap && cap.Plugins && cap.Plugins.App;
+        if (!App || typeof App.getInfo !== "function") return Promise.reject();
+        return App.getInfo().then(function (info) { return info.version; });
+      }
+
+      function check() {
+        if (document.getElementById("kllForceUpdate")) return;
+        Promise.all([
+          getInstalledVersion(),
+          fetch(VERSION_URL, { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+        ])
+          .then(function (v) { if (isHigher(v[1], v[0])) lock(); })
+          .catch(function () {});
+      }
+
+      check();
+      setInterval(check, 10000); // re-check the worker every 10 seconds
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") check();
+      });
+    })();
+  </script>
 
 </body>
 </html>

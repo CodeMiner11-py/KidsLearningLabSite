@@ -24,6 +24,41 @@ import {
 const MAX_STORED_ITEMS = 25;    // trimmed oldest-first on every write
 const MAX_CONTEXT_ITEMS = 25;   // most-recent slice actually sent to the AI (can't exceed what's stored anyway)
 
+// Local mirror of the same history. Firestore stays the main copy, but every
+// read/write below already fails quietly (caught, then ignored), so a
+// security-rules rejection or a flaky connection used to mean history was
+// always empty and games repeated. The local copy means it still remembers.
+function localKey(gameId) {
+  const u = auth.currentUser;
+  return u ? `kll_game_history_${u.uid}_${gameId}` : null;
+}
+function readLocal(gameId) {
+  try {
+    const k = localKey(gameId);
+    const parsed = k ? JSON.parse(localStorage.getItem(k) || '[]') : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+function writeLocal(gameId, items) {
+  try {
+    const k = localKey(gameId);
+    if (k) localStorage.setItem(k, JSON.stringify(items));
+  } catch { /* storage full or unavailable */ }
+}
+// Union of two item lists, de-duplicated, oldest first.
+function mergeItems(a, b) {
+  const seen = new Set();
+  return [...a, ...b]
+    .filter((i) => i && i.text && typeof i.playedAt === 'number')
+    .filter((i) => {
+      const k = `${i.text}|${i.playedAt}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
+    .sort((x, y) => x.playedAt - y.playedAt);
+}
+
 function historyDocRef(gameId) {
   const u = auth.currentUser;
   if (!u) return null;
@@ -39,15 +74,24 @@ export async function recordGameHistory(gameId, texts) {
   const clean = (texts || []).filter(Boolean).map((t) => String(t).trim()).filter(Boolean);
   if (!ref || !clean.length) return;
 
+  const now = Date.now();
+  const additions = clean.map((text) => ({ text, playedAt: now }));
+
+  // Local first, synchronously, so the very next generation sees it even if
+  // the Firestore round trip below is slow or fails.
+  const local = mergeItems(readLocal(gameId), additions).slice(-MAX_STORED_ITEMS);
+  writeLocal(gameId, local);
+
   try {
     const snap = await getDoc(ref);
     const existing = snap.exists() ? (snap.data().items || []) : [];
-    const now = Date.now();
-    const additions = clean.map((text) => ({ text, playedAt: now }));
-    const merged = existing.concat(additions).slice(-MAX_STORED_ITEMS);
+    const merged = mergeItems(existing, local).slice(-MAX_STORED_ITEMS);
+    writeLocal(gameId, merged);
     await setDoc(ref, { items: merged }, { merge: true });
   } catch (err) {
-    console.warn(`Failed to record ${gameId} history:`, err);
+    // console.error, not warn: if this shows up, Firestore rules for
+    // users/{uid}/learnProfile/main/gameHistory/{gameId} are the first suspect.
+    console.error(`Failed to save ${gameId} history to Firestore (kept locally):`, err);
   }
 }
 
@@ -59,10 +103,16 @@ export async function getGameHistoryContext(gameId) {
   const ref = historyDocRef(gameId);
   if (!ref) return [];
 
+  let remote = [];
   try {
     const snap = await getDoc(ref);
-    if (!snap.exists()) return [];
-    const items = snap.data().items || [];
+    remote = snap.exists() ? (snap.data().items || []) : [];
+  } catch (err) {
+    console.error(`Failed to load ${gameId} history from Firestore (using local copy):`, err);
+  }
+
+  {
+    const items = mergeItems(remote, readLocal(gameId));
     const now = Date.now();
     return items
       .slice(-MAX_CONTEXT_ITEMS)
@@ -71,8 +121,5 @@ export async function getGameHistoryContext(gameId) {
         text,
         daysAgo: Math.max(0, Math.floor((now - playedAt) / 86400000)),
       }));
-  } catch (err) {
-    console.warn(`Failed to load ${gameId} history:`, err);
-    return [];
   }
 }

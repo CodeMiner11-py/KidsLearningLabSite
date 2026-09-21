@@ -1,0 +1,3 @@
+Piece images: "cburnett" set by Colin M.L. Burnett, as shipped with Lichess
+(https://github.com/lichess-org/lila/tree/master/public/piece/cburnett).
+Multi-licensed: GFDL 1.2+, BSD, or GPL 2+. See the lila repo's COPYING.md.
