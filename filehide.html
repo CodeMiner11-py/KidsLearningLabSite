@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Funny File Hider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg: #0a0c16;
+    --bg-soft: #0f1220;
+    --panel: #141729;
+    --panel-2: #191d33;
+    --border: #2a2e48;
+    --text: #f1eefb;
+    --muted: #9296ba;
+    --violet: #8b6cff;
+    --pink: #ff6ec7;
+    --orange: #ffa24c;
+    --green: #33e6a0;
+    --red: #ff5c7a;
+    --glow: rgba(139, 108, 255, 0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f5fb;
+    --bg-soft: #eeecfa;
+    --panel: #ffffff;
+    --panel-2: #f9f8ff;
+    --border: #e1defa;
+    --text: #1c1a30;
+    --muted: #6b6890;
+    --glow: rgba(139, 108, 255, 0.18);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    padding: 20px 16px calc(48px + env(safe-area-inset-bottom, 0px));
+    background-image:
+      radial-gradient(circle at 15% 0%, color-mix(in srgb, var(--violet) 20%, transparent), transparent 45%),
+      radial-gradient(circle at 100% 20%, color-mix(in srgb, var(--pink) 14%, transparent), transparent 40%);
+  }
+  h1, h2, .display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  /* ---------- header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 2px 28px;
+  }
+  .mark {
+    width: 38px; height: 38px; flex-shrink: 0;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--violet), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 6px 18px var(--glow);
+  }
+  header .title-block { min-width: 0; }
+  header h1 {
+    margin: 0; font-size: 1.28rem; font-weight: 700; letter-spacing: -0.01em;
+  }
+  header p {
+    margin: 2px 0 0; color: var(--muted); font-size: 0.86rem;
+    height: 1.2em; overflow: hidden;
+  }
+  header p span { display: block; animation: rotateLine 9s ease-in-out infinite; }
+  @keyframes rotateLine {
+    0%, 21% { transform: translateY(0); opacity: 1; }
+    25%, 96% { transform: translateY(-1.2em); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ---------- hero portal ---------- */
+  .portal-card {
+    position: relative;
+    background: radial-gradient(circle at 50% 30%, var(--panel-2), var(--panel) 70%);
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    padding: 34px 20px 26px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .portal-card::before {
+    content: '';
+    position: absolute; inset: -40% -10% auto -10%; height: 60%;
+    background: radial-gradient(circle, var(--glow), transparent 65%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+  .portal {
+    position: relative;
+    width: 216px; height: 216px;
+    margin: 0 auto 18px;
+  }
+  .ring {
+    position: absolute; inset: 0;
+    margin: auto;
+    border-radius: 22%;
+    border: 2px solid transparent;
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    background-image:
+      linear-gradient(var(--bg-soft), var(--bg-soft)),
+      linear-gradient(135deg, var(--violet), var(--pink));
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+    transition: transform 0.55s cubic-bezier(.2,.8,.2,1), opacity 0.4s ease;
+  }
+  .ring.show { opacity: var(--ring-op, 1); transform: scale(1) rotate(var(--ring-rot, 0deg)); }
+  .ring.collapsed { opacity: 0 !important; transform: scale(0) rotate(160deg) !important; }
+  .ring .spin {
+    position: absolute; inset: 0;
+    animation: spin var(--spin-dur, 14s) linear infinite;
+    animation-direction: var(--spin-dir, normal);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .portal .core {
+    position: absolute; inset: 0; margin: auto;
+    width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--pink));
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--violet) 18%, transparent), 0 8px 22px var(--glow);
+    animation: pulse 2.6s ease-in-out infinite;
+    z-index: 2;
+    transition: transform 0.4s ease;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+  }
+  .portal.locked .core { transform: scale(1.15); }
+  .portal .confetti {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .confetti span {
+    position: absolute; left: 50%; top: 50%;
+    width: 6px; height: 6px; border-radius: 2px;
+    background: var(--dot-color, var(--orange));
+    opacity: 0;
+    animation: burst 0.9s ease-out forwards;
+    animation-delay: var(--d, 0s);
+  }
+  @keyframes burst {
+    0% { opacity: 1; transform: translate(-50%,-50%) rotate(0deg) translateY(0) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(-90px) scale(0.4); }
+  }
+
+  .portal-caption {
+    text-align: center; color: var(--muted); font-size: 0.88rem;
+    min-height: 1.3em;
+  }
+  .portal-caption strong { color: var(--text); font-weight: 600; }
+
+  /* ---------- step track ---------- */
+  .steps { position: relative; padding-left: 40px; }
+  .steps::before {
+    content: ''; position: absolute; left: 15px; top: 6px; bottom: 6px; width: 2px;
+    background: linear-gradient(var(--border), var(--border));
+  }
+  .step {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .step-node {
+    position: absolute; left: -40px; top: 2px;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82rem; font-weight: 700;
+    background: var(--panel); border: 2px solid var(--border);
+    color: var(--muted);
+    transition: border-color 0.25s, color 0.25s, background 0.25s;
+    z-index: 1;
+  }
+  .step.active .step-node, .step.done .step-node {
+    border-color: var(--violet); color: #fff;
+    background: linear-gradient(135deg, var(--violet), var(--pink));
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+  }
+  .panel h2 {
+    margin: 0 0 12px; font-size: 1.02rem; font-weight: 600;
+  }
+  .hint { color: var(--muted); font-size: 0.82rem; margin: -6px 0 12px; }
+
+  /* dropzone */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 22px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--violet);
+    background: color-mix(in srgb, var(--violet) 6%, transparent);
+  }
+  .dropzone .big { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+  .dropzone strong { color: var(--violet); }
+  .dropzone input { display: none; }
+  .file-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 12px; padding: 7px 14px; border-radius: 999px;
+    background: color-mix(in srgb, var(--green) 16%, transparent);
+    color: var(--green); font-weight: 600; font-size: 0.86rem;
+    max-width: 100%;
+  }
+  .file-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* slider */
+  .slider-row { display: flex; align-items: center; gap: 14px; }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    flex: 1; height: 6px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--violet), var(--pink) var(--pct, 20%), var(--border) var(--pct, 20%));
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--violet);
+    box-shadow: 0 2px 8px var(--glow); cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--violet); cursor: pointer;
+  }
+  .depth-badge {
+    min-width: 44px; text-align: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem;
+  }
+  .prank-level {
+    margin-top: 12px; font-size: 0.86rem; color: var(--muted);
+  }
+  .prank-level strong { color: var(--text); }
+
+  /* layer name fields */
+  .layer-row {
+    display: grid; grid-template-columns: 1fr; gap: 10px;
+    padding: 12px 0; border-top: 1px solid var(--border);
+  }
+  .layer-row:first-child { border-top: none; padding-top: 0; }
+  @media (min-width: 480px) {
+    .layer-row.two { grid-template-columns: 1fr 1fr; }
+  }
+  .field-label {
+    display: block; font-size: 0.78rem; font-weight: 600; color: var(--muted);
+    margin-bottom: 4px;
+  }
+  input[type="text"] {
+    width: 100%; font-family: 'Inter', sans-serif; font-size: 0.95rem;
+    padding: 10px 12px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--bg-soft); color: var(--text);
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 3px var(--glow); }
+  .char-count { font-size: 0.72rem; color: var(--muted); text-align: right; margin-top: 2px; }
+  .char-count.warn { color: var(--red); font-weight: 700; }
+
+  .layer-title { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.88rem; color: var(--violet); margin-bottom: 2px; }
+
+  .row-between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ghost-btn {
+    background: transparent; border: 1.5px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 7px 12px; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+  }
+  .ghost-btn:hover { border-color: var(--violet); transform: translateY(-1px); }
+
+  /* CTA */
+  button.primary {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem; font-weight: 600; color: #0a0c16;
+    background: linear-gradient(135deg, var(--orange), var(--pink));
+    border: none; border-radius: 16px; padding: 16px 20px; width: 100%;
+    cursor: pointer;
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--orange) 30%, transparent);
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+  }
+  button.primary:hover { transform: translateY(-2px); }
+  button.primary:active { transform: translateY(0); }
+  button.primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .status { margin-top: 12px; text-align: center; font-weight: 600; min-height: 1.3em; font-size: 0.92rem; }
+  .status.error { color: var(--red); }
+  .status.ok { color: var(--green); }
+
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 22px; line-height: 1.55;
+  }
+  footer strong { color: var(--green); }
+
+  ::selection { background: var(--violet); color: #fff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">🪆</div>
+    <div class="title-block">
+      <h1>Funny File Hider</h1>
+      <p>
+        <span id="tagline">Bury any file inside a stack of zips.</span>
+      </p>
+    </div>
+  </header>
+
+  <div class="portal-card">
+    <div class="portal" id="portal">
+      <div class="core" id="core">📄</div>
+      <div class="confetti" id="confetti"></div>
+    </div>
+    <div class="portal-caption" id="portalCaption">Choose a file to begin the descent.</div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step done" id="stepNode1">
+      <div class="step-node">1</div>
+      <div class="panel">
+        <h2>Choose your victim</h2>
+        <p class="hint">It never leaves this browser — nothing is uploaded anywhere.</p>
+        <div class="dropzone" id="dropzone">
+          <span class="big">📄</span>
+          <div><strong>Tap to choose a file</strong><br>or drag one in</div>
+          <input type="file" id="fileInput">
+        </div>
+        <div id="fileChipWrap"></div>
+      </div>
+    </div>
+
+    <div class="step" id="stepNode2">
+      <div class="step-node">2</div>
+      <div class="panel">
+        <h2>Set the depth</h2>
+        <div class="slider-row">
+          <input type="range" id="repCount" min="1" max="15" value="3">
+          <div class="depth-badge" id="depthBadge">3</div>
+        </div>
+        <div class="prank-level" id="prankLevel">Prank level: <strong>Mild</strong></div>
+      </div>
+    </div>
+
+    <div class="step" id="stepNode3">
+      <div class="step-node">3</div>
+      <div class="panel" id="layersCard" style="display:none;">
+        <div class="row-between">
+          <h2 style="margin:0;">Name every layer</h2>
+          <button class="ghost-btn" id="shuffleBtn">🎲 Shuffle names</button>
+        </div>
+        <p class="hint">Zip names: 31 characters max, must end in .zip. Folder names: 28 max.</p>
+        <div id="layersContainer"></div>
+      </div>
+    </div>
+
+    <div class="step" id="stepNode4">
+      <div class="step-node">4</div>
+      <div class="panel">
+        <h2>Seal it up</h2>
+        <button class="primary" id="processBtn" disabled>Bury my file</button>
+        <div class="status" id="statusEl"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    🔒 <strong>100% local.</strong> Everything happens on your device — no servers, no uploads, no trace.<br>
+    A prank tool for fun, not a real hiding place. Please don't lose anything important in here.
+  </footer>
+</div>
+
+<script>
+(function() {
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const fileChipWrap = document.getElementById('fileChipWrap');
+  const repCountInput = document.getElementById('repCount');
+  const depthBadge = document.getElementById('depthBadge');
+  const prankLevel = document.getElementById('prankLevel');
+  const layersCard = document.getElementById('layersCard');
+  const layersContainer = document.getElementById('layersContainer');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const processBtn = document.getElementById('processBtn');
+  const statusEl = document.getElementById('statusEl');
+  const portal = document.getElementById('portal');
+  const core = document.getElementById('core');
+  const portalCaption = document.getElementById('portalCaption');
+  const confettiWrap = document.getElementById('confetti');
+  const stepNodes = [1,2,3,4].map(n => document.getElementById('stepNode' + n));
+  const tagline = document.getElementById('tagline');
+
+  const taglines = [
+    'Bury any file inside a stack of zips.',
+    'The digital equivalent of a Russian nesting doll.',
+    'Perfect for gag gifts, evidence, and awkward selfies.',
+    'Make your files work for their freedom.'
+  ];
+  let tIdx = 0;
+  setInterval(() => {
+    tIdx = (tIdx + 1) % taglines.length;
+    tagline.textContent = taglines[tIdx];
+  }, 4500);
+
+  let selectedFile = null;
+  const ZIP_MAX = 31, FOLDER_MAX = 28;
+  const MAX_VISUAL_RINGS = 7;
+
+  const zipWords = ['Vacation', 'Homework', 'TaxDocs', 'Recipes', 'Backup', 'OldPhotos', 'Notes', 'Misc', 'Archive', 'Stuff', 'DoNotOpen', 'Important', 'ProjectX', 'Receipts', 'Drafts'];
+  const folderWords = ['New Folder', 'Untitled', 'Documents', 'Downloads', 'Personal', 'Work Stuff', 'Random', 'Keep This', 'Old Stuff', 'Temp', 'To Sort', 'Photos 2019', 'System', 'Cache'];
+  function shuffle(arr) { return arr.map(v => [Math.random(), v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+  let zipPool = shuffle(zipWords), folderPool = shuffle(folderWords);
+
+  function sanitize(str) { return (str || '').replace(/[\/\\:*?"<>|]/g, '').trim(); }
+  function nextZipName(i) { return sanitize(zipPool[i % zipPool.length]) + '.zip'; }
+  function nextFolderName(i) { return sanitize(folderPool[i % folderPool.length]); }
+
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function markStep(n, state) {
+    const el = stepNodes[n-1];
+    el.classList.remove('active', 'done');
+    if (state) el.classList.add(state);
+  }
+
+  /* ---------------- portal rings ---------------- */
+  function renderRings(count) {
+    portal.querySelectorAll('.ring').forEach(r => r.remove());
+    const visible = Math.min(count, MAX_VISUAL_RINGS);
+    for (let i = 0; i < visible; i++) {
+      const ring = document.createElement('div');
+      ring.className = 'ring';
+      ring.id = 'ring-' + i;
+      const size = 100 - i * (72 / MAX_VISUAL_RINGS);
+      ring.style.width = size + '%';
+      ring.style.height = size + '%';
+      ring.style.setProperty('--ring-op', (1 - i * 0.09).toFixed(2));
+      ring.style.setProperty('--ring-rot', (i % 2 === 0 ? 8 : -8) + 'deg');
+      const spin = document.createElement('div');
+      spin.className = 'spin';
+      spin.style.setProperty('--spin-dur', (10 + i * 4) + 's');
+      spin.style.setProperty('--spin-dir', i % 2 === 0 ? 'normal' : 'reverse');
+      ring.appendChild(spin);
+      portal.insertBefore(ring, core);
+      requestAnimationFrame(() => requestAnimationFrame(() => ring.classList.add('show')));
+    }
+  }
+
+  function updateCaption() {
+    if (!selectedFile) { portalCaption.innerHTML = 'Choose a file to begin the descent.'; return; }
+    const n = parseInt(repCountInput.value, 10);
+    portalCaption.innerHTML = '<strong>' + escapeHtml(selectedFile.name) + '</strong> is about to go ' + n + ' layer' + (n === 1 ? '' : 's') + ' deep.';
+  }
+
+  /* ---------------- file picking ---------------- */
+  function updateFileChip() {
+    fileChipWrap.innerHTML = selectedFile
+      ? '<div class="file-chip">✅ <span>' + escapeHtml(selectedFile.name) + '</span></div>'
+      : '';
+  }
+  function pickFile(f) {
+    if (!f) return;
+    selectedFile = f;
+    updateFileChip();
+    updateProcessEnabled();
+    updateCaption();
+    markStep(1, 'done');
+    markStep(2, 'active');
+  }
+  dropzone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => pickFile(e.target.files[0]));
+  ['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+  dropzone.addEventListener('drop', e => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) pickFile(f); });
+
+  /* ---------------- depth slider ---------------- */
+  const levels = [
+    [1,1,'Mild'], [2,3,'Cheeky'], [4,6,'Spicy'], [7,9,'Diabolical'], [10,15,'Legendary']
+  ];
+  function levelFor(n) {
+    for (const [lo,hi,name] of levels) if (n >= lo && n <= hi) return name;
+    return 'Legendary';
+  }
+  function updateSliderVisual() {
+    const n = parseInt(repCountInput.value, 10);
+    const pct = ((n - 1) / 14) * 100;
+    repCountInput.style.setProperty('--pct', pct + '%');
+    depthBadge.textContent = n;
+    prankLevel.innerHTML = 'Prank level: <strong>' + levelFor(n) + '</strong>';
+    renderRings(n);
+    buildLayerFields(n);
+    updateCaption();
+    if (selectedFile) { markStep(2, 'done'); markStep(3, 'active'); }
+  }
+  repCountInput.addEventListener('input', updateSliderVisual);
+
+  /* ---------------- layer name fields ---------------- */
+  function makeCharCounter(input, max) {
+    const c = document.createElement('div');
+    c.className = 'char-count';
+    const upd = () => { c.textContent = input.value.length + ' / ' + max; c.classList.toggle('warn', input.value.length > max); };
+    input.addEventListener('input', upd); upd();
+    return c;
+  }
+  function buildLayerFields(n) {
+    layersContainer.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const row = document.createElement('div');
+      row.className = 'layer-row' + (i > 0 ? ' two' : '');
+      const titleWrap = document.createElement('div');
+      titleWrap.style.gridColumn = '1 / -1';
+      titleWrap.innerHTML = '<div class="layer-title">' + (i === 0 ? '📦' : '🗂️ → 📦') + ' Layer ' + (i + 1) + '</div>';
+      row.appendChild(titleWrap);
+
+      if (i > 0) {
+        const fw = document.createElement('div');
+        const fl = document.createElement('label'); fl.className = 'field-label'; fl.textContent = 'Folder name';
+        const fi = document.createElement('input'); fi.type = 'text'; fi.maxLength = FOLDER_MAX;
+        fi.value = nextFolderName(i - 1); fi.dataset.role = 'folder'; fi.dataset.index = i;
+        fw.appendChild(fl); fw.appendChild(fi); fw.appendChild(makeCharCounter(fi, FOLDER_MAX));
+        row.appendChild(fw);
+      }
+      const zw = document.createElement('div');
+      const zl = document.createElement('label'); zl.className = 'field-label'; zl.textContent = 'Zip file name';
+      const zi = document.createElement('input'); zi.type = 'text'; zi.maxLength = ZIP_MAX;
+      zi.value = nextZipName(i); zi.dataset.role = 'zip'; zi.dataset.index = i;
+      zw.appendChild(zl); zw.appendChild(zi); zw.appendChild(makeCharCounter(zi, ZIP_MAX));
+      row.appendChild(zw);
+
+      layersContainer.appendChild(row);
+    }
+    layersCard.style.display = n > 0 ? 'block' : 'none';
+  }
+  shuffleBtn.addEventListener('click', () => {
+    zipPool = shuffle(zipWords); folderPool = shuffle(folderWords);
+    buildLayerFields(parseInt(repCountInput.value, 10));
+  });
+
+  function getLayerData() {
+    const zips = layersContainer.querySelectorAll('input[data-role="zip"]');
+    const folders = layersContainer.querySelectorAll('input[data-role="folder"]');
+    const folderByIndex = {};
+    folders.forEach(f => folderByIndex[f.dataset.index] = f.value.trim());
+    const layers = [];
+    zips.forEach(z => {
+      const idx = z.dataset.index;
+      layers.push({ zipName: z.value.trim(), folderName: folderByIndex[idx] !== undefined ? folderByIndex[idx] : null });
+    });
+    return layers;
+  }
+
+  function validate() {
+    if (!selectedFile) return 'Pick a file first.';
+    const layers = getLayerData();
+    for (let i = 0; i < layers.length; i++) {
+      const L = layers[i];
+      if (!L.zipName) return 'Layer ' + (i+1) + ': zip name can\u2019t be empty.';
+      if (!L.zipName.toLowerCase().endsWith('.zip')) return 'Layer ' + (i+1) + ': zip name must end in .zip';
+      if (L.zipName.length > ZIP_MAX) return 'Layer ' + (i+1) + ': zip name too long (max ' + ZIP_MAX + ').';
+      if (/[\/\\:*?"<>|]/.test(L.zipName)) return 'Layer ' + (i+1) + ': zip name has invalid characters.';
+      if (i > 0) {
+        if (!L.folderName) return 'Layer ' + (i+1) + ': folder name can\u2019t be empty.';
+        if (L.folderName.length > FOLDER_MAX) return 'Layer ' + (i+1) + ': folder name too long (max ' + FOLDER_MAX + ').';
+        if (/[\/\\:*?"<>|]/.test(L.folderName)) return 'Layer ' + (i+1) + ': folder name has invalid characters.';
+      }
+    }
+    return null;
+  }
+
+  function updateProcessEnabled() { processBtn.disabled = !selectedFile; }
+  function setStatus(msg, cls) { statusEl.textContent = msg; statusEl.className = 'status' + (cls ? ' ' + cls : ''); }
+
+  function collapseRing(i) {
+    const visible = Math.min(parseInt(repCountInput.value, 10), MAX_VISUAL_RINGS);
+    const ringIdx = visible - 1 - Math.min(i, visible - 1);
+    const el = document.getElementById('ring-' + ringIdx);
+    if (el) el.classList.add('collapsed');
+  }
+
+  function fireConfetti() {
+    confettiWrap.innerHTML = '';
+    const colors = ['var(--violet)', 'var(--pink)', 'var(--orange)', 'var(--green)'];
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('span');
+      const angle = (360 / 18) * i;
+      s.style.setProperty('--rot', angle + 'deg');
+      s.style.setProperty('--d', (Math.random() * 0.15) + 's');
+      s.style.setProperty('--dot-color', colors[i % colors.length]);
+      s.style.transform = 'translate(-50%,-50%) rotate(' + angle + 'deg)';
+      confettiWrap.appendChild(s);
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  processBtn.addEventListener('click', async () => {
+    const err = validate();
+    if (err) { setStatus(err, 'error'); return; }
+    const layers = getLayerData();
+    processBtn.disabled = true;
+    markStep(3, 'done'); markStep(4, 'active');
+    setStatus('Sealing layer 1 of ' + layers.length + '…', '');
+    core.textContent = '📦';
+
+    try {
+      let currentBlob = selectedFile;
+      let currentName = selectedFile.name;
+      for (let i = 0; i < layers.length; i++) {
+        const L = layers[i];
+        setStatus('Sealing layer ' + (i+1) + ' of ' + layers.length + '…', '');
+        const zip = new JSZip();
+        if (i === 0) { zip.file(currentName, currentBlob); }
+        else { zip.folder(L.folderName).file(currentName, currentBlob); }
+        currentBlob = await zip.generateAsync({ type: 'blob' });
+        currentName = L.zipName;
+        collapseRing(i);
+        await new Promise(r => setTimeout(r, 260));
+      }
+      portal.classList.add('locked');
+      core.textContent = '🔒';
+      fireConfetti();
+      portalCaption.innerHTML = 'Sealed as <strong>' + escapeHtml(currentName) + '</strong>. Good luck, future you.';
+      downloadBlob(currentBlob, currentName);
+      setStatus('Buried successfully. Downloaded as "' + currentName + '" 🎉', 'ok');
+      markStep(4, 'done');
+    } catch (e) {
+      console.error(e);
+      setStatus('Something went wrong: ' + (e && e.message ? e.message : e), 'error');
+    } finally {
+      processBtn.disabled = false;
+    }
+  });
+
+  /* init */
+  renderRings(parseInt(repCountInput.value, 10));
+  updateSliderVisual();
+})();
+</script>
+</body>
+</html>
