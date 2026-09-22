@@ -388,30 +388,38 @@
 <script>
   (function () {
     var STORAGE_KEY = "kllAppBannerDismissed";
+    var MAX_HIDDEN_LOADS = 3;
     var banner = document.getElementById("kll-app-banner");
     var closeBtn = document.getElementById("kll-app-banner-close");
 
-    // Don't show again once dismissed (mirrors Apple's real behavior)
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    var state = null;
+    try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
+
+    var shouldHide = false;
+    if (state && typeof state.loadsLeft === "number") {
+      if (state.loadsLeft > 0) {
+        shouldHide = true;
+        state.loadsLeft -= 1;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      } else {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      }
+    }
+
+    if (!shouldHide) {
       banner.classList.add("kll-show");
-      // push page content down so the banner doesn't cover it
       document.body.style.marginTop = banner.offsetHeight + "px";
     }
 
     closeBtn.addEventListener("click", function () {
       banner.classList.remove("kll-show");
       document.body.style.marginTop = "";
-      try { localStorage.setItem(STORAGE_KEY, "1"); } catch (e) {}
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ loadsLeft: MAX_HIDDEN_LOADS }));
+      } catch (e) {}
     });
   })();
 </script>
-</body>
-
-<footer>
-
-    <button id="downloadFlyer" style="margin:20px; padding:10px 20px; font-size:16px; font-family: var(--sans);">Download Flyer as PNG</button>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   document.getElementById('downloadFlyer').addEventListener('click', function() {
     const flyer = document.querySelector('.flyer');

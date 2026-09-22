@@ -1594,119 +1594,37 @@ function printShopList() {
 <script>
   (function () {
     var STORAGE_KEY = "kllAppBannerDismissed";
+    var MAX_HIDDEN_LOADS = 3;
     var banner = document.getElementById("kll-app-banner");
     var closeBtn = document.getElementById("kll-app-banner-close");
 
-    // Don't show again once dismissed (mirrors Apple's real behavior)
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    var state = null;
+    try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
+
+    var shouldHide = false;
+    if (state && typeof state.loadsLeft === "number") {
+      if (state.loadsLeft > 0) {
+        shouldHide = true;
+        state.loadsLeft -= 1;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      } else {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      }
+    }
+
+    if (!shouldHide) {
       banner.classList.add("kll-show");
-      // push page content down so the banner doesn't cover it
       document.body.style.marginTop = banner.offsetHeight + "px";
     }
 
     closeBtn.addEventListener("click", function () {
       banner.classList.remove("kll-show");
       document.body.style.marginTop = "";
-      try { localStorage.setItem(STORAGE_KEY, "1"); } catch (e) {}
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ loadsLeft: MAX_HIDDEN_LOADS }));
+      } catch (e) {}
     });
   })();
-</script>
-</body></html>`);
-  w.document.close(); w.print();
-}
-
-/* ═══════════════════════════════════════════
-   AUDIO
-═══════════════════════════════════════════ */
-const audio    = document.getElementById('cheeseAudio');
-const audioBtn = document.getElementById('audioBtn');
-function toggleAudio() {
-  if (audio.paused) {
-    audio.play();
-    audioBtn.classList.add('playing');
-    audioBtn.innerHTML = '■ Stop the Anthem';
-  } else {
-    audio.pause(); audio.currentTime = 0;
-    audioBtn.classList.remove('playing');
-    audioBtn.innerHTML = '▶ Play the Anthem';
-  }
-}
-audio.addEventListener('ended', () => {
-  audioBtn.classList.remove('playing');
-  audioBtn.innerHTML = '▶ Play the Anthem';
-});
-
-/* ═══════════════════════════════════════════
-   IMAGE MODAL
-═══════════════════════════════════════════ */
-function openModal() {
-  const modal  = document.getElementById('imgModal');
-  const canvas = document.getElementById('cheeseCanvas');
-  const ctx    = canvas.getContext('2d');
-  const img    = new Image();
-  img.src = 'Spicy Cheese.png';
-  img.onload = () => {
-    const tmp = document.createElement('canvas');
-    tmp.width = img.width; tmp.height = img.height;
-    const tc = tmp.getContext('2d');
-    tc.drawImage(img, 0, 0);
-    const data = tc.getImageData(0, 0, img.width, img.height);
-    const px = data.data; const w = img.width, h = img.height;
-    let top = h, left = w, bottom = 0, right = 0;
-    for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
-      const i=(y*w+x)*4, r=px[i], g=px[i+1], b=px[i+2], a=px[i+3];
-      if (!(a<10||(r>240&&g>240&&b>240))) {
-        if(y<top)top=y; if(y>bottom)bottom=y; if(x<left)left=x; if(x>right)right=x;
-      }
-    }
-    if(top>=bottom||left>=right){top=0;left=0;bottom=h-1;right=w-1;}
-    const pad=8;
-    top=Math.max(0,top-pad); left=Math.max(0,left-pad);
-    bottom=Math.min(h-1,bottom+pad); right=Math.min(w-1,right+pad);
-    const cw=right-left+1, ch=bottom-top+1;
-    canvas.width=cw; canvas.height=ch;
-    ctx.drawImage(img,left,top,cw,ch,0,0,cw,ch);
-    modal.classList.add('open');
-  };
-  img.onerror = () => {
-    canvas.width=440; canvas.height=200;
-    const c2=canvas.getContext('2d');
-    c2.fillStyle='#1A0A00'; c2.fillRect(0,0,440,200);
-    c2.fillStyle='#FF6B00'; c2.font='bold 16px Inter,sans-serif'; c2.textAlign='center';
-    c2.fillText('Could not load "Spicy Cheese.png"',220,90);
-    c2.fillStyle='rgba(255,248,231,0.6)'; c2.font='14px Inter,sans-serif';
-    c2.fillText('Make sure the file is in the same folder.',220,120);
-    modal.classList.add('open');
-  };
-}
-function closeModal() { document.getElementById('imgModal').classList.remove('open'); }
-function closeModalOutside(e) { if(e.target===document.getElementById('imgModal'))closeModal(); }
-document.addEventListener('keydown', e => { if(e.key==='Escape')closeModal(); });
-
-/* ═══════════════════════════════════════════
-   EMOJI RAIN
-═══════════════════════════════════════════ */
-let rainActive = false; let rainInterval = null;
-function toggleRain() {
-  rainActive = !rainActive;
-  document.getElementById('rainBtn').textContent = rainActive ? '🚫 Stop Rain' : '🧀 Emoji Rain';
-  if (rainActive) {
-    rainInterval = setInterval(spawnEmoji, 200);
-  } else {
-    clearInterval(rainInterval);
-  }
-}
-function spawnEmoji() {
-  const emojis = ['🧀','🌶️','🔥','🧀','🧀','🌶️','🔥'];
-  const el = document.createElement('div');
-  el.className = 'emoji-drop';
-  el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-  el.style.left = Math.random()*100 + 'vw';
-  el.style.animationDuration = (2 + Math.random()*3) + 's';
-  el.style.fontSize = (20 + Math.random()*20) + 'px';
-  document.getElementById('emoji-rain').appendChild(el);
-  el.addEventListener('animationend', () => el.remove());
-}
 </script>
 </body>
 </html>
