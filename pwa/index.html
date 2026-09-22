@@ -259,5 +259,131 @@
 
     init();
   </script>
+<!-- ============================================================
+  Kids Learning Lab — Custom "Smart App Banner"
+  Works on ALL devices/browsers (Apple's real one is iOS Safari only).
+  Paste this whole block just before </body> on any page you want
+  the banner to show up on.
+============================================================= -->
+
+<div id="kll-app-banner" class="kll-app-banner" role="banner" aria-label="Get the Kids Learning Lab app">
+  <button id="kll-app-banner-close" class="kll-app-banner-close" aria-label="Close">&times;</button>
+  <img class="kll-app-banner-icon" src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" alt="Kids Learning Lab icon">
+  <div class="kll-app-banner-text">
+    <div class="kll-app-banner-title">Kids Learning Lab</div>
+    <div class="kll-app-banner-sub">Learning, trivia, games, all in one</div>
+    <div class="kll-app-banner-store">FREE – On the App Store</div>
+  </div>
+  <a id="kll-app-banner-view" class="kll-app-banner-view" href="https://apps.apple.com/us/app/kids-learning-lab-learning/id6795386180" target="_blank" rel="noopener">GET</a>
+</div>
+
+<style>
+  .kll-app-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(249, 249, 249, 0.98);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-family: -apple-system, Helvetica, Arial, sans-serif;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    animation: kll-slide-down 0.35s ease-out;
+  }
+  .kll-app-banner.kll-show { display: flex; }
+
+  @keyframes kll-slide-down {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .kll-app-banner-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: #8e8e93;
+    cursor: pointer;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .kll-app-banner-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .kll-app-banner-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .kll-app-banner-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .kll-app-banner-sub {
+    font-size: 12px;
+    color: #6e6e73;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .kll-app-banner-store {
+    font-size: 11px;
+    color: #8e8e93;
+    margin-top: 1px;
+  }
+
+  .kll-app-banner-view {
+    flex-shrink: 0;
+    color: #007aff;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 6px 14px;
+    background: rgba(0,122,255,0.08);
+    border-radius: 14px;
+  }
+
+  @media (max-width: 380px) {
+    .kll-app-banner-icon { width: 44px; height: 44px; border-radius: 10px; }
+    .kll-app-banner-title { font-size: 13px; }
+  }
+</style>
+
+<script>
+  (function () {
+    var STORAGE_KEY = "kllAppBannerDismissed";
+    var banner = document.getElementById("kll-app-banner");
+    var closeBtn = document.getElementById("kll-app-banner-close");
+
+    // Don't show again once dismissed (mirrors Apple's real behavior)
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      banner.classList.add("kll-show");
+      // push page content down so the banner doesn't cover it
+      document.body.style.marginTop = banner.offsetHeight + "px";
+    }
+
+    closeBtn.addEventListener("click", function () {
+      banner.classList.remove("kll-show");
+      document.body.style.marginTop = "";
+      try { localStorage.setItem(STORAGE_KEY, "1"); } catch (e) {}
+    });
+  })();
+</script>
 </body>
 </html>
