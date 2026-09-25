@@ -1,66 +1,327 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Bonus Image Creator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Episode Tag Creator</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f2f2f2;
-      padding: 30px;
-    }
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --accent-blue: #0071e3;
+    --accent-blue-hover: #0077ed;
+    --bonus-color: #34c759;
+    --full-color: #af52de;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  }
 
-    canvas {
-      margin-top: 20px;
-      max-width: 90%;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px #aaa;
-    }
+  * {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
 
-    .preview {
-      position: relative;
-      display: inline-block;
-    }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    input {
-      margin: 15px;
-    }
+  .app {
+    width: 100%;
+    max-width: 460px;
+  }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      background: green;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
-  <script src="popup-guard.js" defer></script>
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+
+  .header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 28px;
+  }
+
+  /* Upload dropzone */
+  .dropzone {
+    position: relative;
+    display: block;
+    border: 1.5px dashed rgba(0,0,0,0.15);
+    border-radius: var(--radius-md);
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    background: #fafafa;
+  }
+
+  .dropzone:hover {
+    border-color: var(--accent-blue);
+    background: #f3f8fe;
+  }
+
+  .dropzone.has-image {
+    padding: 14px 16px;
+  }
+
+  .dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .dropzone-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 10px;
+    color: var(--text-secondary);
+  }
+
+  .dropzone-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  .dropzone-sub {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+
+  /* Segmented control */
+  .segmented {
+    display: flex;
+    background: #eeeef0;
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  .segmented input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .segmented label {
+    flex: 1;
+    text-align: center;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .segmented .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .segmented-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    height: calc(100% - 6px);
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #tag-full:checked ~ .segmented-thumb {
+    transform: translateX(100%);
+  }
+
+  #tag-bonus:checked ~ label[for="tag-bonus"],
+  #tag-full:checked ~ label[for="tag-full"] {
+    color: var(--text-primary);
+  }
+
+  /* Canvas preview */
+  .preview-wrap {
+    margin: 4px 0 20px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: #f0f0f2;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+
+  .preview-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .preview-placeholder {
+    color: #b0b0b5;
+    font-size: 13px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  button.primary {
+    flex: 1;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  button.primary:hover { background: var(--accent-blue-hover); }
+  button.primary:active { transform: scale(0.98); }
+
+  button.primary:disabled {
+    background: #d2d2d7;
+    cursor: not-allowed;
+  }
+
+  button.secondary {
+    background: #f0f0f2;
+    color: var(--text-primary);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  button.secondary:hover { background: #e4e4e7; }
+  button.secondary:active { transform: scale(0.98); }
+
+  button.secondary:disabled {
+    color: #b0b0b5;
+    cursor: not-allowed;
+  }
+</style>
+<script src="popup-guard.js" defer></script>
 </head>
 
 <body>
 
-<h1>Bonus Image Creator</h1>
+<div class="app">
+  <div class="header">
+    <h1>Episode Tag Creator</h1>
+    <p>Upload artwork, choose a tag, export your cover.</p>
+  </div>
 
-<input type="file" id="upload" accept="image/*">
+  <div class="card">
 
-<br>
+    <label class="dropzone" id="dropzone">
+      <input type="file" id="upload" accept="image/*">
+      <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20 16.5v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dropzone-label" id="dropzone-label">Choose an image</div>
+      <div class="dropzone-sub" id="dropzone-sub">JPG or PNG, cropped to a square</div>
+    </label>
 
-<button onclick="createImage()">Create Preview</button>
+    <div class="segmented">
+      <input type="radio" name="tagType" id="tag-bonus" value="bonus" checked>
+      <input type="radio" name="tagType" id="tag-full" value="full">
+      <label for="tag-bonus"><span class="swatch" style="background:#34c759"></span>Bonus</label>
+      <label for="tag-full"><span class="swatch" style="background:#af52de"></span>Full Episode</label>
+      <div class="segmented-thumb"></div>
+    </div>
 
-<br>
+    <div class="preview-wrap">
+      <canvas id="canvas" width="500" height="500" style="display:none;"></canvas>
+      <span class="preview-placeholder" id="placeholder">Your preview will appear here</span>
+    </div>
 
-<canvas id="canvas" width="500" height="500"></canvas>
+    <div class="btn-row">
+      <button class="secondary" id="download-btn" onclick="downloadImage()" disabled>Download</button>
+      <button class="primary" onclick="createImage()" id="create-btn" disabled>Create Preview</button>
+    </div>
+
+  </div>
+</div>
 
 <script>
 const upload = document.getElementById("upload");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const placeholder = document.getElementById("placeholder");
+const dropzone = document.getElementById("dropzone");
+const dropzoneLabel = document.getElementById("dropzone-label");
+const dropzoneSub = document.getElementById("dropzone-sub");
+const createBtn = document.getElementById("create-btn");
+const downloadBtn = document.getElementById("download-btn");
+const tagTypeRadios = document.getElementsByName("tagType");
 
 let img = new Image();
+let hasImage = false;
+
+function getSelectedType() {
+  for (const radio of tagTypeRadios) {
+    if (radio.checked) return radio.value;
+  }
+  return "bonus";
+}
 
 upload.addEventListener("change", e => {
   const file = e.target.files[0];
@@ -69,63 +330,65 @@ upload.addEventListener("change", e => {
   img.src = URL.createObjectURL(file);
 
   img.onload = () => {
+    hasImage = true;
+    dropzone.classList.add("has-image");
+    dropzoneLabel.textContent = file.name;
+    dropzoneSub.textContent = "Click to choose a different image";
+    createBtn.disabled = false;
     drawPreview();
   };
 });
+
+for (const radio of tagTypeRadios) {
+  radio.addEventListener("change", () => {
+    if (hasImage) drawPreview();
+  });
+}
 
 function createImage() {
   drawPreview();
 }
 
 function drawPreview() {
-
   const size = Math.min(img.width, img.height);
-
   const cropX = (img.width - size) / 2;
   const cropY = (img.height - size) / 2;
 
-  ctx.clearRect(0,0,500,500);
+  ctx.clearRect(0, 0, 500, 500);
 
   // Square crop
-  ctx.drawImage(
-    img,
-    cropX,
-    cropY,
-    size,
-    size,
-    0,
-    0,
-    500,
-    500
-  );
+  ctx.drawImage(img, cropX, cropY, size, size, 0, 0, 500, 500);
 
-  // Green BONUS tag (bottom 25%)
-  ctx.fillStyle = "#00a83b";
-  ctx.fillRect(
-    0,
-    375,
-    500,
-    125
-  );
+  const type = getSelectedType();
+  const tagColor = type === "full" ? "#af52de" : "#34c759";
+  const tagText = type === "full" ? "FULL" : "BONUS";
+
+  // Colored tag (bottom 25%)
+  ctx.fillStyle = tagColor;
+  ctx.fillRect(0, 375, 500, 125);
 
   // Text
   ctx.font = "bold 70px 'DM Sans'";
   ctx.fillStyle = "white";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  ctx.fillText(tagText, 250, 437);
 
-  ctx.fillText(
-    "BONUS",
-    250,
-    437
-  );
+  canvas.style.display = "block";
+  placeholder.style.display = "none";
+  downloadBtn.disabled = false;
+}
+
+function downloadImage() {
+  const type = getSelectedType();
+  const link = document.createElement("a");
+  link.download = `${type}-cover.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
 }
 </script>
 
 <!-- ============================================================
-  Kids Learning Lab — Custom "Smart App Banner"
-  Works on ALL devices/browsers (Apple's real one is iOS Safari only).
-  Paste this whole block just before <!-- ============================================================
   Kids Learning Lab — Custom "Smart App Banner"
   Works on ALL devices/browsers (Apple's real one is iOS Safari only).
   Paste this whole block just before </body> -->
@@ -264,7 +527,5 @@ function drawPreview() {
     });
   })();
 </script>
-</body> -->
-
 </body>
 </html>
