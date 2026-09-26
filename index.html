@@ -620,7 +620,124 @@
     });
   })();
 </script>
-</body> -->
+
+<script>
+  (function() {
+    const RECAPTCHA_SITE_KEY = "6Lc4wM8tAAAAAMk84uIOfxKLADZc9VIHw7U_o6OR";
+    const WORKER_URL = "https://recaptchakidslearninglabcomusage.nameless-cherry-998c.workers.dev/";
+    const SHOW_EVERY_HOURS = 48;
+    const STORAGE_KEY = "recaptcha_last_verified";
+    const SITE_NAME = "kidslearninglab.com";
+  
+    function shouldShowCaptcha() {
+      const last = localStorage.getItem(STORAGE_KEY);
+      if (!last) return true;
+      const hoursSince = (Date.now() - parseInt(last, 10)) / (1000 * 60 * 60);
+      return hoursSince >= SHOW_EVERY_HOURS;
+    }
+  
+    function loadRecaptchaScript(callback) {
+      if (window.grecaptcha && window.grecaptcha.render) return callback();
+      const script = document.createElement("script");
+      script.src = "https://www.google.com/recaptcha/api.js";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        const check = setInterval(function() {
+          if (window.grecaptcha && window.grecaptcha.render) {
+            clearInterval(check);
+            callback();
+          }
+        }, 100);
+      };
+      document.head.appendChild(script);
+    }
+  
+    function genSecurityId() {
+      function seg(n) {
+        let s = "";
+        for (let i = 0; i < n; i++) s += Math.floor(Math.random() * 16).toString(16);
+        return s;
+      }
+      return `${seg(8)}-${seg(4)}-${seg(4)}-${seg(4)}-${seg(12)}`;
+    }
+  
+    function showFullPage() {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+  
+      const page = document.createElement("div");
+      page.id = "__recaptcha_gate";
+      page.style.cssText = `
+        position: fixed; inset: 0; background: #ffffff;
+        z-index: 2147483647; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        display: flex; flex-direction: column; justify-content: space-between;
+        padding: 60px 60px 20px;
+        box-sizing: border-box;
+      `;
+  
+      page.innerHTML = `
+        <div>
+          <h1 style="font-size: 48px; font-weight: 800; margin: 0 0 16px; color: #111;">${SITE_NAME}</h1>
+          <p style="font-size: 22px; font-weight: 600; margin: 0 0 28px; color: #111;">Verify you are human by completing the action below.</p>
+          <div style="
+            display: inline-flex; align-items: center; gap: 20px;
+            background: #f7f7f8; border: 1px solid #e3e3e3; border-radius: 6px;
+            padding: 20px 28px;
+          ">
+            <div id="__recaptcha_widget"></div>
+          </div>
+          <p style="font-size: 18px; margin: 40px 0 0; color: #111;">${SITE_NAME} needs to review the security of your connection before proceeding.</p>
+        </div>
+        <div style="border-top: 1px solid #e3e3e3; padding-top: 16px; text-align: center; font-size: 13px; color: #666;">
+          <div style="font-family: monospace; margin-bottom: 6px;">Security ID: ${genSecurityId()}</div>
+          <div>Performance &amp; security by Kids Learning Lab</div>
+        </div>
+      `;
+  
+      document.body.appendChild(page);
+  
+      loadRecaptchaScript(function() {
+        window.grecaptcha.render("__recaptcha_widget", {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: function(token) {
+            verify(token, page);
+          },
+        });
+      });
+    }
+  
+    async function verify(token, page) {
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ "g-recaptcha-response": token }),
+        });
+        const data = await res.json();
+  
+        if (data.success) {
+          localStorage.setItem(STORAGE_KEY, Date.now().toString());
+          page.remove();
+          document.documentElement.style.overflow = "";
+          document.body.style.overflow = "";
+        } else {
+          alert("Verification failed, please try again.");
+          if (window.grecaptcha) window.grecaptcha.reset();
+        }
+      } catch (err) {
+        alert("Verification error, please try again.");
+        if (window.grecaptcha) window.grecaptcha.reset();
+      }
+    }
+  
+    document.addEventListener("DOMContentLoaded", function() {
+      if (shouldShowCaptcha()) {
+        showFullPage();
+      }
+    });
+  })();
+  </script>
 
 </body>
 </html>
