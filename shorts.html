@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KLL Shorts Maker — MP3 → vertical video</title>
+<style>
+  :root { --bg:#0e1030; --card:#1a1d4d; --accent:#ffd54a; --text:#fff; --muted:#9aa0c7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:radial-gradient(1200px 800px at 50% -10%, #23265e 0%, var(--bg) 60%);
+         color:var(--text); min-height:100vh; padding:32px 16px; }
+  .wrap { max-width:1080px; margin:0 auto; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  p.sub { color:var(--muted); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start; }
+  @media (max-width:860px){ .grid{ grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid #2c3070; border-radius:16px; padding:20px; }
+  .drop { border:2px dashed #4a4fa0; border-radius:14px; padding:28px; text-align:center;
+          cursor:pointer; transition:.15s; color:var(--muted); }
+  .drop:hover,.drop.over { border-color:var(--accent); color:var(--text); background:#ffffff08; }
+  .drop b { color:var(--text); }
+  label { display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; }
+  input[type=text], input[type=file] { width:100%; }
+  input[type=text] { background:#10123a; border:1px solid #2c3070; color:#fff;
+                    border-radius:10px; padding:10px 12px; font-size:15px; }
+  input[type=file] { color:var(--muted); font-size:13px; }
+  .row { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  button { border:0; border-radius:12px; padding:12px 18px; font-size:15px; font-weight:700;
+           cursor:pointer; }
+  #renderBtn { background:var(--accent); color:#222; }
+  #renderBtn:disabled { opacity:.4; cursor:default; }
+  #previewBtn { background:#2c3070; color:#fff; }
+  .status { margin-top:12px; font-size:14px; color:var(--muted); min-height:20px; }
+  .bar { height:8px; background:#10123a; border-radius:6px; margin-top:10px; overflow:hidden; }
+  .bar > div { height:100%; width:0%; background:var(--accent); border-radius:6px; transition:width .2s; }
+  canvas#stage { width:100%; max-width:340px; border-radius:12px; display:block;
+                 background:#000; aspect-ratio:9/16; }
+  .hint { font-size:12px; color:var(--muted); margin-top:12px; line-height:1.5; }
+  a.dl { display:inline-block; margin-top:10px; color:var(--accent); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎙️ KLL Shorts Maker</h1>
+  <p class="sub">Drop an MP3 → get a vertical 1080×1920 video with artwork, title, animated waveform &amp; captions. 100% in your browser — nothing is uploaded anywhere.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="drop" id="drop">
+        <b>Drop your MP3 here</b> (or click / paste from clipboard)<br>
+        <span id="fileName">no file yet</span>
+      </div>
+      <input type="file" id="mp3" accept="audio/*" style="display:none">
+
+      <label>Episode title (shown on screen)</label>
+      <input type="text" id="title" placeholder="Why do we get Goosebumps?">
+
+      <label>Artwork (optional — default KLL cover is used)</label>
+      <input type="file" id="art" accept="image/*">
+
+      <label>Captions .srt (optional — burned in at the bottom)</label>
+      <input type="file" id="srt" accept=".srt,text/plain">
+
+      <div class="row">
+        <button id="previewBtn" disabled>▶ Preview</button>
+        <button id="renderBtn" disabled>⬇ Render &amp; download video</button>
+      </div>
+      <div class="status" id="status">Waiting for an MP3…</div>
+      <div class="bar"><div id="prog"></div></div>
+      <div id="dlWrap"></div>
+      <p class="hint">Tip: make captions with Whisper (Groq) → save as .srt → drop it here.
+      The video records in real time (a 1-min episode takes 1 min to render), then downloads as <b>.webm</b> — YouTube accepts it directly.</p>
+    </div>
+    <div class="card">
+      <canvas id="stage" width="1080" height="1920"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ---------- layout constants (match kll-shorts.sh) ---------- */
+const W = 1080, H = 1920;
+const ART = 800, ART_Y = 220, TITLE_Y = 1090, WAVE_Y = 1300, WAVE_H = 260, WAVE_W = 920;
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+
+const state = {
+  audioURL: null, audioBuf: null, duration: 0,
+  artImg: null, cues: [],
+  actx: null, analyser: null, srcNode: null, recDest: null,
+  playing: false, recording: false, recorder: null, chunks: [],
+  bars: new Float32Array(72), peaks: new Float32Array(72),
+  startAt: 0,
+};
+
+const $ = id => document.getElementById(id);
+const status = t => { $('status').textContent = t; };
+const setProg = p => { $('prog').style.width = (p*100).toFixed(1) + '%'; };
+
+/* ---------- default artwork: procedural KLL cover ---------- */
+function makeDefaultArt() {
+  const c = document.createElement('canvas'); c.width = c.height = 800;
+  const g = c.getContext('2d');
+  const grad = g.createLinearGradient(0,0,800,800);
+  grad.addColorStop(0,'#1a237e'); grad.addColorStop(1,'#3949ab');
+  g.fillStyle = grad; g.fillRect(0,0,800,800);
+  g.fillStyle = '#ffd54a'; g.font = '900 230px system-ui';
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillText('KLL', 400, 400);
+  g.fillStyle = '#ffffffcc'; g.font = '700 54px system-ui';
+  g.fillText('KIDS LEARNING LAB', 400, 620);
+  const img = new Image();
+  img.src = c.toDataURL();
+  return img;
+}
+state.artImg = makeDefaultArt();
+
+/* ---------- SRT parsing ---------- */
+function parseSRT(text) {
+  const cues = [];
+  const toSec = s => { const p = String(s).replace(',','.').split(':');
+    return (+p[0])*3600 + (+p[1])*60 + parseFloat(p[2]); };
+  const blocks = String(text || '').replace(/\r/g,'').split(/\n\s*\n/);
+  for (const b of blocks) {
+    if (!b || b.indexOf('-->') < 0) continue;
+    const m = b.match(/(\d{1,2}:\d{2}:\d{2}[,.]\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2}[,.]\d{1,3})/);
+    if (!m || !isFinite(toSec(m[1])) || !isFinite(toSec(m[2]))) continue;
+    const lines = b.slice(m.index + m[0].length).split('\n').map(s=>s.trim()).filter(Boolean);
+    if (!lines.length) continue;
+    cues.push({ start: toSec(m[1]), end: toSec(m[2]), text: lines });
+  }
+  return cues.sort((a,b)=>a.start-b.start);
+}
+
+/* ---------- file handling ---------- */
+function loadMP3(file) {
+  if (!file) return;
+  if (state.audioURL) URL.revokeObjectURL(state.audioURL);
+  state.audioURL = URL.createObjectURL(file);
+  $('fileName').textContent = '🎵 ' + file.name;
+  if (!$('title').value) {
+    $('title').value = file.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();
+  }
+  const a = new Audio();
+  a.preload = 'metadata';
+  a.onloadedmetadata = () => {
+    state.duration = a.duration;
+    $('previewBtn').disabled = false;
+    $('renderBtn').disabled = false;
+    status(`Loaded — ${a.duration.toFixed(1)}s. Preview it, then render.`);
+    drawFrame(0, new Uint8Array(0));
+  };
+  a.onerror = () => status('Could not read that audio file.');
+  a.src = state.audioURL;
+  state._audioEl = a;
+}
+const drop = $('drop');
+drop.addEventListener('click', () => $('mp3').click());
+$('mp3').addEventListener('change', e => loadMP3(e.target.files[0]));
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = [...e.dataTransfer.files].find(f=>/audio|\.mp3$|\.m4a$|\.wav$/i.test(f.type+f.name)); if (f) loadMP3(f); });
+document.addEventListener('paste', e => { const f = [...(e.clipboardData?.files||[])].find(f=>/audio/i.test(f.type)); if (f) loadMP3(f); });
+
+$('art').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => { state.artImg = img; drawFrame(0, new Uint8Array(0)); status('Artwork updated.'); };
+  img.src = URL.createObjectURL(f);
+});
+$('srt').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  f.text().then(t => { state.cues = parseSRT(t); status(`Captions loaded — ${state.cues.length} cues.`); });
+});
+
+/* ---------- audio graph ---------- */
+function ensureGraph() {
+  if (state.actx) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  state.actx = new AC();
+  state.analyser = state.actx.createAnalyser();
+  state.analyser.fftSize = 256;
+  state.analyser.smoothingTimeConstant = 0.82;
+  state.recDest = state.actx.createMediaStreamDestination();
+  state.srcNode = state.actx.createMediaElementSource(state._audioEl);
+  state.srcNode.connect(state.analyser);
+  state.analyser.connect(state.actx.destination);
+  state.srcNode.connect(state.recDest);
+}
+
+/* ---------- drawing ---------- */
+function wrapText(g, text, maxW) {
+  const words = text.split(/\s+/), lines = [];
+  let line = '';
+  for (const w of words) {
+    const t = line ? line + ' ' + w : w;
+    if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; }
+    else line = t;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function drawFrame(time, freq) {
+  const g = ctx;
+  // background: blurred, darkened artwork
+  g.save();
+  g.filter = 'blur(60px) brightness(0.55) saturate(1.3)';
+  g.drawImage(state.artImg, 0, 0, W, H);
+  g.restore();
+  g.fillStyle = 'rgba(5,6,25,0.25)'; g.fillRect(0,0,W,H);
+
+  // artwork square
+  const ax = (W-ART)/2;
+  g.save();
+  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 60; g.shadowOffsetY = 12;
+  // cover-crop the artwork into the square
+  const iw = state.artImg.naturalWidth || state.artImg.width || 800;
+  const ih = state.artImg.naturalHeight || state.artImg.height || 800;
+  const s = Math.max(ART/iw, ART/ih), dw = iw*s, dh = ih*s;
+  g.drawImage(state.artImg, ax+(ART-dw)/2, ART_Y+(ART-dh)/2, dw, dh);
+  g.restore();
+
+  // title
+  const title = $('title').value.trim() || 'Kids Learning Lab';
+  g.save();
+  g.font = '800 64px system-ui, sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  g.shadowColor = 'rgba(0,0,0,0.45)'; g.shadowBlur = 8; g.shadowOffsetY = 3;
+  g.fillStyle = '#fff';
+  const lines = wrapText(g, title, 940);
+  lines.forEach((ln,i) => g.fillText(ln, W/2, TITLE_Y + i*78));
+  g.restore();
+
+  // waveform: mirrored spectrum bars with peak falloff
+  const N = state.bars.length;
+  const n = Math.min(freq.length, 120);
+  const wx = (W-WAVE_W)/2, midY = WAVE_Y + WAVE_H/2, bw = WAVE_W/N;
+  for (let i=0;i<N;i++) {
+    const v = n ? freq[Math.floor(i/N*n)]/255 : 0;
+    state.bars[i] += (v - state.bars[i]) * 0.45;
+    if (state.bars[i] > state.peaks[i]) state.peaks[i] = state.bars[i];
+    else state.peaks[i] = Math.max(0, state.peaks[i] - 0.008);
+  }
+  const grad = g.createLinearGradient(0, WAVE_Y, 0, WAVE_Y+WAVE_H);
+  grad.addColorStop(0,'#ffe082'); grad.addColorStop(0.5,'#ffd54a'); grad.addColorStop(1,'#ff8f00');
+  g.fillStyle = grad;
+  for (let i=0;i<N;i++) {
+    const h = Math.max(6, state.bars[i] * (WAVE_H/2 - 8));
+    const x = wx + i*bw + bw*0.18, w = bw*0.64;
+    const r = Math.min(w/2, 8);
+    g.beginPath();
+    if (g.roundRect) g.roundRect(x, midY-h, w, h*2, r); else g.rect(x, midY-h, w, h*2);
+    g.fill();
+    // peak cap
+    const py = midY - Math.max(6, state.peaks[i]*(WAVE_H/2-8));
+    g.fillStyle = '#ffffffcc';
+    g.fillRect(x, py-3, w, 5);
+    g.fillRect(x, 2*midY-py-2, w, 5);
+    g.fillStyle = grad;
+  }
+
+  // captions
+  const cue = state.cues.find(c => time >= c.start && time <= c.end);
+  if (cue) {
+    g.save();
+    g.font = '700 58px system-ui, sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.lineWidth = 8; g.strokeStyle = 'rgba(0,0,0,0.75)';
+    g.fillStyle = '#fff';
+    const cy = H - 140 - (cue.text.length-1)*70;
+    cue.text.forEach((ln,i) => {
+      const y = cy + i*70;
+      g.strokeText(ln, W/2, y); g.fillText(ln, W/2, y);
+    });
+    g.restore();
+  }
+}
+
+/* ---------- preview ---------- */
+let raf = null;
+$('previewBtn').addEventListener('click', async () => {
+  ensureGraph();
+  await state.actx.resume();
+  const a = state._audioEl;
+  if (!state.playing) {
+    a.currentTime = 0; a.play();
+    state.playing = true; $('previewBtn').textContent = '⏸ Stop';
+    const data = new Uint8Array(state.analyser.frequencyBinCount);
+    const loop = () => {
+      if (!state.playing) return;
+      state.analyser.getByteFrequencyData(data);
+      drawFrame(a.currentTime, data);
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+    a.onended = () => { state.playing = false; $('previewBtn').textContent = '▶ Preview'; cancelAnimationFrame(raf); };
+  } else {
+    a.pause(); state.playing = false;
+    $('previewBtn').textContent = '▶ Preview'; cancelAnimationFrame(raf);
+  }
+});
+
+/* ---------- render & download ---------- */
+$('renderBtn').addEventListener('click', async () => {
+  if (state.recording) return;
+  ensureGraph();
+  await state.actx.resume();
+  $('dlWrap').innerHTML = '';
+  const a = state._audioEl;
+
+  const vStream = canvas.captureStream(30);
+  const combined = new MediaStream([...vStream.getVideoTracks(), ...state.recDest.stream.getAudioTracks()]);
+  const mimes = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+  const mime = mimes.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  if (!mime) { status('MediaRecorder not supported in this browser — try Chrome/Edge.'); return; }
+
+  state.recorder = new MediaRecorder(combined, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+  state.chunks = [];
+  state.recorder.ondataavailable = e => { if (e.data.size) state.chunks.push(e.data); };
+  state.recorder.onstop = () => {
+    const blob = new Blob(state.chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const name = (($('title').value.trim() || 'kll-short').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase() || 'kll-short') + '.webm';
+    const link = document.createElement('a');
+    link.href = url; link.download = name; link.className = 'dl';
+    link.textContent = '⬇ Download ' + name + ` (${(blob.size/1048576).toFixed(1)} MB)`;
+    $('dlWrap').appendChild(link);
+    link.click();
+    state.recording = false;
+    $('renderBtn').disabled = false;
+    status('Done! Video downloaded. Upload it to YouTube as a Short. 🎉');
+    setProg(1);
+  };
+
+  // reset animation state, start from 0
+  state.bars.fill(0); state.peaks.fill(0);
+  a.currentTime = 0;
+  const data = new Uint8Array(state.analyser.frequencyBinCount);
+  state.recorder.start(500);
+  state.recording = true;
+  $('renderBtn').disabled = true;
+  status('Rendering in real time — keep this tab open…');
+  setProg(0);
+
+  const loop = () => {
+    if (!state.recording) return;
+    state.analyser.getByteFrequencyData(data);
+    drawFrame(a.currentTime, data);
+    setProg(a.currentTime / (state.duration || 1));
+    requestAnimationFrame(loop);
+  };
+  a.onended = () => { state.recorder.stop(); cancelAnimationFrame(raf); };
+  a.play();
+  loop();
+});
+
+// initial paint
+drawFrame(0, new Uint8Array(0));
+</script>
+</body>
+</html>
