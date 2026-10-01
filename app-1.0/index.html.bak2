@@ -1493,11 +1493,6 @@
   }
   .kll-modal-btn-pink:hover { background: #DB2777; }
   .kll-modal-btn-pink:disabled { background: #F5B3D3; cursor: not-allowed; }
-  .cc-spinner { align-items: center; justify-content: center; padding: 34px 0 40px; }
-  .cc-spinner .material-symbols-outlined { font-size: 44px; color: var(--blue-main); animation: idkQuizSpin 1s linear infinite; }
-  #ccCustomTopicBtn { background: #30C67C; }
-  #ccCustomTopicBtn:hover { background: #22A866; }
-  #createCoursePdfPicker .cc-pdf-create-btn { margin: 12px 0 0; }
   #chessLessonsBtn { background: #9C6B43; }
   #chessLessonsBtn:hover { background: #85582F; }
   #chessLessonsBtn:disabled { background: #D9C0A5; }
@@ -2337,7 +2332,7 @@
     width: 100%; max-width: 260px; max-height: 220px; object-fit: cover;
     border-radius: 12px; border: 1.5px solid var(--border-soft);
   }
-  .lesson-image-credit { display: block; width: 100%; margin: 6px auto 10px; font-size: 0.64rem; line-height: 1.3; text-align: center; align-self: center; color: var(--muted, #6b7280); }
+  .lesson-image-credit { font-size: 10.5px; color: var(--ink-soft); margin-top: 4px; }
 
   /* ---- Diagram templates (chess/graph/shapes/map/timeline/numberline/
      clock/musicstaff/labeled/gridtable/venn/chart) — real HTML/CSS
@@ -3967,7 +3962,7 @@ body.dark-mode #kllForceUpdate {
 }
 #kllForceUpdate .fu-btn:active { background: var(--fu-press); }
 @media (prefers-reduced-motion: reduce) { #kllForceUpdate .fu-alert { animation: none; } }
-  /* ---- File Hub ---- */
+  /* ---- PDF Hub ---- */
   .pdf-hub-row-label { display: flex; flex-direction: column; gap: 1px; }
   .pdf-hub-row-label small { font-size: 11.5px; font-weight: 500; color: var(--ink-soft); }
   .pdf-hub-status { font-size: 12.5px; color: var(--ink-soft); min-height: 16px; margin: 0 0 12px; }
@@ -3995,7 +3990,7 @@ body.dark-mode #kllForceUpdate {
   .pdf-hub-icon-btn:hover { color: var(--blue-main); }
   .pdf-hub-icon-btn.confirming { color: var(--white); background: var(--error); }
 
-  /* ---- File picker (Create Course + every game chooser) ---- */
+  /* ---- PDF picker (Create Course + every game chooser) ---- */
   .pdf-picker {
     border: 2px solid var(--border-soft); border-radius: 14px; background: var(--blue-mist);
     padding: 12px 14px; margin-bottom: 14px; text-align: left;
@@ -4004,8 +3999,6 @@ body.dark-mode #kllForceUpdate {
   .pdf-picker-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--ink); margin-bottom: 8px; }
   .pdf-picker-title .material-symbols-outlined { font-size: 18px; color: var(--blue-main); }
   .pdf-picker-row { display: flex; gap: 8px; }
-  .pdf-picker-uploads { margin-top: 8px; }
-  .pdf-picker-uploads .pdf-picker-upload { flex: 1; }
   .pdf-picker-select {
     flex: 1; min-width: 0; font-size: 14px; padding: 10px 12px; border-radius: 10px;
     border: 1.5px solid var(--border-soft); background: var(--white); color: var(--ink); outline: none;
@@ -4417,6 +4410,7 @@ body.dark-mode #kllForceUpdate {
             <div class="skel home-skel-stat"></div>
             <div class="skel home-skel-stat"></div>
           </div>
+          <div class="skel home-skel-banner"></div>
           <div class="skel home-skel-section-label"></div>
           <div class="home-skel-games-row">
             <div class="skel home-skel-game-card"></div>
@@ -4434,13 +4428,15 @@ body.dark-mode #kllForceUpdate {
           <div class="home-hero-sub" id="homeHeroSub"></div>
         </button>
 
-        <button type="button" class="game-card" id="homeQuickLearnBtn" style="margin-bottom:12px;">
-          <div class="game-card-icon"><span class="material-symbols-outlined">bolt</span></div>
+        <button type="button" class="game-card go-premium-card combo-lesson-card" id="homeReviewPageBtn" style="margin-bottom:12px;">
+          <div class="game-card-icon"><span class="material-symbols-outlined">history_edu</span></div>
           <div>
-            <div class="game-card-title">Quick Learn</div>
-            <div class="game-card-sub">Learn anything quickly with a one minute lesson. You can even just take a picture of something and learn immediately!</div>
+            <div class="game-card-title">Review Page</div>
+            <div class="game-card-sub">See all your weak spots, strong areas, and review everything.</div>
           </div>
         </button>
+
+        <div class="home-usage-banner" id="homeUsageBanner" style="display:none;"></div>
 
         <div class="home-stats-row" id="homeStatsRow" style="display:none;">
           <button type="button" class="home-stat-card c-amber" id="homeStatStreak">
@@ -4541,8 +4537,8 @@ body.dark-mode #kllForceUpdate {
 
         <div class="settings-card">
           <button class="settings-row-btn" id="profilePdfHubBtn">
-            <span class="material-symbols-outlined">folder</span>
-            <span class="pdf-hub-row-label">File Hub<small id="profilePdfHubCount">Upload files to learn from</small></span>
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span class="pdf-hub-row-label">PDF Hub<small id="profilePdfHubCount">Upload PDFs to learn from</small></span>
             <span class="profile-row-chevron material-symbols-outlined">chevron_right</span>
           </button>
         </div>
@@ -5081,36 +5077,14 @@ body.dark-mode #kllForceUpdate {
   <!-- ============ LEARN: CREATE COURSE MODAL ============ -->
   <div class="kll-modal-overlay" id="createCourseModalOverlay">
     <div class="kll-modal">
-      <!-- Page 1: start -->
-      <div class="cc-page" id="ccPageStart">
-        <h2>Create a New Course</h2>
-        <button class="kll-modal-btn-pink" id="chessLessonsBtn">Chess Lessons (NEW)<div class="kll-modal-btn-sub">Play and Learn Chess for free!</div></button>
-        <button class="kll-modal-btn" id="ccOtherTopicBtn">Other topic</button>
-      </div>
-      <!-- Page 2: file (the File Hub picker + its Create From File button are mounted into #createCoursePdfPicker) -->
-      <div class="cc-page" id="ccPagePdf" style="display:none;">
-        <h2>Upload a file?</h2>
-        <div id="createCoursePdfPicker"></div>
-        <button class="kll-modal-btn" id="ccNoPdfBtn">No file</button>
-      </div>
-      <!-- Page 3: how to pick a topic -->
-      <div class="cc-page" id="ccPageChoice" style="display:none;">
-        <h2>Create a New Course</h2>
-        <button class="kll-modal-btn" id="idkWhatToLearnBtn">I don't know what to learn!</button>
-        <button class="kll-modal-btn" id="ccCustomTopicBtn">Custom topic</button>
-      </div>
-      <!-- Page 4: type a topic -->
-      <div class="cc-page" id="ccPageCustom" style="display:none;">
-        <h2>What do you want to learn?</h2>
-        <p>Type any topic and we'll build you a 10-unit course.</p>
-        <input type="text" id="createCourseInput" class="kll-text-input" maxlength="80" placeholder="e.g. Ancient Rome, guitar chords, chess openings...">
-        <button class="kll-modal-btn" id="createCourseSubmitBtn">Create Course</button>
-      </div>
-      <!-- 2-second spinner shown between pages -->
-      <div class="cc-page cc-spinner" id="ccPageSpinner" style="display:none;">
-        <span class="material-symbols-outlined">progress_activity</span>
-      </div>
+      <h2>What do you want to learn?</h2>
+      <p>Type any topic and we'll build you a 10-unit course.</p>
+      <input type="text" id="createCourseInput" class="kll-text-input" maxlength="80" placeholder="e.g. Ancient Rome, guitar chords, chess openings...">
+      <div id="createCoursePdfPicker"></div>
       <div class="kll-modal-error" id="createCourseError"></div>
+      <button class="kll-modal-btn" id="createCourseSubmitBtn">Create Course</button>
+      <button class="kll-modal-btn-pink" id="chessLessonsBtn">Chess Lessons (NEW)</button>
+      <button class="kll-modal-btn-pink" id="idkWhatToLearnBtn">I don't know what to learn</button>
       <button class="kll-modal-btn-secondary" id="createCourseCancelBtn">Cancel</button>
     </div>
   </div>
@@ -5345,14 +5319,6 @@ body.dark-mode #kllForceUpdate {
             </div>
             <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
           </button>
-          <button type="button" class="game-card" id="gameCardQuickLearn">
-            <div class="game-card-icon"><span class="material-symbols-outlined">bolt</span></div>
-            <div>
-              <div class="game-card-title">Quick Learn</div>
-              <div class="game-card-sub">Enter a topic or file and learn it in one lesson</div>
-            </div>
-            <span class="material-symbols-outlined game-card-chevron">chevron_right</span>
-          </button>
           <button type="button" class="game-card" id="gameCardMaze">
             <div class="game-card-icon"><span class="material-symbols-outlined">explore</span></div>
             <div>
@@ -5468,25 +5434,6 @@ body.dark-mode #kllForceUpdate {
         </div>
         <div class="voice-trivia-status" style="margin-top:14px;">You can also just say "play again" or "exit"</div>
       </div>
-    </div>
-  </div>
-
-  <!-- ============ LEARN: QUICK LEARN MODAL ============ -->
-  <div class="kll-modal-overlay" id="quickLearnModalOverlay">
-    <div class="kll-modal">
-      <h2>Quick Learn</h2>
-      <div class="trivia-option-list">
-        <div class="trivia-option-card selected" style="cursor:default;">
-          <div class="trivia-option-title">
-            <span class="material-symbols-outlined">edit</span> What do you want to learn?
-          </div>
-          <input type="text" id="quickLearnInput" class="kll-text-input" maxlength="80" placeholder="e.g. how volcanoes work, fractions, the Roman Empire...">
-        </div>
-      </div>
-      <div id="quickLearnPdfPicker"></div>
-      <div class="kll-modal-error" id="quickLearnError"></div>
-      <button class="kll-modal-btn" id="quickLearnGenerateBtn">Start Learning</button>
-      <button class="kll-modal-btn-secondary" id="quickLearnCancelBtn">Cancel</button>
     </div>
   </div>
 
@@ -6116,21 +6063,19 @@ body.dark-mode #kllForceUpdate {
     </div>
   </div>
 
-  <!-- ============ PROFILE: FILE HUB FULL PAGE ============ -->
+  <!-- ============ PROFILE: PDF HUB FULL PAGE ============ -->
   <div class="kll-modal-overlay games-page-overlay" id="pdfHubPageOverlay">
     <div class="games-page-container">
       <div class="games-page-topbar">
         <button id="pdfHubExitBtn" class="games-exit-btn">
           <span class="material-symbols-outlined">close</span>
         </button>
-        <div class="games-page-title">File Hub</div>
+        <div class="games-page-title">PDF Hub</div>
       </div>
       <div class="games-page-body">
-        <p class="games-page-sub">Upload PDFs or images, then build courses and learning games from them.</p>
+        <p class="games-page-sub">Upload PDFs, then build courses and learning games from them.</p>
         <button type="button" class="kll-modal-btn" id="pdfHubUploadBtn">Upload PDF</button>
         <input type="file" id="pdfHubFileInput" accept="application/pdf,.pdf" hidden>
-        <button type="button" class="kll-modal-btn" id="pdfHubImageBtn">Upload Image</button>
-        <input type="file" id="pdfHubImageInput" accept="image/*" hidden>
         <p class="pdf-hub-status" id="pdfHubStatus"></p>
         <div class="pdf-hub-list" id="pdfHubList"></div>
       </div>
@@ -6139,8 +6084,8 @@ body.dark-mode #kllForceUpdate {
 
   <div class="kll-modal-overlay" id="pdfRenameOverlay">
     <div class="kll-modal">
-      <h2>Rename File</h2>
-      <input type="text" id="pdfRenameInput" class="kll-text-input" maxlength="60" placeholder="File name">
+      <h2>Rename PDF</h2>
+      <input type="text" id="pdfRenameInput" class="kll-text-input" maxlength="60" placeholder="PDF name">
       <button class="kll-modal-btn" id="pdfRenameSaveBtn">Save</button>
       <button class="kll-modal-btn-secondary" id="pdfRenameCancelBtn">Cancel</button>
     </div>

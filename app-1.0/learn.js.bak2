@@ -228,8 +228,8 @@ const shareCourseScanStatus = document.getElementById('shareCourseScanStatus');
 const createCourseModalOverlay = document.getElementById('createCourseModalOverlay');
 const createCourseCancelBtn = document.getElementById('createCourseCancelBtn');
 const createCourseInput = document.getElementById('createCourseInput');
-// ---- File Hub pickers (PDFs and scanned images live locally in IndexedDB; only plaintext is sent to the worker) ----
-const createCoursePdfPicker = mountPdfPicker(document.getElementById('createCoursePdfPicker'), { onChange: () => syncCreateFromPdfBtn() });
+// ---- PDF Hub pickers (PDFs live locally in IndexedDB; only plaintext is sent to the worker) ----
+const createCoursePdfPicker = mountPdfPicker(document.getElementById('createCoursePdfPicker'));
 const gamePdfPickers = {
   trivia: mountPdfPicker(document.getElementById('triviaPdfPicker'), { onChange: () => resetTriviaReadyState() }),
   maze: mountPdfPicker(document.getElementById('mazePdfPicker')),
@@ -238,7 +238,6 @@ const gamePdfPickers = {
   meltdown: mountPdfPicker(document.getElementById('meltdownPdfPicker')),
   wordGrid: mountPdfPicker(document.getElementById('wordGridPdfPicker')),
   connectors: mountPdfPicker(document.getElementById('connectorsPdfPicker')),
-  quickLearn: mountPdfPicker(document.getElementById('quickLearnPdfPicker')),
 };
 // Plaintext of the PDF chosen for the game currently being generated ('' = none).
 // Set by every game's Generate handler and included by its fetch function,
@@ -249,7 +248,7 @@ async function resolveGamePdf(picker) {
   const sel = picker.getSelected();
   if (!sel) return { topic: null, text: '' };
   const text = excerptText(await getPdfText(sel.id));
-  return text ? { topic: `${sel.name} (from the learner's file)`, text } : { topic: null, text: '' };
+  return text ? { topic: `${sel.name} (from the learner's PDF)`, text } : { topic: null, text: '' };
 }
 const createCourseError = document.getElementById('createCourseError');
 const createCourseSubmitBtn = document.getElementById('createCourseSubmitBtn');
@@ -363,12 +362,6 @@ const voiceTriviaPlayAgainBtn = document.getElementById('voiceTriviaPlayAgainBtn
 const voiceTriviaExitFinishedBtn = document.getElementById('voiceTriviaExitFinishedBtn');
 
 // ---- Maze ----
-const gameCardQuickLearn = document.getElementById('gameCardQuickLearn');
-const quickLearnModalOverlay = document.getElementById('quickLearnModalOverlay');
-const quickLearnInput = document.getElementById('quickLearnInput');
-const quickLearnError = document.getElementById('quickLearnError');
-const quickLearnGenerateBtn = document.getElementById('quickLearnGenerateBtn');
-const quickLearnCancelBtn = document.getElementById('quickLearnCancelBtn');
 const gameCardMaze = document.getElementById('gameCardMaze');
 const mazeChooseModalOverlay = document.getElementById('mazeChooseModalOverlay');
 const mazeCourseOption = document.getElementById('mazeCourseOption');
@@ -1156,7 +1149,7 @@ function sanitizeLessonImageUrl(raw) {
 function lessonImageCreditHtml(rawCredit) {
   const name = typeof rawCredit === 'string' ? rawCredit.trim() : '';
   const who = name && !/^pexels$/i.test(name) ? `Photo by ${escapeHtml(name)} on ` : 'Photo from ';
-  return `<div class="lesson-image-credit">${who}Pexels</div>`;
+  return `<div class="lesson-image-credit">${who}<a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer">Pexels</a></div>`;
 }
 
 // Preloads every Pexels photo in a lesson up front, so each part's image is
@@ -2917,7 +2910,7 @@ async function removeWrongAnswerFromCourse(courseId, docId) {
 // ============================================================
 learnCreateFirstBtn.addEventListener('click', () => openCreateCourseModal());
 addCourseBtn.addEventListener('click', () => openCreateCourseModal());
-createCourseCancelBtn.addEventListener('click', () => { clearCreateCourseNav(); createCourseModalOverlay.classList.remove('show'); });
+createCourseCancelBtn.addEventListener('click', () => createCourseModalOverlay.classList.remove('show'));
 
 // +1 slot from the one-time-ever "Extra Course Slot" XP Shop purchase
 // (5→6 free, 10→11 premium) — stacks with, doesn't replace, the base limit.
@@ -2947,78 +2940,9 @@ function openCreateCourseModal(prefillTopic) {
   createCourseError.textContent = '';
   createCourseInput.value = prefillTopic || '';
   createCoursePdfPicker.reset();
-  syncCreateFromPdfBtn();
-  clearCreateCourseNav();
-  showCreateCoursePage(prefillTopic ? 'custom' : 'start');
   coursesModalOverlay.classList.remove('show');
   createCourseModalOverlay.classList.add('show');
 }
-
-// ---- Create-course modal pages: start -> (Other topic) pdf -> (No PDF) choice -> (Custom topic) custom.
-// Every step between pages shows a 2-second spinner first. Chess creates the course straight away.
-const CC_PAGES = {
-  start: document.getElementById('ccPageStart'),
-  pdf: document.getElementById('ccPagePdf'),
-  choice: document.getElementById('ccPageChoice'),
-  custom: document.getElementById('ccPageCustom'),
-  spinner: document.getElementById('ccPageSpinner'),
-};
-const CC_SPINNER_MS = 2000;
-let ccNavTimer = null;
-
-function showCreateCoursePage(name) {
-  for (const [key, el] of Object.entries(CC_PAGES)) el.style.display = key === name ? '' : 'none';
-  if (name === 'custom') createCourseInput.focus();
-}
-function clearCreateCourseNav() {
-  if (ccNavTimer) { clearTimeout(ccNavTimer); ccNavTimer = null; }
-}
-// Shows the spinner for 2s, then runs `then` (defaults to showing `page`).
-function goToCreateCoursePage(page, then) {
-  clearCreateCourseNav();
-  createCourseError.textContent = '';
-  showCreateCoursePage('spinner');
-  ccNavTimer = setTimeout(() => {
-    ccNavTimer = null;
-    if (!createCourseModalOverlay.classList.contains('show')) return; // cancelled
-    if (then) then(); else showCreateCoursePage(page);
-  }, CC_SPINNER_MS);
-}
-
-document.getElementById('ccOtherTopicBtn').addEventListener('click', () => goToCreateCoursePage('pdf'));
-document.getElementById('ccNoPdfBtn').addEventListener('click', () => {
-  createCoursePdfPicker.reset(); // "No file" really means none, even if one was picked above
-  syncCreateFromPdfBtn();
-  goToCreateCoursePage('choice');
-});
-document.getElementById('ccCustomTopicBtn').addEventListener('click', () => goToCreateCoursePage('custom'));
-
-// "Create From File" lives inside the File Hub box (page 2). It runs the normal Create Course
-// flow below, which already uses the picked PDF (its name is the topic when nothing is typed).
-const createFromPdfBtn = document.createElement('button');
-createFromPdfBtn.type = 'button';
-createFromPdfBtn.className = 'kll-modal-btn cc-pdf-create-btn';
-createFromPdfBtn.textContent = 'Create From File';
-createFromPdfBtn.disabled = true;
-document.getElementById('createCoursePdfPicker').appendChild(createFromPdfBtn);
-function syncCreateFromPdfBtn() {
-  createFromPdfBtn.disabled = !createCoursePdfPicker.getSelected();
-}
-createFromPdfBtn.addEventListener('click', () => {
-  if (!createCoursePdfPicker.getSelected()) return;
-  createCourseInput.value = '';
-  createCourseSubmitBtn.click();
-});
-// Mirror the real submit button's "Creating…" state onto this one while a course is being made.
-new MutationObserver(() => {
-  if (createCourseSubmitBtn.disabled) {
-    createFromPdfBtn.disabled = true;
-    createFromPdfBtn.textContent = 'Creating…';
-  } else {
-    createFromPdfBtn.textContent = 'Create From File';
-    syncCreateFromPdfBtn();
-  }
-}).observe(createCourseSubmitBtn, { attributes: true, attributeFilter: ['disabled'] });
 
 createCourseSubmitBtn.addEventListener('click', async () => {
   const pdfSel = createCoursePdfPicker.getSelected();
@@ -3091,13 +3015,12 @@ createCourseSubmitBtn.addEventListener('click', async () => {
 // regular Create Course input so the learner can still review/edit it
 // before actually creating the course — this deliberately reuses the
 // existing generateCourse flow rather than creating a course directly.
-idkWhatToLearnBtn.addEventListener('click', () => goToCreateCoursePage(null, openIdkQuiz));
+idkWhatToLearnBtn.addEventListener('click', openIdkQuiz);
 
 // "Chess Lessons (NEW)" shortcut — fills the topic and runs the exact same
 // Create Course flow as typing "Chess" by hand (so the banked-day block and
 // course-limit guard inside the submit handler still apply).
 chessLessonsBtn.addEventListener('click', () => {
-  createCoursePdfPicker.reset();
   createCourseInput.value = 'Chess';
   createCourseSubmitBtn.click();
 });
@@ -3171,7 +3094,6 @@ async function submitIdkQuiz() {
     idkQuizModalOverlay.classList.remove('show');
     createCourseError.textContent = '';
     createCourseInput.value = data.topic || '';
-    showCreateCoursePage('custom');
     createCourseModalOverlay.classList.add('show');
     createCourseInput.focus();
   } catch (err) {
@@ -4678,14 +4600,13 @@ function startLessonView() {
   // amount per correct answer rather than the normal streak-scaled gain,
   // and start their tracker at 0 rather than the usual base-10 — see
   // checkAnswer()'s isReviewLesson branch.
-  lessonXp = (currentLesson.isReviewLesson || currentLesson.isDailyLesson || currentLesson.isQuickLearn) ? 0 : 10;
+  lessonXp = (currentLesson.isReviewLesson || currentLesson.isDailyLesson) ? 0 : 10;
   lessonStreakCount = 0;
   lessonAnsweredAny = false;
   lessonAnswerLog = [];
   lessonXpTracker.style.display = (currentLesson.isWrongAnswerReview && !currentLesson.isReviewLesson && !currentLesson.isDailyLesson) ? 'none' : 'flex';
   lessonXpTrackerCount.textContent = lessonXp;
-  // Quick Learn isn't tied to a course (activeCourse can even be null), so it carries its own color.
-  applyCourseColor(currentLesson.color || activeCourse?.color || '#1E6FE0'); // lesson-view-container reads the same --cc var, inherited
+  applyCourseColor(activeCourse.color); // lesson-view-container reads the same --cc var, inherited
   lessonViewTitle.textContent = currentLesson.lessonTitle
     || (currentLesson.isCourseReview ? 'Course Review' : (currentLesson.isUnitReview ? 'Unit Review' : ''));
   lessonViewOverlay.classList.add('show');
@@ -4773,10 +4694,10 @@ function renderCurrentPart() {
     const imageUrl = sanitizeLessonImageUrl(p.imageUrl);
     if (imageUrl) {
       const alt = escapeHtml(p.imageAlt || '');
-      currentDiagramFeedbackContext = null;
+      currentDiagramFeedbackContext = { kind: 'image', imageUrl, imageAlt: p.imageAlt || '', imageCredit: p.imageCredit || 'Pexels' };
       return `<div class="lesson-image-wrap">
         <img src="${imageUrl}" alt="${alt}" decoding="async" />
-      </div>${lessonImageCreditHtml(p.imageCredit)}`;
+      </div>${lessonImageCreditHtml(p.imageCredit)}${feedbackBtnHtml}`;
     }
     if (p.template && typeof p.template === 'string') {
       const html = renderDiagramTemplate(p.template, p.templateData);
@@ -4846,11 +4767,6 @@ function checkAnswer() {
       lessonXp += gain;
       lessonXpTrackerCount.textContent = lessonXp;
       if (gain > 0) window.KLLAnim?.flyXpPopup({ container: xpPopupLayer, target: lessonXpTracker, amount: gain });
-    } else if (currentLesson.isQuickLearn) {
-      // Flat +10 XP per correct answer for Quick Learn — no streak scaling.
-      lessonXp += 10;
-      lessonXpTrackerCount.textContent = lessonXp;
-      window.KLLAnim?.flyXpPopup({ container: xpPopupLayer, target: lessonXpTracker, amount: 10 });
     } else if (currentLesson.isDailyLesson) {
       // Flat +20 XP for Daily Lesson (renamed Combo Lesson) — no streak scaling.
       lessonXp += 20;
@@ -4888,14 +4804,14 @@ function checkAnswer() {
     lessonWhyBtn.style.display = '';
     // Store every missed question (outside of review/Daily-Lesson
     // sessions, where it's already in the bank) so it can resurface later.
-    if (!currentLesson.isWrongAnswerReview && !currentLesson.isDailyLesson && !currentLesson.isQuickLearn) {
+    if (!currentLesson.isWrongAnswerReview && !currentLesson.isDailyLesson) {
       saveWrongAnswer(part);
     }
   }
   // Collect this question+answer for end-of-lesson weak/strong-spot
   // generation — regular lessons only (see finishLesson()'s call into
   // generateLessonSpots below).
-  if (!currentLesson.isWrongAnswerReview && !currentLesson.isDailyLesson && !currentLesson.isQuickLearn) {
+  if (!currentLesson.isWrongAnswerReview && !currentLesson.isDailyLesson) {
     lessonAnswerLog.push({
       question: part.question,
       choices: part.choices,
@@ -4967,17 +4883,6 @@ async function finishLesson() {
     const streakExtended = await bumpStreak();
     if (lessonXp > 0) await awardLessonXp();
     setDailyLessonDoneToday();
-    await checkLessonBadges();
-    showLessonSummary(streakExtended);
-    return;
-  }
-  // Quick Learn: a one-off lesson on any topic/PDF, not backed by a course or a
-  // lesson doc. Earns its flat XP and counts toward the daily streak, but
-  // writes nothing course-related (no lesson doc, no lastLessonScore, no recents).
-  if (currentLesson.isQuickLearn) {
-    pauseCelebrations();
-    const streakExtended = await bumpStreak();
-    if (lessonXp > 0) await awardLessonXp();
     await checkLessonBadges();
     showLessonSummary(streakExtended);
     return;
@@ -5192,13 +5097,6 @@ async function advanceAfterLessonCompletion() {
     return;
   }
 
-  // ---- Quick Learn finished: nothing to advance, just return home ----
-  if (currentLesson.isQuickLearn) {
-    currentLesson = null;
-    renderCourseHomeOrEmpty({ resetView: false });
-    return;
-  }
-
   // ---- Daily Lesson finished: nothing to advance, just return home ----
   if (currentLesson.isDailyLesson) {
     currentLesson = null;
@@ -5256,112 +5154,6 @@ async function advanceAfterLessonCompletion() {
   currentLesson = null;
   renderCourseHomeOrEmpty({ resetView });
 }
-
-// ============================================================
-// QUICK LEARN — type a topic (or pick a PDF) and get ONE lesson on it,
-// played in the normal lesson view. Uses the same worker `generateLesson`
-// action as course lessons, just framed as a standalone lesson 1, so it
-// needs no course, no outline and no Firestore writes.
-// ============================================================
-function openQuickLearnModal() {
-  gamePdfPickers.quickLearn.reset();
-  quickLearnInput.value = '';
-  quickLearnError.textContent = '';
-  quickLearnGenerateBtn.disabled = false;
-  quickLearnGenerateBtn.textContent = 'Start Learning';
-  quickLearnModalOverlay.classList.add('show');
-  quickLearnInput.focus();
-}
-
-gameCardQuickLearn?.addEventListener('click', () => {
-  gamesPageOverlay.classList.remove('show');
-  openQuickLearnModal();
-});
-// Home page Quick Learn card — same modal as the Learning Games entry.
-document.getElementById('homeQuickLearnBtn')?.addEventListener('click', () => {
-  openQuickLearnModal();
-});
-quickLearnCancelBtn?.addEventListener('click', () => {
-  // Bumping the token makes any in-flight generation quietly discard its result.
-  quickLearnGenToken++;
-  quickLearnModalOverlay.classList.remove('show');
-});
-quickLearnInput?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); quickLearnGenerateBtn.click(); }
-});
-
-let quickLearnGenToken = 0;
-
-async function fetchQuickLearnLesson(topic, pdfText) {
-  const res = await fetch(LEARN_WORKER_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'generateLesson',
-      courseTitle: topic,
-      courseDescription: `A single standalone lesson that teaches the learner about: ${topic}`,
-      unitTitle: topic,
-      unitDescription: `One self-contained lesson introducing ${topic}`,
-      lessonNumber: 1,
-      previousTopics: [],
-      enableVisuals: getDiagramsEnabledFlag(),
-      pdfText: pdfText || undefined,
-    }),
-  });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || 'Could not create that lesson.');
-  if (!Array.isArray(data.parts) || !data.parts.length) throw new Error('That lesson came back empty. Try again.');
-  return data;
-}
-
-quickLearnGenerateBtn?.addEventListener('click', async () => {
-  const pdfSel = gamePdfPickers.quickLearn.getSelected();
-  const typed = quickLearnInput.value.trim();
-  const topic = typed || (pdfSel ? pdfSel.name : '');
-  if (!topic) {
-    quickLearnError.textContent = 'Type a topic or pick a file first.';
-    return;
-  }
-
-  const myToken = ++quickLearnGenToken;
-  quickLearnError.textContent = '';
-  quickLearnGenerateBtn.disabled = true;
-  quickLearnGenerateBtn.textContent = 'Building your lesson…';
-
-  try {
-    // Plaintext of the chosen PDF (stays on this device; only text is sent). Same 12k slice course lessons use.
-    let pdfText = '';
-    if (pdfSel) {
-      try { pdfText = excerptText(await getPdfText(pdfSel.id), 12000, 0); } catch { pdfText = ''; }
-    }
-    const data = await fetchQuickLearnLesson(topic, pdfText);
-    if (myToken !== quickLearnGenToken) return; // cancelled while generating
-
-    quickLearnModalOverlay.classList.remove('show');
-    currentLesson = {
-      id: 'quickLearn',
-      isQuickLearn: true,
-      isWrongAnswerReview: false,
-      isDailyLesson: false,
-      isCourseReview: false,
-      isUnitReview: false,
-      color: pickRandomCourseColor(),
-      lessonTitle: data.lessonTitle || topic,
-      parts: data.parts,
-    };
-    preloadLessonImages(currentLesson);
-    await maybeShowDiagramsInfoModal();
-    startLessonView();
-  } catch (err) {
-    if (myToken !== quickLearnGenToken) return;
-    quickLearnError.textContent = err.message || 'Could not build that lesson. Try again.';
-  } finally {
-    if (myToken === quickLearnGenToken) {
-      quickLearnGenerateBtn.disabled = false;
-      quickLearnGenerateBtn.textContent = 'Start Learning';
-    }
-  }
-});
 
 // ============================================================
 // TRIVIA

@@ -466,9 +466,11 @@ const DIAGRAMS_ENABLED_KEY = 'kll_diagrams_enabled';
 const diagramsToggleSwitch = document.getElementById('diagramsToggleSwitch');
 
 function getDiagramsEnabled() {
-  // Default ON — an unset value (new install, or a device that's never
-  // touched the toggle) reads as enabled. Only an explicit '0' turns it off.
-  try { return localStorage.getItem(DIAGRAMS_ENABLED_KEY) !== '0'; } catch { return true; }
+  // Default OFF until opted in — must match learn.js (getDiagramsEnabledFlag,
+  // diagramDiv renderer, and the "Enable Diagrams" info modal), which all
+  // require an explicit '1'. Reading unset as ON here made the switch show
+  // ON while lessons got no diagrams/photos at all.
+  try { return localStorage.getItem(DIAGRAMS_ENABLED_KEY) === '1'; } catch { return false; }
 }
 function setDiagramsEnabled(enabled) {
   try { localStorage.setItem(DIAGRAMS_ENABLED_KEY, enabled ? '1' : '0'); } catch {}
@@ -557,8 +559,6 @@ function renderReviewLessonsToggleSwitch() {
   const enabled = getReviewLessonsToggleEnabled();
   reviewLessonsToggleSwitch?.classList.toggle('on', enabled);
   reviewLessonsToggleSwitch?.setAttribute('aria-checked', String(enabled));
-  const reviewBtn = document.getElementById('homeReviewPageBtn');
-  if (reviewBtn) reviewBtn.style.display = enabled ? '' : 'none';
 }
 renderReviewLessonsToggleSwitch();
 
@@ -1646,7 +1646,6 @@ const homeHeroTitleEl = document.getElementById('homeHeroTitle');
 const homeHeroSubEl = document.getElementById('homeHeroSub');
 const homeHeroProgressTrackEl = document.getElementById('homeHeroProgressTrack');
 const homeHeroProgressFillEl = document.getElementById('homeHeroProgressFill');
-const homeUsageBannerEl = document.getElementById('homeUsageBanner');
 const homeStatsRowEl = document.getElementById('homeStatsRow');
 const homeStatStreakEl = document.getElementById('homeStatStreak');
 const homeStatStreakNumEl = document.getElementById('homeStatStreakNum');
@@ -1664,13 +1663,8 @@ const homeNotifListEl = document.getElementById('homeNotifList');
 const homeGamesSectionEl = document.getElementById('homeGamesSection');
 const homeGamesRowEl = document.getElementById('homeGamesRow');
 const homeEditProfileBtn = document.getElementById('homeEditProfileBtn');
-const homeReviewPageBtn = document.getElementById('homeReviewPageBtn');
 
 homeEditProfileBtn?.addEventListener('click', () => document.querySelector('.nav-btn[data-page="settings"]')?.click());
-// Review Page itself is free to open — the Premium gate lives inside it,
-// on the individual Full Weak Spot Review / Full Personalized Review / Daily
-// Lesson actions (openReviewPage() no-ops if Review Lessons are toggled off).
-homeReviewPageBtn?.addEventListener('click', async () => { await ensureLearnInitialized(); openReviewPage(); });
 homeStatXpEl?.addEventListener('click', () => openXpShop());
 homeXpShopBannerEl?.addEventListener('click', () => openXpShop());
 
@@ -2025,27 +2019,12 @@ function renderHome(data) {
   renderHomeGames();
 }
 
-// ---- Usage banner: free-tier "Games left / Lessons left" (from today's
-// local usage counts), or a "Unlimited unlocked" callout for Premium.
-// Re-run on every premium-status change too, not just on home renders,
-// since purchasing/restoring can flip isPremium() without necessarily
+// ---- Premium styling for the Go Premium card. Re-run on every
+// premium-status change too, not just on home renders, since
+// purchasing/restoring can flip isPremium() without necessarily
 // re-running renderHome() right away. ----
 function renderHomeUsageBanner() {
-  if (!homeUsageBannerEl) return;
-
-  // Lesson/game gating no longer exists — everyone gets unlimited Games &
-  // Lessons, free or Premium, so there's nothing left to count down. Keep
-  // a lightweight banner rather than removing it outright since it's a
-  // nice, cheap "you have everything" reassurance on Home.
-  homeUsageBannerEl.style.display = 'flex';
-  homeUsageBannerEl.className = isPremium() ? 'home-usage-banner c-premium' : 'home-usage-banner c-free';
-  homeUsageBannerEl.innerHTML = `
-    <span class="material-symbols-outlined">bolt</span>
-    <span>Unlimited Games &amp; Lessons!</span>
-  `;
-
   document.getElementById('homeGoPremiumBtn')?.classList.toggle('is-premium-member', isPremium());
-  homeReviewPageBtn?.classList.toggle('is-premium-member', isPremium());
 }
 
 onPremiumChange(() => renderHomeUsageBanner());
