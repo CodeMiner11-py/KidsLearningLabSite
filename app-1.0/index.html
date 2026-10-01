@@ -2109,7 +2109,7 @@
     background: var(--blue-mist); font-family: inherit;
   }
   .unit-card.current { background: var(--cc-pale); box-shadow: inset 0 0 0 1.5px var(--cc); }
-  .unit-card.locked { cursor: not-allowed; opacity: 0.55; }
+  .unit-card.locked { cursor: pointer; opacity: 0.55; }
   .unit-card-icon {
     flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -2143,6 +2143,7 @@
   }
   .lesson-node .material-symbols-outlined { font-size: 28px; color: var(--white); }
   .lesson-node.completed { background: var(--cc); }
+  .lesson-node.skipped { background: var(--cc-light, var(--cc)); }
   .lesson-node.available { background: var(--cc); box-shadow: 0 0 0 6px var(--cc-pale); }
   .lesson-node.locked, .lesson-node.pending { background: var(--border-soft); }
   .lesson-node.locked .material-symbols-outlined,
@@ -2276,6 +2277,43 @@
   .lesson-start-spinner .material-symbols-outlined {
     font-size: 30px; color: var(--blue-main); animation: idkQuizSpin 1s linear infinite;
   }
+
+  /* ---- Skip quiz: hearts + result screens ---- */
+  .skip-hearts { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .skip-heart { width: 26px; height: 26px; object-fit: contain; transition: filter .25s, opacity .25s; }
+  .skip-heart.lost { filter: grayscale(1); opacity: .28; }
+  .skip-heart.just-lost { animation: skipHeartBreak .5s ease; }
+  @keyframes skipHeartBreak {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.35) rotate(-10deg); }
+    60% { transform: scale(.8) rotate(8deg); }
+    100% { transform: scale(1); }
+  }
+  .skip-quiz-loading { display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: var(--ink-soft); font-weight: 600; font-size: 14px; }
+  .skip-quiz-loading .material-symbols-outlined { font-size: 34px; color: var(--cc);
+    animation: idkQuizSpin 1s linear infinite; }
+  .skip-quiz-result { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+  .skip-result-heart { width: 84px; height: 84px; object-fit: contain; }
+  .skip-result-heart.lost { filter: grayscale(1); opacity: .35; }
+  .skip-result-icon { font-size: 46px; color: var(--cc); background: var(--cc-pale);
+    width: 88px; height: 88px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .skip-quiz-result-title { font-size: 20px; font-weight: 800; color: var(--ink); }
+  .skip-quiz-result-sub { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; max-width: 300px; }
+  #skipQuizSecondaryBtn { width: 100%; margin-top: 8px; }
+
+  /* ---- Placement quiz offer card (new courses) ---- */
+  .placement-card { display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    padding: 12px 10px 12px 14px; border-radius: 14px; background: var(--cc-pale);
+    box-shadow: inset 0 0 0 1.5px var(--cc); }
+  .placement-card-icon { font-size: 26px; color: var(--cc); flex-shrink: 0; }
+  .placement-card-body { flex: 1; min-width: 0; }
+  .placement-card-title { font-size: 14px; font-weight: 800; color: var(--ink); }
+  .placement-card-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 1px; }
+  .placement-card-btn { flex-shrink: 0; border: none; border-radius: 999px; padding: 8px 14px;
+    background: var(--cc); color: var(--white); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .placement-card-x { flex-shrink: 0; background: none; border: none; padding: 2px; cursor: pointer; color: var(--ink-soft); }
+  .placement-card-x .material-symbols-outlined { font-size: 20px; }
 
   /* ---- Full-screen lesson view ---- */
   .lesson-view-overlay { background: var(--white); backdrop-filter: none; padding: 0; }
@@ -4342,6 +4380,17 @@ body.dark-mode #kllForceUpdate {
 
         <div id="learnPaneLearn">
         <div id="learnCourseDescription" class="learn-course-description"></div>
+        <div id="placementCard" class="placement-card" style="display:none;">
+          <span class="material-symbols-outlined placement-card-icon">rocket_launch</span>
+          <div class="placement-card-body">
+            <div class="placement-card-title">Already know some of this?</div>
+            <div class="placement-card-sub">Take a quick quiz to skip ahead.</div>
+          </div>
+          <button type="button" id="placementStartBtn" class="placement-card-btn">Take Quiz</button>
+          <button type="button" id="placementDismissBtn" class="placement-card-x" aria-label="Dismiss">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
         <div id="learnUnitsList" class="learn-units-list"></div>
 
         <div id="learnUnitPathView" class="learn-unit-path-view" style="display:none;">
@@ -5156,11 +5205,34 @@ body.dark-mode #kllForceUpdate {
         <span class="material-symbols-outlined">progress_activity</span>
       </div>
       <button class="kll-modal-btn" id="lessonStartRetryBtn" style="display:none;">Try again</button>
+      <button class="kll-modal-btn" id="lessonSkipQuizBtn" style="display:none;">Take Quiz</button>
       <button class="kll-modal-btn" id="lessonStartBtn">
         <span class="lesson-start-btn-fill"></span>
         <span class="lesson-start-btn-label">Start</span>
       </button>
       <button class="kll-modal-btn-secondary" id="lessonStartCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ============ LEARN: SKIP QUIZ (three hearts) ============ -->
+  <div class="kll-modal-overlay lesson-view-overlay" id="skipQuizOverlay">
+    <div class="lesson-view-container" id="skipQuizContainer">
+      <div class="lesson-view-topbar">
+        <button id="skipQuizExitBtn" class="lesson-exit-btn" aria-label="Close quiz">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="lesson-progress-track">
+          <div id="skipQuizProgressFill" class="lesson-progress-fill"></div>
+        </div>
+        <div class="skip-hearts" id="skipQuizHearts" aria-label="Hearts left"></div>
+      </div>
+      <div id="skipQuizTitle" class="lesson-view-title"></div>
+      <div id="skipQuizContent" class="lesson-part-content"></div>
+      <div class="lesson-view-footer">
+        <div id="skipQuizFeedback" class="lesson-feedback"></div>
+        <button id="skipQuizActionBtn" class="lesson-action-btn">Check</button>
+        <button id="skipQuizSecondaryBtn" class="kll-modal-btn-secondary" style="display:none;"></button>
+      </div>
     </div>
   </div>
 
