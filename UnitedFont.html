@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>United Font Downloader</title>
+
+<style>
+@font-face { font-family: "United Thin"; src: url("UnitedOfficialFont/Thin.ttf"); }
+@font-face { font-family: "United UltraLight"; src: url("UnitedOfficialFont/UltraLight.ttf"); }
+@font-face { font-family: "United Light"; src: url("UnitedOfficialFont/Light.ttf"); }
+@font-face { font-family: "United Regular"; src: url("UnitedOfficialFont/Regular.ttf"); }
+@font-face { font-family: "United SemiBold"; src: url("UnitedOfficialFont/SemiBold.ttf"); }
+@font-face { font-family: "United Bold"; src: url("UnitedOfficialFont/Bold.ttf"); }
+@font-face { font-family: "United Black"; src: url("UnitedOfficialFont/Black.ttf"); }
+@font-face { font-family: "United ExtraBlack"; src: url("UnitedOfficialFont/ExtraBlack.ttf"); }
+
+@font-face { font-family: "United CondensedThin"; src: url("UnitedOfficialFont/CondensedThin.ttf"); }
+@font-face { font-family: "United CondensedUltraLight"; src: url("UnitedOfficialFont/CondensedUltraLight.ttf"); }
+@font-face { font-family: "United CondensedLight"; src: url("UnitedOfficialFont/CondensedLight.ttf"); }
+@font-face { font-family: "United CondensedRegular"; src: url("UnitedOfficialFont/CondensedRegular.ttf"); }
+@font-face { font-family: "United CondensedSemiBold"; src: url("UnitedOfficialFont/CondensedSemiBold.ttf"); }
+@font-face { font-family: "United CondensedBold"; src: url("UnitedOfficialFont/CondensedBold.ttf"); }
+@font-face { font-family: "United CondensedBlack"; src: url("UnitedOfficialFont/CondensedBlack.ttf"); }
+@font-face { font-family: "United CondensedExtraBlack"; src: url("UnitedOfficialFont/CondensedExtraBlack.ttf"); }
+
+@font-face { font-family: "United ExtendedThin"; src: url("UnitedOfficialFont/ExtendedThin.ttf"); }
+@font-face { font-family: "United ExtendedUltraLight"; src: url("UnitedOfficialFont/ExtendedUltraLight.ttf"); }
+@font-face { font-family: "United ExtendedLight"; src: url("UnitedOfficialFont/ExtendedLight.ttf"); }
+@font-face { font-family: "United ExtendedRegular"; src: url("UnitedOfficialFont/ExtendedRegular.ttf"); }
+@font-face { font-family: "United ExtendedSemiBold"; src: url("UnitedOfficialFont/ExtendedSemiBold.ttf"); }
+@font-face { font-family: "United ExtendedBold"; src: url("UnitedOfficialFont/ExtendedBold.ttf"); }
+@font-face { font-family: "United ExtendedBlack"; src: url("UnitedOfficialFont/ExtendedBlack.ttf"); }
+@font-face { font-family: "United ExtendedExtraBlack"; src: url("UnitedOfficialFont/ExtendedExtraBlack.ttf"); }
+
+@font-face { font-family: "United TextThin"; src: url("UnitedOfficialFont/TextThin.ttf"); }
+@font-face { font-family: "United TextLight"; src: url("UnitedOfficialFont/TextLight.ttf"); }
+@font-face { font-family: "United TextBold"; src: url("UnitedOfficialFont/TextBold.ttf"); }
+@font-face { font-family: "United TextSemiBold"; src: url("UnitedOfficialFont/TextSemiBold.ttf"); }
+@font-face { font-family: "United TextBlack"; src: url("UnitedOfficialFont/TextBlack.ttf"); }
+@font-face { font-family: "United TextItalic"; src: url("UnitedOfficialFont/TextItalic.ttf"); }
+
+@font-face { font-family: "United TextItalicThin"; src: url("UnitedOfficialFont/TextItalicThin.ttf"); }
+@font-face { font-family: "United TextItalicLight"; src: url("UnitedOfficialFont/TextItalicLight.ttf"); }
+@font-face { font-family: "United TextItalicSemiBold"; src: url("UnitedOfficialFont/TextItalicSemiBold.ttf"); }
+@font-face { font-family: "United TextItalicBold"; src: url("UnitedOfficialFont/TextItalicBold.ttf"); }
+@font-face { font-family: "United TextItalicBlack"; src: url("UnitedOfficialFont/TextItalicBlack.ttf"); }
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: #000;
+  font-family: "Times New Roman", Times, serif;
+}
+
+header {
+  border-bottom: 2px solid #000;
+  padding: 28px 24px;
+}
+
+header h1 {
+  max-width: 1100px;
+  margin: 0 auto;
+  font-size: 38px;
+  font-weight: normal;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 24px 60px;
+}
+
+.controls {
+  border: 1px solid #000;
+  padding: 20px;
+  margin-bottom: 35px;
+}
+
+.controls h2 {
+  margin: 0 0 15px;
+  font-size: 25px;
+  font-weight: normal;
+}
+
+.control-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+select,
+input {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 17px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 9px 10px;
+}
+
+select {
+  min-width: 210px;
+}
+
+input {
+  flex: 1;
+  min-width: 250px;
+}
+
+button {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 17px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 9px 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #fff;
+  color: #000;
+}
+
+.test-box {
+  border-top: 1px solid #000;
+  margin-top: 20px;
+  padding-top: 18px;
+}
+
+#selectedName {
+  font-size: 18px;
+}
+
+#testPreview {
+  margin-top: 10px;
+  font-size: 64px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: normal;
+  border-bottom: 1px solid #000;
+  padding-bottom: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.font-card {
+  border: 1px solid #000;
+  padding: 16px;
+  cursor: pointer;
+  min-height: 130px;
+}
+
+.font-card:hover {
+  background: #f2f2f2;
+}
+
+.font-name {
+  font-size: 16px;
+  margin-bottom: 18px;
+}
+
+.font-preview {
+  font-size: 58px;
+  line-height: 1;
+}
+
+.note {
+  margin-top: 12px;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>United Font Downloader</h1>
+</header>
+
+<main>
+
+<section class="controls">
+  <h2>Test a Font</h2>
+
+  <div class="control-row">
+
+    <select id="fontSelect" onchange="updatePreview()">
+      <option value="Thin">Thin</option>
+      <option value="UltraLight">UltraLight</option>
+      <option value="Light">Light</option>
+      <option value="Regular">Regular</option>
+      <option value="SemiBold">SemiBold</option>
+      <option value="Bold">Bold</option>
+      <option value="Black">Black</option>
+      <option value="ExtraBlack">ExtraBlack</option>
+
+      <option value="CondensedThin">CondensedThin</option>
+      <option value="CondensedUltraLight">CondensedUltraLight</option>
+      <option value="CondensedLight">CondensedLight</option>
+      <option value="CondensedRegular">CondensedRegular</option>
+      <option value="CondensedSemiBold">CondensedSemiBold</option>
+      <option value="CondensedBold">CondensedBold</option>
+      <option value="CondensedBlack">CondensedBlack</option>
+      <option value="CondensedExtraBlack">CondensedExtraBlack</option>
+
+      <option value="ExtendedThin">ExtendedThin</option>
+      <option value="ExtendedUltraLight">ExtendedUltraLight</option>
+      <option value="ExtendedLight">ExtendedLight</option>
+      <option value="ExtendedRegular">ExtendedRegular</option>
+      <option value="ExtendedSemiBold">ExtendedSemiBold</option>
+      <option value="ExtendedBold">ExtendedBold</option>
+      <option value="ExtendedBlack">ExtendedBlack</option>
+      <option value="ExtendedExtraBlack">ExtendedExtraBlack</option>
+
+      <option value="TextThin">TextThin</option>
+      <option value="TextLight">TextLight</option>
+      <option value="TextBold">TextBold</option>
+      <option value="TextSemiBold">TextSemiBold</option>
+      <option value="TextBlack">TextBlack</option>
+      <option value="TextItalic">TextItalic</option>
+
+      <option value="TextItalicThin">TextItalicThin</option>
+      <option value="TextItalicLight">TextItalicLight</option>
+      <option value="TextItalicSemiBold">TextItalicSemiBold</option>
+      <option value="TextItalicBold">TextItalicBold</option>
+      <option value="TextItalicBlack">TextItalicBlack</option>
+    </select>
+
+    <input
+      id="testText"
+      type="text"
+      value="Aa The quick brown fox jumps over the lazy dog"
+      oninput="updatePreview()"
+    >
+
+    <button onclick="downloadAll()">Download All Fonts</button>
+
+  </div>
+
+  <div class="test-box">
+    <div id="selectedName">Regular</div>
+
+    <div id="testPreview" style="font-family:'United Regular';">
+      Aa The quick brown fox jumps over the lazy dog
+    </div>
+
+    <div class="note">
+      Click any font below to select it.
+    </div>
+  </div>
+</section>
+
+<h2>All Fonts</h2>
+
+<div class="grid">
+
+  <div class="font-card" onclick="selectFont('Thin')">
+    <div class="font-name">Thin</div>
+    <div class="font-preview" style="font-family:'United Thin'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('UltraLight')">
+    <div class="font-name">UltraLight</div>
+    <div class="font-preview" style="font-family:'United UltraLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('Light')">
+    <div class="font-name">Light</div>
+    <div class="font-preview" style="font-family:'United Light'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('Regular')">
+    <div class="font-name">Regular</div>
+    <div class="font-preview" style="font-family:'United Regular'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('SemiBold')">
+    <div class="font-name">SemiBold</div>
+    <div class="font-preview" style="font-family:'United SemiBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('Bold')">
+    <div class="font-name">Bold</div>
+    <div class="font-preview" style="font-family:'United Bold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('Black')">
+    <div class="font-name">Black</div>
+    <div class="font-preview" style="font-family:'United Black'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtraBlack')">
+    <div class="font-name">ExtraBlack</div>
+    <div class="font-preview" style="font-family:'United ExtraBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedThin')">
+    <div class="font-name">CondensedThin</div>
+    <div class="font-preview" style="font-family:'United CondensedThin'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedUltraLight')">
+    <div class="font-name">CondensedUltraLight</div>
+    <div class="font-preview" style="font-family:'United CondensedUltraLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedLight')">
+    <div class="font-name">CondensedLight</div>
+    <div class="font-preview" style="font-family:'United CondensedLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedRegular')">
+    <div class="font-name">CondensedRegular</div>
+    <div class="font-preview" style="font-family:'United CondensedRegular'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedSemiBold')">
+    <div class="font-name">CondensedSemiBold</div>
+    <div class="font-preview" style="font-family:'United CondensedSemiBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedBold')">
+    <div class="font-name">CondensedBold</div>
+    <div class="font-preview" style="font-family:'United CondensedBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedBlack')">
+    <div class="font-name">CondensedBlack</div>
+    <div class="font-preview" style="font-family:'United CondensedBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('CondensedExtraBlack')">
+    <div class="font-name">CondensedExtraBlack</div>
+    <div class="font-preview" style="font-family:'United CondensedExtraBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedThin')">
+    <div class="font-name">ExtendedThin</div>
+    <div class="font-preview" style="font-family:'United ExtendedThin'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedUltraLight')">
+    <div class="font-name">ExtendedUltraLight</div>
+    <div class="font-preview" style="font-family:'United ExtendedUltraLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedLight')">
+    <div class="font-name">ExtendedLight</div>
+    <div class="font-preview" style="font-family:'United ExtendedLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedRegular')">
+    <div class="font-name">ExtendedRegular</div>
+    <div class="font-preview" style="font-family:'United ExtendedRegular'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedSemiBold')">
+    <div class="font-name">ExtendedSemiBold</div>
+    <div class="font-preview" style="font-family:'United ExtendedSemiBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedBold')">
+    <div class="font-name">ExtendedBold</div>
+    <div class="font-preview" style="font-family:'United ExtendedBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedBlack')">
+    <div class="font-name">ExtendedBlack</div>
+    <div class="font-preview" style="font-family:'United ExtendedBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('ExtendedExtraBlack')">
+    <div class="font-name">ExtendedExtraBlack</div>
+    <div class="font-preview" style="font-family:'United ExtendedExtraBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextThin')">
+    <div class="font-name">TextThin</div>
+    <div class="font-preview" style="font-family:'United TextThin'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextLight')">
+    <div class="font-name">TextLight</div>
+    <div class="font-preview" style="font-family:'United TextLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextBold')">
+    <div class="font-name">TextBold</div>
+    <div class="font-preview" style="font-family:'United TextBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextSemiBold')">
+    <div class="font-name">TextSemiBold</div>
+    <div class="font-preview" style="font-family:'United TextSemiBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextBlack')">
+    <div class="font-name">TextBlack</div>
+    <div class="font-preview" style="font-family:'United TextBlack'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalic')">
+    <div class="font-name">TextItalic</div>
+    <div class="font-preview" style="font-family:'United TextItalic'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalicThin')">
+    <div class="font-name">TextItalicThin</div>
+    <div class="font-preview" style="font-family:'United TextItalicThin'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalicLight')">
+    <div class="font-name">TextItalicLight</div>
+    <div class="font-preview" style="font-family:'United TextItalicLight'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalicSemiBold')">
+    <div class="font-name">TextItalicSemiBold</div>
+    <div class="font-preview" style="font-family:'United TextItalicSemiBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalicBold')">
+    <div class="font-name">TextItalicBold</div>
+    <div class="font-preview" style="font-family:'United TextItalicBold'">Aa</div>
+  </div>
+
+  <div class="font-card" onclick="selectFont('TextItalicBlack')">
+    <div class="font-name">TextItalicBlack</div>
+    <div class="font-preview" style="font-family:'United TextItalicBlack'">Aa</div>
+  </div>
+
+</div>
+
+</main>
+
+<script>
+function updatePreview() {
+  var name = document.getElementById("fontSelect").value;
+  var text = document.getElementById("testText").value || "Aa";
+
+  document.getElementById("selectedName").textContent = name;
+  document.getElementById("testPreview").style.fontFamily =
+    "'United " + name + "'";
+  document.getElementById("testPreview").textContent = text;
+}
+
+function selectFont(name) {
+  document.getElementById("fontSelect").value = name;
+  updatePreview();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+async function downloadAll() {
+  var fonts = [
+    "Thin", "UltraLight", "Light", "Regular", "SemiBold", "Bold",
+    "Black", "ExtraBlack",
+    "CondensedThin", "CondensedUltraLight", "CondensedLight",
+    "CondensedRegular", "CondensedSemiBold", "CondensedBold",
+    "CondensedBlack", "CondensedExtraBlack",
+    "ExtendedThin", "ExtendedUltraLight", "ExtendedLight",
+    "ExtendedRegular", "ExtendedSemiBold", "ExtendedBold",
+    "ExtendedBlack", "ExtendedExtraBlack",
+    "TextThin", "TextLight", "TextBold", "TextSemiBold",
+    "TextBlack", "TextItalic",
+    "TextItalicThin", "TextItalicLight", "TextItalicSemiBold",
+    "TextItalicBold", "TextItalicBlack"
+  ];
+
+  var button = document.querySelector(".control-row button");
+
+  button.disabled = true;
+  button.textContent = "Downloading...";
+
+  for (var i = 0; i < fonts.length; i++) {
+    var link = document.createElement("a");
+
+    link.href = "UnitedOfficialFont/" + fonts[i] + ".ttf";
+    link.download = fonts[i] + ".ttf";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 150);
+    });
+  }
+
+  button.disabled = false;
+  button.textContent = "Download All Fonts";
+}
+
+updatePreview();
+</script>
+
+</body>
+</html>
