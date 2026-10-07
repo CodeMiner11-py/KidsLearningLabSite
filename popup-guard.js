@@ -31,7 +31,7 @@
         "width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);";
   
       var img = document.createElement("img");
-      img.src = "https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png";
+      img.src = "https://kidslearninglab.com/logo.png";
       img.alt = "Logo";
       img.style.cssText = "width:64px;height:64px;border-radius:16px;margin-bottom:12px;";
   

@@ -50,7 +50,7 @@ function generateCode() {
 async function sendOnboardingVerificationEmail(email, code) {
   const html = `
     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:40px 32px;background:#F5FAFF;border-radius:18px;border:1.5px solid #DCE7F5">
-      <img src="https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png" style="width:48px;height:48px;border-radius:14px;display:block;margin:0 auto 20px">
+      <img src="https://kidslearninglab.com/logo.png" style="width:48px;height:48px;border-radius:14px;display:block;margin:0 auto 20px">
       <h2 style="text-align:center;color:#14213D;margin-bottom:8px">Verify your email</h2>
       <p style="text-align:center;color:#5B6B85;font-size:14px;line-height:1.6;margin-bottom:28px">Enter this code in Kids Learning Lab to finish creating your account. It expires in 10 minutes.</p>
       <div style="background:#fff;border:1.5px solid #DCE7F5;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px">

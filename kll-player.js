@@ -28,7 +28,7 @@
   'use strict';
 
   const RSS_URL      = 'https://anchor.fm/s/d1b8e6fc/podcast/rss';
-  const FALLBACK_ART = 'https://kidslearninglab.com/wp-content/uploads/2025/02/podcast-logo-app-rounded.png';
+  const FALLBACK_ART = 'https://kidslearninglab.com/logo.png';
   const CACHE_KEY     = 'kllEpisodeCache_v1';
   const CACHE_TTL_MS  = 5 * 60 * 60 * 1000; // 5 hours
 
