@@ -76,6 +76,10 @@
           title: 'Account',
           src: 'https://news.kidslearninglab.com/login',
           openInNewPageUrl: 'https://news.kidslearninglab.com/login',
+          footerLinks: [
+            { label: 'Forgot password?', src: 'https://news.kidslearninglab.com/reset_password' },
+            { label: "Don't have an account?", src: 'https://news.kidslearninglab.com/subscribe' },
+          ],
         });
       });
     }
@@ -99,4 +103,3 @@
     init();
   }
 })();
-

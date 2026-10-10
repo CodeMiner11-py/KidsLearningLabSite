@@ -36,14 +36,40 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
   }
 
-  // opts: { title, src, openInNewPageUrl (optional) }
+  // opts: {
+  //   title,
+  //   src,
+  //   openInNewPageUrl (optional) — renders an "Open in new page" button,
+  //   footerLinks (optional) — [{ label, src }]. Each renders as a text link
+  //     below the button; clicking it loads `src` inside this modal's iframe.
+  // }
   function open(opts) {
     ensureMarkup();
     titleEl.textContent = opts.title || '';
     iframeEl.src = opts.src;
-    footerEl.innerHTML = opts.openInNewPageUrl
-      ? `<a class="cta-button" href="${opts.openInNewPageUrl}" target="_blank" rel="noopener">Open in new page</a>`
-      : '';
+
+    let html = '';
+    if (opts.openInNewPageUrl) {
+      html += `<a class="cta-button" href="${opts.openInNewPageUrl}" target="_blank" rel="noopener">Open in new page</a>`;
+    }
+    if (opts.footerLinks && opts.footerLinks.length) {
+      html += '<div class="kll-iframe-modal-links" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px;">';
+      opts.footerLinks.forEach((l, i) => {
+        html += `<a href="${l.src}" data-link-idx="${i}" style="font-size:14px;color:inherit;text-decoration:underline;cursor:pointer;">${l.label}</a>`;
+      });
+      html += '</div>';
+    }
+    footerEl.innerHTML = html;
+
+    if (opts.footerLinks && opts.footerLinks.length) {
+      footerEl.querySelectorAll('[data-link-idx]').forEach((a) => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          iframeEl.src = opts.footerLinks[Number(a.dataset.linkIdx)].src;
+        });
+      });
+    }
+
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
