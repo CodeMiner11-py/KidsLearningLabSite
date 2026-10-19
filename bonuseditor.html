@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Learning Lab Audio Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.1/wavesurfer.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    :root {
+      --bg-primary: #000000;
+      --bg-secondary: #0a0a0a;
+      --bg-tertiary: #1a1a1a;
+      --bg-hover: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --text-tertiary: #666666;
+      --border: #2a2a2a;
+      --border-light: #3a3a3a;
+      --accent: #10a37f;
+      --accent-hover: #0d8c6f;
+      --danger: #ef4444;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 0;
+      margin: 0;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 16px 24px;
+    }
+
+    .navbar-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 3.4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.02;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .step {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step:last-child {
+      border-bottom: none;
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .step-content {
+      display: none;
+    }
+
+    .step-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    input[type="file"],
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      transition: all 0.15s ease;
+    }
+
+    input[type="file"]:hover,
+    input[type="text"]:hover,
+    select:hover,
+    textarea:hover {
+      border-color: var(--border-light);
+    }
+
+    input[type="file"]:focus,
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-tertiary);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: scale(1.02);
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+    }
+
+    button.secondary:hover:not(:disabled) {
+      border-color: var(--border-light);
+      background: var(--bg-hover);
+    }
+
+    button:disabled {
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .file-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 12px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .file-info.show {
+      display: block;
+    }
+
+    .file-info.success {
+      background: rgba(16, 163, 127, 0.1);
+      color: var(--accent);
+      border-color: rgba(16, 163, 127, 0.2);
+    }
+
+    .date-filter {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .date-filter button {
+      flex: 1;
+      padding: 10px 14px;
+    }
+
+    .date-filter button.active {
+      background: var(--accent);
+    }
+
+    .date-filter button.active:hover {
+      background: var(--accent-hover);
+    }
+
+    .episode-list {
+      max-height: 600px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: var(--bg-secondary);
+    }
+
+    .episode-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .episode-item:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .episode-item.selected {
+      background: rgba(16, 163, 127, 0.15);
+      color: var(--accent);
+      font-weight: 500;
+      border-left: 3px solid var(--accent);
+      padding-left: 11px;
+    }
+
+    .episode-item:last-child {
+      border-bottom: none;
+    }
+
+    .script-display {
+      background: var(--bg-tertiary);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      max-height: 400px;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: none;
+      font-family: 'Courier New', monospace;
+    }
+
+    .script-display.show {
+      display: block;
+    }
+
+    .sfx-link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(16, 163, 127, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .sfx-link:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .sfx-container {
+      background: rgba(16, 163, 127, 0.08);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+      border-left: 3px solid var(--accent);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .sfx-container p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .sfx-container p:last-child {
+      margin-bottom: 0;
+    }
+
+    .progress {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .progress.show {
+      display: block;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.processing {
+      color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .slider-group label {
+      margin-bottom: 0;
+      min-width: 140px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 5px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 2.5px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.15);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 6px rgba(16, 163, 127, 0.2);
+    }
+
+    .slider-value {
+      min-width: 50px;
+      text-align: right;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .recording-time {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .recording-time.show {
+      display: block;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      display: none;
+      border: 1px solid;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ff6b6b;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .alert.success {
+      background: rgba(16, 163, 127, 0.1);
+      color: var(--accent);
+      border-color: rgba(16, 163, 127, 0.2);
+    }
+
+    #parseStatus {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    #parseStatus.show {
+      display: block;
+    }
+
+    #parseStatus.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    #parseStatus.success {
+      background: rgba(16, 163, 127, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border-light);
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="logo">Kids Learning Lab Audio Editor</div>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Create bonus episodes</h1>
+  <p class="subtitle">Record, mix, and generate MP3 audio files with ease</p>
+
+  <!-- STEP 0: Paste Episode Document -->
+  <div class="step">
+    <div class="step-title">0. Paste episode document</div>
+    <div class="step-content active" id="step0">
+      <label for="docPaste">Paste the Kids Learning Lab bonus episodes document:</label>
+      <textarea id="docPaste" placeholder="Paste the entire document here..."></textarea>
+      <button onclick="parseDocument()">Parse episodes</button>
+      <div id="parseStatus"></div>
+    </div>
+  </div>
+
+  <!-- STEP A: Upload Intro/Outro -->
+  <div class="step">
+    <div class="step-title">A. Upload intro and outro</div>
+    <div class="step-content" id="stepA">
+      <label for="introFile">Intro.mp3</label>
+      <input type="file" id="introFile" accept="audio/*">
+      <div class="file-info" id="introInfo"></div>
+
+      <label for="outroFile">Outro.mp3</label>
+      <input type="file" id="outroFile" accept="audio/*">
+      <div class="file-info" id="outroInfo"></div>
+
+      <button onclick="checkFilesReady()">Next step</button>
+    </div>
+  </div>
+
+  <!-- STEP B: Select episode and record voice -->
+  <div class="step">
+    <div class="step-title">B. Select episode and record voice</div>
+    <div class="step-content" id="stepB">
+      <label>Select episode by date:</label>
+      <div class="date-filter">
+        <button class="secondary active" id="todayBtn" onclick="filterByDate('today')">Today's date</button>
+        <button class="secondary" id="tomorrowBtn" onclick="filterByDate('tomorrow')">Tomorrow's date</button>
+      </div>
+      <div class="episode-list" id="episodeList"></div>
+
+      <div class="script-display" id="scriptDisplay"></div>
+
+      <label>Record your voice:</label>
+      <div class="controls">
+        <button id="recordBtn" onclick="toggleRecording()">Start recording</button>
+        <button id="playBtn" onclick="playRecording()" class="secondary" disabled>Play</button>
+        <button id="discardBtn" onclick="discardRecording()" class="secondary" disabled>Discard</button>
+      </div>
+      <div class="file-info" id="recordingInfo"></div>
+      <div class="recording-time" id="recordingTime"></div>
+
+      <button onclick="goToStep('C')" disabled id="nextStepBBtn">Next step</button>
+    </div>
+  </div>
+
+  <!-- STEP C: Add sound effect -->
+  <div class="step">
+    <div class="step-title">C. Add sound effect</div>
+    <div class="step-content" id="stepC">
+      <div class="sfx-container">
+        <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">SFX link from script</p>
+        <p id="sfxLink" style="font-size: 14px; margin: 0;"></p>
+      </div>
+
+      <label for="sfxFile">Upload sound effect:</label>
+      <input type="file" id="sfxFile" accept="audio/*">
+      <div class="file-info" id="sfxInfo"></div>
+
+      <label>Sound effect volume</label>
+      <div class="slider-group">
+        <input type="range" id="sfxVolume" min="-24" max="6" value="0" step="1">
+        <span class="slider-value"><span id="sfxVolValue">0</span> dB</span>
+      </div>
+
+      <label>Your voice volume</label>
+      <div class="slider-group">
+        <input type="range" id="voiceVolume" min="-24" max="6" value="0" step="1">
+        <span class="slider-value"><span id="voiceVolValue">0</span> dB</span>
+      </div>
+
+      <button onclick="goToStep('D')" disabled id="nextStepCBtn">Next step</button>
+    </div>
+  </div>
+
+  <!-- STEP D: Generate and download -->
+  <div class="step">
+    <div class="step-title">D. Generate audio file</div>
+    <div class="step-content" id="stepD">
+      <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">Review your settings and generate the final MP3 file. The audio will combine: intro + (voice + looping SFX) + outro with proper timing and fade-outs.</p>
+
+      <div id="generateStatus">
+        <div class="status processing show">Generating audio...</div>
+        <div class="progress show">
+          <div class="progress-bar" id="genProgress"></div>
+        </div>
+      </div>
+
+      <button onclick="generateAudio()" id="generateBtn">Generate audio</button>
+      <button onclick="downloadAudio()" id="downloadBtn" style="display:none; margin-top: 16px;">Download episode</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let episodes = [];
+
+let introFile = null, outroFile = null, voiceBlob = null, sfxFile = null;
+let mediaRecorder = null, audioChunks = [], recordingStartTime = 0;
+let selectedEpisode = null;
+let generatedAudioBuffer = null;
+
+document.getElementById('introFile').addEventListener('change', (e) => {
+  introFile = e.target.files[0];
+  const info = document.getElementById('introInfo');
+  info.classList.remove('show', 'success');
+  if (introFile) {
+    info.textContent = `✓ ${introFile.name}`;
+    info.classList.add('show', 'success');
+  }
+});
+
+document.getElementById('outroFile').addEventListener('change', (e) => {
+  outroFile = e.target.files[0];
+  const info = document.getElementById('outroInfo');
+  info.classList.remove('show', 'success');
+  if (outroFile) {
+    info.textContent = `✓ ${outroFile.name}`;
+    info.classList.add('show', 'success');
+  }
+});
+
+document.getElementById('sfxFile').addEventListener('change', (e) => {
+  sfxFile = e.target.files[0];
+  const info = document.getElementById('sfxInfo');
+  info.classList.remove('show', 'success');
+  if (sfxFile) {
+    info.textContent = `✓ ${sfxFile.name}`;
+    info.classList.add('show', 'success');
+    document.getElementById('nextStepCBtn').disabled = false;
+  }
+});
+
+document.getElementById('sfxVolume').addEventListener('input', (e) => {
+  document.getElementById('sfxVolValue').textContent = e.target.value;
+});
+
+document.getElementById('voiceVolume').addEventListener('input', (e) => {
+  document.getElementById('voiceVolValue').textContent = e.target.value;
+});
+
+// Matches a date line like "Wed Aug 26" or "Sun Oct 5" (day name + month + day number, no year)
+const DATE_RE_SRC = '(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\w*\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\w*\\s+(\\d{1,2})';
+
+function parseDocument() {
+  const raw = document.getElementById('docPaste').value;
+  if (!raw.trim()) {
+    showAlert('Please paste the episode document', 'error');
+    return;
+  }
+
+  episodes = [];
+
+  // Split the whole document on "Bonus episode NNNNN" markers. This is the one
+  // element that stays well-formed throughout the document, even in stretches
+  // where the line breaks between fields have collapsed onto a single line.
+  const parts = raw.split(/Bonus episode\s+0*(\d+)/);
+  // parts = [preamble, num1, chunk1, num2, chunk2, ...]
+  // chunk_i holds this episode's Script/Description/Attribution, followed by
+  // the NEXT episode's date+title (unconsumed text up to the next marker).
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const num = parts[i];
+    const chunk = parts[i + 1] || '';
+    const priorText = i === 1 ? parts[0] : parts[i - 1];
+
+    // Date + title live at the end of the text just before this episode's marker.
+    const dateTitleRe = new RegExp(DATE_RE_SRC + '\\s*[\u201c"](.*?)[\u201d"]\\s*$', 's');
+    const dm = priorText.match(dateTitleRe);
+    if (!dm) continue; // malformed episode block; skip rather than corrupt the list
+    const mon = dm[2], day = dm[3];
+    const title = dm[4].trim();
+
+    // Script: tolerate a missing/mismatched closing quote by stopping at the
+    // next "Description:" label instead of requiring a literal closing quote.
+    const scriptRe = /Script:\s*[\u201c"]?\s*([\s\S]*?)\s*[\u201d"]?\s*Description:/;
+    const sm = chunk.match(scriptRe);
+    if (!sm) continue;
+    let script = sm[1].replace(/\s+/g, ' ').trim();
+    // Strip any stray leftover curly quote from a malformed close in the source doc
+    script = script.replace(/[\u201c\u201d"]\s*$/, '').trim();
+
+    // Description: everything after "Description:" up to the next date line or
+    // end of chunk, again tolerating a missing closing quote.
+    const rest = chunk.slice(sm.index + sm[0].length);
+    const descRe = new RegExp('^\\s*[\u201c"]?\\s*([\\s\\S]*?)\\s*(?:[\u201d"]\\s*(?:' + DATE_RE_SRC + ')?|(?:' + DATE_RE_SRC + ')|$)');
+    const descM = rest.match(descRe);
+    const descBlock = (descM ? descM[1] : rest).trim();
+
+    let sfxUrl = '';
+    const am = descBlock.match(/Attribution:?\s*(https?:\/\/\S+)/);
+    if (am) sfxUrl = am[1].replace(/[.,]+$/, '');
+
+    episodes.push({
+      date: `${mon} ${day}`,
+      number: num,
+      title,
+      script,
+      sfxUrl
+    });
+  }
+
+  const status = document.getElementById('parseStatus');
+  status.classList.remove('show', 'success', 'error');
+
+  if (episodes.length > 0) {
+    status.classList.add('show', 'success');
+    status.textContent = `✓ Parsed ${episodes.length} episodes`;
+    document.getElementById('docPaste').disabled = true;
+    setTimeout(() => {
+      goToStep('A');
+    }, 800);
+  } else {
+    status.classList.add('show', 'error');
+    status.textContent = 'Could not parse episodes. Check format.';
+  }
+}
+
+function checkFilesReady() {
+  if (!introFile || !outroFile) {
+    showAlert('Please upload both intro and outro files', 'error');
+    return;
+  }
+  renderEpisodes();
+  goToStep('B');
+}
+
+function getEpisodeDate(dateStr) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const parts = dateStr.split(' ');
+  const month = parts[0];
+  const date = parts[1];
+  const monthIdx = months.indexOf(month);
+  // The schedule runs across a year boundary (e.g. Aug 2026 -> Mar 2027).
+  // Anchor "today" to figure out which side of the boundary each month falls on:
+  // treat months from the current month onward as this year, and anything that
+  // would otherwise be "in the past" by more than ~6 months as next year.
+  const now = new Date();
+  let year = now.getFullYear();
+  const monthDiff = monthIdx - now.getMonth();
+  if (monthDiff < -6) year += 1;
+  else if (monthDiff > 6) year -= 1;
+  return new Date(year, monthIdx, parseInt(date));
+}
+
+function renderEpisodes(filter = 'today') {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  let filtered = episodes;
+
+  if (filter === 'today') {
+    filtered = episodes.filter(ep => {
+      const epDate = getEpisodeDate(ep.date);
+      return epDate.toDateString() === today.toDateString();
+    });
+  } else if (filter === 'tomorrow') {
+    filtered = episodes.filter(ep => {
+      const epDate = getEpisodeDate(ep.date);
+      return epDate.toDateString() === tomorrow.toDateString();
+    });
+  }
+
+  const list = document.getElementById('episodeList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="episode-item" style="color: var(--text-tertiary); pointer-events: none;">No episodes for this date</div>`;
+  } else {
+    list.innerHTML = filtered.map((ep) => {
+      const origIdx = episodes.indexOf(ep);
+      return `<div class="episode-item" onclick="selectEpisode(${origIdx})">${ep.date} • ${ep.title}</div>`;
+    }).join('');
+  }
+}
+
+function filterByDate(filter) {
+  document.getElementById('todayBtn').classList.toggle('active', filter === 'today');
+  document.getElementById('tomorrowBtn').classList.toggle('active', filter === 'tomorrow');
+  renderEpisodes(filter);
+}
+
+function selectEpisode(index) {
+  selectedEpisode = episodes[index];
+  document.querySelectorAll('.episode-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === index);
+  });
+  const scriptDisplay = document.getElementById('scriptDisplay');
+  scriptDisplay.textContent = selectedEpisode.script;
+  scriptDisplay.classList.add('show');
+  const sfxLink = document.getElementById('sfxLink');
+  sfxLink.innerHTML = `<a href="${selectedEpisode.sfxUrl}" target="_blank" class="sfx-link">${selectedEpisode.sfxUrl}</a>`;
+  document.getElementById('nextStepBBtn').disabled = !voiceBlob;
+}
+
+async function toggleRecording() {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    recordingStartTime = Date.now();
+
+    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      voiceBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const info = document.getElementById('recordingInfo');
+      info.textContent = `✓ Recording saved (${(voiceBlob.size / 1024 / 1024).toFixed(2)} MB)`;
+      info.classList.add('show', 'success');
+      document.getElementById('nextStepBBtn').disabled = false;
+    };
+
+    mediaRecorder.start();
+    document.getElementById('recordBtn').textContent = 'Stop recording';
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('discardBtn').disabled = false;
+    updateRecordingTime();
+    const interval = setInterval(() => {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') clearInterval(interval);
+      else updateRecordingTime();
+    }, 100);
+  } else {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    document.getElementById('recordBtn').textContent = 'Start recording';
+    document.getElementById('playBtn').disabled = false;
+  }
+}
+
+function updateRecordingTime() {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+  const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  const time = document.getElementById('recordingTime');
+  time.textContent = `Recording: ${m}:${s.toString().padStart(2, '0')}`;
+  time.classList.add('show');
+}
+
+function playRecording() {
+  if (!voiceBlob) return;
+  const audio = new Audio(URL.createObjectURL(voiceBlob));
+  audio.play();
+}
+
+function discardRecording() {
+  voiceBlob = null;
+  audioChunks = [];
+  document.getElementById('recordingInfo').classList.remove('show', 'success');
+  document.getElementById('recordingTime').classList.remove('show');
+  document.getElementById('recordBtn').textContent = 'Start recording';
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('discardBtn').disabled = true;
+  document.getElementById('nextStepBBtn').disabled = true;
+}
+
+function goToStep(step) {
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('step' + step).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function generateAudio() {
+  if (!voiceBlob || !sfxFile) {
+    showAlert('Missing voice recording or sound effect', 'error');
+    return;
+  }
+
+  document.getElementById('generateStatus').style.display = 'block';
+  document.getElementById('generateBtn').disabled = true;
+
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const [introBuf, outroBuf, voiceBuf, sfxBuf] = await Promise.all([
+      arrayBufferToAudioBuffer(await introFile.arrayBuffer(), audioContext),
+      arrayBufferToAudioBuffer(await outroFile.arrayBuffer(), audioContext),
+      blobToAudioBuffer(voiceBlob, audioContext),
+      arrayBufferToAudioBuffer(await sfxFile.arrayBuffer(), audioContext)
+    ]);
+
+    const voiceGain = dbToGain(parseFloat(document.getElementById('voiceVolume').value));
+    const sfxGain = dbToGain(parseFloat(document.getElementById('sfxVolume').value));
+
+    const voiceDuration = voiceBuf.duration;
+    const sfxStopTime = voiceDuration - 10;
+    const fadeOutDuration = 3;
+
+    const totalDuration = introBuf.duration + voiceDuration + outroBuf.duration;
+    const offlineContext = new OfflineAudioContext(2, audioContext.sampleRate * totalDuration, audioContext.sampleRate);
+
+    let currentTime = 0;
+
+    // Intro
+    const introSource = offlineContext.createBufferSource();
+    introSource.buffer = introBuf;
+    introSource.connect(offlineContext.destination);
+    introSource.start(currentTime);
+    currentTime += introBuf.duration;
+
+    // Voice + SFX
+    const voiceSource = offlineContext.createBufferSource();
+    voiceSource.buffer = voiceBuf;
+    const voiceGainNode = offlineContext.createGain();
+    voiceGainNode.gain.value = voiceGain;
+    voiceSource.connect(voiceGainNode);
+    voiceGainNode.connect(offlineContext.destination);
+    voiceSource.start(currentTime);
+
+    const sfxSource = offlineContext.createBufferSource();
+    sfxSource.buffer = sfxBuf;
+    const sfxGainNode = offlineContext.createGain();
+    sfxGainNode.gain.value = sfxGain;
+    sfxSource.connect(sfxGainNode);
+    sfxGainNode.connect(offlineContext.destination);
+    sfxSource.start(currentTime);
+    sfxSource.stop(currentTime + sfxStopTime);
+    sfxGainNode.gain.setValueAtTime(sfxGain, currentTime + sfxStopTime);
+    sfxGainNode.gain.linearRampToValueAtTime(0, currentTime + sfxStopTime + fadeOutDuration);
+
+    const voiceEndTime = currentTime + voiceDuration;
+
+    // Outro (starts 10s before voice ends)
+    const outroSource = offlineContext.createBufferSource();
+    outroSource.buffer = outroBuf;
+    outroSource.connect(offlineContext.destination);
+    outroSource.start(voiceEndTime - 10);
+
+    generatedAudioBuffer = await offlineContext.startRendering();
+
+    document.getElementById('generateStatus').style.display = 'none';
+    document.getElementById('downloadBtn').style.display = 'block';
+    document.getElementById('generateBtn').disabled = false;
+    showAlert('Audio generated successfully!', 'success');
+  } catch (err) {
+    showAlert('Error generating audio: ' + err.message, 'error');
+    document.getElementById('generateBtn').disabled = false;
+  }
+}
+
+function downloadAudio() {
+  if (!generatedAudioBuffer) return;
+
+  const wav = encodeWAV(generatedAudioBuffer);
+  const blob = new Blob([wav], { type: 'audio/wav' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `KLL_Bonus_${selectedEpisode.number}.wav`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function arrayBufferToAudioBuffer(arrayBuffer, audioContext) {
+  return audioContext.decodeAudioData(arrayBuffer);
+}
+
+async function blobToAudioBuffer(blob, audioContext) {
+  return arrayBufferToAudioBuffer(await blob.arrayBuffer(), audioContext);
+}
+
+function dbToGain(db) {
+  return Math.pow(10, db / 20);
+}
+
+function encodeWAV(audioBuffer) {
+  const numChannels = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
+  const format = 1;
+  const bitDepth = 16;
+
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numChannels * bytesPerSample;
+
+  const channelData = [];
+  for (let i = 0; i < numChannels; i++) {
+    channelData.push(audioBuffer.getChannelData(i));
+  }
+
+  const dataLength = audioBuffer.length * numChannels * bytesPerSample;
+  const buffer = new ArrayBuffer(44 + dataLength);
+  const view = new DataView(buffer);
+
+  const writeString = (offset, string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataLength, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(36, 'data');
+  view.setUint32(40, dataLength, true);
+
+  let offset = 44;
+  for (let i = 0; i < audioBuffer.length; i++) {
+    for (let channel = 0; channel < numChannels; channel++) {
+      const sample = Math.max(-1, Math.min(1, channelData[channel][i]));
+      const int16 = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, int16, true);
+      offset += 2;
+    }
+  }
+
+  return buffer;
+}
+
+function showAlert(message, type) {
+  const alert = document.createElement('div');
+  alert.className = `alert ${type} show`;
+  alert.textContent = message;
+  document.querySelector('.container').insertBefore(alert, document.querySelector('.step'));
+  setTimeout(() => alert.remove(), 5000);
+}
+</script>
+
+</body>
+</html>
