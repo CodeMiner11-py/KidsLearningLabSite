@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kids Learning Lab Audio Editor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.1/wavesurfer.min.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.1/wavesurfer.min.js"></script><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
   <style>
     * {
       margin: 0;
@@ -520,7 +518,18 @@
       background: var(--border-light);
     }
   </style>
-</head>
+<style type="text/css" id="ctre_styles">
+			#ctre_wnd {
+				position: fixed; bottom: 0; right: 10px;
+				background: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);
+				border-radius: 3px 3px 0 0;
+				z-index: 2147483647;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				#ctre_wnd { background: #000; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
+			}
+			</style></head>
 <body>
 
 <nav class="navbar">
@@ -576,13 +585,13 @@
       <label>Record your voice:</label>
       <div class="controls">
         <button id="recordBtn" onclick="toggleRecording()">Start recording</button>
-        <button id="playBtn" onclick="playRecording()" class="secondary" disabled>Play</button>
-        <button id="discardBtn" onclick="discardRecording()" class="secondary" disabled>Discard</button>
+        <button id="playBtn" onclick="playRecording()" class="secondary" disabled="">Play</button>
+        <button id="discardBtn" onclick="discardRecording()" class="secondary" disabled="">Discard</button>
       </div>
       <div class="file-info" id="recordingInfo"></div>
       <div class="recording-time" id="recordingTime"></div>
 
-      <button onclick="goToStep('C')" disabled id="nextStepBBtn">Next step</button>
+      <button onclick="goToStep('C')" disabled="" id="nextStepBBtn">Next step</button>
     </div>
   </div>
 
@@ -611,7 +620,12 @@
         <span class="slider-value"><span id="voiceVolValue">0</span> dB</span>
       </div>
 
-      <button onclick="goToStep('D')" disabled id="nextStepCBtn">Next step</button>
+      <div class="controls">
+        <button class="secondary" id="previewBtn" onclick="togglePreview()">Preview mix</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Plays your voice and the sound effect together. Move the sliders while it plays to hear changes live.</p>
+
+      <button onclick="stopPreview(); goToStep('D')" disabled="" id="nextStepCBtn">Next step</button>
     </div>
   </div>
 
@@ -630,6 +644,12 @@
 
       <button onclick="generateAudio()" id="generateBtn">Generate audio</button>
       <button onclick="downloadAudio()" id="downloadBtn" style="display:none; margin-top: 16px;">Download episode</button>
+
+      <div id="descBox" style="display:none; margin-top: 24px;">
+        <label>Episode description</label>
+        <div class="script-display show" id="descText" style="white-space:pre-wrap;"></div>
+        <button class="secondary" id="copyDescBtn" onclick="copyDescription()">Copy</button>
+      </div>
     </div>
   </div>
 </div>
@@ -675,11 +695,60 @@ document.getElementById('sfxFile').addEventListener('change', (e) => {
 
 document.getElementById('sfxVolume').addEventListener('input', (e) => {
   document.getElementById('sfxVolValue').textContent = e.target.value;
+  if (previewNodes) previewNodes.sfxGain.gain.value = dbToGain(parseFloat(e.target.value));
 });
 
 document.getElementById('voiceVolume').addEventListener('input', (e) => {
   document.getElementById('voiceVolValue').textContent = e.target.value;
+  if (previewNodes) previewNodes.voiceGain.gain.value = dbToGain(parseFloat(e.target.value));
 });
+
+// ---- live preview of voice + sfx ----
+let previewCtx = null, previewNodes = null;
+
+async function togglePreview() {
+  if (previewNodes) { stopPreview(); return; }
+  if (!voiceBlob || !sfxFile) { showAlert('Need a voice recording and a sound effect first', 'error'); return; }
+  try {
+    previewCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const [voiceBuf, sfxBuf] = await Promise.all([
+      blobToAudioBuffer(voiceBlob, previewCtx),
+      arrayBufferToAudioBuffer(await sfxFile.arrayBuffer(), previewCtx)
+    ]);
+    const voiceSrc = previewCtx.createBufferSource();
+    voiceSrc.buffer = voiceBuf;
+    const voiceGain = previewCtx.createGain();
+    voiceGain.gain.value = dbToGain(parseFloat(document.getElementById('voiceVolume').value));
+    voiceSrc.connect(voiceGain); voiceGain.connect(previewCtx.destination);
+
+    const sfxSrc = previewCtx.createBufferSource();
+    sfxSrc.buffer = sfxBuf;
+    sfxSrc.loop = true;
+    const sfxGain = previewCtx.createGain();
+    sfxGain.gain.value = dbToGain(parseFloat(document.getElementById('sfxVolume').value));
+    sfxSrc.connect(sfxGain); sfxGain.connect(previewCtx.destination);
+
+    voiceSrc.onended = () => stopPreview();
+    previewNodes = { voiceSrc, sfxSrc, voiceGain, sfxGain };
+    voiceSrc.start(); sfxSrc.start();
+    document.getElementById('previewBtn').textContent = 'Stop preview';
+  } catch (err) {
+    showAlert('Preview error: ' + err.message, 'error');
+    stopPreview();
+  }
+}
+
+function stopPreview() {
+  if (previewNodes) {
+    previewNodes.voiceSrc.onended = null;
+    try { previewNodes.voiceSrc.stop(); } catch (e) {}
+    try { previewNodes.sfxSrc.stop(); } catch (e) {}
+    previewNodes = null;
+  }
+  if (previewCtx) { previewCtx.close(); previewCtx = null; }
+  const b = document.getElementById('previewBtn');
+  if (b) b.textContent = 'Preview mix';
+}
 
 // Matches a date line like "Wed Aug 26" or "Sun Oct 5" (day name + month + day number, no year)
 const DATE_RE_SRC = '(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\w*\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\w*\\s+(\\d{1,2})';
@@ -738,7 +807,8 @@ function parseDocument() {
       number: num,
       title,
       script,
-      sfxUrl
+      sfxUrl,
+      description: descBlock
     });
   }
 
@@ -948,6 +1018,7 @@ async function generateAudio() {
 
     const sfxSource = offlineContext.createBufferSource();
     sfxSource.buffer = sfxBuf;
+    sfxSource.loop = true;
     const sfxGainNode = offlineContext.createGain();
     sfxGainNode.gain.value = sfxGain;
     sfxSource.connect(sfxGainNode);
@@ -985,9 +1056,13 @@ function downloadAudio() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `KLL_Bonus_${selectedEpisode.number}.wav`;
+  a.download = `${String(selectedEpisode.number).padStart(5, '0')}.wav`;
   a.click();
   URL.revokeObjectURL(url);
+
+  document.getElementById('descText').textContent = selectedEpisode.description || '(no description found)';
+  document.getElementById('descBox').style.display = 'block';
+  document.getElementById('copyDescBtn').textContent = 'Copy';
 }
 
 async function arrayBufferToAudioBuffer(arrayBuffer, audioContext) {
@@ -1053,6 +1128,20 @@ function encodeWAV(audioBuffer) {
   return buffer;
 }
 
+async function copyDescription() {
+  const text = document.getElementById('descText').textContent;
+  const btn = document.getElementById('copyDescBtn');
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
+}
+
 function showAlert(message, type) {
   const alert = document.createElement('div');
   alert.className = `alert ${type} show`;
@@ -1062,5 +1151,6 @@ function showAlert(message, type) {
 }
 </script>
 
-</body>
-</html>
+
+
+</body></html>
