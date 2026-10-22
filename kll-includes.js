@@ -48,6 +48,31 @@
 
   window.toggleMenu = toggleMenu;
 
+  function getEshaanAge() {
+    const birthDate = new Date(2013, 6, 11); // July 11, 2013
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  function updateEshaanAge() {
+    const age = getEshaanAge();
+    document.querySelectorAll(".eshaan-age").forEach(function (el) {
+      el.textContent = age;
+    });
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc && metaDesc.content) {
+      metaDesc.content = metaDesc.content.replace(/\b\d+[- ]year[- ]old\b/i, age + "-year-old");
+    }
+  }
+
+  window.getEshaanAge = getEshaanAge;
+  window.updateEshaanAge = updateEshaanAge;
+
   function init() {
     return Promise.all([
       loadPartial("header.html", "header"),
@@ -61,6 +86,7 @@
       // inside header.html/footer.html themselves (a <script> tag inside
       // fetched innerHTML never executes).
       wireHeaderFooterModals();
+      updateEshaanAge();
     });
   }
 

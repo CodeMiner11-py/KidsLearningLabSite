@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="/url_fixing_worker.js"></script>
+  <script src="url_fixing_worker.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kids Learning Lab™ - By a Kid, For Kids</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="wp-content/uploads/2025/02/podcast-logo-app-rounded.png">
-    <meta name="description" content="A kids and family podcast made by a 12 year old kid! We explore science, history, technology, and more!">
+    <meta name="description" content="A kids and family podcast made by a 13 year old kid! We explore science, history, technology, and more!">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -68,20 +68,20 @@
   <div id="pear-ai-overlay">
     <div class="pear-ai-modal">
       <button class="pear-ai-close" onclick="document.getElementById('pear-ai-overlay').classList.remove('active')">✕</button>
-      <img src="https://kidslearninglab.com/pear%201.png" class="pear-ai-logo" alt="Pear AI logo">
+      <img src="pear%201.png" class="pear-ai-logo" alt="Pear AI logo">
       <div class="pear-ai-title">Cook Faster & Easier</div>
       <p class="pear-ai-desc">Pear AI is a recipe creator created by the host of Kids Learning Lab, Eshaan (me). It can create a recipe in seconds from a description or ingredients, and has useful cooking and organizing tools. Download Pear AI today for free on the iOS App Store.</p>
-      <a href="https://kidslearninglab.com/pear-ai-ios/" class="pear-ai-btn" target="_blank" rel="noopener">Download For Free</a>
+      <a href="pear-ai-ios.html" class="pear-ai-btn">Download For Free</a>
     </div>
   </div>
 
     <div id="top-banner" style="background-color: #add8e6;">
       <div class="desktop-banner">
         Click to learn about
-        <a href="https://kidslearninglab.com/episodes?ep=how-waymo-and-other-self-driving-cars-work" style="text-decoration: underline;">how Waymo & self-driving cars work!</a>
+        <a href="episodes.html?ep=how-waymo-and-other-self-driving-cars-work" style="text-decoration: underline;">how Waymo & self-driving cars work!</a>
       </div>
       <div class="mobile-banner">
-        <a href="https://kidslearninglab.com/episodes?ep=how-waymo-and-other-self-driving-cars-work" style="text-decoration: underline;">
+        <a href="episodes.html?ep=how-waymo-and-other-self-driving-cars-work" style="text-decoration: underline;">
           How Waymo self-driving cars work!
         </a>
       </div>
@@ -101,9 +101,9 @@
         <section class="hero" id="home">
             <div class="container">
                 <div class="hero-content">
-                    <img src="https://kidslearninglab.com/logo.png" width="100">
+                    <img src="logo.png" width="100" alt="Kids Learning Lab Logo">
                     <h1>A Kids & Family Podcast</h1>
-                    <p>A podcast for kids, by a kid! Join 13-year-old Eshaan every other day for <b>FREE</b> educational episodes that make learning fun!</p>
+                    <p>A podcast for kids, by a kid! Join <span class="eshaan-age">13</span>-year-old Eshaan every other day for <b>FREE</b> educational episodes that make learning fun!</p>
                     <a href="episodes.html" class="cta-button">Listen Now!</a>
 
                     <!-- ── Episode Carousel ── -->
@@ -294,11 +294,11 @@
             <div class="container">
                 <div class="creator-content">
                     <div class="creator-image creator-avatar">
-                        <img src="https://kidslearninglab.com/wp-content/uploads/2024/12/eglu.jpeg">
+                        <img src="wp-content/uploads/2024/12/eglu.jpeg" alt="Eshaan Buddhisagar" width="300" height="300">
                     </div>
                     <div class="creator-text">
                         <h2>Hi, I'm <span class="highlight">Eshaan!</span></h2>
-                        <p>I'm a <span class="highlight">13-year-old creator</span> who loves making learning fun! I write all the scripts, record every episode, and edit everything myself.</p>
+                        <p>I'm a <span class="highlight"><span class="eshaan-age">13</span>-year-old creator</span> who loves making learning fun! I write all the scripts, record every episode, and edit everything myself.</p>
                         <p>From stocks and crypto to the history of the universe, I explore topics that are both educational and entertaining. Every episode is made with kids in mind!</p>
                         <p>You can also check out <span class="highlight">Python Learning Lab</span>, my book to help kids learn programming. You can <a href="python.html">read it</a> today!</p>
                     </div>
@@ -432,14 +432,40 @@
 
 <script src="kll-includes.js"></script>
 <script>
+  function getEshaanAge() {
+    const birthDate = new Date(2013, 6, 11); // July 11, 2013
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  function updateEshaanAge() {
+    const age = getEshaanAge();
+    document.querySelectorAll('.eshaan-age').forEach(function (el) {
+      el.textContent = age;
+    });
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc && metaDesc.content) {
+      metaDesc.content = metaDesc.content.replace(/\b\d+[- ]year[- ]old\b/i, age + "-year-old");
+    }
+  }
+  updateEshaanAge();
+  window.getEshaanAge = getEshaanAge;
+  window.updateEshaanAge = updateEshaanAge;
+
   (function () {
     const KEY = 'pearAiVisitCount';
     let count = parseInt(localStorage.getItem(KEY) || '0', 10) + 1;
     localStorage.setItem(KEY, count);
   
-    // Show on visit 1, 6, 11, 16, ...
-    if ((count - 1) % 5 === 0) {
-      document.getElementById('pear-ai-overlay').classList.add('active');
+    // Show on 5th visit onwards (every 5 visits starting from 5: 5, 10, 15, ...)
+    if (count >= 5 && count % 5 === 0) {
+      const overlay = document.getElementById('pear-ai-overlay');
+      if (overlay) overlay.classList.add('active');
     }
   })();
   </script>
@@ -481,14 +507,11 @@
 <!-- ============================================================
   Kids Learning Lab — Custom "Smart App Banner"
   Works on ALL devices/browsers (Apple's real one is iOS Safari only).
-  Paste this whole block just before <!-- ============================================================
-  Kids Learning Lab — Custom "Smart App Banner"
-  Works on ALL devices/browsers (Apple's real one is iOS Safari only).
-  Paste this whole block just before </body> -->
+============================================================ -->
 
 <div id="kll-app-banner" class="kll-app-banner" role="banner" aria-label="Get the Kids Learning Lab app">
   <button id="kll-app-banner-close" class="kll-app-banner-close" aria-label="Close">&times;</button>
-  <img class="kll-app-banner-icon" src="https://kidslearninglab.com/logo.png" alt="Kids Learning Lab icon">
+  <img class="kll-app-banner-icon" src="logo.png" alt="Kids Learning Lab icon">
   <div class="kll-app-banner-text">
     <div class="kll-app-banner-title">Kids Learning Lab</div>
     <div class="kll-app-banner-sub">Learning, trivia, games, all in one</div>

@@ -382,13 +382,13 @@
   <h2 class="reveal">A kid who builds <em>things</em>.</h2>
   <div class="about-grid">
     <div class="about-text" id="aboutText">
-      <p class="reveal-line">Eshaan Buddhisagar is a 12-year-old creator from California, USA who makes technology and science easy to understand for other kids.</p>
+      <p class="reveal-line">Eshaan Buddhisagar is a <span class="eshaan-age">13</span>-year-old creator from California, USA who makes technology and science easy to understand for other kids.</p>
       <p class="reveal-line">He began the Kids Learning Lab podcast at nine and has since released more than 100 episodes on topics like the water cycle, Disney secrets, and cheese.</p>
       <p class="reveal-line">His passion for technology and space pushes him past content into apps and books. Every episode is kid-made, from writing and editing to recording and publishing.</p>
       <p class="reveal-line">He is the author of <a href="#python"><em>Python Learning Lab</em></a>, a programming book for kids.</p>
     </div>
     <div class="photo reveal d1">
-      <img src="https://kidslearninglab.com/wp-content/uploads/2024/12/eglu.jpeg" alt="Eshaan Buddhisagar">
+      <img src="wp-content/uploads/2024/12/eglu.jpeg" alt="Eshaan Buddhisagar">
     </div>
   </div>
 
@@ -690,6 +690,16 @@
   }
   addEventListener('scroll', updateTimeline, {passive:true});
   updateTimeline();
+
+  /* ---------- dynamic age calculation ---------- */
+  (function updateEshaanAge() {
+    const birthDate = new Date(2013, 6, 11);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    document.querySelectorAll('.eshaan-age').forEach(el => { el.textContent = age; });
+  })();
 
   /* ---------- smooth anchor scroll ---------- */
   document.querySelectorAll('a[href^="#"]').forEach(a => {
